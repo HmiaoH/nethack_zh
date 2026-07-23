@@ -1909,47 +1909,37 @@ getobj(
         compactify(bp);
     *ap = '\0';
 
+#ifdef ZHLANG
+    {
+        const char *verbs_en[] = { "drink","zap","throw","rub","wield",
+            "wear","read","apply","dip","eat","fire","put in","drop",
+            "take off","remove","quiver","ready","shoot","put on",
+            "sacrifice","offer","invoke","name","call","tip","stash",
+            "open","close","loot","pay","buy","spill","force",
+            "engrave","write","adjust","swap","pick up",NULL };
+        const char *verbs_zh[] = { "喝","施放","投掷","擦拭","挥舞",
+            "穿上","阅读","使用","浸泡","吃","发射","放入","丢弃",
+            "脱下","取下","装箭","装备","射击","戴上",
+            "献祭","供奉","激发","命名","称呼","倒出","存放",
+            "打开","关闭","搜刮","支付","购买","泼洒","撬开",
+            "雕刻","书写","调整","交换","捡起",NULL };
+        int vi;
+        for (vi = 0; verbs_en[vi]; vi++)
+            if (!strcmp(word, verbs_en[vi])) { word = verbs_zh[vi]; break; }
+    }
+#endif
+
     if (suggested == 0 && !forceprompt && !allownone) {
+#ifdef ZHLANG
+        You("没有任何东西可以%s。", word);
+#else
         You("don't have anything %sto %s.", inaccess ? "else " : "", word);
+#endif
         return (struct obj *) 0;
     }
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-#ifdef ZHLANG
-        {
-            static const char *verb_en[] = {
-                "wield", "wear", "put on", "take off", "remove",
-                "read", "drink", "quaff", "throw", "shoot",
-                "zap", "apply", "rub", "dip", "fire",
-                "quiver", "ready", "eat", "drop", "pick up",
-                "sacrifice", "offer", "invoke", "name", "call",
-                "open", "close", "stash", "put in", "tip",
-                "spill", "force", "loot", "buy", "pay for",
-                "engrave", "write", "wipe", "polish",
-                "adjust", "swap", "exchange",
-                NULL
-            };
-            static const char *verb_zh[] = {
-                "挥舞", "穿上", "戴上", "脱下", "取下",
-                "阅读", "喝", "喝下", "投掷", "射击",
-                "施放", "使用", "擦拭", "浸泡", "发射",
-                "装箭", "装备", "吃", "丢弃", "捡起",
-                "献祭", "供奉", "激发", "命名", "称呼",
-                "打开", "关闭", "存放", "放入", "倒出",
-                "泼洒", "撬开", "搜刮", "购买", "支付",
-                "雕刻", "书写", "擦拭", "擦拭",
-                "调整", "交换", "交换",
-                NULL
-            };
-            int v;
-            for (v = 0; verb_en[v]; v++)
-                if (!strcmp(word, verb_en[v])) {
-                    word = verb_zh[v];
-                    break;
-                }
-        }
-#endif
         Sprintf(qbuf,
 #ifdef ZHLANG
                 "你想%s什么？",
