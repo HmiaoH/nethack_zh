@@ -3506,7 +3506,7 @@ find_objtype(lua_State *L, const char *s, char oclass)
 
         /* find by object name */
         for (i = 0; i < NUM_OBJECTS; i++) {
-            objname = OBJ_NAME(objects[i]);
+            objname = obj_descr[objects[i].oc_name_idx].oc_name;
             if ((!class || class == objects[i].oc_class)
                 && objname && !strcmpi(s, objname))
                 return i;
@@ -3526,7 +3526,7 @@ find_objtype(lua_State *L, const char *s, char oclass)
 
         /* find by object description */
         for (i = 0; i < NUM_OBJECTS; i++) {
-            objname = OBJ_DESCR(objects[i]);
+            objname = obj_descr[objects[i].oc_descr_idx].oc_descr;
             if (objname && !strcmpi(s, objname))
                 return i;
         }
