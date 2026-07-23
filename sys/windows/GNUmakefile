@@ -337,7 +337,7 @@ endif
 #
 # Handle user settings
 #
-CFLAGS = -mms-bitfields -I../include -I../sys/windows
+CFLAGS = -DZHLANG -mms-bitfields -I../include -I../sys/windows
 LDFLAGS =
 ifeq "$(DEBUGINFO)" "Y"
 CFLAGS += -g -D_DEBUG

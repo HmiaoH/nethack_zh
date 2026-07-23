@@ -1276,11 +1276,11 @@ lcommon= /NOLOGO /INCREMENTAL:NO
 
 !IF "$(DEBUGINFO)" == "Y"
 ldebug = /DEBUG
-ctmpflags1=$(ccommon) $(cdebug)
+ctmpflags1=$(ccommon) $(cdebug) -DZHLANG
 lflags1=$(lcommon) $(ldebug)
 !ELSE
 ldebug= /DEBUG
-ctmpflags1=$(ccommon) $(crelease)
+ctmpflags1=$(ccommon) $(crelease) -DZHLANG
 lflags1=$(lcommon) $(ldebug)
 !ENDIF
 

@@ -53,8 +53,18 @@ make fetch-Lua && make all && make install
 ```bash
 cd sys/unix && sh setup.sh hints/linux.500 && cd ../..
 make fetch-Lua && make all && make install
-nethack
 ```
+
+### Windows
+
+使用 **MSYS2/MinGW64**：
+
+```bash
+cd sys/windows
+mingw32-make -f GNUmakefile install
+```
+
+或使用 **Visual Studio 2022**：打开 `sys/windows/vs/NetHack.sln`，选择 `Release` 配置直接编译。项目默认已启用 `ZHLANG` 预处理宏。
 
 ### 清理与重编译
 
