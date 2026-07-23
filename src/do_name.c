@@ -1405,9 +1405,17 @@ Mgender(struct monst *mtmp)
 const char *
 pmname(struct permonst *pm, int mgender)
 {
+#ifdef ZHLANG
+    int idx = (int)(pm - mons);
+    if (mgender < MALE || mgender >= NUM_MGENDERS
+        || !mons_zh[idx].pmnames[mgender])
+        mgender = NEUTRAL;
+    return mons_zh[idx].pmnames[mgender];
+#else
     if (mgender < MALE || mgender >= NUM_MGENDERS || !pm->pmnames[mgender])
         mgender = NEUTRAL;
     return pm->pmnames[mgender];
+#endif
 }
 #endif /* PMNAME_MACROS */
 
