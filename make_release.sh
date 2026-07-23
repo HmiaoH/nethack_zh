@@ -19,6 +19,25 @@ cat > "$PKG/nethack.sh" << 'SCRIPT'
 DIR="$(cd "$(dirname "$0")" && pwd)"
 export HACKDIR="$DIR"
 cd "$HACKDIR"
+
+# 首次运行：如果硬编码的 sysconf 路径不存在，创建软链接
+SYSCONF_PATH=$(strings "$HACKDIR/nethack" | grep "/sysconf$" | head -1)
+if [ -n "$SYSCONF_PATH" ] && [ ! -f "$SYSCONF_PATH" ]; then
+    SYSCONF_DIR=$(dirname "$SYSCONF_PATH")
+    if [ ! -d "$SYSCONF_DIR" ]; then
+        echo "首次运行，创建配置目录..." 
+        sudo mkdir -p "$SYSCONF_DIR" 2>/dev/null && \
+        sudo ln -sf "$HACKDIR" "$SYSCONF_DIR" 2>/dev/null && \
+        echo "完成！" || {
+            echo "需要管理员权限来配置游戏环境"
+            echo "请输入密码："
+            sudo mkdir -p "$SYSCONF_DIR" && \
+            sudo ln -sf "$HACKDIR" "$SYSCONF_DIR" && \
+            echo "配置完成！"
+        }
+    fi
+fi
+
 exec "$HACKDIR/nethack" "$@"
 SCRIPT
 chmod +x "$PKG/nethack.sh"
