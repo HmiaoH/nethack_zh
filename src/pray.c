@@ -725,12 +725,26 @@ angrygods(aligntyp resp_god)
     switch (rn2(maxanger)) {
     case 0:
     case 1:
+#ifdef ZHLANG
+        You_feel("你感到%s%s。", align_gname(resp_god),
+                 Hallucination ? "不高兴" : "不悦");
+#else
         You_feel("that %s is %s.", align_gname(resp_god),
                  Hallucination ? "bummed" : "displeased");
+#endif
         break;
     case 2:
     case 3:
         godvoice(resp_god, (char *) 0);
+#ifdef ZHLANG
+        pline("\"汝%s，%s。\"",
+              (ugod_is_angry() && resp_god == u.ualign.type)
+                  ? "已偏离正道"
+                  : "傲慢无礼",
+              gy.youmonst.data->mlet == S_HUMAN ? "凡人" : "生灵");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
+        verbalize("汝必须重新学习教训！");
+#else
         pline("\"Thou %s, %s.\"",
               (ugod_is_angry() && resp_god == u.ualign.type)
                   ? "hast strayed from the path"
@@ -738,6 +752,7 @@ angrygods(aligntyp resp_god)
               gy.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou must relearn thy lessons!");
+#endif
         (void) adjattrib(A_WIS, -1, FALSE);
         losexp((char *) 0);
         break;
@@ -1074,12 +1089,21 @@ pleased(aligntyp g_align)
     int trouble = in_trouble(); /* what's your worst difficulty? */
     int pat_on_head = 0, kick_on_butt;
 
+#ifdef ZHLANG
+    You_feel("你感到%s%s。", align_gname(g_align),
+             (u.ualign.record >= DEVOUT)
+                 ? Hallucination ? "非常满意" : "十分满意"
+                 : (u.ualign.record >= STRIDENT)
+                       ? Hallucination ? "笑嘻嘻的" : "很满意"
+                       : Hallucination ? "吃饱了" : "还算满意");
+#else
     You_feel("that %s is %s.", align_gname(g_align),
              (u.ualign.record >= DEVOUT)
                  ? Hallucination ? "pleased as punch" : "well-pleased"
                  : (u.ualign.record >= STRIDENT)
                        ? Hallucination ? "ticklish" : "pleased"
                        : Hallucination ? "full" : "satisfied");
+#endif
 
     /* not your deity */
     if (on_altar() && gp.p_aligntyp != u.ualign.type) {
@@ -1428,7 +1452,11 @@ godvoice(aligntyp g_align, const char *words)
 staticfn void
 gods_angry(aligntyp g_align)
 {
+#ifdef ZHLANG
+    godvoice(g_align, "你惹怒了我。");
+#else
     godvoice(g_align, "Thou hast angered me.");
+#endif
 }
 
 /* The g_align god is upset with you. */
@@ -2053,7 +2081,11 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
             if (Hallucination)
                 pline_The("gods seem tall.");
             else
+#ifdef ZHLANG
+                You("感到力不从心。");
+#else
                 You("have a feeling of inadequacy.");
+#endif
         }
     } else if (ugod_is_angry()) {
         if (value > MAXVALUE)
@@ -2137,7 +2169,11 @@ can_pray(boolean praying) /* false means no messages should be given */
     }
 
     if (praying)
+#ifdef ZHLANG
+        You("你开始向%s祈祷。", align_gname(gp.p_aligntyp));
+#else
         You("begin praying to %s.", align_gname(gp.p_aligntyp));
+#endif
 
     if (u.ualign.type && u.ualign.type == -gp.p_aligntyp)
         alignment = -u.ualign.record; /* Opposite alignment altar */

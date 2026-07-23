@@ -627,10 +627,19 @@ disclose(int how, boolean taken)
 
     if (gi.invent && !done_stopprint) {
         if (taken)
+#ifdef ZHLANG
+            Sprintf(qbuf, "需要查看%s前携带的物品吗？",
+                    (how == QUIT) ? "退出" : "死亡");
+#else
             Sprintf(qbuf, "Do you want to see what you had when you %s?",
                     (how == QUIT) ? "quit" : "died");
+#endif
         else
+#ifdef ZHLANG
+            Strcpy(qbuf, "需要鉴定你的物品吗？");
+#else
             Strcpy(qbuf, "Do you want your possessions identified?");
+#endif
 
         ask = should_query_disclose_option('i', &defquery);
         c = ask ? yn_function(qbuf, ynqchars, defquery, TRUE) : defquery;

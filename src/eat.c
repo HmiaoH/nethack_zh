@@ -250,7 +250,11 @@ choke(struct obj *food)
             return;
     } else if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL) {
         adjalign(-1); /* gluttony is unchivalrous */
-        You_feel("like a glutton!");
+#ifdef ZHLANG
+            You_feel("像只饕餮！");
+#else
+            You_feel("like a glutton!");
+#endif
     }
 
     exercise(A_CON, FALSE);
@@ -258,10 +262,18 @@ choke(struct obj *food)
     if (Breathless || Hunger || (!Strangled && !rn2(20))) {
         /* choking by eating AoS doesn't involve stuffing yourself */
         if (food && food->otyp == AMULET_OF_STRANGULATION) {
+#ifdef ZHLANG
+            You("噎住了，但恢复了镇静。");
+#else
             You("choke, but recover your composure.");
+#endif
             return;
         }
+#ifdef ZHLANG
+        You("吃得太撑，然后大吐特吐。");
+#else
         You("stuff yourself and then vomit voluminously.");
+#endif
         morehungry(Hunger ? (u.uhunger - 60) : 1000); /* just got very sick! */
         vomit();
     } else {
@@ -271,7 +283,11 @@ choke(struct obj *food)
          * high score list & tombstone.  So plan accordingly.
          */
         if (food) {
+#ifdef ZHLANG
+            You("被%s噎住了。", foodword(food));
+#else
             You("choke over your %s.", foodword(food));
+#endif
             if (food->oclass == COIN_CLASS) {
                 Strcpy(svk.killer.name, "very rich meal");
             } else {
@@ -279,10 +295,18 @@ choke(struct obj *food)
                 Strcpy(svk.killer.name, killer_xname(food));
             }
         } else {
+#ifdef ZHLANG
+            You("被它噎住了。");
+#else
             You("choke over it.");
+#endif
             Strcpy(svk.killer.name, "quick snack");
         }
+#ifdef ZHLANG
+        You("死了……");
+#else
         You("die...");
+#endif
         done(CHOKING);
     }
 }
@@ -553,10 +577,15 @@ done_eating(boolean message)
             pline1(gn.nomovemsg);
         gn.nomovemsg = 0;
     } else if (message) {
+#ifdef ZHLANG
+        You("吃完了%s。",
+            food_xname(piece, TRUE));
+#else
         You("finish %s %s.",
             (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]) ? "consuming"
             : "eating",
             food_xname(piece, TRUE));
+#endif
     }
 
     if (piece->otyp == CORPSE || piece->globby)
@@ -622,7 +651,11 @@ eat_brains(
                   (mdef == &gy.youmonst) ? "Your" : s_suffix(Monnam(mdef)));
         return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
+#ifdef ZHLANG
+        You("吃掉了%s的脑子！", s_suffix(mon_nam(mdef)));
+#else
         You("eat %s brain!", s_suffix(mon_nam(mdef)));
+#endif
     } else if (mdef == &gy.youmonst) {
         Your("brain is eaten!");
     } else { /* monster against monster */
@@ -716,7 +749,11 @@ eat_brains(
             /* can only get here when in wizard or explore mode and user has
                explicitly chosen not to die; arbitrarily boost intelligence */
             ABASE(A_INT) = ATTRMIN(A_INT) + 2;
+#ifdef ZHLANG
+            You_feel("像稻草人一样。");
+#else
             You_feel("like a scarecrow.");
+#endif
         }
         give_nutrit = TRUE; /* in case a conflicted pet is doing this */
         exercise(A_WIS, FALSE);
@@ -777,8 +814,13 @@ maybe_cannibal(int pm, boolean allowmsg)
             || (ismnum(u.ulycn) && were_beastie(pm) == u.ulycn))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
+#ifdef ZHLANG
+                You("内心深处有一种不祥的预感。");
+            You("食人族！你会后悔的！");
+#else
                 You("have a bad feeling deep inside.");
             You("cannibal!  You will regret this!");
+#endif
         }
         HAggravate_monster |= FROMOUTSIDE;
         change_luck(-rn1(4, 2)); /* -5..-2 */
@@ -802,7 +844,11 @@ cprefx(int pm)
             Sprintf(svk.killer.name, "tasting %s meat",
                     mons[pm].pmnames[NEUTRAL]);
             svk.killer.format = KILLED_BY;
+#ifdef ZHLANG
+            You("变成了石头。");
+#else
             You("turn to stone.");
+#endif
             done(STONING);
             if (svc.context.victual.piece)
                 svc.context.victual.eating = 0;
@@ -819,7 +865,11 @@ cprefx(int pm)
     case PM_LARGE_CAT:
         /* cannibals are allowed to eat domestic animals without penalty */
         if (!CANNIBAL_ALLOWED()) {
+#ifdef ZHLANG
+            You_feel("你感到吃%s是个坏主意。",
+#else
             You_feel("that eating the %s was a bad idea.",
+#endif
                      mons[pm].pmnames[NEUTRAL]);
             HAggravate_monster |= FROMOUTSIDE;
         }
@@ -850,7 +900,11 @@ cprefx(int pm)
     }
     case PM_GREEN_SLIME:
         if (!Slimed && !Unchanging && !slimeproof(gy.youmonst.data)) {
+#ifdef ZHLANG
+            You("感到不太舒服。");
+#else
             You("don't feel very well.");
+#endif
             make_slimed(10L, (char *) 0);
             delayed_killer(SLIMED, KILLED_BY_AN, "");
         }
@@ -868,11 +922,19 @@ fix_petrification(void)
 {
     char buf[BUFSZ];
 
+#ifdef ZHLANG
+    if (Hallucination)
+        Sprintf(buf, "真可惜——你刚刚毁了一件未来的%s艺术品！",
+                ACURR(A_CHA) > 15 ? "精美" : "");
+    else
+        Strcpy(buf, "你感到身体柔韧！");
+#else
     if (Hallucination)
         Sprintf(buf, "What a pity--you just ruined a future piece of %sart!",
                 ACURR(A_CHA) > 15 ? "fine " : "");
     else
         Strcpy(buf, "You feel limber!");
+#endif
     make_stoned(0L, buf, 0, (char *) 0);
 }
 
@@ -1551,7 +1613,11 @@ consume_tin(const char *mesg)
                       rn2(2) ? "air elemental souffle"
                              : "dehydrated water");
             else
-                pline("It turns out to be empty.");
+#ifdef ZHLANG
+        pline("结果是空的。");
+#else
+        pline("It turns out to be empty.");
+#endif
             observe_object(tin);
             tin->known = 1;
             tin = costly_tin(COST_OPEN);
@@ -1584,7 +1650,11 @@ consume_tin(const char *mesg)
             pline("It smells like %s.", what);
             if (y_n("Eat it?") == 'n') {
                 if (flags.verbose)
+#ifdef ZHLANG
+                You("扔掉了打开的罐头。");
+#else
                     You("discard the open tin.");
+#endif
                 if (!Hallucination) {
                     observe_object(tin);
                     tin->known = 1;
@@ -1598,7 +1668,11 @@ consume_tin(const char *mesg)
         /* in case stop_occupation() was called on previous meal */
         svc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
+#ifdef ZHLANG
+        You("吃掉了%s%s。", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
+#else
         You("consume %s %s.", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
+#endif
 
         eating_conducts(&mons[mnum]);
 
@@ -1708,13 +1782,21 @@ opentin(void)
             || !can_reach_floor(TRUE)))
         return 0; /* %% probably we should use tinoid */
     if (svc.context.tin.usedtime++ >= 50) {
+#ifdef ZHLANG
+        You("放弃打开罐头了。");
+#else
         You("give up your attempt to open the tin.");
+#endif
         return 0;
     }
     if (svc.context.tin.usedtime < svc.context.tin.reqtime)
         return 1; /* still busy */
 
-    consume_tin("You succeed in opening the tin.");
+#ifdef ZHLANG
+        You("成功打开了罐头。");
+#else
+        consume_tin("You succeed in opening the tin.");
+#endif
     return 0;
 }
 
@@ -1726,7 +1808,11 @@ start_tin(struct obj *otmp)
     int tmp;
 
     if (metallivorous(gy.youmonst.data)) {
+#ifdef ZHLANG
+        mesg = "你一口咬穿了金属罐头……";
+#else
         mesg = "You bite right into the metal tin...";
+#endif
         tmp = 0;
     } else if (cantwield(gy.youmonst.data)) { /* nohands || verysmall */
         You("cannot handle the tin properly to open it.");
@@ -1922,12 +2008,20 @@ eatcorpse(struct obj *otmp)
         return 2;
     } else if (acidic(&mons[mnum]) && !Acid_resistance) {
         tp++;
+#ifdef ZHLANG
+        You("有严重的胃酸问题。");   /* not body_part() */
+#else
         You("have a very bad case of stomach acid.");   /* not body_part() */
+#endif
         losehp(rnd(15), !glob ? "acidic corpse" : "acidic glob",
                KILLED_BY_AN); /* acid damage */
     } else if (poisonous(&mons[mnum]) && rn2(5)) {
         tp++;
+#ifdef ZHLANG
+        pline("嗯——那肯定有毒！");
+#else
         pline("Ecch - that must have been poisonous!");
+#endif
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15),
                           !glob ? "poisonous corpse" : "poisonous glob",
@@ -1970,7 +2064,11 @@ eatcorpse(struct obj *otmp)
             consume_oeaten(otmp, 2); /* oeaten >>= 2 */
     } else if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
                && (Stone_resistance || Hallucination)) {
+#ifdef ZHLANG
+        pline("尝起来像鸡肉！");
+#else
         pline("This tastes just like chicken!");
+#endif
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
     } else if (tp) {
@@ -1999,19 +2097,31 @@ eatcorpse(struct obj *otmp)
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
-        pline("%s%s %s %s%c",
-              type_is_pname(&mons[mnum])
-                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
-              pmxnam,
-              use_is ? "is" : "tastes",
-                  /* tiger reference is to TV ads for "Frosted Flakes",
-                     breakfast cereal targeted at kids by "Tony the tiger" */
-              Hallucination
-                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
-                          : palatable ? "copacetic" : "grody")
-              : (yummy ? "delicious" : palatable ?
-                 &palat_msg[1] : "terrible"),
-              (yummy || !palatable) ? '!' : '.');
+#ifdef ZHLANG
+            pline("%s%s%s%s%s",
+                  type_is_pname(&mons[mnum])
+                     ? "" : the_unique_pm(&mons[mnum]) ? "那只" : "这只",
+                  pmxnam,
+                  use_is ? "是" : "尝起来",
+                  Hallucination
+                     ? (yummy ? ((u.umonnum == PM_TIGER) ? "棒极了" : "超棒")
+                              : palatable ? "还行" : "怪怪的")
+                  : (yummy ? "很美味" : palatable ?
+                     &palat_msg[1] : "很难吃"),
+                  (yummy || !palatable) ? "!" : ".");
+#else
+            pline("%s%s %s %s%c",
+                  type_is_pname(&mons[mnum])
+                     ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
+                  pmxnam,
+                  use_is ? "is" : "tastes",
+                  Hallucination
+                     ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
+                              : palatable ? "copacetic" : "grody")
+                  : (yummy ? "delicious" : palatable ?
+                     &palat_msg[1] : "terrible"),
+                  (yummy || !palatable) ? '!' : '.');
+#endif
     }
 
     return retcode;
@@ -2202,6 +2312,17 @@ fprefx(struct obj *otmp)
 #endif
         } else {
  give_feedback:
+#ifdef ZHLANG
+            pline("这个%s%s",
+                  singular(otmp, xname),
+                  otmp->cursed
+                     ? (Hallucination ? "怪怪的！" : "难吃极了！")
+                     : (otmp->otyp == CRAM_RATION
+                        || otmp->otyp == K_RATION
+                        || otmp->otyp == C_RATION)
+                        ? "味同嚼蜡。"
+                        : Hallucination ? "超棒！" : "真美味！");
+#else
             pline("This %s is %s", singular(otmp, xname),
                   otmp->cursed
                      ? (Hallucination ? "grody!" : "terrible!")
@@ -2210,6 +2331,7 @@ fprefx(struct obj *otmp)
                         || otmp->otyp == C_RATION)
                         ? "bland."
                         : Hallucination ? "gnarly!" : "delicious!");
+#endif
         }
         break; /* default */
     } /* switch */
@@ -2257,8 +2379,13 @@ bounded_increase(int old, int inc, int typ)
 staticfn void
 accessory_has_effect(struct obj *otmp)
 {
+#ifdef ZHLANG
+    pline("魔法随着你消化%s而在体内扩散。",
+          (otmp->oclass == RING_CLASS) ? "戒指" : "护身符");
+#else
     pline("Magic spreads through your body as you digest the %s.",
           (otmp->oclass == RING_CLASS) ? "ring" : "amulet");
+#endif
 }
 
 staticfn void
@@ -2458,13 +2585,22 @@ eatspecial(void)
     /* KMH -- idea by "Tommy the Terrorist" */
     if (otmp->otyp == TRIDENT && !otmp->cursed) {
         /* sugarless chewing gum which used to be heavily advertised on TV */
+#ifdef ZHLANG
+        pline(Hallucination ? "五位牙医里有四位表示认可。"
+                            : "纯粹的咀嚼享受！");
+#else
         pline(Hallucination ? "Four out of five dentists agree."
                             : "That was pure chewing satisfaction!");
+#endif
         exercise(A_WIS, TRUE);
     }
     if (otmp->otyp == FLINT && !otmp->cursed) {
         /* chewable vitamin for kids based on "The Flintstones" TV cartoon */
+#ifdef ZHLANG
+        pline("呀吧哒吧好吃！");
+#else
         pline("Yabba-dabba delicious!");
+#endif
         exercise(A_CON, TRUE);
     }
 
@@ -2587,7 +2723,11 @@ fpostfx(struct obj *otmp)
             if (Race_if(PM_DWARF) && Hallucination) {
                 verbalize("Heigh-ho, ho-hum, I think I'll skip work today.");
             } else if (Deaf || !flags.acoustics) {
+#ifdef ZHLANG
+                You("睡着了。");
+#else
                 You("fall asleep.");
+#endif
             } else {
                 Soundeffect(se_sinister_laughter, 100);
                 You_hear("sinister laughter as you fall asleep...");
@@ -2793,12 +2933,26 @@ doeat_nonfood(struct obj *otmp)
         nodelicious = TRUE;
 
     if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
+#ifdef ZHLANG
+        pline("嗯——那肯定有毒！");
+#else
         pline("Ecch - that must have been poisonous!");
+#endif
         if (!Poison_resistance) {
             poison_strdmg(rnd(4), rnd(15), xname(otmp), KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
     } else if (!nodelicious) {
+#ifdef ZHLANG
+        pline("这%s%s真美味！",
+              (obj_is_pname(otmp)
+               && otmp->oartifact < ART_ORB_OF_DETECTION)
+              ? ""
+              : "个",
+              (otmp->oclass == COIN_CLASS)
+              ? foodword(otmp)
+              : singular(otmp, xname));
+#else
         pline("%s%s is delicious!",
               (obj_is_pname(otmp)
                && otmp->oartifact < ART_ORB_OF_DETECTION)
@@ -2807,6 +2961,7 @@ doeat_nonfood(struct obj *otmp)
               (otmp->oclass == COIN_CLASS)
               ? foodword(otmp)
               : singular(otmp, xname));
+#endif
     }
     eatspecial();
     return ECMD_TIME;
@@ -2852,7 +3007,11 @@ doeat(void)
         if (still_chewing(u.ux, u.uy) && levl[u.ux][u.uy].typ == IRONBARS) {
             /* this is verbose, but player will see the hero rather than the
                bars so wouldn't know that more turns of eating are required */
+#ifdef ZHLANG
+            You("停下来吞咽。");
+#else
             You("pause to swallow.");
+#endif
         }
         return ECMD_TIME;
     }
@@ -2862,7 +3021,11 @@ doeat(void)
      * metallic meal, etc....
      */
     if (!is_edible(otmp)) {
+#ifdef ZHLANG
+        You("不能吃那个！");
+#else
         You("cannot eat that!");
+#endif
         return ECMD_OK;
     } else if ((otmp->owornmask & (W_ARMOR | W_TOOL | W_AMUL | W_SADDLE))
                != 0) {
@@ -2921,8 +3084,10 @@ doeat(void)
 
 
     if (otmp == svc.context.victual.piece) {
+#ifndef ZHLANG
         boolean one_bite_left = (svc.context.victual.usedtime + 1
                                  >= svc.context.victual.reqtime);
+#endif
 
         /* If they weren't able to choke, they don't suddenly become able to
          * choke just because they were interrupted.  On the other hand, if
@@ -2943,8 +3108,12 @@ doeat(void)
            "you finish eating" message when done; use different wording
            for resuming with one bite remaining instead of trying to
            determine whether or not "you finish" is going to be given */
+#ifdef ZHLANG
+        You("继续吃你的食物。");
+#else
         You("%s your meal.",
             !one_bite_left ? "resume" : "consume the last bite of");
+#endif
         if (otmp)
             start_eating(otmp, FALSE);
         return ECMD_TIME;
@@ -3040,9 +3209,14 @@ doeat(void)
                 return ECMD_TIME;
             }
         } else {
+#ifdef ZHLANG
+            You("开始吃%s。",
+                doname(otmp));
+#else
             You("%s %s.",
                 (svc.context.victual.reqtime == 1) ? "eat" : "begin eating",
                 doname(otmp));
+#endif
         }
     }
 
@@ -3101,7 +3275,11 @@ use_tin_opener(struct obj *obj)
     int res = ECMD_OK;
 
     if (!carrying(TIN)) {
+#ifdef ZHLANG
+        You("没有罐头可以打开。");
+#else
         You("have no tin to open.");
+#endif
         return ECMD_OK;
     }
 

@@ -200,38 +200,90 @@ do_statusline2(void)
      * unusual for more than one of them to apply at a time.]
      */
     if (Stoned)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 石化");
+#else
         Strcpy(nb = eos(nb), " Stone");
+#endif
     if (Slimed)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 粘液");
+#else
         Strcpy(nb = eos(nb), " Slime");
+#endif
     if (Strangled)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 窒息");
+#else
         Strcpy(nb = eos(nb), " Strngl");
+#endif
     if (Sick) {
         if (u.usick_type & SICK_VOMITABLE)
+#ifdef ZHLANG
+            Strcpy(nb = eos(nb), " 食物中毒");
+#else
             Strcpy(nb = eos(nb), " FoodPois");
+#endif
         if (u.usick_type & SICK_NONVOMITABLE)
+#ifdef ZHLANG
+            Strcpy(nb = eos(nb), " 绝症");
+#else
             Strcpy(nb = eos(nb), " TermIll");
+#endif
     }
     if (u.uhs != NOT_HUNGRY)
         Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
     if ((cap = near_capacity()) > UNENCUMBERED)
         Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
     if (Blind)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 失明");
+#else
         Strcpy(nb = eos(nb), " Blind");
+#endif
     if (Deaf)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 耳聋");
+#else
         Strcpy(nb = eos(nb), " Deaf");
+#endif
     if (Stunned)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 眩晕");
+#else
         Strcpy(nb = eos(nb), " Stun");
+#endif
     if (Confusion)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 混乱");
+#else
         Strcpy(nb = eos(nb), " Conf");
+#endif
     if (Hallucination)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 幻觉");
+#else
         Strcpy(nb = eos(nb), " Hallu");
+#endif
     /* levitation and flying are mutually exclusive; riding is not */
     if (Levitation)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 漂浮");
+#else
         Strcpy(nb = eos(nb), " Lev");
+#endif
     if (Flying)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 飞行");
+#else
         Strcpy(nb = eos(nb), " Fly");
+#endif
     if (u.usteed)
+#ifdef ZHLANG
+        Strcpy(nb = eos(nb), " 骑乘");
+#else
         Strcpy(nb = eos(nb), " Ride");
+#endif
     cln = strlen(cond);
 
     /* version on status line, with leading space */

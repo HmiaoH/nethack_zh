@@ -1286,7 +1286,11 @@ doname_base(
         if (dknown || !vague_quan)
             Sprintf(prefix, "%ld ", obj->quan);
         else
+#ifdef ZHLANG
+            Strcpy(prefix, "");
+#else
             Strcpy(prefix, "some ");
+#endif
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
@@ -1297,7 +1301,11 @@ doname_base(
         Strcpy(prefix, "the ");
     } else if (!fake_arti) {
         /* default prefix */
+#ifdef ZHLANG
+        Strcpy(prefix, "");
+#else
         Strcpy(prefix, "a ");
+#endif
     }
 
     /* "empty" goes at the beginning, but item count goes at the end */
@@ -1315,7 +1323,11 @@ doname_base(
                 it is a container that has no contents */
              : ((Is_container(obj) || obj->otyp == STATUE)
                 && !Has_contents(obj))))
+#ifdef ZHLANG
+        Strcat(prefix, "空的 ");
+#else
         Strcat(prefix, "empty ");
+#endif
 
     if (bknown && obj->oclass != COIN_CLASS
         && (obj->otyp != POT_WATER || !objects[POT_WATER].oc_name_known
@@ -1324,9 +1336,17 @@ doname_base(
          * always allow "uncursed potion of water"
          */
         if (obj->cursed)
+#ifdef ZHLANG
+            Strcat(prefix, "诅咒的 ");
+#else
             Strcat(prefix, "cursed ");
+#endif
         else if (obj->blessed)
+#ifdef ZHLANG
+            Strcat(prefix, "祝福的 ");
+#else
             Strcat(prefix, "blessed ");
+#endif
         else if (!flags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
@@ -1347,7 +1367,11 @@ doname_base(
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
                      && obj->otyp != AMULET_OF_YENDOR
                      && !Role_if(PM_CLERIC)))
+#ifdef ZHLANG
+            Strcat(prefix, "未诅咒的 ");
+#else
             Strcat(prefix, "uncursed ");
+#endif
     }
 
     /* "a large trapped box" would perhaps be more correct; [no!]
@@ -1384,10 +1408,21 @@ doname_base(
     switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
+#ifdef ZHLANG
+            Concat(bp, 0, " （已穿戴）");
+#else
             Concat(bp, 0, " (being worn)");
+#endif
         break;
     case ARMOR_CLASS:
         if (obj->owornmask & W_ARMOR) {
+#ifdef ZHLANG
+            Concat(bp, 0,
+                   (obj == uskin) ? " （嵌入皮肤）"
+                   : doffing(obj) ? " （正在脱）"
+                     : donning(obj) ? " （正在穿）"
+                       : " （已穿戴）");
+#else
             Concat(bp, 0,
                    (obj == uskin) ? " (embedded in your skin)"
                    /* in case of perm_invent update while Wear/Takeoff
@@ -1396,6 +1431,7 @@ doname_base(
                    : doffing(obj) ? " (being doffed)"
                      : donning(obj) ? " (being donned)"
                        : " (being worn)");
+#endif
             /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
             if (bp_eos[-1] == ')') {
@@ -1427,7 +1463,11 @@ doname_base(
         break;
     case TOOL_CLASS:
         if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
+#ifdef ZHLANG
+            Concat(bp, 0, " （已穿戴）");
+#else
             Concat(bp, 0, " (being worn)");
+#endif
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
@@ -1583,8 +1623,28 @@ doname_base(
                  ? (is_ammo(obj) || is_missile(obj))
                  : !is_weptool(obj)))
             && !twoweap_primary) {
+#ifdef ZHLANG
+            Concat(bp, 0, " （已挥舞）");
+#else
             Concat(bp, 0, " (wielded)");
+#endif
         } else {
+#ifdef ZHLANG
+            char handsbuf[40];
+            const char *hand_s;
+
+            if (bimanual(obj)) {
+                hand_s = "双手";
+            } else {
+                Sprintf(handsbuf, "%s手",
+                        URIGHTY ? "右" : "左");
+                hand_s = handsbuf;
+            }
+            if (tethered)
+                ConcatF1(bp, 0, "（系留%s武器）", hand_s);
+            else
+                ConcatF1(bp, 0, "（%s武器）", hand_s);
+#else
             const char *hand_s = body_part(HAND);
             char *obufp, handsbuf[40];
 
@@ -1603,6 +1663,7 @@ doname_base(
                      : twoweap_primary ? "wielded in"
                        : "weapon in",
                      hand_s);
+#endif
 
             /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
@@ -1622,12 +1683,22 @@ doname_base(
     }
     if (obj->owornmask & W_SWAPWEP) {
         if (u.twoweap)
+#ifdef ZHLANG
+            ConcatF1(bp, 0, "（%s手武器）",
+                     URIGHTY ? "左" : "右");
+#else
             ConcatF2(bp, 0, " (wielded in %s %s)",
                      URIGHTY ? "left" : "right", body_part(HAND));
+#endif
         else
             /* TODO: rephrase this when obj isn't a weapon or weptool */
+#ifdef ZHLANG
+            ConcatF1(bp, 0, "（副手武器%s；未挥舞）",
+                     plur(obj->quan));
+#else
             ConcatF1(bp, 0, " (alternate weapon%s; not wielded)",
                      plur(obj->quan));
+#endif
     }
     if (obj->owornmask & W_QUIVER) {
         int Qtyp;
@@ -1649,10 +1720,17 @@ doname_base(
             Qtyp = 3; /* "at the ready" */
             break;
         }
+#ifdef ZHLANG
+        ConcatF1(bp, 0, "（%s）",
+                 (Qtyp == 1) ? "箭袋中"
+                 : (Qtyp == 2) ? "箭袋包中"
+                   : "已备好");
+#else
         ConcatF1(bp, 0, " (%s)",
                  (Qtyp == 1) ? "in quiver"
                  : (Qtyp == 2) ? "in quiver pouch"
                    : "at the ready");
+#endif
     }
 
     /* treat 'restoring' like suppress_price because shopkeeper and
@@ -2141,6 +2219,12 @@ just_an(char *outbuf, const char *str)
 
     *outbuf = '\0';
     c0 = lowc(*str);
+#ifdef ZHLANG
+    if (*str & 0x80) {
+        /* skip article for items with non-ASCII (Chinese) names */
+        ;
+    } else
+#endif
     if (!str[1] || str[1] == ' ') {
         /* single letter; might be used for named fruit or a musical note */
         Strcpy(outbuf, strchr("aefhilmnosx", c0) ? "an " : "a ");

@@ -203,7 +203,11 @@ money2u(struct monst *mon, long amount)
 
     if (!merge_choice(gi.invent, mongold)
             && inv_cnt(FALSE) >= invlet_basic) {
-        You("have no room for the gold!");
+#ifdef ZHLANG
+            You("没有空间装金币！");
+#else
+            You("have no room for the gold!");
+#endif
         dropy(mongold);
     } else {
         addinv(mongold);
@@ -517,7 +521,11 @@ call_kops(struct monst *shkp, boolean nearshop)
 
     Soundeffect(se_alarm, 80);
     if (!Deaf)
+#ifdef ZHLANG
+        pline("警报响了！");
+#else
         pline("An alarm sounds!");
+#endif
 
     nokops = ((svm.mvitals[PM_KEYSTONE_KOP].mvflags & G_GONE)
               && (svm.mvitals[PM_KOP_SERGEANT].mvflags & G_GONE)
@@ -526,7 +534,11 @@ call_kops(struct monst *shkp, boolean nearshop)
 
     if (!angry_guards(!!Deaf) && nokops) {
         if (flags.verbose && !Deaf)
+#ifdef ZHLANG
+            pline("但似乎没有人回应。");
+#else
             pline("But no one seems to respond to it.");
+#endif
         return;
     }
 
@@ -607,14 +619,27 @@ u_left_shop(char *leavestring, boolean newlev)
         boolean not_upset = !eshkp->surcharge;
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize(not_upset ? "%s！离开前请付款。"
+                                : "%s！不付钱别想走！",
+                      svp.plname);
+#else
             verbalize(not_upset ? "%s!  Please pay before leaving."
                                 : "%s!  Don't you leave without paying!",
                       svp.plname);
+#endif
         } else {
+#ifdef ZHLANG
+            pline("%s %s你离开前需要付款%s",
+                  Shknam(shkp),
+                  not_upset ? "指出" : "明确表示",
+                  not_upset ? "。" : "！");
+#else
             pline("%s %s that you need to pay before leaving%s",
                   Shknam(shkp),
                   not_upset ? "points out" : "makes it clear",
                   not_upset ? "." : "!");
+#endif
         }
         return;
     }
@@ -742,8 +767,12 @@ deserted_shop(/*const*/ char *enterstring)
     if (Blind && !(Blind_telepat || Detect_monsters))
         ++n; /* force feedback to be less specific */
 
+#ifdef ZHLANG
+    pline("这个商店%s%s。", (m < n) ? "似乎" : "", !n ? "已废弃" : "无人看管");
+#else
     pline("This shop %s %s.", (m < n) ? "seems to be" : "is",
           !n ? "deserted" : "untended");
+#endif
 }
 
 /* called from check_special_room(hack.c) */
@@ -800,7 +829,11 @@ u_entered_shop(char *enterstring)
         pline("%s senses your presence.", Shknam(shkp));
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("隐形顾客不受欢迎！");
+#else
             verbalize("Invisible customers are not welcome!");
+#endif
         } else {
             pline("%s stands firm as if %s knows you are there.",
                   Shknam(shkp), noit_mhe(shkp));
@@ -813,8 +846,13 @@ u_entered_shop(char *enterstring)
     if (ANGRY(shkp)) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("那么，%s，你竟敢回到%s的%s？！", svp.plname,
+                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+#else
             verbalize("So, %s, you dare return to %s %s?!", svp.plname,
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+#endif
         } else {
             pline("%s seems %s over your return to %s %s!",
                   Shknam(shkp), ROLL_FROM(angrytexts),
@@ -823,8 +861,13 @@ u_entered_shop(char *enterstring)
     } else if (eshkp->surcharge) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("又回来了，%s？我的%s盯着你呢。",
+                      svp.plname, mbodypart(shkp, EYE));
+#else
             verbalize("Back again, %s?  I've got my %s on you.",
                       svp.plname, mbodypart(shkp, EYE));
+#endif
         } else {
             pline_The("atmosphere at %s %s seems unwelcoming.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
@@ -841,14 +884,27 @@ u_entered_shop(char *enterstring)
     } else {
         if (!Deaf && !muteshk(shkp)) {
             set_voice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("%s，%s！欢迎%s光临%s的%s！", Hello(shkp), svp.plname,
+                      eshkp->visitct++ ? "再次" : "",
+                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+#else
             verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), svp.plname,
                       eshkp->visitct++ ? " again" : "",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+#endif
         } else {
+#ifdef ZHLANG
+            You("进入了%s的%s%s！",
+                s_suffix(shkname(shkp)),
+                shtypes[rt - SHOPBASE].name,
+                eshkp->visitct++ ? "再次" : "");
+#else
             You("enter %s %s%s!",
                 s_suffix(shkname(shkp)),
                 shtypes[rt - SHOPBASE].name,
                 eshkp->visitct++ ? " again" : "");
+#endif
         }
     }
     /* can't do anything about blocking if teleported in */
@@ -1395,8 +1451,13 @@ rouse_shk(struct monst *shkp, boolean verbosely)
     if (helpless(shkp)) {
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp))
+#ifdef ZHLANG
+            pline("%s %s。", Shknam(shkp),
+                  shkp->msleeping ? "醒了" : "又能动了");
+#else
             pline("%s %s.", Shknam(shkp),
                   shkp->msleeping ? "wakes up" : "can move again");
+#endif
         shkp->msleeping = 0;
         shkp->mfrozen = 0;
         shkp->mcanmove = 1;
@@ -1440,9 +1501,17 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
             eshkp->dismiss_kops = TRUE;
         }
         if (vanished)
+#ifdef ZHLANG
+            pline("满意了的%s突然消失了！", shk_nam);
+#else
             pline("Satisfied, %s suddenly disappears!", shk_nam);
+#endif
     } else if (wasmad)
+#ifdef ZHLANG
+        pline("%s平静下来了。", Shknam(shkp));
+#else
         pline("%s calms down.", Shknam(shkp));
+#endif
 
     make_happy_shoppers(silentkops);
 }
@@ -1496,7 +1565,11 @@ make_angry_shk(
         setpaid(shkp);
     }
 
+#ifdef ZHLANG
+    pline("%s%s！", Shknam(shkp), !ANGRY(shkp) ? "怒了" : "暴怒");
+#else
     pline("%s %s!", Shknam(shkp), !ANGRY(shkp) ? "gets angry" : "is furious");
+#endif
     hot_pursuit(shkp);
 }
 
@@ -1876,34 +1949,70 @@ dopay(void)
         rouse_shk(shkp, TRUE);
 
     if (helpless(shkp)) { /* still asleep/paralyzed */
+#ifdef ZHLANG
+        pline("%s %s。", Shknam(shkp),
+              rn2(2) ? "似乎在打盹" : "没有回应");
+#else
         pline("%s %s.", Shknam(shkp),
               rn2(2) ? "seems to be napping" : "doesn't respond");
+#endif
         return ECMD_OK;
     }
 
     if (shkp != resident && NOTANGRY(shkp)) {
         umoney = money_cnt(gi.invent);
         if (!ltmp) {
+#ifdef ZHLANG
+            You("不欠%s任何东西。", shkname(shkp));
+#else
             You("do not owe %s anything.", shkname(shkp));
+#endif
         } else if (!umoney) {
+#ifdef ZHLANG
+            You("%s没有金币。", stashed_gold ? "似乎" : "");
+#else
             You("%shave no gold.", stashed_gold ? "seem to " : "");
+#endif
             if (stashed_gold)
+#ifdef ZHLANG
+                pline("但你藏了一些金币。");
+#else
                 pline("But you have some gold stashed away.");
+#endif
         } else {
             if (umoney > ltmp) {
+#ifdef ZHLANG
+                You("给了%s%s要的%ld金币。",
+                    shkname(shkp), noit_mhe(shkp), ltmp);
+#else
                 You("give %s the %ld gold piece%s %s asked for.",
                     shkname(shkp), ltmp, plur(ltmp), noit_mhe(shkp));
+#endif
                 pay(ltmp, shkp);
             } else {
+#ifdef ZHLANG
+                You("把你所有%s的金币都给了%s。", stashed_gold ? "" : "藏着",
+                    shkname(shkp));
+#else
                 You("give %s all your%s gold.", shkname(shkp),
                     stashed_gold ? " openly kept" : "");
+#endif
                 pay(umoney, shkp);
                 if (stashed_gold)
+#ifdef ZHLANG
+                    pline("但你有隐藏的金币！");
+#else
                     pline("But you have hidden gold!");
+#endif
             }
             if ((umoney < ltmp / 2L) || (umoney < ltmp && stashed_gold))
+#ifdef ZHLANG
+                pline("不幸的是，%s看起来不满意。",
+                      noit_mhe(shkp));
+#else
                 pline("Unfortunately, %s doesn't look satisfied.",
                       noit_mhe(shkp));
+#endif
             else
                 make_happy_shk(shkp, FALSE);
         }
@@ -1914,11 +2023,19 @@ dopay(void)
     if (!eshkp->billct && !eshkp->debit) {
         umoney = money_cnt(gi.invent);
         if (!ltmp && NOTANGRY(shkp)) {
+#ifdef ZHLANG
+            You("不欠%s任何东西。", shkname(shkp));
+#else
             You("do not owe %s anything.", shkname(shkp));
+#endif
             if (!umoney)
                 pline(no_money, stashed_gold ? " seem to" : "");
         } else if (ltmp) {
+#ifdef ZHLANG
+            pline("%s要的是血，不是金币！", shkname(shkp));
+#else
             pline("%s is after blood, not gold!", shkname(shkp));
+#endif
             if (umoney < ltmp / 2L || (umoney < ltmp && stashed_gold)) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1936,7 +2053,11 @@ dopay(void)
         } else {
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
+#ifdef ZHLANG
+            pline("%s要的是你的皮，不是你的金币！", Shknam(shkp));
+#else
             pline("%s is after your hide, not your gold!", Shknam(shkp));
+#endif
             if (umoney < 1000L) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -2026,15 +2147,29 @@ dopay(void)
     if (pay_done && !ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("感谢你在%s的%s购物%s",
+                      s_suffix(shkname(shkp)),
+                      shtypes[eshkp->shoptype - SHOPBASE].name,
+                      !eshkp->surcharge ? "！" : "。");
+#else
             verbalize("Thank you for shopping in %s %s%s",
                       s_suffix(shkname(shkp)),
                       shtypes[eshkp->shoptype - SHOPBASE].name,
                       !eshkp->surcharge ? "!" : ".");
+#endif
         } else {
+#ifdef ZHLANG
+            pline("%s%s对你在%s的%s购物点头示意%s",
+                  Shknam(shkp), !eshkp->surcharge ? "感激地" : "",
+                  noit_mhis(shkp), shtypes[eshkp->shoptype - SHOPBASE].name,
+                  !eshkp->surcharge ? "！" : "。");
+#else
             pline("%s nods%s at you for shopping in %s %s%s",
                   Shknam(shkp), !eshkp->surcharge ? " appreciatively" : "",
                   noit_mhis(shkp), shtypes[eshkp->shoptype - SHOPBASE].name,
                   !eshkp->surcharge ? "!" : ".");
+#endif
         }
     }
 
@@ -2636,8 +2771,13 @@ inherits(
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (gi.invent != 0);
         if (taken && !silently)
+#ifdef ZHLANG
+            pline("%s感激地继承了你所有的财产。",
+                  Shknam(shkp));
+#else
             pline("%s gratefully inherits all your possessions.",
                   Shknam(shkp));
+#endif
         goto clear;
     }
 
@@ -2669,7 +2809,11 @@ inherits(
                 disp.botl = TRUE;
             }
             if (!silently)
-                pline("%s %s all your possessions.", Shknam(shkp), takes);
+#ifdef ZHLANG
+            pline("%s %s你所有的财产。", Shknam(shkp), "取走了");
+#else
+            pline("%s %s all your possessions.", Shknam(shkp), takes);
+#endif
             taken = TRUE;
         } else {
             money2mon(shkp, loss);
@@ -3577,12 +3721,21 @@ addtobill(
            add_one_tobill above */
 
         if (!ltmp) {
+#ifdef ZHLANG
+            pline("%s对%s没有兴趣。", Shknam(shkp), the(xname(obj)));
+#else
             pline("%s has no interest in %s.", Shknam(shkp), the(xname(obj)));
+#endif
             return;
         }
         if (!ininv) {
+#ifdef ZHLANG
+            pline("%s要花你%ld个%s%s。", The(xname(obj)), ltmp,
+                  currency(ltmp), (obj->quan > 1L) ? "每件" : "");
+#else
             pline("%s will cost you %ld %s%s.", The(xname(obj)), ltmp,
                   currency(ltmp), (obj->quan > 1L) ? " each" : "");
+#endif
         } else {
             long save_quan = obj->quan;
 
@@ -3614,7 +3767,11 @@ addtobill(
                       (contentscount && obj->unpaid) ? and_its_contents : "",
                       ltmp, currency(ltmp), (obj->quan > 1L) ? " each" : "");
         } else {
+#ifdef ZHLANG
+            pline("%s没有注意到。", Shknam(shkp));
+#else
             pline("%s does not notice.", Shknam(shkp));
+#endif
         }
     }
 }
@@ -3989,7 +4146,11 @@ sellobj(
     if (ANGRY(shkp)) { /* they become shop-objects, no pay */
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("谢谢你，人渣！");
+#else
             verbalize("Thank you, scum!");
+#endif
         } else {
             pline("%s smirks with satisfaction.", Shknam(shkp));
         }
@@ -4013,7 +4174,11 @@ sellobj(
 
         if (!unpaid && (gs.sell_how != SELL_DONTSELL)
             && !special_stock(obj, shkp, FALSE))
+#ifdef ZHLANG
+            pline("%s似乎不感兴趣。", Shknam(shkp));
+#else
             pline("%s seems uninterested.", Shknam(shkp));
+#endif
         return;
     }
 
@@ -4056,8 +4221,13 @@ sellobj(
         || offer == 0L || (obj->oclass == FOOD_CLASS && obj->oeaten)
         || (Is_candle(obj)
             && obj->age < 20L * (long) objects[obj->otyp].oc_cost)) {
+#ifdef ZHLANG
+        pline("%s似乎不感兴趣%s。", Shknam(shkp),
+              cgold ? "于剩下的东西" : "");
+#else
         pline("%s seems uninterested%s.", Shknam(shkp),
               cgold ? " in the rest" : "");
+#endif
         if (container)
             dropped_container(obj, shkp, FALSE);
         obj->no_charge = 1;
@@ -5441,7 +5611,11 @@ price_quote(struct obj *first_obj)
         return;
 
     tmpwin = create_nhwindow(NHW_MENU);
+#ifdef ZHLANG
+    putstr(tmpwin, 0, "精选商品出售：");
+#else
     putstr(tmpwin, 0, "Fine goods for sale:");
+#endif
     putstr(tmpwin, 0, "");
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
         if (otmp->oclass == COIN_CLASS)

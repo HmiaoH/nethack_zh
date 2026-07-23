@@ -2157,7 +2157,11 @@ domove_swap_with_pet(
                    || mundisplaceable(mtmp))) {
         /* displacing peaceful into unsafe or trapped space, or trying to
            displace quest leader, Oracle, shk, priest, or vault guard */
+#ifdef ZHLANG
+        You("停。%s不想交换位置。", YMonnam(mtmp));
+#else
         You("stop.  %s doesn't want to swap places.", YMonnam(mtmp));
+#endif
         didnt_move = TRUE;
     } else {
         mtmp->mtrapped = 0;
@@ -2166,6 +2170,21 @@ domove_swap_with_pet(
         newsym(x, y);
         newsym(u.ux0, u.uy0);
 
+#ifdef ZHLANG
+        {
+            const char *mnam = x_monnam(mtmp,
+                     mtmp->mtame ? ARTICLE_YOUR
+                     : (!has_mgivenname(mtmp)
+                        && !type_is_pname(mtmp->data)) ? ARTICLE_THE
+                     : ARTICLE_NONE,
+                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+            if (mtmp->mpeaceful)
+                You("你和%s交换了位置。", mnam);
+            else
+                You("你吓退了%s。", mnam);
+        }
+#else
         You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
             x_monnam(mtmp,
                      mtmp->mtame ? ARTICLE_YOUR
@@ -2174,6 +2193,7 @@ domove_swap_with_pet(
                      : ARTICLE_NONE,
                      (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
                      has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+#endif
 
         /* check for displacing it into pools and traps */
         switch (minliquid(mtmp) ? Trap_Killed_Mon
@@ -2896,8 +2916,13 @@ domove_core(void)
             /* monst still knows where hero is */
             mtmp->mux = u.ux, mtmp->muy = u.uy;
 
+#ifdef ZHLANG
+            pline("%s和你交换了位置...",
+                  !noticed_it ? Something : YMonnam(mtmp));
+#else
             pline("%s swaps places with you...",
                   !noticed_it ? Something : YMonnam(mtmp));
+#endif
             if (!canspotmon(mtmp))
                 map_invisible(u.ux0, u.uy0);
             /* monster chose to swap places; hero doesn't get any credit
