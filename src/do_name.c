@@ -1108,10 +1108,18 @@ x_monnam(
     buf2[0] = '\0'; /* lint suppression */
     switch (article) {
     case ARTICLE_YOUR:
+#ifdef ZHLANG
+        Strcpy(buf2, "你的");
+#else
         Strcpy(buf2, "your ");
+#endif
         break;
     case ARTICLE_THE:
+#ifdef ZHLANG
+        Strcpy(buf2, "");
+#else
         Strcpy(buf2, "the ");
+#endif
         break;
     case ARTICLE_A:
         /* avoid an() here */
