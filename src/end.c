@@ -41,6 +41,15 @@ staticfn void bel_copy1(char **, char *);
 /*
  * The order of these needs to match the macros in hack.h.
  */
+#ifdef ZHLANG
+static NEARDATA const char *deaths[] = {
+    /* the array of death */
+    "死亡", "噎死", "毒死", "饿死", "溺死", "烧死",
+    "在高温高压下溶解", "压死", "石化",
+    "变成粘液", "被灭绝", "恐慌", "诡计", "退出",
+    "逃脱", "飞升"
+};
+#else
 static NEARDATA const char *deaths[] = {
     /* the array of death */
     "died", "choked", "poisoned", "starvation", "drowning", "burning",
@@ -48,7 +57,20 @@ static NEARDATA const char *deaths[] = {
     "turned into slime", "genocided", "panic", "trickery", "quit",
     "escaped", "ascended"
 };
+#endif
 
+#ifdef ZHLANG
+static NEARDATA const char *ends[] = {
+    /* "when you %s" */
+    "死亡", "噎死", "中毒",
+    "饿死", "溺死", "烧死",
+    "溶解在岩浆中",
+    "被压死", "石化",
+    "变成粘液", "被灭绝",
+    "恐慌", "被戏弄", "退出",
+    "逃跑", "飞升"
+};
+#else
 static NEARDATA const char *ends[] = {
     /* "when you %s" */
     "died", "choked", "were poisoned",
@@ -59,6 +81,7 @@ static NEARDATA const char *ends[] = {
     "panicked", "were tricked", "quit",
     "escaped", "ascended"
 };
+#endif
 
 static boolean Schroedingers_cat = FALSE;
 
@@ -92,11 +115,19 @@ done2(void)
     boolean abandon_tutorial = FALSE;
 
     if (In_tutorial(&u.uz)
+#ifdef ZHLANG
+        && y_n("从教程切换回正常游戏吗？") == 'y')
+#else
         && y_n("Switch from the tutorial back to regular play?") == 'y')
+#endif
         abandon_tutorial = TRUE;
 
     if (abandon_tutorial || !paranoid_query(
+#ifdef ZHLANG
+            ParanoidQuit, "确定不保存就退出吗？")) {
+#else
             ParanoidQuit, "Really quit without saving?")) {
+#endif
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -114,7 +145,11 @@ done2(void)
             /* mention_decor can be processed now */
             rcfile_only_this_option(opt_mention_decor);
             schedule_goto(&u.ucamefrom, UTOTYPE_ATSTAIRS,
+#ifdef ZHLANG
+                          "恢复正常游戏。", (char *) 0);
+#else
                           "Resuming regular play.", (char *) 0);
+#endif
         }
         return ECMD_OK;
     }
@@ -125,12 +160,24 @@ done2(void)
 #ifdef VMS
         extern int debuggable; /* sys/vms/vmsmisc.c, vmsunix.c */
 
+#ifdef ZHLANG
+        c = !debuggable ? 'n' : ynq("进入调试器？");
+#else
         c = !debuggable ? 'n' : ynq("Enter debugger?");
+#endif
 #else
 #ifdef LATTICE
+#ifdef ZHLANG
+        c = ynq("创建快照？");
+#else
         c = ynq("Create SnapShot?");
+#endif
+#else
+#ifdef ZHLANG
+        c = ynq("生成核心转储？");
 #else
         c = ynq("Dump core?");
+#endif
 #endif
 #endif
         if (c == 'y') {
@@ -405,7 +452,11 @@ panic VA_DECL(const char *, str)
 
     gb.bot_disabled = TRUE;
     if (iflags.window_inited) {
+#ifdef ZHLANG
+        raw_print("\r\n哎呀……");
+#else
         raw_print("\r\nOops...");
+#endif
         wait_synch(); /* make sure all pending output gets flushed */
         if (soundprocs.sound_exit_nhsound)
             (*soundprocs.sound_exit_nhsound)("panic");
@@ -414,32 +465,65 @@ panic VA_DECL(const char *, str)
     }
 
     raw_print(program_state.gameover
+#ifdef ZHLANG
+                  ? "游戏结束后处理被中断。"
+                  : !program_state.something_worth_saving
+                        ? "程序初始化失败。"
+                        : "突然之间，地牢崩塌了。");
+#else
                   ? "Postgame wrapup disrupted."
                   : !program_state.something_worth_saving
                         ? "Program initialization has failed."
                         : "Suddenly, the dungeon collapses.");
+#endif
 #ifndef MICRO
 #ifdef NOTIFY_NETHACK_BUGS
     if (!wizard)
+#ifdef ZHLANG
+        raw_printf("请将以下错误报告至 \"%s\" 或在 \"%s\"。",
+#else
         raw_printf("Report the following error to \"%s\" or at \"%s\".",
+#endif
                    DEVTEAM_EMAIL, DEVTEAM_URL);
     else if (program_state.something_worth_saving)
+#ifdef ZHLANG
+        raw_print("\n正在写入错误存档文件。\n");
+#else
         raw_print("\nError save file being written.\n");
+#endif
 #else /* !NOTIFY_NETHACK_BUGS */
     if (!wizard) {
+#ifdef ZHLANG
+        const char *maybe_rebuild = !program_state.something_worth_saving
+                                     ? "。"
+                                     : "\n可能可以重建游戏。";
+#else
         const char *maybe_rebuild = !program_state.something_worth_saving
                                      ? "."
                                      : "\nand it may be possible to rebuild.";
+#endif
 
 // XXX this may need an update if defined(CRASHREPORT) TBD
         if (sysopt.support)
+#ifdef ZHLANG
+            raw_printf("要报告此错误，%s%s", sysopt.support,
+#else
             raw_printf("To report this error, %s%s", sysopt.support,
+#endif
                        maybe_rebuild);
         else if (sysopt.fmtd_wizard_list) /* formatted SYSCF WIZARDS */
+#ifdef ZHLANG
+            raw_printf("要报告此错误，联系%s%s",
+#else
             raw_printf("To report this error, contact %s%s",
+#endif
                        sysopt.fmtd_wizard_list, maybe_rebuild);
         else
+#ifdef ZHLANG
+            raw_printf("报告错误至 \"%s\"%s", WIZARD_NAME,
+#else
             raw_printf("Report error to \"%s\"%s", WIZARD_NAME,
+#endif
                        maybe_rebuild);
     }
 #endif /* ?NOTIFY_NETHACK_BUGS */
@@ -525,7 +609,11 @@ dump_plines(void)
     char buf[BUFSZ], **strp;
 
     Strcpy(buf, " "); /* one space for indentation */
+#ifdef ZHLANG
+    putstr(0, 0, "最近消息：");
+#else
     putstr(0, 0, "Latest messages:");
+#endif
     for (i = 0, j = (int) gs.saved_pline_index; i < DUMPLOG_MSG_COUNT;
          ++i, j = (j + 1) % DUMPLOG_MSG_COUNT) {
         strp = &gs.saved_plines[j];
@@ -564,6 +652,15 @@ dump_everything(
 
     /* game start and end date+time to disambiguate version date+time */
     Strcpy(datetimebuf, yyyymmddhhmmss(ubirthday));
+#ifdef ZHLANG
+    Sprintf(pbuf, "游戏开始于 %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s",
+            &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
+            &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+    Strcpy(datetimebuf, yyyymmddhhmmss(when));
+    Sprintf(eos(pbuf), "，结束于 %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s。",
+            &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
+            &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#else
     Sprintf(pbuf, "Game began %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s",
             &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
             &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
@@ -571,6 +668,7 @@ dump_everything(
     Sprintf(eos(pbuf), ", ended %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s.",
             &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
             &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#endif
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 
@@ -591,7 +689,11 @@ dump_everything(
 
     dump_plines();
     putstr(0, 0, "");
+#ifdef ZHLANG
+    putstr(0, 0, "物品栏：");
+#else
     putstr(0, 0, "Inventory:");
+#endif
     (void) display_inventory((char *) 0, TRUE);
     container_contents(gi.invent, TRUE, TRUE, FALSE);
     enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
@@ -656,8 +758,13 @@ disclose(int how, boolean taken)
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('a', &defquery);
+#ifdef ZHLANG
+        c = ask ? yn_function("需要查看你的属性吗？", ynqchars,
+                              defquery, TRUE)
+#else
         c = ask ? yn_function("Do you want to see your attributes?", ynqchars,
                               defquery, TRUE)
+#endif
                 : defquery;
         if (c == 'y')
             enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
@@ -681,6 +788,16 @@ disclose(int how, boolean taken)
         if (should_query_disclose_option('c', &defquery)) {
             int acnt = count_achievements();
 
+#ifdef ZHLANG
+            Sprintf(qbuf, "需要查看你的行为记录%s吗？",
+                    /* this was distinguishing between one achievement and
+                       multiple achievements, but "conduct and achievement"
+                       looked strange if multiple conducts got shown (which
+                       is usual for an early game death); we could switch
+                       to plural vs singular for conducts but the less
+                       specific "conduct and achievements" is sufficient */
+                    (acnt > 0) ? "与成就" : "");
+#else
             Sprintf(qbuf, "Do you want to see your conduct%s?",
                     /* this was distinguishing between one achievement and
                        multiple achievements, but "conduct and achievement"
@@ -689,6 +806,7 @@ disclose(int how, boolean taken)
                        to plural vs singular for conducts but the less
                        specific "conduct and achievements" is sufficient */
                     (acnt > 0) ? " and achievements" : "");
+#endif
             c = yn_function(qbuf, ynqchars, defquery, TRUE);
         } else {
             c = defquery;
@@ -701,8 +819,13 @@ disclose(int how, boolean taken)
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('o', &defquery);
+#ifdef ZHLANG
+        c = ask ? yn_function("需要查看地牢概览吗？",
+                              ynqchars, defquery, TRUE)
+#else
         c = ask ? yn_function("Do you want to see the dungeon overview?",
                               ynqchars, defquery, TRUE)
+#endif
                 : defquery;
         if (c == 'y')
             show_overview((how >= PANICKED) ? 1 : 2, how);
@@ -736,7 +859,11 @@ savelife(int how)
     if ((Sick & TIMEOUT) == 1L) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
+#ifdef ZHLANG
+    gn.nomovemsg = "你从那次死亡中活了下来。";
+#else
     gn.nomovemsg = "You survived that attempt on your life.";
+#endif
     svc.context.move = 0;
 
     gm.multi = -1; /* can't move again during the current turn */
@@ -744,8 +871,13 @@ savelife(int how)
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
+#ifdef ZHLANG
+    gm.multi_reason = Role_if(PM_TOURIST) ? "被命运戏弄"
+                                          : "尝试欺骗死神";
+#else
     gm.multi_reason = Role_if(PM_TOURIST) ? "being toyed with by Fate"
                                           : "attempting to cheat Death";
+#endif
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
@@ -1091,6 +1223,15 @@ done(int how)
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {
+#ifdef ZHLANG
+        pline("但是等等……");
+        makeknown(AMULET_OF_LIFE_SAVING);
+        Your("勋章%s！", !Blind ? "开始发光" : "感到温暖");
+        if (how == CHOKING)
+            You("呕吐……");
+        You_feel("感觉好多了！");
+        pline_The("勋章化为了灰烬！");
+#else
         pline("But wait...");
         /* assumes that only one type of item confers LifeSaved property */
         makeknown(AMULET_OF_LIFE_SAVING);
@@ -1099,13 +1240,18 @@ done(int how)
             You("vomit ...");
         You_feel("much better!");
         pline_The("medallion crumbles to dust!");
+#endif
         if (uamul)
             useup(uamul);
 
         (void) adjattrib(A_CON, -1, TRUE);
         savelife(how);
         if (how == GENOCIDED) {
+#ifdef ZHLANG
+            pline("不幸的是你仍然被灭绝了……");
+#else
             pline("Unfortunately you are still genocided...");
+#endif
         } else {
             char killbuf[BUFSZ];
             formatkiller(killbuf, BUFSZ, how, FALSE);
@@ -1121,8 +1267,13 @@ done(int how)
            accept it more than once if there's no user supplying it */
         && !(program_state.done_hup && gd.done_seq++ == gh.hero_seq)
 #endif
+#ifdef ZHLANG
+        && !paranoid_query(ParanoidDie, "要死吗？")) {
+        pline("好吧，那你就不%s了。", (how == CHOKING) ? "噎" : "死");
+#else
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
+#endif
         iflags.last_msg = PLNMSG_OK_DONT_DIE;
         savelife(how);
         survive = TRUE;
@@ -1196,7 +1347,11 @@ really_done(int how)
      * smiling... :-)  -3.
      */
     if (svm.moves <= 1 && how < PANICKED && !done_stopprint)
+#ifdef ZHLANG
+        pline("不要经过起点。不要领取200%s。", currency(200L));
+#else
         pline("Do not pass Go.  Do not collect 200 %s.", currency(200L));
+#endif
 
     if (have_windows)
         wait_synch(); /* flush screen output */
@@ -1235,7 +1390,11 @@ really_done(int how)
         if (u.uhp < 1) {
             how = DIED;
             u.umortality++; /* skipped above when how==QUIT */
+#ifdef ZHLANG
+            Strcpy(svk.killer.name, "在已经登上卡戎之船时退出");
+#else
             Strcpy(svk.killer.name, "quit while already on Charon's boat");
+#endif
         }
     }
     if (how == ESCAPED || how == PANICKED)
@@ -1364,16 +1523,28 @@ really_done(int how)
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
+#ifdef ZHLANG
+        Your("%s%s……",
+             (u.ugrave_arise != PM_GREEN_SLIME)
+                 ? "尸体从死亡中苏醒，变成了"
+                 : "亡魂留存，变成了",
+             an(pmname(&mons[u.ugrave_arise], Ugender)));
+#else
         Your("%s as %s...",
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "body rises from the dead"
                  : "revenant persists",
              an(pmname(&mons[u.ugrave_arise], Ugender)));
+#endif
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
 
     if (bones_ok) {
+#ifdef ZHLANG
+        if (!wizard || paranoid_query(ParanoidBones, "保存尸体吗？"))
+#else
         if (!wizard || paranoid_query(ParanoidBones, "Save bones?"))
+#endif
             savebones(how, endtime, corpse);
         /* corpse may be invalid pointer now so
             ensure that it isn't used again */
@@ -1418,21 +1589,42 @@ really_done(int how)
     }
 #endif
     if (u.uhave.amulet) {
+#ifdef ZHLANG
+        Strcat(svk.killer.name, "（携带护身符）");
+#else
         Strcat(svk.killer.name, " (with the Amulet)");
+#endif
     } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) /* offered Amulet to wrong deity */
+#ifdef ZHLANG
+            Strcat(svk.killer.name, "（在天界蒙羞）");
+#else
             Strcat(svk.killer.name, " (in celestial disgrace)");
+#endif
         else if (carrying(FAKE_AMULET_OF_YENDOR))
+#ifdef ZHLANG
+            Strcat(svk.killer.name, "（携带假护身符）");
+#else
             Strcat(svk.killer.name, " (with a fake Amulet)");
+#endif
         /* don't bother counting to see whether it should be plural */
     }
 
+#ifdef ZHLANG
+    Sprintf(pbuf, "%s%s%s...", Goodbye(), svp.plname,
+            (how != ASCENDED)
+                ? (const char *) ((flags.female && gu.urole.name.f)
+                    ? gu.urole.name.f
+                    : gu.urole.name.m)
+                : (const char *) (flags.female ? "半女神" : "半神"));
+#else
     Sprintf(pbuf, "%s %s the %s...", Goodbye(), svp.plname,
             (how != ASCENDED)
                 ? (const char *) ((flags.female && gu.urole.name.f)
                     ? gu.urole.name.f
                     : gu.urole.name.m)
                 : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
+#endif
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
 
@@ -1462,10 +1654,18 @@ really_done(int how)
 
         gv.viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
         mtmp = gm.mydogs;
+#ifdef ZHLANG
+        Strcpy(pbuf, "你");
+#else
         Strcpy(pbuf, "You");
+#endif
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
+#ifdef ZHLANG
+                Sprintf(eos(pbuf), "和%s", mon_nam(mtmp));
+#else
                 Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
+#endif
                 if (mtmp->mtame)
                     u.urexp = nowrap_add(u.urexp, mtmp->mhp);
                 mtmp = mtmp->nmon;
@@ -1477,17 +1677,32 @@ really_done(int how)
 
                 mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
+#ifdef ZHLANG
+                Strcat(eos(pbuf), "和薛定谔的猫");
+#else
                 Strcat(eos(pbuf), " and Schroedinger's cat");
+#endif
             }
             dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
             pbuf[0] = '\0';
         } else {
+#ifdef ZHLANG
             Strcat(pbuf, " ");
+#else
+            Strcat(pbuf, " ");
+#endif
         }
+#ifdef ZHLANG
+        Sprintf(eos(pbuf), "%s，获得%ld分，",
+                (how == ASCENDED) ? "前往你的奖励"
+                                  : "逃出了地牢",
+                u.urexp, plur(u.urexp));
+#else
         Sprintf(eos(pbuf), "%s with %ld point%s,",
                 (how == ASCENDED) ? "went to your reward"
                                   : "escaped from the dungeon",
                 u.urexp, plur(u.urexp));
+#endif
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
 
         if (!done_stopprint)
@@ -1518,13 +1733,18 @@ really_done(int how)
                     if (has_oname(otmp))
                         free_oname(otmp);
                     otmp->quan = count;
-                    Sprintf(pbuf, "%8ld %s (worth %ld %s),", count,
+                    Sprintf(pbuf, "%8ld %s (价值%ld %s)，", count,
                             xname(otmp), count * (long) objects[typ].oc_cost,
                             currency(2L));
                     obfree(otmp, (struct obj *) 0);
                 } else {
+#ifdef ZHLANG
+                    Sprintf(pbuf, "%8ld 片无价值的彩色玻璃，",
+                            count, plur(count));
+#else
                     Sprintf(pbuf, "%8ld worthless piece%s of colored glass,",
                             count, plur(count));
+#endif
                 }
                 dump_forward_putstr(endwin, 0, pbuf, 0);
             }
@@ -1535,30 +1755,63 @@ really_done(int how)
         if (u.uz.dnum == 0 && u.uz.dlevel <= 0) {
             /* level teleported out of the dungeon; `how' is DIED,
                due to falling or to "arriving at heaven prematurely" */
+#ifdef ZHLANG
+            Sprintf(pbuf, "你%s于地牢之外",
+                    (u.uz.dlevel < 0) ? "安息" : "死亡");
+#else
             Sprintf(pbuf, "You %s beyond the confines of the dungeon",
                     (u.uz.dlevel < 0) ? "passed away" : ends[how]);
+#endif
         } else {
             /* more conventional demise */
             const char *where = svd.dungeons[u.uz.dnum].dname;
 
             if (Is_astralevel(&u.uz))
+#ifdef ZHLANG
+                where = "星界";
+#else
                 where = "The Astral Plane";
+#endif
+#ifdef ZHLANG
+            Sprintf(pbuf, "你死于%s", where);
+#else
             Sprintf(pbuf, "You %s in %s", ends[how], where);
+#endif
             if (!In_endgame(&u.uz) && !single_level_branch(&u.uz))
+#ifdef ZHLANG
+                Sprintf(eos(pbuf), "第%d层",
+                        In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
+#else
                 Sprintf(eos(pbuf), " on dungeon level %d",
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
+#endif
         }
 
+#ifdef ZHLANG
+        Sprintf(eos(pbuf), "，获得%ld分，", u.urexp, plur(u.urexp));
+#else
         Sprintf(eos(pbuf), " with %ld point%s,", u.urexp, plur(u.urexp));
+#endif
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     }
 
+#ifdef ZHLANG
+    Sprintf(pbuf, "获得%ld金币，经过了%ld回合。", umoney,
+            plur(umoney), svm.moves, plur(svm.moves));
+#else
     Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.", umoney,
             plur(umoney), svm.moves, plur(svm.moves));
+#endif
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
+#ifdef ZHLANG
+    Sprintf(pbuf,
+            "你死亡时是%d级，最大生命值%d。",
+            u.ulevel, u.uhpmax);
+#else
     Sprintf(pbuf,
             "You were level %d with a maximum of %d hit point%s when you %s.",
             u.ulevel, u.uhpmax, plur(u.uhpmax), ends[how]);
+#endif
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
     if (!done_stopprint)
@@ -1636,7 +1889,11 @@ container_contents(
                    reports the box as containing "1 item" */
                 cat = SchroedingersBox(box);
 
+#ifdef ZHLANG
+                Sprintf(buf, "%s的内容：", the(xname(box)));
+#else
                 Sprintf(buf, "Contents of %s:", the(xname(box)));
+#endif
                 putstr(tmpwin, 0, buf);
                 if (!dumping)
                     putstr(tmpwin, 0, "");
@@ -1672,7 +1929,11 @@ container_contents(
                     container_contents(box->cobj, identified, TRUE,
                                        reportempty);
             } else if (reportempty) {
+#ifdef ZHLANG
+                pline("%s是空的。", upstart(thesimpleoname(box)));
+#else
                 pline("%s is empty.", upstart(thesimpleoname(box)));
+#endif
                 display_nhwindow(WIN_MESSAGE, FALSE);
             }
         }

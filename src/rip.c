@@ -24,6 +24,25 @@ staticfn void center(int, char *);
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
+#ifdef ZHLANG
+static const char *const rip_txt[] = {
+    "                       ----------",
+    "                      /          \\",
+    "                     /    安      \\",
+    "                    /     息       \\",
+    "                   /                \\",
+    "                  /                  \\",
+    "                  |                  |", /* Name of player */
+    "                  |                  |", /* Amount of $ */
+    "                  |                  |", /* Type of death */
+    "                  |                  |", /* . */
+    "                  |                  |", /* . */
+    "                  |                  |", /* . */
+    "                  |       1001       |", /* Real year of death */
+    "                 *|     *  *  *      | *",
+    "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______", 0
+};
+#else
 static const char *const rip_txt[] = {
     "                       ----------",
     "                      /          \\",
@@ -41,9 +60,31 @@ static const char *const rip_txt[] = {
     "                 *|     *  *  *      | *",
     "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______", 0
 };
+#endif
 #define STONE_LINE_CENT 28 /* char[] element of center of stone face */
 #else                      /* NH320_DEDICATION */
 /* NetHack 3.2.x displayed a dual tombstone as a tribute to Izchak. */
+#ifdef ZHLANG
+static const char *const rip_txt[] = {
+    "              ----------                      ----------",
+    "             /          \\                    /          \\",
+    "            /    安       \\                  /    谨以     \\",
+    "           /     息       \\                /   此版本的   \\",
+    "          /                \\              /   NetHack     \\",
+    "         /                  \\            /   献给          \\",
+    "         |                  |            |                  |",
+    "         |                  |            |                  |",
+    "         |                  |            |  Izchak Miller   |",
+    "         |                  |            |   1935 - 1994    |",
+    "         |                  |            |                  |",
+    "         |                  |            |     飞升        |",
+    "         |       1001       |            |                  |",
+    "      *  |     *  *  *      | *        * |      *  *  *     | *",
+    (" _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)___"
+     "_____)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____"),
+    0
+};
+#else
 static const char *const rip_txt[] = {
     "              ----------                      ----------",
     "             /          \\                    /          \\",
@@ -63,6 +104,7 @@ static const char *const rip_txt[] = {
      "_____)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____"),
     0
 };
+#endif
 #define STONE_LINE_CENT 19 /* char[] element of center of stone face */
 #endif                     /* NH320_DEDICATION */
 #define STONE_LINE_LEN  16 /* # chars that fit on one line
@@ -141,7 +183,11 @@ genl_outrip(winid tmpwin, int how, time_t when)
 
 #ifdef DUMPLOG
     if (tmpwin == 0)
+#ifdef ZHLANG
+        dump_forward_putstr(0, 0, "游戏结束：", TRUE);
+#else
         dump_forward_putstr(0, 0, "Game over:", TRUE);
+#endif
     else
 #endif
         putstr(tmpwin, 0, "");

@@ -93,6 +93,18 @@ formatkiller(
     int how,
     boolean incl_helpless)
 {
+#ifdef ZHLANG
+    static NEARDATA const char *const killed_by_prefix[] = {
+        /* DIED, CHOKING, POISONING, STARVING, */
+        "死于", "呛死于", "中毒死于", "死于",
+        /* DROWNING, BURNING, DISSOLVED, CRUSHING, */
+        "溺死于", "烧死于", "溶解于", "被压死于",
+        /* STONING, TURNED_SLIME, GENOCIDED, */
+        "被石化于", "被变成粘液于", "死于",
+        /* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
+        "", "", "", "", ""
+    };
+#else
     static NEARDATA const char *const killed_by_prefix[] = {
         /* DIED, CHOKING, POISONING, STARVING, */
         "killed by ", "choked on ", "poisoned by ", "died of ",
@@ -103,6 +115,7 @@ formatkiller(
         /* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
         "", "", "", "", ""
     };
+#endif
     unsigned l;
     char c, *kname = svk.killer.name;
 
@@ -153,10 +166,16 @@ formatkiller(
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (gm.multi_reason
             && strlen(gm.multi_reason) + sizeof ", while " <= siz)
+#ifdef ZHLANG
+            Sprintf(buf, "，在%s时", gm.multi_reason);
+        else if (sizeof "，在无助时" <= siz)
+            Strcpy(buf, "，在无助时");
+#else
             Sprintf(buf, ", while %s", gm.multi_reason);
         /* either gm.multi_reason wasn't specified or wouldn't fit */
         else if (sizeof ", while helpless" <= siz)
             Strcpy(buf, ", while helpless");
+#endif
         /* else extra death info won't fit, so leave it out */
     }
 }

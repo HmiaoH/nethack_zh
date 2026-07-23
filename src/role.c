@@ -2365,15 +2365,35 @@ Goodbye(void)
 {
     switch (Role_switch) {
     case PM_KNIGHT:
+#ifdef ZHLANG
+        return "再会";
+#else
         return "Fare thee well"; /* Olde English */
+#endif
     case PM_SAMURAI:
+#ifdef ZHLANG
+        return "再见";
+#else
         return "Sayonara"; /* Japanese */
+#endif
     case PM_TOURIST:
+#ifdef ZHLANG
+        return "再见";
+#else
         return "Aloha"; /* Hawaiian */
+#endif
     case PM_VALKYRIE:
+#ifdef ZHLANG
+        return "再见";
+#else
         return "Farvel"; /* Norse */
+#endif
     default:
+#ifdef ZHLANG
+        return "再见";
+#else
         return "Goodbye";
+#endif
     }
 }
 
