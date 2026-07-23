@@ -1,0 +1,120 @@
+这是 nethack 命令行参数的简要说明。
+主要面向 UNIX（包括 linux 和 macOS 等衍生系统），
+对于其他平台可能不完全准确。
+
+当开始游戏时，如果所选角色名称存在存档文件，则将恢复该存档，
+否则将以该名称开始新游戏。
+
+nethack
+  无参数；使用运行时配置文件中的 OPTIONS=name:角色名称 条目
+  作为角色名称，如果没有则使用玩家的用户名。
+
+nethack -u 角色名称 [-X 或 -D]
+  '-u 角色名称' 指定此游戏角色的名称；
+       -u 必须为小写；它和角色名称之间的空格可以省略；
+  '-X' 以不计分的探索模式（又称发现模式）进行游戏；
+       -X 必须为大写；角色初始拥有一根许愿魔杖，玩家可以选择
+       在角色死亡时被救活并继续游戏；
+  '-D' 以调试模式（又称巫师模式）运行；-D 必须为大写；
+       如果玩家不被允许，nethack 将切换到 -X；如果玩家被允许，
+       角色名称将被更改为 "wizard"。
+
+  角色名称可以有后缀，指定角色、种族、性别和阵营中的任意或全部，
+  例如 -u Conan-Bar-Hum-Mal-Neu 或 -u Tim-Wiz。
+  存在的组成部分必须至少三个字母长，但可以更长；大小写不重要。
+  另请参阅下面的 -p 和 -r。
+
+nethack -p Ppp -r Rrr [-@]
+  '-p Ppp' 指定职业；使用 p 代表 profession 是因为 -r 已被占用；
+       'Ppp' 是职业名称的三个或以上字母，例如 Val 代表女武神；
+       与 -p 本身不同，Ppp 的大小写不重要
+  '-r Rrr' 指定种族或物种：Hum[an]、Elf、Orc、Dwa[rf]、Gno[me]；
+  '-@' 强制非交互式启动；任何未在命令行或运行时配置文件中指定的
+       角色、种族、性别和阵营将随机选择，无需提示；
+       at 符号可能需要在其前面加反斜杠进行转义。
+
+  角色的旧形式仍然被接受：-A 或 -Arc[heologist]、-B 或 -Bar[barian]、
+  -C 或 -Cav[eman] 或 -Cavew[oman]、-H 或 -Hea[ler]、-K 或 -Kni[ght]、
+  -M 或 -Mon[k]、-P 或 -Pri[est] 或 -Prieste[ss]、-Ran[ger]、
+  -R 或 -Rog[ue]、-S 或 -Sam[urai]、-T 或 -Tou[rist]、
+  -V 或 -Val[kyrie]、-W 或 -Wiz[ard]。单字母形式必须为大写，
+  三个或以上字母形式可以任意大小写。游侠职业没有单字母选项。
+
+nethack -DEC[graphics]
+nethack -IBM[graphics]
+  选择 DEC 或 IBM 符号集，用于在文本地图上使用线条绘制字符；
+  可能因界面而被忽略，或因显示能力而无效甚至乱码；-DECgraphics 和
+  -IBMgraphics 互斥；可以任意大小写，但必须使用至少三个字母。
+
+nethack -wIii
+nethack --windowtype:Iii
+  其中 'Iii' 代表界面指定：tty、curses、X11 或 Qt；
+  仅在程序构建时支持多个界面时有用（游戏中的 '#version' 命令
+  会显示此信息）；覆盖运行时配置文件中的 OPTIONS=windowtype:Iii
+  和构建时的默认值；'-w' 或 '--windowtype' 必须为小写，界面指定
+  本身可以任意大小写；变体 '--windowtype Iii' 和 '-w Iii' 也可以。
+
+  在 Windows 上，nethack.exe 支持 tty 或 curses 或两者，取决于
+  源代码构建时的设置；nethackW.exe 支持 mswin（也称为 Win GUI）
+  和可选的 curses。对于 MS-DOS，程序支持 tty 或 curses 或两者。
+
+nethack -n
+  不显示 'news' 文件，即使 nethack 目录中存在该文件。
+
+nethack --nethackrc:RC-file
+  使用 RC-file 而不是默认的运行时配置文件（通常是
+  '~/.nethackrc'）；文件名应包含完整路径，除非位于 nethack 的目录中；
+nethack --no-nethackrc
+  不使用任何运行时配置文件；等同于 --nethackrc:/dev/null，
+  其行为如同一个空文件。
+
+nethack -dDir
+nethack --directory:Dir
+  可用于用位置 Dir 覆盖构建时的 NETHACKDIR 值；如果使用，
+  它应该在其他命令行参数之前。
+
+以上各种选项可以在单个命令行上组合使用；为便于阅读，它们被分开列出。
+
+*******
+
+其他执行某些操作后退出而不进行游戏的选项：
+
+nethack -s
+nethack --scores
+  显示默认角色的分数；可选附加参数：
+nethack -s -v
+  如果高分文件（记录）中包含旧版本的分数，则显示所有版本的
+  分数；默认情况下，只显示当前版本 nethack 的分数；使用 '-v'
+  时，它应紧跟在 -s 或 --scores 之后，在任何名称或 -p 或 -r 之前；
+nethack -s 角色名称 [角色名称2 [角色名称3 [...]]]
+  显示一个或多个特定角色名称的分数（如果在 nethack 的 sysconf
+  文件中指定了 PERS_IS_UID=1，可能无效）；角色名称前可以加 '-u'，
+  但不是必需的；特殊角色名称 "all" 用于显示符合其他条件的所有分数；
+nethack -s -p Ppp -r Rrr
+  显示特定职业或种族的分数；可以使用多个实例；如果同时使用 '-p'
+  和 '-r'，将显示匹配任一条件的分数，而不是必须同时匹配两者的分数；
+nethack -dDir -s
+nethack --directory:Dir -s
+  同上；如果指定了替代目录，应放在前面。
+
+nethack --version 或 --version:copy 或 --version:dump 或 --version:show
+  '--version' 显示程序的版本号以及从源代码构建的日期和时间，然后退出；
+  '--version:copy' 显示版本号并将其复制到系统剪贴板（应在 macOS 和
+  Windows 上工作；可能在其他系统上不工作），以便后续可粘贴到电子邮件
+  或网页联系表单中，然后退出；
+  '--version:dump' 显示多个内部值，然后退出；
+  '--version:show' 同 '--version'。
+
+nethack --showpaths
+  列出各种文件和目录的预期位置，然后退出；包括运行时配置文件的
+  名称和位置，这可能因平台而异。
+
+nethack --usage
+nethack --help
+  显示此文本；'nethack -?' 和 'nethack ?' 也可以，但问号可能需要
+  转义以防止 shell 拦截它。
+
+*******
+
+此文本在游戏过程中可通过 '?' 命令的菜单查看，也可通过命令行的
+'nethack --usage | more' 查看。

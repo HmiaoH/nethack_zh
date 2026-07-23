@@ -68,7 +68,7 @@ DIRPERM  = 0755
 #	Qt without X11; assumes GRAPHIC_TOMBSTONE:
 # VARDATND = nhtiles.bmp pet_mark.xbm pilemark.xbm rip.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
+VARDATD = bogusmon data engrave epitaph oracles options quest.lua quest_zh.lua rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
 #	Some versions of make use the SHELL environment variable as the
@@ -92,7 +92,9 @@ LUA_VERSION = 5.4.8
 # end of configuration
 #
 
-DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp
+DATHELP = help hh cmdhelp keyhelp history opthelp optmenu usagehlp wizhelp \
+	help_zh hh_zh cmdhelp_zh keyhelp_zh history_zh opthelp_zh optmenu_zh \
+	usagehlp_zh wizhelp_zh
 
 SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
@@ -102,7 +104,7 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
-DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon.lua dungeon_zh.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 # These get set only if they weren't already set above or in a hints file
@@ -224,6 +226,8 @@ options: $(GAME)
 	( cd dat ; $(MAKE) options )
 
 quest.lua: $(GAME)
+
+quest_zh.lua: $(GAME)
 
 spec_levs:
 	( cd dat ; $(MAKE) spec_levs )

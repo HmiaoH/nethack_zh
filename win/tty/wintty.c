@@ -1819,16 +1819,8 @@ process_text_window(winid window, struct WinDesc *cw)
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
                 if (linestart) {
-                    if (SYMHANDLING(H_UTF8)) {
-                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
-                        g_putch(*cp);
-                    } else if ((*cp & 0x80) != 0) {
-                        g_putch(*cp);
-                        end_glyphout();
-                    } else {
-                        (void) putchar(*cp);
-                    }
                     linestart = FALSE;
+                    (void) putchar(*cp);
                 } else {
                     (void) putchar(*cp);
                 }

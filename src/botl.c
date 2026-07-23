@@ -82,6 +82,16 @@ do_statusline1(void)
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
 
+#ifdef ZHLANG
+    Sprintf(nb = eos(nb), "力:%s 敏:%-1d 体:%-1d 智:%-1d 慧:%-1d 魅:%-1d",
+            get_strength_str(),
+            ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
+            ACURR(A_CHA));
+    Sprintf(nb = eos(nb), "%s",
+            (u.ualign.type == A_CHAOTIC) ? "  混沌"
+              : (u.ualign.type == A_NEUTRAL) ? "  中立"
+                : "  守序");
+#else
     Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
@@ -90,6 +100,7 @@ do_statusline1(void)
             (u.ualign.type == A_CHAOTIC) ? "  Chaotic"
               : (u.ualign.type == A_NEUTRAL) ? "  Neutral"
                 : "  Lawful");
+#endif
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
@@ -140,23 +151,41 @@ do_statusline2(void)
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
     if (hp < 0)
         hp = 0;
+#ifdef ZHLANG
+    Sprintf(hlth, "生命:%d(%d) 魔力:%d(%d) 防:%-2d",
+            min(hp, 9999), min(hpmax, 9999),
+            min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
+#else
     Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
             min(hp, 9999), min(hpmax, 9999),
             min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
+#endif
     hln = strlen(hlth);
 
     /* experience */
     if (Upolyd)
+#ifdef ZHLANG
+        Sprintf(expr, "级:%d", mons[u.umonnum].mlevel);
+    else if (flags.showexp)
+        Sprintf(expr, "经:%d/%-1ld", u.ulevel, u.uexp);
+    else
+        Sprintf(expr, "经:%d", u.ulevel);
+#else
         Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
         Sprintf(expr, "Xp:%d/%-1ld", u.ulevel, u.uexp);
     else
         Sprintf(expr, "Xp:%d", u.ulevel);
+#endif
     xln = strlen(expr);
 
     /* time/move counter */
     if (flags.time)
+#ifdef ZHLANG
+        Sprintf(tmmv, "时:%ld", svm.moves);
+#else
         Sprintf(tmmv, "T:%ld", svm.moves);
+#endif
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);

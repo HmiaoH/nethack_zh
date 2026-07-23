@@ -31,7 +31,7 @@ HINTSINCLNAMES := dirs-perms \
 		gbdates-pre gbdates-post \
 		multiw-1 multiw-2 misc \
 		multisnd1-pre multisnd2-pre multisnd-post \
-		response
+		response chinese
 HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
 endif
 endif
@@ -42,6 +42,8 @@ endif
 # note: '#-INCLUDE' is not just a comment
 #        it pulls in the contents of dirs-perms.500
 #-INCLUDE dirs-perms.500
+
+#-INCLUDE chinese.500
 
 ifneq "$(USEMACPORTS)" "1"
 HAVE_HOMEBREW := $(shell expr `which -s brew; echo $$?` = 0)

@@ -261,8 +261,16 @@
             || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
 
 #ifdef PMNAME_MACROS
+#ifdef ZHLANG
+extern NEARDATA struct permonst mons_zh[];
+#define pmname(ptr,g) ((((g) == MALE || (g) == FEMALE) \
+                        && mons_zh[(ptr) - mons].pmnames[g]) \
+                        ? mons_zh[(ptr) - mons].pmnames[g] \
+                        : mons_zh[(ptr) - mons].pmnames[NEUTRAL])
+#else
 #define pmname(ptr,g) ((((g) == MALE || (g) == FEMALE) && (ptr)->pmnames[g]) \
                         ? (ptr)->pmnames[g] : (ptr)->pmnames[NEUTRAL])
+#endif
 #endif
 #define monsym(ptr) (def_monsyms[(int) (ptr)->mlet].sym)
 

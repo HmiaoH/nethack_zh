@@ -1,0 +1,51 @@
+调试模式快速参考：
+
+^E  ==  侦测附近的暗门和陷阱
+^F  ==  绘制关卡地图；显示陷阱和隐藏走廊，但不显示暗门
+^G  ==  按名称或类别创建怪物
+^I  ==  鉴定背包中的物品
+^T  ==  执行层内传送
+^V  ==  执行跨层传送；'?' 显示特殊目的地的菜单
+^W  ==  许愿一件物品或一个陷阱或有限的地形子集
+^X  ==  显示状态、属性和特征（扩展启迪）
+
+#debugfuzzer    == 设置游戏为自动驾驶模式；持续运行直到失败；
+                   将不可能警告升级为 panic
+#levelchange    == 设置英雄的经验等级
+#lightsources   == 显示移动光源
+#migratemons    == 显示迁移中的怪物；[可选] 可能创建一些
+#panic          == panic 测试（警告：当前游戏将被终止）
+#polyself       == 变形自身
+#stats          == 显示内存统计信息
+#terrain        == 显示当前关卡（比正常游戏中有更多选项）
+#timeout        == 查看超时队列和英雄的定时内在特性
+#vision         == 显示视野数组
+#wizborn        == 显示怪物诞生/死亡/灭绝/绝种统计信息
+#wizcast        == 施放任意法术
+#wizdispmacros  == [可选] 检查内部显示分类
+#wizfliplevel   == 翻转当前地下城楼层
+#wizintrinsic   == 设置选定的内在特性超时
+#wizkill        == 移除游戏中的怪物
+#wizloaddes     == 加载并执行特殊关卡描述的 lua 脚本
+#wizloadlua     == 加载并执行 lua 脚本
+#wizmakemap     == 重新创建当前地下城楼层
+#wizmondiff     == [可选] 检查怪物难度评分差异
+#wizobjprobs    == [可选] 列出物品生成的实际概率
+#wizrumorcheck  == 验证谣言索引；同时显示第一个、第二个和最后一个
+                   随机刻写、墓志铭和幻觉怪物
+#wizseenv       == 显示地图位置的 seen 向量
+#wizsmell       == 嗅探怪物
+#wiztelekinesis == 魔法推撞怪物
+#wizwhere       == 显示所有特殊关卡的在地牢中的位置
+#wmode          == 显示墙壁模式
+
+选项：
+debug_hunger    == 禁用英雄的饥饿感
+debug_mongen    == 禁用随机怪物生成
+debug_overwrite_stairs
+                == 允许楼梯被其他地形替换
+monpolycontrol  == 在任意怪物变形时提示选择新形态
+sanity_check    == 在每回合前评估怪物、物品和地图
+wizweight       == 在物品描述中附加物品的重量信息
+
+[可选] = 根据构建时的设置条件性可用

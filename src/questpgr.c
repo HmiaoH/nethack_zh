@@ -7,7 +7,11 @@
 
 /*  quest-specific pager routines. */
 
+#ifdef ZHLANG
+#define QTEXT_FILE "quest_zh.lua"
+#else
 #define QTEXT_FILE "quest.lua"
+#endif
 
 #ifdef TTY_GRAPHICS
 #include "wintty.h"

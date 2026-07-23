@@ -1,0 +1,350 @@
+NetHack 历史文件 — 5.0 发行版
+
+看吧，凡人，NetHack 的起源……
+
+Jay Fenlason 在 Kenny Woodland、Mike Thome 和 Jon Payne 的帮助下
+编写了最初的 Hack。
+
+Andries Brouwer 在 Stichting Mathematisch Centrum（现 Centrum Wiskunde &
+Informatica）任职期间进行了一次大规模重写，将 Hack 转变为一款截然不同
+的游戏。他通过在 Usenet 新闻组 net.sources（后更名为 comp.sources）
+发布 Hack 源代码供 UNIX(tm) 系统使用，于 1984 年 12 月发布了 1.0 版本，
+随后发布了 1.0.1、1.0.2 版本，最终于 1985 年 7 月发布了 1.0.3 版本。
+Usenet 新闻组 net.games.hack（后更名为 rec.games.hack，最终被
+rec.games.roguelike.nethack 取代）被创建用于讨论此游戏。
+
+Don G. Kneller 将 Hack 1.0.3 移植到 Microsoft(tm) C 和 MS-DOS(tm)，
+制作了 PC HACK 1.01e，在 1.03g 版本中添加了对 DEC Rainbow 图形的支持，
+并继续制作了至少四个版本（3.0、3.2、3.51 和 3.6；
+请注意，这些是旧 Hack 版本号，不是当代 NetHack 版本号）。
+
+R. Black 将 PC HACK 3.51 移植到 Lattice(tm) C 和 Atari 520/1040ST，
+制作了 ST Hack 1.03。
+
+Mike Stephenson 将这些不同版本合并在一起，整合了许多新增功能，
+并于 1987 年发布了 NetHack 1.4 版本。随后他协调了众多人员对
+NetHack 1.4 进行增强和调试，发布了 NetHack 2.2 和 2.3 版本。
+与 Hack 一样，它们通过向 Usenet 发布源代码的方式发布，在从新闻组
+过期后，它们仍可通过 ftp 和 uucp 在各种存档中获取。
+
+后来，Mike 协调了一次游戏的大规模重写，领导了一个团队，成员包括
+Ken Arromdee、Jean-Christophe Collet、Steve Creps、Eric Hendrickson、
+Izchak Miller、Eric S. Raymond、John Rupley、Mike Threepoint 和
+Janet Walz，制作了 NetHack 3.0c。
+
+NetHack 3.0 由 Eric R. Smith 移植到 Atari，由 Timo Hakulinen 移植到
+OS/2，由 David Gentzel 移植到 VMS。他们三人以及 Kevin Darcy 后来加入
+了主要的 NetHack 开发团队，制作了 3.0 的后续修订版本。
+
+Olaf Seibert 将 NetHack 2.3 和 3.0 移植到 Amiga。Norm Meluch、Stephen
+Spackman 和 Pierre Martineau 为 PC NetHack 3.0 设计了覆盖代码。
+Johnny Lee 将 NetHack 3.0 移植到 Macintosh。与其他众多地下城探险者
+一起，他们在 3.0 的后续修订版本中继续增强 PC、Macintosh 和 Amiga
+的移植版本。
+
+版本 3.0 经历了十次相对快速发布的"补丁级别"修订。当时的版本被称为
+3.0 基础版，以及各种称呼如 "3.0a" 到 "3.0j"、"3.0 patchlevel 1" 到
+"3.0 patchlevel 10" 或 "3.0pl1" 到 "3.0pl10"，而不是 3.0.0 和
+3.0.1 到 3.0.10；三组件的编号方案从 3.1.0 开始使用。
+
+由 Mike Stephenson 领导、Izchak Miller 和 Janet Walz 协调的 NetHack
+开发团队，此时包括 Ken Arromdee、David Cohrs、Jean-Christophe Collet、
+Kevin Darcy、Matt Day、Timo Hakulinen、Steve Linhart、Dean Luick、
+Pat Rankin、Eric Raymond 和 Eric Smith，对 3.0 进行了彻底的修订。
+他们重新设计了游戏结构，重写了主要部分的代码。他们添加了多个地下城、
+新的显示方式、特殊的个人角色任务、新的终局以及许多其他新功能，
+制作了 NetHack 3.1。3.1.0 版本于 1993 年 1 月发布。
+
+Ken Lorber、Gregg Wonderly 和 Greg Olson 在 Richard Addison、Mike
+Passaretti 和 Olaf Seibert 的帮助下，为 Amiga 开发了 NetHack 3.1。
+
+Norm Meluch 和 Kevin Smolkowski 在 Carl Schelin、Stephen Spackman、
+Steve VanDevender 和 Paul Winner 的帮助下，将 NetHack 3.1 移植到 PC。
+
+Jon W{tte 和 Hao-yang Wang 在 Ross Brown、Mike Engber、David Hairston、
+Michael Hamel、Jonathan Handler、Johnny Lee、Tim Lennan、Rob Menke 和
+Andy Swanson 的帮助下，为 Macintosh 开发了 NetHack 3.1，将其移植到
+MPW。在他们的开发基础上，Bart House 添加了 Think C 移植版本。
+
+Timo Hakulinen 将 NetHack 3.1 移植到 OS/2。Eric Smith 将 NetHack 3.1
+移植到 Atari。Pat Rankin 在 Joshua Delahunty 的帮助下负责 VMS 版本的
+NetHack 3.1。Michael Allison 将 NetHack 3.1 移植到 Windows NT。
+
+Dean Luick 在 David Cohrs 的帮助下为 X11 开发了 NetHack 3.1。
+它以文本方式绘制地图，而非图形方式，但包含了 nh10.bdf，一个可选的
+自定义 X11 字体，其中用微小图像代替字母和标点符号，这是 tiles
+的前身。这些图像不区分具体的怪物和物品类型，只是怪物和物品类别的
+替代品（因此所有 "a" 昆虫使用一个自定义图像，所有 "[" 盔甲使用
+另一个，等等，而不是为甲虫和蚂蚁或斗篷和靴子分别使用不同的图像）。
+
+Warwick Allison 为 Atari 编写了一个图形显示的 NetHack 版本，其中
+微小图片被称为"图标"，并且对特定类型的怪物和物品是不同的，而不仅仅
+是它们的类别。他将这些贡献给了 NetHack 开发团队，团队将其重新命名
+为"tiles"，这个最初的用法后来被其他各种游戏所采用。NetHack 的 tiles
+支持随后在其他平台上实现（最初在 MS-DOS，后来也在 Windows、Qt 和
+X11 上）。
+
+3.2 的 NetHack 开发团队由 Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Steve Creps、Kevin Darcy、Timo Hakulinen、Steve Linhart、
+Dean Luick、Pat Rankin、Eric Smith、Mike Stephenson、Janet Walz 和
+Paul Winner 组成，于 1996 年 4 月发布了 3.2.0 版本。
+
+版本 3.2 标志着开发团队成立十周年。作为他们对游戏奉献精神的证明，
+原 NetHack 开发团队的全部十三名成员在该版本开始时仍然留在团队中。
+在 3.1.3 和 3.2.0 的发布间隔期间，NetHack 开发团队的创始成员之一
+Izchak Miller 博士被诊断出癌症并去世。该版本由开发和移植团队献给他。
+
+版本 3.2 证明比之前的版本更加稳定。修复了许多 bug，消除了滥用行为，
+并调整了游戏功能以获得更好的游戏体验。
+
+在 NetHack 3.1 和 3.2 的生命周期中，几位游戏爱好者添加了自己的修改
+并公开分享了这些"变体"：
+
+Tom Proudfoot 和 Yuval Oren 创建了 NetHack++，当一些人错误地以为
+它是 C 源代码向 C++ 的转换时，它很快被重新命名为 NetHack--。
+独立工作的 Stephen White 编写了 NetHack Plus。Tom Proudfoot 后来将
+NetHack Plus 和他自己的 NetHack-- 合并制作了 SLASH。Larry Stewart-Zerba
+和 Warwick Allison 通过 Wizard Patch 改进了法术施放系统。Warwick Allison
+还将 NetHack 移植到使用 Qt 界面。
+
+Warren Cheung 将 SLASH 与 Wizard Patch 结合制作了 Slash'EM，并在 Kevin
+Hugo 的帮助下添加了更多功能。Kevin 后来加入了 NetHack 开发团队，并将
+这些想法中的精华融入 NetHack 3.3。
+
+3.2 的最终更新是 bug 修复版本 3.2.3，于 1999 年 12 月与 3.3.0 同时
+发布，刚好赶在 2000 年之前。由于有更新的版本，3.2.3 仅以源代码补丁
+形式发布，没有为通常有就绪版本的平台提供可直接游玩的发行版。
+
+（对于考虑恢复旧版本的任何人：3.2.3 之前的所有版本都有一个千年虫
+bug。高分文件和日志文件包含的日期使用两位数字的年份格式化，1999 年
+的年份 99 之后是 2000 年的年份 100。这能成功写入，但无意中在文件布局
+中引入了额外的列，导致分数条目无法正确读回，干扰了新高分的插入以及
+从旧角色名称中检索用于当前游戏中随机鬼魂和雕像名称的功能。）
+
+3.3 的 NetHack 开发团队由 Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Steve Creps、Kevin Darcy、Timo Hakulinen、Kevin Hugo、
+Steve Linhart、Ken Lorber、Dean Luick、Pat Rankin、Eric Smith、
+Mike Stephenson、Janet Walz 和 Paul Winner 组成，于 1999 年 12 月
+发布了 3.3.0，于 2000 年 8 月发布了 3.3.1。
+
+版本 3.3 带来了许多首创。它是第一个将种族和职业分开的版本。精灵职业
+被移除，取而代之的是精灵种族，矮人、侏儒和兽人种族与熟悉的人类种族
+一起首次出现在游戏中。僧侣和游侠职业加入了考古学家、野蛮人、穴居人、
+治疗师、骑士、牧师、盗贼、武士、游客、女武神，当然还有巫师的行列。
+它也是第一个允许你骑乘坐骑的版本，也是第一个拥有公开网站列出所有已
+发现 bug 的版本。尽管 bug 列表不断增长，3.3 证明足够稳定，持续了
+超过一年半。
+
+3.4 的 NetHack 开发团队最初由 Michael Allison、Ken Arromdee、David Cohrs、
+Jessie Collet、Kevin Hugo、Ken Lorber、Dean Luick、Pat Rankin、
+Mike Stephenson、Janet Walz 和 Paul Winner 组成，Warwick Allison 在
+NetHack 3.4.0 于 2002 年 3 月发布前加入。
+
+与 3.3 版本一样，许多人既为游戏整体做出了贡献，也支持了 NetHack
+运行的不同平台上的移植版本：
+
+Pat Rankin 维护了 3.4 的 VMS 版本。
+
+Michael Allison 维护了 NetHack 3.4 的 MS-DOS 平台版本。
+Paul Winner 和 Yitzhak Sapir 提供了鼓励。
+
+Dean Luick、Mark Modrall 和 Kevin Hugo 维护并增强了 3.4 的 Macintosh
+移植版本。
+
+Michael Allison、David Cohrs、Alex Kompel、Dion Nicolaas 和 Yitzhak Sapir
+维护并增强了 3.4 的 Microsoft Windows 平台版本。Alex Kompel 为 Windows
+移植版贡献了新的图形界面。Alex Kompel 还为 3.4.1 贡献了 Windows CE
+移植版本。
+
+Ron Van Iwaarden 是过去几个版本中 NetHack OS/2 版本的唯一维护者。
+不幸的是，Ron 的最后一台 OS/2 机器在 2006 年初停止工作。非常感谢
+Ron 这些年来让 NetHack 在 OS/2 上保持活力。
+
+Janne Salmijarvi 和 Teemu Suikki 在 Janne Salmijarvi 为 3.3.1
+恢复 Amiga 移植版后，维护并增强了 3.4 的 Amiga 移植版本。
+
+Christian "Marvin" Bressler 在为 3.3.1 恢复 Atari 移植版后，
+维护了 3.4 的 Atari 版本。
+
+NetHack 3.4.3 于 2003 年 12 月发布，标志着一个漫长发布中断的开始。
+3.4.3 证明是一个异常稳定的版本，为社区提供了超过十年的持续享受。
+NetHack 开发团队在 3.4.3 的任期内缓慢而安静地继续在幕后开发游戏。
+在同一时期，NetHack 社区中出现了几个新的变体。值得注意的是 Derek S.
+Ray 的 sporkhack、Patric Mueller 的 unnethack、最初由 Daniel Thaler
+后来由 Alex Smith 开发的 nitrohack 及其后继者，以及 Tung Nguyen 的
+Dynahack。其中一些变体至今仍在由社区开发、维护和享受。
+
+2014 年 9 月，开发中代码的一个中期快照被其他方公开发布。由于该代码
+是正在开发中的工作，尚未经过适合发布的调试过程，因此决定该代码快照
+上的版本号将被停用，永不在官方 NetHack 版本中使用。NetHack 开发团队
+的官方网站 nethack.org 上发布了一份公告，声明永远不会有一个 3.4.4、
+3.5 或 3.5.0 的官方发布版本。
+
+2015 年 1 月，NetHack 3.6 的发布准备工作开始了。
+
+在最终发布为 3.6.0 的开发工作开始时，NetHack 开发团队由 Warwick
+Allison、Michael Allison、Ken Arromdee、David Cohrs、Jessie Collet、
+Ken Lorber、Dean Luick、Pat Rankin、Mike Stephenson、Janet Walz 和
+Paul Winner 组成。2015 年初，在 3.6.0 发布之前，新成员 Sean Hunt、
+Pasi Kallinen 和 Derek S. Ray 加入了 NetHack 开发团队。
+
+在 3.6.0 开发接近尾声时，游戏中许多幽默和有趣功能的重要灵感来源之一、
+作家 Terry Pratchett 去世了。NetHack 3.6.0 引入了一个向他致敬的内容。
+
+3.6.0 于 2015 年 12 月发布，合并了开发团队自 3.4.3 发布以来所做的
+工作以及一些受欢迎的社区补丁。修复了许多 bug，并重构了一些代码。
+
+NetHack 开发团队以及 Steve VanDevender 和 Kevin Smolkowski 确保了
+NetHack 3.6 继续在各种 UNIX 变体上运行，并维护了 X11 界面。
+
+Ken Lorber、Haoyang Wang、Pat Rankin 和 Dean Luick 维护了 NetHack 3.6
+的 MacOS 移植版本。
+
+Michael Allison、David Cohrs、Bart House、Pasi Kallinen、Alex Kompel、
+Dion Nicolaas、Derek S. Ray 和 Yitzhak Sapir 维护了 NetHack 3.6 的
+Microsoft Windows 移植版本。
+
+Pat Rankin 尝试在有限访问权限的阻碍下保持 NetHack 3.6 的 VMS 移植版
+运行。Kevin Smolkowski 已在 Alpha 和 Integrity（即 Itanium 即 IA64）
+上的最新版 OpenVMS（撰写本文时为 V8.4）上更新并测试了它，但未在 VAX
+上测试。
+
+Ray Chason 为 3.6 恢复了 MS-DOS 移植版，并向广大社区贡献了必要的更新。
+
+2018 年 4 月下旬，为 3.6.0 修复了数百个 bug 并添加了一些新功能，
+以 NetHack 3.6.1 的形式发布。3.6.1 发布时的 NetHack 开发团队由
+Warwick Allison、Michael Allison、Ken Arromdee、David Cohrs、Jessie
+Collet、Pasi Kallinen、Ken Lorber、Dean Luick、Patric Mueller、
+Pat Rankin、Derek S. Ray、Alex Smith、Mike Stephenson、Janet Walz 和
+Paul Winner 组成。
+
+2019 年 5 月初，另外 320 个 bug 修复以及一些增强功能和被采纳的 curses
+窗口端口，以 3.6.2 的形式发布。
+
+Bart House 曾作为移植团队成员数十年来为游戏做出贡献，于 2019 年 5 月
+底加入了 NetHack 开发团队。
+
+NetHack 3.6.3 于 2019 年 12 月 5 日发布，包含对 NetHack 3.6.2 的
+超过 190 个 bug 修复。
+
+NetHack 3.6.4 于 2019 年 12 月 18 日发布，包含一个安全修复和几个
+bug 修复。
+
+NetHack 3.6.5 于 2020 年 1 月 27 日发布，包含一些安全修复和少量
+bug 修复。
+
+NetHack 3.6.6 于 2020 年 3 月 8 日发布，包含一个安全修复和一些
+bug 修复。
+
+NetHack 3.6.7 于 2023 年 2 月 16 日发布，包含一个安全修复和一些
+bug 修复。
+
+继 NetHack 3.6 之后的主要版本的开发工作于 2015 年开始，大约与
+NetHack 3.6.0 的发布同时。该开发工作与每个 NetHack 3.6 版本（从
+2015 年到 2023 年）并行进行，一直持续到 2026 年 4 月底。这是首次
+开发过程在 GitHub 和 SourceForge 上公开分享。它是在 NetHack-3.7
+work-in-progress (WIP) 标签下进行的，尽管下一个发布的版本号尚未确定。
+
+将开发过程暴露给公众带来了许多好处，也带来了一些挑战。人们几乎可以
+立即观察和批评更改和新功能，而且他们经常这样做。GitHub 的 pull request
+系统使人们可以直接为开发做出贡献变得简单。贡献者解决了游戏中非常多
+的 bug，我们感谢所有贡献者。
+
+2026 年初，随着游戏开发变得足够稳定，可以考虑启动正式发布，开发团队
+审查了游戏中更改的性质和数量。很明显，有足够的深度和广度来支持一个
+主要版本发布，于是决定使用版本号 5.0。这是一个超越 3.x 的新主要版本，
+如果以 4.0 版本发布，可能会与现有变体产生歧义或混淆。
+
+NetHack 5.0.0 于 2026 年 5 月 2 日发布。
+
+NetHack 5.0.0 的源代码被修改和现代化，以符合 C99 标准。5.0.0 版本
+包含了超过 3100 个修复、更改和更新的功能。
+
+NetHack 5.0 是第一个用新的基于 Lua 解释器的方法取代过去版本中 lex 和
+yacc 关卡与地下城编译器的版本，以提供这些元素。在 NetHack 5.0.0 中，
+Lua 也用于处理任务文本。整个开发团队感谢 Pasi Kallinen 为实现这一点
+所做的工作。
+
+在 NetHack 5.0 发布时，核心开发团队（现役和曾经的成员）包括 Warwick
+Allison、Michael Allison、Ken Arromdee、David Cohrs、Jessie Collet、
+Bart House、Kevin Hugo、Pasi Kallinen、Ken Lorber、Dean Luick、
+Pat Rankin、Derek S. Ray、Alex Smith、Patric Mueller、Mike Stephenson、
+Janet Walz、Paul Winner。
+
+Ken Lorber、Pat Rankin、Patrick Mueller 和 Michael Allison 帮助确保
+NetHack 5.0 能够在 macOS 上运行。
+
+Ingo Paschke 设法使用现代平台上的交叉编译器恢复了 NetHack 5.0 的
+Amiga 移植版。他分享了自己的工作，这样其他人就可以借助他的努力轻松地
+为 Amiga 制作 NetHack 5.0。
+
+Ray Chason 为 NetHack 5.0 的 MS-DOS 移植版贡献了大部分维护工作，
+包括将 curses 界面移植到其上。Michael Allison 确保 NetHack 5.0 的
+核心更改继续与 msdos 移植版兼容并保持其活力。交叉编译 MS-DOS 移植版
+使这成为可能且几乎无痛。
+
+自 NetHack 5.0 的开发于十一年多前开始以来，为 Windows 移植版做出贡献
+的人员包括 Michael Allison、David Cohrs、Bart House、Pasi Kallinen、
+Alex Kompel、Dion Nicolaas、Derek S. Ray 和 Yitzhak Sapir。
+
+怀着悲痛的心情，开发团队希望承认并纪念已故的 Ron Van Iwaarden 过去的
+贡献，他曾是过去多个 NetHack 版本中 NetHack OS/2 的唯一维护者。我们
+将怀念 Ron。
+
+NetHack 官方网站由 Ken Lorber 维护，地址为 https://www.nethack.org/。
+
+代表 NetHack 社区，再次非常感谢 M. Drew Streib 和 Pasi Kallinen 在
+nethack.alt.org 提供公共 NetHack 服务器。感谢 Keith Simpson 和 Andy
+Thomson 为 hardfought.org 所做的工作。感谢所有那些无名的地下城探险者，
+他们投入时间和精力举办年度 NetHack 锦标赛，如 Junethack、The November
+NetHack Tournament，以及过去的 devnull.net（暂时离去，但未被遗忘）。
+
+                            - - - - - - - - - -
+
+时不时地，网络世界中的某个堕落个体会发送一个特别有趣的修改来帮助改进
+游戏。NetHack 开发团队有时会在这个地下城探险者名单中记下这些最恶劣的
+恶棍的名字：
+
+    Adam Aronow               Irina Rempt-Drijfhout     Mike Gallop
+    Alex Kompel               Izchak Miller             Mike Passaretti
+    Alex Smith                J. Ali Harlow             Mike Stephenson
+    Andreas Dorn              Janet Walz                Mikko Juola
+    Andy Church               Janne Salmijarvi          Nathan Eady
+    Andy Swanson              Jean-Christophe Collet    Norm Meluch
+    Andy Thomson              Jeff Bailey               Olaf Seibert
+    Ari Huttunen              Jochen Erwied             Pasi Kallinen
+    Bart House                John Kallen               Pat Rankin
+    Benson I. Margulies       John Rupley               Patric Mueller
+    Bill Dyer                 John S. Bien              Paul Winner
+    Boudewijn Waijers         Johnny Lee                Pierre Martineau
+    Bruce Cox                 Jon W{tte                 Ralf Brown
+    Bruce Holloway            Jonathan Handler          Ray Chason
+    Bruce Mewborne            Joshua Delahunty          Richard Addison
+    Cameron Root              Karl Garrison             Richard Beigel
+    Carl Schelin              Keizo Yamamoto            Richard P. Hughey
+    Chris Russo               Keith Simpson             Rob Menke
+    David Cohrs               Ken Arnold                Robin Bandy
+    David Damerell            Ken Arromdee              Robin Johnson
+    David Gentzel             Ken Lorber                Roderick Schertler
+    David Hairston            Ken Washikita             Roland McGrath
+    Dean Luick                Kestrel Gregorich-Trevor  Ron Van Iwaarden
+    Del Lamb                  Kevin Darcy               Ronnen Miller
+    Derek S. Ray              Kevin Hugo                Ross Brown
+    Deron Meranda             Kevin Sitze               Sascha Wostmann
+    Dion Nicolaas             Kevin Smolkowski          Scott Bigham
+    Dylan O'Donnell           Kevin Sweet               Scott R. Turner
+    Eric Backus               Lars Huttar               Sean Hunt
+    Eric Hendrickson          Leon Arnott               Stephen Spackman
+    Eric R. Smith             M. Drew Streib            Stefan Thielscher
+    Eric S. Raymond           Malcolm Ryan              Stephen White
+    Erik Andersen             Mark Gooderum             Steve Creps
+    Fredrik Ljungdahl         Mark Modrall              Steve Linhart
+    Frederick Roeber          Marvin Bressler           Steve VanDevender
+    G. Branden Robinson       Matthew Day               Teemu Suikki
+    Gil Neiger                Merlyn LeRoy              Tim Lennan
+    Greg Laskin               Michael Allison           Timo Hakulinen
+    Greg Olson                Michael Feir              Tom Almy
+    Gregg Wonderly            Michael Hamel             Tom West
+    Hao-yang Wang             Michael Meyer             Warren Cheung
+    Helge Hafting             Michael Sokolov           Warwick Allison
+    Ingo Paschke              Mike Engber               Yitzhak Sapir

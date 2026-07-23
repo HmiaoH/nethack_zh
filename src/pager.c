@@ -2831,7 +2831,25 @@ static const struct {
     void (*f)(void);
     const char *text;
 } help_menu_items[] = {
-    { hmenu_doextversion, "About NetHack (version information)." },
+    { hmenu_doextversion,
+#ifdef ZHLANG
+      "关于 NetHack（版本信息）。" },
+    { dispfile_help, "游戏与命令的详细说明。" },
+    { dispfile_shelp, "游戏命令列表。" },
+    { hmenu_dohistory, "NetHack 简史。" },
+    { hmenu_dowhatis, "查看游戏画面中某个字符的信息。" },
+    { hmenu_dowhatdoes, "查看某个按键对应的命令。" },
+    { option_help, "游戏选项列表。" },
+    { dispfile_optionfile, "游戏选项详细说明。" },
+    { dispfile_optmenu, "使用 %s 命令设置选项。" },
+    { dokeylist, "键盘命令完整列表。" },
+    { hmenu_doextlist, "扩展命令列表。" },
+    { domenucontrols, "菜单控制键列表。" },
+    { dispfile_usagehelp, "NetHack 命令行说明。" },
+    { dispfile_license, "NetHack 许可协议。" },
+    { docontact, "支持信息。" },
+#else
+      "About NetHack (version information)." },
     { dispfile_help, "Long description of the game and commands." },
     { dispfile_shelp, "List of game commands." },
     { hmenu_dohistory, "Concise history of NetHack." },
@@ -2846,6 +2864,7 @@ static const struct {
     { dispfile_usagehelp, "Description of NetHack's command line." },
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
+#endif
 #ifdef PORT_HELP
     { port_help, "%s-specific help and commands." },
 #endif

@@ -60,6 +60,25 @@ static struct permonst mons_init[NUMMONS + 1] = {
         0, 0, 0),
 };
 
+#ifdef ZHLANG
+static struct permonst mons_zh_init[NUMMONS + 1] = {
+#include "monsters_zh.h"
+#undef MON
+#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
+            flg1, flg2, flg3, d, col, bn)           \
+    {                                                                   \
+        nam, NON_PM,                                                    \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col     \
+    }
+    MON(NAM(""), 0,
+        LVL(0, 0, 0, 0, 0), G_NOGEN | G_NOCORPSE,
+        A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(0, 0, 0, 0), 0, 0,
+        0L,  M2_NOPOLY, 0,
+        0, 0, 0),
+};
+#endif
+
 #undef MON
 #undef NAM
 #undef NAMS
@@ -67,11 +86,17 @@ static struct permonst mons_init[NUMMONS + 1] = {
 void monst_globals_init(void); /* in hack.h but we're using config.h */
 
 struct permonst mons[SIZE(mons_init)];
+#ifdef ZHLANG
+struct permonst mons_zh[SIZE(mons_zh_init)];
+#endif
 
 void
 monst_globals_init(void)
 {
     memcpy(mons, mons_init, sizeof mons);
+#ifdef ZHLANG
+    memcpy(mons_zh, mons_zh_init, sizeof mons_zh);
+#endif
     return;
 }
 

@@ -81,5 +81,8 @@ struct permonst {
 
 extern NEARDATA struct permonst mons[NUMMONS + 1]; /* the master list of
                                                     * monster types */
+#ifdef ZHLANG
+extern NEARDATA struct permonst mons_zh[NUMMONS + 1]; /* Chinese display names */
+#endif
 
 #endif /* PERMONST_H */

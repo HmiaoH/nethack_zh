@@ -320,7 +320,7 @@
  *      won't necessarily work as intended within nethack but at least
  *      makedefs wouldn't reject them.)
  */
-#define MAKEDEFS_FILTER_NONASCII
+/* #define MAKEDEFS_FILTER_NONASCII */ /* disabled for Chinese localization */
 
 /*
  *      PERSMAX, POINTSMIN, ENTRYMAX, PERS_IS_UID:

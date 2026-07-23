@@ -17,6 +17,14 @@ static struct objdescr obj_descr_init[NUM_OBJECTS + 1] = {
 #undef OBJECTS_DESCR_INIT
 };
 
+#ifdef ZHLANG
+static struct objdescr obj_descr_zh_init[NUM_OBJECTS + 1] = {
+#define OBJECTS_DESCR_INIT
+#include "objects_zh.h"
+#undef OBJECTS_DESCR_INIT
+};
+#endif
+
 static struct objclass obj_init[NUM_OBJECTS + 1] = {
 #define OBJECTS_INIT
 #include "objects.h"
@@ -27,11 +35,17 @@ void objects_globals_init(void); /* in hack.h but we're using config.h */
 
 struct objdescr obj_descr[SIZE(obj_descr_init)];
 struct objclass objects[SIZE(obj_init)];
+#ifdef ZHLANG
+struct objdescr obj_descr_zh[SIZE(obj_descr_zh_init)];
+#endif
 
 void
 objects_globals_init(void)
 {
     memcpy(obj_descr, obj_descr_init, sizeof(obj_descr));
+#ifdef ZHLANG
+    memcpy(obj_descr_zh, obj_descr_zh_init, sizeof(obj_descr_zh));
+#endif
     memcpy(objects, obj_init, sizeof(objects));
 }
 

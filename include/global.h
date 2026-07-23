@@ -33,6 +33,27 @@
 #define TRIBUTEFILE "tribute"   /* 3.6 tribute to Terry Pratchett */
 #define LEV_EXT ".lua"          /* extension for special level files */
 
+#ifdef ZHLANG
+#undef HELP
+#define HELP "help_zh"
+#undef SHELP
+#define SHELP "hh_zh"
+#undef KEYHELP
+#define KEYHELP "keyhelp_zh"
+#undef DEBUGHELP
+#define DEBUGHELP "wizhelp_zh"
+#undef CMDHELPFILE
+#define CMDHELPFILE "cmdhelp_zh"
+#undef HISTORY
+#define HISTORY "history_zh"
+#undef OPTIONFILE
+#define OPTIONFILE "opthelp_zh"
+#undef OPTMENUHELP
+#define OPTMENUHELP "optmenu_zh"
+#undef USAGEHELP
+#define USAGEHELP "usagehlp_zh"
+#endif
+
 /* padding amounts for files that have lines chosen by fseek to random spot,
    advancing to the next line, and using that line; makedefs forces shorter
    lines to be padded to these lengths; value of 0 will inhibit any padding,
