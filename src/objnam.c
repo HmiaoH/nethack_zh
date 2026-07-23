@@ -561,14 +561,22 @@ xcalled(
     const char *pfx, /* usually class string, sometimes more specific */
     const char *sfx) /* user assigned type name */
 {
-    int bufsiz = siz - 1 - (int) strlen(buf),
-        pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+    int bufsiz = siz - 1 - (int) strlen(buf);
+#ifdef ZHLANG
+    int pfxlen = (int) (strlen(pfx) + sizeof "名为" - sizeof "");
+#else
+    int pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+#endif
 
     if (pfxlen > bufsiz)
         panic("xcalled: not enough room for prefix (%d > %d)",
               pfxlen, bufsiz);
 
+#ifdef ZHLANG
+    Sprintf(eos(buf), "%s名为%.*s", pfx, bufsiz - pfxlen, sfx);
+#else
     Sprintf(eos(buf), "%s called %.*s", pfx, bufsiz - pfxlen, sfx);
+#endif
 }
 
 char *
@@ -671,16 +679,28 @@ xname_flags(
     switch (obj->oclass) {
     case AMULET_CLASS:
         if (!dknown)
+#ifdef ZHLANG
+            Strcpy(buf, "护身符");
+#else
             Strcpy(buf, "amulet");
+#endif
         else if (typ == AMULET_OF_YENDOR || typ == FAKE_AMULET_OF_YENDOR)
             /* each must be identified individually */
             Strcpy(buf, known ? actualn : dn);
         else if (nn)
             Strcpy(buf, actualn);
         else if (un)
+#ifdef ZHLANG
+            xcalled(buf, BUFSZ - PREFIX, "护身符", un);
+#else
             xcalled(buf, BUFSZ - PREFIX, "amulet", un);
+#endif
         else
+#ifdef ZHLANG
+            Sprintf(buf, "%s护身符", dn);
+#else
             Sprintf(buf, "%s amulet", dn);
+#endif
         break;
     case WEAPON_CLASS:
         if (is_poisonable(obj) && obj->opoisoned)
@@ -817,7 +837,11 @@ xname_flags(
                originally we just tested for non-0 but checking for 1 is
                more robust because the default value for that overloaded
                field (obj->corpsenm) is NON_PM (-1) rather than 0 */
+#ifdef ZHLANG
+            Strcat(strcpy(buf, "下一个"), actualn);
+#else
             Strcat(strcpy(buf, "next "), actualn); /* "next boulder" */
+#endif
             /* once "next boulder" occurs, subsequent messages should just
                use ordinary "boulder" */
             obj->next_boulder = 0;
@@ -826,10 +850,39 @@ xname_flags(
         }
         break;
     case BALL_CLASS:
+#ifdef ZHLANG
+        Sprintf(buf, "%s重铁球",
+                (obj->owt > ocl->oc_weight) ? "非常" : "");
+#else
         Sprintf(buf, "%sheavy iron ball",
                 (obj->owt > ocl->oc_weight) ? "very " : "");
+#endif
         break;
     case POTION_CLASS:
+#ifdef ZHLANG
+        if (dknown && obj->odiluted)
+            Strcpy(buf, "稀释的");
+        if (nn || un || !dknown) {
+            if (!dknown) {
+                Strcat(buf, "药水");
+                break;
+            }
+            if (nn) {
+                if (typ == POT_WATER && bknown
+                    && (obj->blessed || obj->cursed)) {
+                    Strcat(buf, obj->blessed ? "圣" : "邪");
+                }
+                Strcat(buf, actualn);
+                Strcat(buf, "药水");
+            } else {
+                Strcat(buf, "药水");
+                xcalled(buf, BUFSZ - PREFIX, "", un);
+            }
+        } else {
+            Strcat(buf, dn);
+            Strcat(buf, "药水");
+        }
+#else
         if (dknown && obj->odiluted)
             Strcpy(buf, "diluted ");
         if (nn || un || !dknown) {
@@ -850,8 +903,26 @@ xname_flags(
             Strcat(buf, dn);
             Strcat(buf, " potion");
         }
+#endif
         break;
     case SCROLL_CLASS:
+#ifdef ZHLANG
+        Strcpy(buf, "卷轴");
+        if (!dknown)
+            break;
+        if (nn) {
+            Strcpy(buf, actualn);
+            Strcat(buf, "卷轴");
+        } else if (un) {
+            xcalled(buf, BUFSZ - PREFIX, "", un);
+        } else if (ocl->oc_magic) {
+            Strcat(buf, " 标签为");
+            Strcat(buf, dn);
+        } else {
+            Strcpy(buf, dn);
+            Strcat(buf, " 卷轴");
+        }
+#else
         Strcpy(buf, "scroll");
         if (!dknown)
             break;
@@ -867,18 +938,60 @@ xname_flags(
             Strcpy(buf, dn);
             Strcat(buf, " scroll");
         }
+#endif
         break;
     case WAND_CLASS:
         if (!dknown)
+#ifdef ZHLANG
+            Strcpy(buf, "魔杖");
+#else
             Strcpy(buf, "wand");
+#endif
         else if (nn)
+#ifdef ZHLANG
+            Sprintf(buf, "%s魔杖", actualn);
+#else
             Sprintf(buf, "wand of %s", actualn);
+#endif
         else if (un)
+#ifdef ZHLANG
+            xcalled(buf, BUFSZ - PREFIX, "魔杖", un);
+#else
             xcalled(buf, BUFSZ - PREFIX, "wand", un);
+#endif
         else
+#ifdef ZHLANG
+            Sprintf(buf, "%s魔杖", dn);
+#else
             Sprintf(buf, "%s wand", dn);
+#endif
         break;
     case SPBOOK_CLASS:
+#ifdef ZHLANG
+        if (typ == SPE_NOVEL) {
+            if (!dknown)
+                Strcpy(buf, "书");
+            else if (nn)
+                Strcpy(buf, actualn);
+            else if (un)
+                xcalled(buf, BUFSZ - PREFIX, "小说", un);
+            else
+                Sprintf(buf, "%s书", dn);
+            break;
+        } else if (!dknown) {
+            Strcpy(buf, "魔法书");
+        } else if (nn) {
+            if (typ != SPE_BOOK_OF_THE_DEAD) {
+                Strcpy(buf, actualn);
+                Strcat(buf, "魔法书");
+            } else {
+                Strcpy(buf, actualn);
+            }
+        } else if (un) {
+            xcalled(buf, BUFSZ - PREFIX, "魔法书", un);
+        } else
+            Sprintf(buf, "%s魔法书", dn);
+#else
         if (typ == SPE_NOVEL) { /* 3.6 tribute */
             if (!dknown)
                 Strcpy(buf, "book");
@@ -900,18 +1013,51 @@ xname_flags(
             xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
         } else
             Sprintf(buf, "%s spellbook", dn);
+#endif
         break;
     case RING_CLASS:
         if (!dknown)
+#ifdef ZHLANG
+            Strcpy(buf, "戒指");
+#else
             Strcpy(buf, "ring");
+#endif
         else if (nn)
+#ifdef ZHLANG
+            Sprintf(buf, "%s戒指", actualn);
+#else
             Sprintf(buf, "ring of %s", actualn);
+#endif
         else if (un)
+#ifdef ZHLANG
+            xcalled(buf, BUFSZ - PREFIX, "戒指", un);
+#else
             xcalled(buf, BUFSZ - PREFIX, "ring", un);
+#endif
         else
+#ifdef ZHLANG
+            Sprintf(buf, "%s戒指", dn);
+#else
             Sprintf(buf, "%s ring", dn);
+#endif
         break;
     case GEM_CLASS: {
+#ifdef ZHLANG
+        const char *rock = (ocl->oc_material == MINERAL) ? "石头" : "宝石";
+
+        if (!dknown) {
+            Strcpy(buf, rock);
+        } else if (!nn) {
+            if (un)
+                xcalled(buf, BUFSZ - PREFIX, rock, un);
+            else
+                Sprintf(buf, "%s%s", dn, rock);
+        } else {
+            Strcpy(buf, actualn);
+            if (GemStone(typ))
+                Strcat(buf, "石头");
+        }
+#else
         const char *rock = (ocl->oc_material == MINERAL) ? "stone" : "gem";
 
         if (!dknown) {
@@ -926,6 +1072,7 @@ xname_flags(
             if (GemStone(typ))
                 Strcat(buf, " stone");
         }
+#endif
         break;
     } /* gem */
     default:
@@ -996,7 +1143,11 @@ xname_flags(
     }
 
     if (has_oname(obj) && dknown) {
+#ifdef ZHLANG
+        Concat(buf, 0, "名为");
+#else
         Concat(buf, 0, " named ");
+#endif
 
         /* jump directly here if obj passes the has-personal-name test */
  nameit:

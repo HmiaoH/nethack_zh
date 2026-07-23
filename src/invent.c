@@ -4843,9 +4843,16 @@ useupf(struct obj *obj, long numused)
  * This must match the object class order.
  */
 static NEARDATA const char *names[] = {
+    0,
+#ifdef ZHLANG
+    "非法物品", "武器", "防具", "戒指", "护身符", "工具",
+    "食物", "药水", "卷轴", "魔法书", "魔杖", "金币",
+    "宝石/石头", "巨石/雕像", "铁球", "铁链", "毒液"
+#else
     0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
+#endif
 };
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
