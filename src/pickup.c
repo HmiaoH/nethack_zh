@@ -3405,8 +3405,13 @@ use_container(
     }
 
     if ((loot_in || stash_one) && !inokay) {
+#ifdef ZHLANG
+        You("没有任何东西可以%s。", gi.invent ? " else" : "",
+            stash_one ? "stash" : "put in");
+#else
         You("don't have anything%s to %s.", gi.invent ? " else" : "",
             stash_one ? "stash" : "put in");
+#endif
         loot_in = stash_one = FALSE;
     }
 

@@ -1137,7 +1137,11 @@ test_move(
                                 You_cant("lead %s through that closed door.",
                                          y_monnam(u.usteed));
                             } else {
+#ifdef ZHLANG
+                                pline("哎呦！你撞到了门上。");
+#else
                                 pline("Ouch!  You bump into a door.");
+#endif
                                 exercise(A_DEX, FALSE);
                             }
                             /* use current move; needed for the "ouch" case

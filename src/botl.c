@@ -541,8 +541,13 @@ describe_level(
     } else {
         /* ports with more room may expand this one */
         if (!addbranch)
+#ifdef ZHLANG
+            Sprintf(buf, "%s:%-2d",
+                    In_tutorial(&u.uz) ? "教程" : "层", depth(&u.uz));
+#else
             Sprintf(buf, "%s:%-2d", /* "Dlvl:n" (grep fodder) */
                     In_tutorial(&u.uz) ? "Tutorial" : "Dlvl", depth(&u.uz));
+#endif
         else
             Sprintf(buf, "level %d", depth(&u.uz));
         ret = 0;

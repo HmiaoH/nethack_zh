@@ -29,7 +29,11 @@
 
 const struct Role roles[NUM_ROLES+1] = {
     { { "Archeologist", 0 },
+#ifdef ZHLANG
+      { { "考古学家", 0 },
+#else
       { { "Digger", 0 },
+#endif
         { "Field Worker", 0 },
         { "Investigator", 0 },
         { "Exhumer", 0 },
@@ -69,7 +73,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_MAGIC_MAPPING,
       -4 },
+#ifdef ZHLANG
+    { { "野蛮人", 0 },
+#else
     { { "Barbarian", 0 },
+#endif
       { { "Plunderer", "Plunderess" },
         { "Pillager", 0 },
         { "Bandit", 0 },
@@ -110,7 +118,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_HASTE_SELF,
       -4 },
+#ifdef ZHLANG
+    { { "穴居人", "穴居女" },
+#else
     { { "Caveman", "Cavewoman" },
+#endif
       { { "Troglodyte", 0 },
         { "Aborigine", 0 },
         { "Wanderer", 0 },
@@ -151,7 +163,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_DIG,
       -4 },
+#ifdef ZHLANG
+    { { "治疗师", 0 },
+#else
     { { "Healer", 0 },
+#endif
       { { "Rhizotomist", 0 },
         { "Empiric", 0 },
         { "Embalmer", 0 },
@@ -191,7 +207,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_CURE_SICKNESS,
       -4 },
+#ifdef ZHLANG
+    { { "骑士", 0 },
+#else
     { { "Knight", 0 },
+#endif
       { { "Gallant", 0 },
         { "Esquire", 0 },
         { "Bachelor", 0 },
@@ -231,7 +251,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_TURN_UNDEAD,
       -4 },
+#ifdef ZHLANG
+    { { "武僧", 0 },
+#else
     { { "Monk", 0 },
+#endif
       { { "Candidate", 0 },
         { "Novice", 0 },
         { "Initiate", 0 },
@@ -272,7 +296,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
+#ifdef ZHLANG
+    { { "祭司", "女祭司" },
+#else
     { { "Priest", "Priestess" },
+#endif
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
         { "Adept", 0 },
@@ -315,7 +343,11 @@ const struct Role roles[NUM_ROLES+1] = {
       -4 },
     /* Note:  Rogue precedes Ranger so that use of `-R' on the command line
        retains its traditional meaning. */
+#ifdef ZHLANG
+    { { "游荡者", 0 },
+#else
     { { "Rogue", 0 },
+#endif
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
         { "Rogue", 0 },
@@ -355,7 +387,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_DETECT_TREASURE,
       -4 },
+#ifdef ZHLANG
+    { { "游侠", 0 },
+#else
     { { "Ranger", 0 },
+#endif
       {
 #if 0 /* OBSOLETE */
         {"Edhel",   "Elleth"},
@@ -410,7 +446,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_INVISIBILITY,
       -4 },
+#ifdef ZHLANG
+    { { "武士", 0 },
+#else
     { { "Samurai", 0 },
+#endif
       { { "Hatamoto", 0 },       /* Banner Knight */
         { "Ronin", 0 },          /* no allegiance */
         { "Ninja", "Kunoichi" }, /* secret society */
@@ -450,7 +490,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_CLAIRVOYANCE,
       -4 },
+#ifdef ZHLANG
+    { { "游客", 0 },
+#else
     { { "Tourist", 0 },
+#endif
       { { "Rambler", 0 },
         { "Sightseer", 0 },
         { "Excursionist", 0 },
@@ -490,7 +534,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_CHARM_MONSTER,
       -4 },
+#ifdef ZHLANG
+    { { "女武神", 0 },
+#else
     { { "Valkyrie", 0 },
+#endif
       { { "Stripling", 0 },
         { "Skirmisher", 0 },
         { "Fighter", 0 },
@@ -530,7 +578,11 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_CONE_OF_COLD,
       -4 },
+#ifdef ZHLANG
+    { { "法师", 0 },
+#else
     { { "Wizard", 0 },
+#endif
       { { "Evoker", 0 },
         { "Conjurer", 0 },
         { "Thaumaturge", 0 },
