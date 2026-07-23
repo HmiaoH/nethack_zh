@@ -1917,10 +1917,46 @@ getobj(
         cnt = 0L;
         cntgiven = FALSE;
 #ifdef ZHLANG
-        Sprintf(qbuf, "你想%s什么？", word);
-#else
-        Sprintf(qbuf, "What do you want to %s?", word);
+        {
+            static const char *verb_en[] = {
+                "wield", "wear", "put on", "take off", "remove",
+                "read", "drink", "quaff", "throw", "shoot",
+                "zap", "apply", "rub", "dip", "fire",
+                "quiver", "ready", "eat", "drop", "pick up",
+                "sacrifice", "offer", "invoke", "name", "call",
+                "open", "close", "stash", "put in", "tip",
+                "spill", "force", "loot", "buy", "pay for",
+                "engrave", "write", "wipe", "polish",
+                "adjust", "swap", "exchange",
+                NULL
+            };
+            static const char *verb_zh[] = {
+                "挥舞", "穿上", "戴上", "脱下", "取下",
+                "阅读", "喝", "喝下", "投掷", "射击",
+                "施放", "使用", "擦拭", "浸泡", "发射",
+                "装箭", "装备", "吃", "丢弃", "捡起",
+                "献祭", "供奉", "激发", "命名", "称呼",
+                "打开", "关闭", "存放", "放入", "倒出",
+                "泼洒", "撬开", "搜刮", "购买", "支付",
+                "雕刻", "书写", "擦拭", "擦拭",
+                "调整", "交换", "交换",
+                NULL
+            };
+            int v;
+            for (v = 0; verb_en[v]; v++)
+                if (!strcmp(word, verb_en[v])) {
+                    word = verb_zh[v];
+                    break;
+                }
+        }
 #endif
+        Sprintf(qbuf,
+#ifdef ZHLANG
+                "你想%s什么？",
+#else
+                "What do you want to %s?",
+#endif
+                word);
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {

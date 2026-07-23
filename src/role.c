@@ -34,6 +34,16 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
       { { "Digger", 0 },
 #endif
+#ifdef ZHLANG
+        { "田野工作者", 0 },
+        { "调查员", 0 },
+        { "发掘者", 0 },
+        { "挖掘者", 0 },
+        { "洞穴探险家", 0 },
+        { "洞穴学家", 0 },
+        { "收藏家", 0 },
+        { "馆长", 0 } },
+#else
         { "Field Worker", 0 },
         { "Investigator", 0 },
         { "Exhumer", 0 },
@@ -42,6 +52,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Speleologist", 0 },
         { "Collector", 0 },
         { "Curator", 0 } },
+#endif
       "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
       "Arc",
       "the College of Archeology",
@@ -78,6 +89,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Barbarian", 0 },
 #endif
+#ifdef ZHLANG
+      { { "掠夺者", "女掠夺者" },
+        { "劫掠者", 0 },
+        { "强盗", 0 },
+        { "匪徒", 0 },
+        { "袭击者", 0 },
+        { "掠夺者", 0 },
+        { "屠戮者", 0 },
+        { "酋长", "女酋长" },
+        { "征服者", "女征服者" } },
+#else
       { { "Plunderer", "Plunderess" },
         { "Pillager", 0 },
         { "Bandit", 0 },
@@ -87,6 +109,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Slayer", 0 },
         { "Chieftain", "Chieftainess" },
         { "Conqueror", "Conqueress" } },
+#endif
       "Mitra", "Crom", "Set", /* Hyborian */
       "Bar",
       "the Camp of the Duali Tribe",
@@ -123,6 +146,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Caveman", "Cavewoman" },
 #endif
+#ifdef ZHLANG
+      { { "穴居人", 0 },
+        { "原住民", 0 },
+        { "流浪者", 0 },
+        { "漂泊者", 0 },
+        { "旅人", 0 },
+        { "漫游者", 0 },
+        { "游牧者", 0 },
+        { "游荡者", 0 },
+        { "开拓者", 0 } },
+#else
       { { "Troglodyte", 0 },
         { "Aborigine", 0 },
         { "Wanderer", 0 },
@@ -132,6 +166,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Nomad", 0 },
         { "Rover", 0 },
         { "Pioneer", 0 } },
+#endif
       "Anu", "_Ishtar", "Anshar", /* Babylonian */
       "Cav",
       "the Caves of the Ancestors",
@@ -168,6 +203,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Healer", 0 },
 #endif
+#ifdef ZHLANG
+      { { "草药师", 0 },
+        { "经验医者", 0 },
+        { "入殓师", 0 },
+        { "包扎师", 0 },
+        { "骨科医", "女骨科医" },
+        { "草药医", 0 },
+        { "医师", "女医师" },
+        { "内科医生", 0 },
+        { "外科医生", 0 } },
+#else
       { { "Rhizotomist", 0 },
         { "Empiric", 0 },
         { "Embalmer", 0 },
@@ -177,6 +223,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Magister", "Magistra" },
         { "Physician", 0 },
         { "Chirurgeon", 0 } },
+#endif
       "_Athena", "Hermes", "Poseidon", /* Greek */
       "Hea",
       "the Temple of Epidaurus",
@@ -212,6 +259,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Knight", 0 },
 #endif
+#ifdef ZHLANG
+      { { "豪侠", 0 },
+        { "随从", 0 },
+        { "单身骑士", 0 },
+        { "中士", 0 },
+        { "骑士", 0 },
+        { "方旗骑士", 0 },
+        { "骑士", "女骑士" },
+        { "领主", "夫人" },
+        { "圣骑士", 0 } },
+#else
       { { "Gallant", 0 },
         { "Esquire", 0 },
         { "Bachelor", 0 },
@@ -221,6 +279,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Chevalier", "Chevaliere" },
         { "Seignieur", "Dame" },
         { "Paladin", 0 } },
+#endif
       "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
       "Kni",
       "Camelot Castle",
@@ -256,6 +315,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Monk", 0 },
 #endif
+#ifdef ZHLANG
+      { { "见习", 0 },
+        { "新手", 0 },
+        { "入门", 0 },
+        { "石之学徒", 0 },
+        { "水之学徒", 0 },
+        { "金之学徒", 0 },
+        { "风之学徒", 0 },
+        { "火之学徒", 0 },
+        { "大师", 0 } },
+#else
       { { "Candidate", 0 },
         { "Novice", 0 },
         { "Initiate", 0 },
@@ -265,6 +335,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Student of Winds", 0 },
         { "Student of Fire", 0 },
         { "Master", 0 } },
+#endif
       "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
       "Mon",
       "the Monastery of Chan-Sune",
@@ -301,6 +372,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Priest", "Priestess" },
 #endif
+#ifdef ZHLANG
+      { { "见习", 0 },
+        { "侍僧", 0 },
+        { "能手", 0 },
+        { "祭司", "女祭司" },
+        { "副牧师", 0 },
+        { "教士", "女教士" },
+        { "喇嘛", 0 },
+        { "主教", "女主教" },
+        { "大祭司", "女大祭司" } },
+#else
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
         { "Adept", 0 },
@@ -310,6 +392,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Lama", 0 },
         { "Patriarch", "Matriarch" },
         { "High Priest", "High Priestess" } },
+#endif
       0, 0, 0, /* deities from a randomly chosen other role will be used */
       "Pri",
       "the Great Temple",
@@ -348,6 +431,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Rogue", 0 },
 #endif
+#ifdef ZHLANG
+      { { "拦路贼", 0 },
+        { "扒手", 0 },
+        { "游荡者", 0 },
+        { "小偷", 0 },
+        { "强盗", 0 },
+        { "夜贼", 0 },
+        { "窃贼", 0 },
+        { "惯偷", "女惯偷" },
+        { "大盗", 0 } },
+#else
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
         { "Rogue", 0 },
@@ -357,6 +451,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Filcher", 0 },
         { "Magsman", "Magswoman" },
         { "Thief", 0 } },
+#endif
       "Issek", "Mog", "Kos", /* Nehwon */
       "Rog",
       "the Thieves' Guild Hall",
@@ -392,6 +487,31 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Ranger", 0 },
 #endif
+#ifdef ZHLANG
+      {
+#if 0 /* OBSOLETE */
+        {"埃戴尔", "埃莱丝"},
+        {"埃戴尔", "埃莱丝"},         /* elf-maid */
+        {"奥赫塔", "奥赫蒂"},          /* warrior */
+        {"卡诺", "卡妮"},          /* commander (Q.) ['a] educated guess,
+                                          until further research- SAC */
+        {"阿兰杜尔","阿兰杜丽埃尔"}, /* king's servant, minister (Q.) - guess */
+        {"希尔", "希丽尔"},      /* lord, lady (S.) ['ir] */
+        {"阿瑞德海尔", "阿尔温"},      /* noble elf, maiden (S.) */
+        {"埃尔尼尔", "埃伦塔丽埃尔"}, /* prince (S.), elf-maiden (Q.) */
+        {"埃伦塔", "埃伦塔丽"},   /* Star-king, -queen (Q.) */
+        "索洛诺尔·塞兰迪拉", "艾尔德丽·费恩雅", "罗丝", /* Elven */
+#endif
+        { "新手", 0 },
+        { "瞭望者", 0 },
+        { "开路先锋", 0 },
+        { "侦察兵", "女侦察兵" },
+        { "斥候", 0 },
+        { "弩手", 0 },
+        { "弓箭手", 0 },
+        { "神射手", 0 },
+        { "神枪手", "女神枪手" } },
+#else
       {
 #if 0 /* OBSOLETE */
         {"Edhel",   "Elleth"},
@@ -415,6 +535,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Archer", 0 },
         { "Sharpshooter", 0 },
         { "Marksman", "Markswoman" } },
+#endif
       "Mercury", "_Venus", "Mars", /* Roman/planets */
       "Ran",
       "Orion's camp",
@@ -451,6 +572,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Samurai", 0 },
 #endif
+#ifdef ZHLANG
+      { { "旗本", 0 },
+        { "浪人", 0 },
+        { "忍者", "女忍" },
+        { "城主", 0 },
+        { "领主", 0 },
+        { "国主", 0 },
+        { "大名", 0 },
+        { "公卿", 0 },
+        { "将军", 0 } },
+#else
       { { "Hatamoto", 0 },       /* Banner Knight */
         { "Ronin", 0 },          /* no allegiance */
         { "Ninja", "Kunoichi" }, /* secret society */
@@ -460,6 +592,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Daimyo", 0 },         /* a samurai lord */
         { "Kuge", 0 },           /* Noble of the Court */
         { "Shogun", 0 } },       /* supreme commander, warlord */
+#endif
       "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
       "Sam",
       "the Castle of the Taro Clan",
@@ -495,6 +628,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Tourist", 0 },
 #endif
+#ifdef ZHLANG
+      { { "漫步者", 0 },
+        { "观光客", 0 },
+        { "远足者", 0 },
+        { "旅行者", "女旅行者" },
+        { "旅客", 0 },
+        { "旅途者", 0 },
+        { "航海者", 0 },
+        { "探险家", 0 },
+        { "冒险家", 0 } },
+#else
       { { "Rambler", 0 },
         { "Sightseer", 0 },
         { "Excursionist", 0 },
@@ -504,6 +648,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Voyager", 0 },
         { "Explorer", 0 },
         { "Adventurer", 0 } },
+#endif
       "Blind Io", "_The Lady", "Offler", /* Discworld */
       "Tou",
       "Ankh-Morpork",
@@ -539,6 +684,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Valkyrie", 0 },
 #endif
+#ifdef ZHLANG
+      { { "见习", 0 },
+        { "散兵", 0 },
+        { "斗士", 0 },
+        { "士兵", "女兵" },
+        { "战士", 0 },
+        { "剑客", 0 },
+        { "英雄", "女英雄" },
+        { "冠军", 0 },
+        { "领主", "女领主" } },
+#else
       { { "Stripling", 0 },
         { "Skirmisher", 0 },
         { "Fighter", 0 },
@@ -548,6 +704,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Hero", "Heroine" },
         { "Champion", 0 },
         { "Lord", "Lady" } },
+#endif
       "Tyr", "Odin", "Loki", /* Norse */
       "Val",
       "the Shrine of Destiny",
@@ -583,6 +740,17 @@ const struct Role roles[NUM_ROLES+1] = {
 #else
     { { "Wizard", 0 },
 #endif
+#ifdef ZHLANG
+      { { "召唤师", 0 },
+        { "咒术师", 0 },
+        { "奇术师", 0 },
+        { "魔术师", 0 },
+        { "附魔师", "女附魔师" },
+        { "术士", "女术士" },
+        { "死灵法师", 0 },
+        { "大法师", 0 },
+        { "贤者", 0 } },
+#else
       { { "Evoker", 0 },
         { "Conjurer", 0 },
         { "Thaumaturge", 0 },
@@ -592,6 +760,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Necromancer", 0 },
         { "Wizard", 0 },
         { "Mage", 0 } },
+#endif
       "Ptah", "Thoth", "Anhur", /* Egyptian */
       "Wiz",
       "the Lonely Tower",
