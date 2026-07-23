@@ -198,7 +198,11 @@ pri_move(struct monst *priest)
         || (Conflict && !resist_conflict(priest))) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced)
+                #ifdef ZHLANG
+                Your("位移影像骗不了%s！", mon_nam(priest));
+                #else
                 Your("displaced image doesn't fool %s!", mon_nam(priest));
+                #endif
             (void) mattacku(priest);
             return 0;
         } else if (strchr(u.urooms, temple)) {
@@ -437,8 +441,13 @@ intemple(int roomno)
                Moloch so suppress the "of Moloch" for him here too */
             if (sanctum && !Hallucination)
                 priest->ispriest = 0;
+#ifdef ZHLANG
+            pline("%s吟唱道：",
+                  canseemon(priest) ? Monnam(priest) : "附近的一个声音");
+#else
             pline("%s intones:",
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");
+#endif
             priest->ispriest = save_priest;
             epri_p->intone_time = svm.moves + (long) d(10, 500); /* ~2505 */
             /* make sure that we don't suppress entry message when
@@ -503,13 +512,25 @@ intemple(int roomno)
 
         switch (rn2(4)) {
         case 0:
+            #ifdef ZHLANG
+            You("有一种怪异的感觉...");
+            #else
             You("have an eerie feeling...");
+            #endif
             break;
         case 1:
+            #ifdef ZHLANG
+            You_feel("感觉像是被监视着。");
+            #else
             You_feel("like you are being watched.");
+            #endif
             break;
         case 2:
+            #ifdef ZHLANG
+            pline("一股战栗沿着你的%s直下。", body_part(SPINE));
+            #else
             pline("A shiver runs down your %s.", body_part(SPINE));
+            #endif
             break;
         default:
             break; /* no message; unfortunately there's no
@@ -521,15 +542,29 @@ intemple(int roomno)
                    != 0) {
             int ngen = svm.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
+                #ifdef ZHLANG
+                pline("一个%s鬼魂出现在你旁边%c",
+                      ngen < 5 ? "n enormous" : "",
+                      ngen < 10 ? '!' : '.');
+                #else
                 pline("A%s ghost appears next to you%c",
                       ngen < 5 ? "n enormous" : "",
                       ngen < 10 ? '!' : '.');
+                #endif
             else
+                #ifdef ZHLANG
+                You("感觉到附近有一个存在！");
+                #else
                 You("sense a presence close by!");
+                #endif
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             if (flags.verbose)
+                #ifdef ZHLANG
+                You("被吓得要死，动弹不得。");
+                #else
                 You("are frightened to death, and unable to move.");
+                #endif
             nomul(-3);
             gm.multi_reason = "being terrified of a ghost";
             gn.nomovemsg = "You regain your composure.";
@@ -575,7 +610,11 @@ priest_talk(struct monst *priest)
                        mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {
+        #ifdef ZHLANG
+        pline("%s不想与你有任何关系！", Monnam(priest));
+        #else
         pline("%s doesn't want anything to do with you!", Monnam(priest));
+        #endif
         priest->mpeaceful = 0;
         return;
     }
@@ -589,8 +628,13 @@ priest_talk(struct monst *priest)
         };
 
         if (helpless(priest)) {
+            #ifdef ZHLANG
+            pline("%s从%s的沉思中惊醒！", Monnam(priest),
+                  mhis(priest));
+            #else
             pline("%s breaks out of %s reverie!", Monnam(priest),
                   mhis(priest));
+            #endif
             priest->mfrozen = priest->msleeping = 0;
             priest->mcanmove = 1;
         }
@@ -604,8 +648,13 @@ priest_talk(struct monst *priest)
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
         SetVoice(priest, 0, 80, 0);
+        #ifdef ZHLANG
+        verbalize(
+              "滚开！你的存在亵渎了这片圣地。");
+        #else
         verbalize(
               "Begone!  Thou desecratest this holy place with thy presence.");
+        #endif
         priest->mpeaceful = 0;
         return;
     }
@@ -617,14 +666,27 @@ priest_talk(struct monst *priest)
                 bits = (Hallucination) ? currency(pmoney)
                                        : (pmoney == 1L) ? "bit" : "bits";
                 /* Note: two bits is actually 25 cents.  Hmm. */
+                #ifdef ZHLANG
+                pline("%s给了你%s%s买麦芽酒。", Monnam(priest),
+                      (pmoney == 1L) ? "one " : "two ", bits);
+                #else
                 pline("%s gives you %s%s for an ale.", Monnam(priest),
                       (pmoney == 1L) ? "one " : "two ", bits);
+                #endif
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
+                #ifdef ZHLANG
+                pline("%s宣扬贫困的美德。", Monnam(priest));
+                #else
                 pline("%s preaches the virtues of poverty.", Monnam(priest));
+                #endif
             exercise(A_WIS, TRUE);
         } else
+            #ifdef ZHLANG
+            pline("%s不感兴趣。", Monnam(priest));
+            #else
             pline("%s is not interested.", Monnam(priest));
+            #endif
         return;
     } else {
         /* there's now some randomization in how much you need to donate, but
@@ -646,36 +708,66 @@ priest_talk(struct monst *priest)
                 suggested * quan, suggested * quan * 2);
 
         if (flags.debug)
+#ifdef ZHLANG
+            pline("%s请求你为神殿捐款（基础%ld）。",
+                  Monnam(priest), suggested);
+#else
             pline("%s asks you for a contribution for the temple (base %ld).",
                   Monnam(priest), suggested);
+#endif
         else
+#ifdef ZHLANG
+            pline("%s请求你为神殿捐款。",
+                  Monnam(priest));
+#else
             pline("%s asks you for a contribution for the temple.",
                   Monnam(priest));
+#endif
         if ((offer = bribe(priest, buf)) == 0) {
             SetVoice(priest, 0, 80, 0);
+            #ifdef ZHLANG
+            verbalize("你会后悔你的行为！");
+            #else
             verbalize("Thou shalt regret thine action!");
+            #endif
             if (coaligned)
                 adjalign(-1);
             if (cheapskate) ++*cheapskate;
         } else if (offer < suggested * quan) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
                 SetVoice(priest, 0, 80, 0);
+                #ifdef ZHLANG
+                verbalize("小气鬼。");
+                #else
                 verbalize("Cheapskate.");
+                #endif
                 if (cheapskate) ++*cheapskate;
             } else {
                 SetVoice(priest, 0, 80, 0);
+                #ifdef ZHLANG
+                verbalize("我感谢你的捐赠。");
+                #else
                 verbalize("I thank thee for thy contribution.");
+                #endif
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < suggested * quan * 2) {
             SetVoice(priest, 0, 80, 0);
+            #ifdef ZHLANG
+            verbalize("你确实是一个虔诚的人。");
+            #else
             verbalize("Thou art indeed a pious individual.");
+            #endif
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
             }
+            #ifdef ZHLANG
+            verbalize("我赐福于你。");
+            #else
             verbalize("I bestow upon thee a blessing.");
+            #endif
             incr_itimeout(&HClairvoyant, rn1(500 * offer / suggested,
                                              500 * offer / suggested));
         } else if (offer < suggested * quan * 3) {
@@ -699,13 +791,25 @@ priest_talk(struct monst *priest)
             }
             SetVoice(priest, 0, 80, 0);
             if (u.ublessed > orig_ublessed) {
+                #ifdef ZHLANG
+                verbalize("你的虔诚得到了回报。");
+                #else
                 verbalize("Thou hast been rewarded for thy devotion.");
+                #endif
             } else {
+                #ifdef ZHLANG
+                verbalize("你的无私奉献深表感谢。");
+                #else
                 verbalize("Thy selfless generosity is deeply appreciated.");
+                #endif
             }
         } else {
             SetVoice(priest, 0, 80, 0);
+            #ifdef ZHLANG
+            verbalize("你的无私奉献深表感谢。");
+            #else
             verbalize("Thy selfless generosity is deeply appreciated.");
+            #endif
             /* money_cnt check is preserved for futureproofing but probably
                can't fail in the current code */
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
@@ -849,16 +953,31 @@ ghod_hitsu(struct monst *priest)
 
     switch (rn2(3)) {
     case 0:
+        #ifdef ZHLANG
+        pline("%s愤怒地咆哮：\"你必将受苦！\"",
+              a_gname_at(ax, ay));
+        #else
         pline("%s roars in anger:  \"Thou shalt suffer!\"",
               a_gname_at(ax, ay));
+        #endif
         break;
     case 1:
+        #ifdef ZHLANG
+        pline("%s的声音轰鸣：\"你竟敢伤害我的仆人！\"",
+              s_suffix(a_gname_at(ax, ay)));
+        #else
         pline("%s voice booms:  \"How darest thou harm my servant!\"",
               s_suffix(a_gname_at(ax, ay)));
+        #endif
         break;
     default:
+        #ifdef ZHLANG
+        pline("%s咆哮：\"你亵渎了我的神殿！\"",
+              a_gname_at(ax, ay));
+        #else
         pline("%s roars:  \"Thou dost profane my shrine!\"",
               a_gname_at(ax, ay));
+        #endif
         break;
     }
 

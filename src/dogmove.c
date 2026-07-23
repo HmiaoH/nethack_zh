@@ -284,13 +284,26 @@ dog_eat(struct monst *mtmp,
                result won't be printed */
             obj_name = distant_name(obj, doname);
             if (tunnels(mtmp->data))
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s开始挖掘。", noit_Monnam(mtmp));
+#else
                 pline_mon(mtmp, "%s digs in.", noit_Monnam(mtmp));
+#endif
             else
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s%s了%s。", noit_Monnam(mtmp),
+                      devour ? "狼吞虎咽" : "吃", obj_name);
+#else
                 pline_mon(mtmp, "%s %s %s.", noit_Monnam(mtmp),
                       devour ? "devours" : "eats", obj_name);
+#endif
         } else if (seeobj) {
             obj_name = distant_name(obj, doname);
+#ifdef ZHLANG
+            pline("它%s了%s。", devour ? "狼吞虎咽" : "吃", obj_name);
+#else
             pline("It %s %s.", devour ? "devours" : "eats", obj_name);
+#endif
         }
     }
     if (obj->unpaid) {
@@ -305,9 +318,14 @@ dog_eat(struct monst *mtmp,
         mtmp->mstun = 1;
         if (canseemon(mtmp)) {
             obj_name = distant_name(obj, doname); /* (see above) */
-            if (flags.verbose)
-                pline("%s spits %s out in disgust!",
-                      Monnam(mtmp), obj_name);
+                if (flags.verbose)
+#ifdef ZHLANG
+                    pline("%s厌恶地吐出了%s！",
+                          Monnam(mtmp), obj_name);
+#else
+                    pline("%s spits %s out in disgust!",
+                          Monnam(mtmp), obj_name);
+#endif
         }
     } else {
         /* It's a reward if it's DOGFOOD and the player dropped/threw it.
@@ -333,8 +351,13 @@ dog_eat(struct monst *mtmp,
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, COST_CONTENTS);
+#ifdef ZHLANG
+            pline("那个%s将花费你%ld%s。", objnambuf, oprice,
+                  currency(oprice));
+#else
             pline("That %s will cost you %ld %s.", objnambuf, oprice,
                   currency(oprice));
+#endif
             /* m_consume_obj() -> delobj() -> obfree() will handle the shop
                billing update */
         }
@@ -348,12 +371,25 @@ staticfn void
 dog_starve(struct monst *mtmp)
 {
     if (mtmp->mleashed && mtmp != u.usteed)
+#ifdef ZHLANG
+        Your("牵绳松了。");
+#else
         Your("leash goes slack.");
+#endif
     else if (cansee(mtmp->mx, mtmp->my))
+#ifdef ZHLANG
+        pline_mon(mtmp, "%s饿死了。", Monnam(mtmp));
+#else
         pline_mon(mtmp, "%s starves.", Monnam(mtmp));
+#endif
     else
+#ifdef ZHLANG
+        You_feel("难过了一瞬间。",
+                    Hallucination ? "郁闷" : "伤心");
+#else
         You_feel("%s for a moment.",
                     Hallucination ? "bummed" : "sad");
+#endif
     mondied(mtmp);
 }
 
@@ -378,11 +414,19 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
                 return TRUE;
             }
             if (cansee(mtmp->mx, mtmp->my))
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s因为饥饿而变得困惑。", Monnam(mtmp));
+#else
                 pline_mon(mtmp, "%s is confused from hunger.", Monnam(mtmp));
+#endif
             else if (couldsee(mtmp->mx, mtmp->my))
                 beg(mtmp);
             else
+#ifdef ZHLANG
+                You_feel("担心%s。", y_monnam(mtmp));
+#else
                 You_feel("worried about %s.", y_monnam(mtmp));
+#endif
             stop_occupation();
         } else if (svm.moves > edog->hungrytime + DOG_STARVE
                    || DEADMONSTER(mtmp)) {
@@ -457,8 +501,13 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             char *otmpname = distant_name(otmp, doname);
 
                             if (flags.verbose)
+#ifdef ZHLANG
+                                pline_xy(omx, omy, "%s捡起了%s。",
+                                      Monnam(mtmp), otmpname);
+#else
                                 pline_xy(omx, omy, "%s picks up %s.",
                                       Monnam(mtmp), otmpname);
+#endif
                         }
                         obj_extract_self(otmp);
                         newsym(omx, omy);
@@ -1279,8 +1328,13 @@ dog_move(
 
         if (mfp.info[chi] & ALLOW_U) {
             if (mtmp->mleashed) { /* play it safe */
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s挣脱了%s的牵绳！",
+                         Monnam(mtmp), mhis(mtmp));
+#else
                 pline_mon(mtmp, "%s breaks loose of %s leash!",
                          Monnam(mtmp), mhis(mtmp));
+#endif
                 m_unleash(mtmp, FALSE);
             }
             (void) mattacku(mtmp);
@@ -1304,11 +1358,18 @@ dog_move(
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
 
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s不情愿地%s了%s。", noit_Monnam(mtmp),
+                  vtense((char *) 0, locomotion(mtmp->data, "走")),
+                  (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "过" : "上",
+                  what);
+#else
             pline_mon(mtmp, "%s %s reluctantly %s %s.", noit_Monnam(mtmp),
                   vtense((char *) 0, locomotion(mtmp->data, "step")),
                   (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "over"
-                                                                   : "onto",
+                                                                    : "onto",
                   what);
+#endif
         }
         mon_track_add(mtmp, omx, omy);
         /* We have to know if the pet's going to do a combined eat and
@@ -1525,16 +1586,31 @@ quickmimic(struct monst *mtmp)
         if (was_leashed
             && (M_AP_TYPE(mtmp) != M_AP_MONSTER
                 || !mnum_leashable(mtmp->mappearance))) {
+#ifdef ZHLANG
+            Your("牵绳松了。");
+#else
             Your("leash goes slack.");
+#endif
             m_unleash(mtmp, FALSE);
         }
         if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
-            You("%s %s %s where %s was!",
-                seeloc ? "see" : "sense that",
-                (what != something) ? an(what) : what,
-                seeloc ? "appear" : "has appeared", buf);
+#ifdef ZHLANG
+        You("%s%s出现在%s原来的位置！",
+            seeloc ? "看到" : "感觉到",
+            (what != something) ? an(what) : what,
+            buf);
+#else
+        You("%s %s %s where %s was!",
+            seeloc ? "see" : "sense that",
+            (what != something) ? an(what) : what,
+            seeloc ? "appear" : "has appeared", buf);
+#endif
         else
+#ifdef ZHLANG
+            You("感觉到%s散发出类似%s的气息。", buf, what);
+#else
             You("sense that %s feels rather %s-ish.", buf, what);
+#endif
 
         display_nhwindow(WIN_MAP, TRUE);
     }

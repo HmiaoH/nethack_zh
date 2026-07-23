@@ -37,6 +37,22 @@ picking_at(coordxy x, coordxy y)
 staticfn const char *
 lock_action(void)
 {
+#ifdef ZHLANG
+    /* if the target is currently unlocked, we're trying to lock it now */
+    if (gx.xlock.door && !(gx.xlock.door->doormask & D_LOCKED))
+        return "正在锁门";
+    else if (gx.xlock.box && !gx.xlock.box->olocked)
+        return (gx.xlock.box->otyp == CHEST) ? "正在锁箱子" : "正在锁盒子";
+    /* otherwise we're trying to unlock it */
+    else if (gx.xlock.picktyp == LOCK_PICK || gx.xlock.picktyp == CREDIT_CARD)
+        return "正在撬锁";
+    else if (gx.xlock.door)
+        return "正在开锁（门）";
+    else if (gx.xlock.box)
+        return (gx.xlock.box->otyp == CHEST) ? "正在开锁（箱子）" : "正在开锁（盒子）";
+    else
+        return "正在撬锁";
+#else
     /* "unlocking"+2 == "locking" */
     static const char *const actions[] = {
         "unlocking the door",   /* [0] */
@@ -61,6 +77,7 @@ lock_action(void)
         return gx.xlock.box->otyp == CHEST ? actions[1] : actions[2];
     else
         return actions[3];
+#endif
 }
 
 /* try to open/close a lock */
@@ -78,19 +95,35 @@ picklock(void)
         }
         switch (gx.xlock.door->doormask) {
         case D_NODOOR:
+#ifdef ZHLANG
+            pline("这个门口没有门。");
+#else
             pline("This doorway has no door.");
+#endif
             return ((gx.xlock.usedtime = 0));
         case D_ISOPEN:
+#ifdef ZHLANG
+            You("无法锁上一扇开着的门。");
+#else
             You("cannot lock an open door.");
+#endif
             return ((gx.xlock.usedtime = 0));
         case D_BROKEN:
+#ifdef ZHLANG
+            pline("这扇门坏了。");
+#else
             pline("This door is broken.");
+#endif
             return ((gx.xlock.usedtime = 0));
         }
     }
 
     if (gx.xlock.usedtime++ >= 50 || nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You("放弃了%s的尝试。", lock_action());
+#else
         You("give up your attempt at %s.", lock_action());
+#endif
         exercise(A_DEX, TRUE); /* even if you don't succeed */
         return ((gx.xlock.usedtime = 0));
     }
@@ -107,7 +140,11 @@ picklock(void)
         gx.xlock.chance += 20; /* less effort needed next time */
         if (!gx.xlock.door) {
             if (!gx.xlock.box->tknown)
+#ifdef ZHLANG
+                You("发现了一个陷阱！");
+#else
                 You("find a trap!");
+#endif
             gx.xlock.box->tknown = 1;
         }
         if (y_n("Do you want to try to disarm it?") == 'y') {
@@ -125,17 +162,36 @@ picklock(void)
                 what = (gx.xlock.box->otyp == CHEST) ? "chest" : "box";
                 alreadyunlocked = !gx.xlock.box->olocked;
             }
+#ifdef ZHLANG
+            {
+                const char *znoun = what;
+                if (!strcmp(what, "door")) znoun = "门";
+                else if (!strcmp(what, "chest")) znoun = "箱子";
+                else if (!strcmp(what, "box")) znoun = "盒子";
+                You("成功解除了陷阱。%s仍然是%s锁着的。",
+                    znoun, alreadyunlocked ? "未" : "");
+            }
+#else
             You("succeed in disarming the trap.  The %s is still %slocked.",
                 what, alreadyunlocked ? "un" : "");
+#endif
             exercise(A_WIS, TRUE);
         } else {
+#ifdef ZHLANG
+            You("停止了%s。", lock_action());
+#else
             You("stop %s.", lock_action());
+#endif
             exercise(A_WIS, FALSE);
         }
         return ((gx.xlock.usedtime = 0));
     }
 
+#ifdef ZHLANG
+    You("成功%s。", lock_action());
+#else
     You("succeed in %s.", lock_action());
+#endif
     if (gx.xlock.door) {
         if (gx.xlock.door->doormask & D_TRAPPED) {
             b_trapped("door", FINGER);
@@ -179,7 +235,11 @@ breakchestlock(struct obj *box, boolean destroyit)
                 peaceful_shk = costly && (boolean) shkp->mpeaceful;
         long loss = 0L;
 
+#ifdef ZHLANG
+        pline("事实上，你已经完全摧毁了%s。", the(xname(box)));
+#else
         pline("In fact, you've totally destroyed %s.", the(xname(box)));
+#endif
         /* Put the contents on ground at the hero's feet. */
         while ((otmp = box->cobj) != 0) {
             obj_extract_self(otmp);
@@ -206,7 +266,11 @@ breakchestlock(struct obj *box, boolean destroyit)
         if (costly)
             loss += stolen_value(box, u.ux, u.uy, peaceful_shk, TRUE);
         if (loss)
+#ifdef ZHLANG
+            You("因物品被毁，欠款%ld%s。", loss, currency(loss));
+#else
             You("owe %ld %s for objects destroyed.", loss, currency(loss));
+#endif
         delobj(box);
     }
 }
@@ -219,7 +283,11 @@ forcelock(void)
         return ((gx.xlock.usedtime = 0)); /* you or it moved */
 
     if (gx.xlock.usedtime++ >= 50 || !uwep || nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You("放弃了强行开锁的尝试。");
+#else
         You("give up your attempt to force the lock.");
+#endif
         if (gx.xlock.usedtime >= 50) /* you made the effort */
             exercise((gx.xlock.picktyp) ? A_DEX : A_STR, TRUE);
         return ((gx.xlock.usedtime = 0));
@@ -231,10 +299,19 @@ forcelock(void)
             /* for a +0 weapon, probability that it survives an unsuccessful
              * attempt to force the lock is (.992)^50 = .67
              */
+#ifdef ZHLANG
+            pline("%s%s断了！", (uwep->quan > 1L) ? "你其中一把" : "你的",
+                  xname(uwep));
+#else
             pline("%sour %s broke!", (uwep->quan > 1L) ? "One of y" : "Y",
                   xname(uwep));
+#endif
             useup(uwep);
+#ifdef ZHLANG
+            You("放弃了强行开锁的尝试。");
+#else
             You("give up your attempt to force the lock.");
+#endif
             exercise(A_DEX, TRUE);
             return ((gx.xlock.usedtime = 0));
         }
@@ -244,7 +321,11 @@ forcelock(void)
     if (rn2(100) >= gx.xlock.chance)
         return 1; /* still busy */
 
+#ifdef ZHLANG
+    You("成功撬开了锁。");
+#else
     You("succeed in forcing the lock.");
+#endif
     exercise(gx.xlock.picktyp ? A_DEX : A_STR, TRUE);
     /* breakchestlock() might destroy xlock.box; if so, xlock context will
        be cleared (delobj -> obfree -> maybe_reset_pick); but it might not,
@@ -378,24 +459,47 @@ pick_lock(
 
     /* check whether we're resuming an interrupted previous attempt */
     if (gx.xlock.usedtime && picktyp == gx.xlock.picktyp) {
+#ifdef ZHLANG
+        static char no_longer[] = "不幸的是，你再也无法%s%s了。";
+#else
         static char no_longer[] = "Unfortunately, you can no longer %s %s.";
+#endif
 
         if (nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+            const char *what;
+            if (picktyp == LOCK_PICK)
+                what = "撬锁器";
+            else if (picktyp == CREDIT_CARD)
+                what = "信用卡";
+            else
+                what = "钥匙";
+            pline(no_longer, "握住", what);
+#else
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
 
             if (picktyp == CREDIT_CARD)
                 what = "card";
             pline(no_longer, "hold the", what);
+#endif
             reset_pick();
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (u.uswallow || (gx.xlock.box && !can_reach_floor(TRUE))) {
+#ifdef ZHLANG
+            pline(no_longer, "接触到", "锁");
+#else
             pline(no_longer, "reach the", "lock");
+#endif
             reset_pick();
             return PICKLOCK_LEARNED_SOMETHING;
         } else {
             const char *action = lock_action();
 
+#ifdef ZHLANG
+            You("继续%s。", action);
+#else
             You("resume your attempt at %s.", action);
+#endif
             gx.xlock.magic_key = is_magic_key(&gy.youmonst, pick);
             set_occupation(picklock, action, 0);
             return PICKLOCK_DID_SOMETHING;
@@ -403,11 +507,19 @@ pick_lock(
     }
 
     if (nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You_cant("拿不住%s——你没有手！", doname(pick));
+#else
         You_cant("hold %s -- you have no hands!", doname(pick));
+#endif
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
+#ifdef ZHLANG
+        You_cant("在%s身上开锁或解锁。", mon_nam(u.ustuck));
+#else
         You_cant("%sunlock %s.", (picktyp == CREDIT_CARD) ? "" : "lock or ",
                  mon_nam(u.ustuck));
+#endif
         return PICKLOCK_DID_NOTHING;
     }
 
@@ -433,14 +545,27 @@ pick_lock(
         int count;
 
         if (u.dz < 0 && !autounlock) { /* beware stale u.dz value */
+#ifdef ZHLANG
+            There("在%s没有任何锁。",
+                  Levitation ? "这里" : "那里");
+#else
             There("isn't any sort of lock up %s.",
                   Levitation ? "here" : "there");
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_lava(u.ux, u.uy)) {
+#ifdef ZHLANG
+            pline("那样做可能会熔化%s。", yname(pick));
+#else
             pline("Doing that would probably melt %s.", yname(pick));
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_pool(u.ux, u.uy) && !Underwater) {
+#ifdef ZHLANG
+            pline_The("%s没有锁。", hliquid("water"));
+#else
             pline_The("%s has no lock.", hliquid("water"));
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         }
 
@@ -455,7 +580,11 @@ pick_lock(
             if (Is_box(otmp)) {
                 ++count;
                 if (!can_reach_floor(TRUE)) {
+#ifdef ZHLANG
+                    You_cant("从上面够不到%s。", the(xname(otmp)));
+#else
                     You_cant("reach %s from up here.", the(xname(otmp)));
+#endif
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
                 it = 0;
@@ -504,13 +633,23 @@ pick_lock(
                 }
 
                 if (otmp->obroken) {
+#ifdef ZHLANG
+                    You_cant("无法用%s修复其坏掉的锁。",
+                             ansimpleoname(pick));
+#else
                     You_cant("fix its broken lock with %s.",
                              ansimpleoname(pick));
+#endif
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */
+#ifdef ZHLANG
+                    You_cant("不能用%s来做这个。",
+                             an(simple_typename(picktyp)));
+#else
                     You_cant("do that with %s.",
                              an(simple_typename(picktyp)));
+#endif
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (autounlock
                            && !touch_artifact(pick, &gy.youmonst)) {
@@ -540,7 +679,11 @@ pick_lock(
         }
         if (c != 'y') {
             if (!count)
+#ifdef ZHLANG
+                There("这里似乎没有任何锁。");
+#else
                 There("doesn't seem to be any sort of lock here.");
+#endif
             return PICKLOCK_LEARNED_SOMETHING; /* decided against all boxes */
         }
 
@@ -549,7 +692,11 @@ pick_lock(
         struct monst *mtmp;
 
         if (u.utrap && u.utraptype == TT_PIT) {
+#ifdef ZHLANG
+            You_cant("够不到坑的边缘。");
+#else
             You_cant("reach over the edge of the pit.");
+#endif
             /* this used to return PICKLOCK_LEARNED_SOMETHING but the
                #open command doesn't use a turn for similar situation */
             return PICKLOCK_DID_NOTHING;
@@ -562,10 +709,19 @@ pick_lock(
             if (picktyp == CREDIT_CARD
                 && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE])) {
                 SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+                verbalize("不查信用，不打折，没问题。");
+#else
                 verbalize("No checks, no credit, no problem.");
+#endif
             } else {
+#ifdef ZHLANG
+                pline("我觉得%s不会喜欢这样。",
+                      mon_nam(mtmp));
+#else
                 pline("I don't think %s would appreciate that.",
                       mon_nam(mtmp));
+#endif
             }
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {
@@ -586,20 +742,40 @@ pick_lock(
                 res = PICKLOCK_LEARNED_SOMETHING;
 
             if (is_drawbridge_wall(cc.x, cc.y) >= 0)
+#ifdef ZHLANG
+                You("%s到吊桥上没有锁。", Blind ? "感觉" : "看");
+#else
                 You("%s no lock on the drawbridge.", Blind ? "feel" : "see");
+#endif
             else
+#ifdef ZHLANG
+                You("那里%s有门。", Blind ? "没感觉到" : "没看到");
+#else
                 You("%s no door there.", Blind ? "feel" : "see");
+#endif
             return res;
         }
         switch (door->doormask) {
         case D_NODOOR:
+#ifdef ZHLANG
+            pline("这个门口没有门。");
+#else
             pline("This doorway has no door.");
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         case D_ISOPEN:
+#ifdef ZHLANG
+            You("无法锁上一扇开着的门。");
+#else
             You("cannot lock an open door.");
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         case D_BROKEN:
+#ifdef ZHLANG
+            pline("这扇门坏了。");
+#else
             pline("This door is broken.");
+#endif
             return PICKLOCK_LEARNED_SOMETHING;
         default:
             if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
@@ -613,7 +789,11 @@ pick_lock(
             }
             /* credit cards are only good for unlocking */
             if (picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
+#ifdef ZHLANG
+                You_cant("不能用信用卡锁门。");
+#else
                 You_cant("lock a door with a credit card.");
+#endif
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
@@ -685,18 +865,30 @@ doforce(void)
      */
 
     if (u.uswallow) {
+#ifdef ZHLANG
+        You_cant("无法在此处强行打开任何东西。");
+#else
         You_cant("force anything from inside here.");
+#endif
         return ECMD_OK;
     }
     if (!u_have_forceable_weapon()) {
         boolean use_plural = uwep && uwep->quan > 1;
 
+#ifdef ZHLANG
+        You_cant("无法用%s武器强行开锁。",
+                 !uwep ? "——你没有装备"
+                 : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
+                   ? "合适的"
+                   : "你的");
+#else
         You_cant("force anything %s weapon%s.",
                  !uwep ? "when not wielding a"
                  : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
                    ? (use_plural ? "without proper" : "without a proper")
                    : (use_plural ? "with those" : "with that"),
                  use_plural ? "s" : "");
+#endif
         return ECMD_OK;
     }
     if (!can_reach_floor(TRUE)) {
@@ -706,7 +898,11 @@ doforce(void)
 
     picktyp = is_blade(uwep) && !is_pick(uwep);
     if (gx.xlock.usedtime && gx.xlock.box && picktyp == gx.xlock.picktyp) {
+#ifdef ZHLANG
+        You("继续尝试强行开锁。");
+#else
         You("resume your attempt to force the lock.");
+#endif
         set_occupation(forcelock, "forcing the lock", 0);
         return ECMD_TIME;
     }
@@ -721,8 +917,13 @@ doforce(void)
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp->lknown = 0;
+#ifdef ZHLANG
+                There("这里有%s，但它的锁已经%s了。",
+                      doname(otmp), otmp->obroken ? "坏了" : "开了");
+#else
                 There("is %s here, but its lock is already %s.",
                       doname(otmp), otmp->obroken ? "broken" : "unlocked");
+#endif
                 otmp->lknown = 1;
                 continue;
             }
@@ -737,9 +938,17 @@ doforce(void)
                 continue;
 
             if (picktyp)
+#ifdef ZHLANG
+                You("把%s插入缝隙中撬动。", yname(uwep));
+#else
                 You("force %s into a crack and pry.", yname(uwep));
+#endif
             else
+#ifdef ZHLANG
+                You("开始用%s敲打它。", yname(uwep));
+#else
                 You("start bashing it with %s.", yname(uwep));
+#endif
             gx.xlock.box = otmp;
             gx.xlock.chance = objects[uwep->otyp].oc_wldam * 2;
             gx.xlock.picktyp = picktyp;
@@ -751,7 +960,11 @@ doforce(void)
     if (gx.xlock.box)
         set_occupation(forcelock, "forcing the lock", 0);
     else
+#ifdef ZHLANG
+        You("决定不强行开锁了。");
+#else
         You("decide not to force the issue.");
+#endif
     return ECMD_TIME;
 }
 
@@ -786,13 +999,21 @@ doopen_indir(coordxy x, coordxy y)
     int res = ECMD_OK;
 
     if (nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You_cant("无法打开任何东西——你没有手！");
+#else
         You_cant("open anything -- you have no hands!");
+#endif
         return ECMD_OK;
     }
 
     dirprompt = NULL; /* have get_adjacent_loc() -> getdir() use default */
     if (u.utrap && u.utraptype == TT_PIT && container_at(u.ux, u.uy, FALSE))
+#ifdef ZHLANG
+        dirprompt = "在哪里打开？[.>]";
+#else
         dirprompt = "Open where? [.>]";
+#endif
 
     if (x > 0 && y >= 0) {
         /* nonzero <x,y> is used when hero in amorphous form tries to
@@ -813,7 +1034,11 @@ doopen_indir(coordxy x, coordxy y)
     /* this used to be done prior to get_adjacent_loc() but doing so was
        incorrect once open at hero's spot became an alternate way to loot */
     if (u.utrap && u.utraptype == TT_PIT) {
+#ifdef ZHLANG
+        You_cant("够不到坑的边缘。");
+#else
         You_cant("reach over the edge of the pit.");
+#endif
         return ECMD_OK;
     }
 
@@ -841,38 +1066,76 @@ doopen_indir(coordxy x, coordxy y)
     if (portcullis || !IS_DOOR(door->typ)) {
         /* closed portcullis or spot that opened bridge would span */
         if (is_db_wall(cc.x, cc.y) || door->typ == DRAWBRIDGE_UP)
+#ifdef ZHLANG
+            There("没有明显的方式打开吊桥。");
+#else
             There("is no obvious way to open the drawbridge.");
+#endif
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
+#ifdef ZHLANG
+            pline_The("吊桥已经打开了。");
+#else
             pline_The("drawbridge is already open.");
+#endif
         else if (container_at(cc.x, cc.y, TRUE))
+#ifdef ZHLANG
+            pline("那边%s有什么可以搜刮的东西。",
+                  Blind ? "感觉" : "好像");
+        else
+            You("那里%s有门。", Blind ? "没感觉到" : "没看到");
+#else
             pline("%s like something lootable over there.",
                   Blind ? "Feels" : "Seems");
         else
             You("%s no door there.", Blind ? "feel" : "see");
+#endif
         return res;
     }
 
-    if (!(door->doormask & D_CLOSED)) {
-        const char *mesg;
-        boolean locked = FALSE;
+        if (!(door->doormask & D_CLOSED)) {
+#ifdef ZHLANG
+            const char *mesg;
+            boolean locked = FALSE;
 
-        switch (door->doormask) {
-        case D_BROKEN:
-            mesg = " is broken";
-            break;
-        case D_NODOOR:
-            mesg = "way has no door";
-            break;
-        case D_ISOPEN:
-            mesg = " is already open";
-            break;
-        default:
-            mesg = " is locked";
-            locked = TRUE;
-            break;
-        }
-        set_msg_xy(cc.x, cc.y);
-        pline("This door%s.", mesg);
+            switch (door->doormask) {
+            case D_BROKEN:
+                mesg = "坏了";
+                break;
+            case D_NODOOR:
+                mesg = "没有门";
+                break;
+            case D_ISOPEN:
+                mesg = "已经打开了";
+                break;
+            default:
+                mesg = "锁着";
+                locked = TRUE;
+                break;
+            }
+            set_msg_xy(cc.x, cc.y);
+            pline("这扇门%s。", mesg);
+#else
+            const char *mesg;
+            boolean locked = FALSE;
+
+            switch (door->doormask) {
+            case D_BROKEN:
+                mesg = " is broken";
+                break;
+            case D_NODOOR:
+                mesg = "way has no door";
+                break;
+            case D_ISOPEN:
+                mesg = " is already open";
+                break;
+            default:
+                mesg = " is locked";
+                locked = TRUE;
+                break;
+            }
+            set_msg_xy(cc.x, cc.y);
+            pline("This door%s.", mesg);
+#endif
         if (locked && flags.autounlock) {
             struct obj *unlocktool;
 
@@ -896,14 +1159,22 @@ doopen_indir(coordxy x, coordxy y)
     }
 
     if (verysmall(gy.youmonst.data)) {
+#ifdef ZHLANG
+        pline("你太小了，拉不开门。");
+#else
         pline("You're too small to pull the door open.");
+#endif
         return res;
     }
 
     /* door is known to be CLOSED */
     if (rnl(20) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
         set_msg_xy(cc.x, cc.y);
+#ifdef ZHLANG
+        pline_The("门开了。");
+#else
         pline_The("door opens.");
+#endif
         if (door->doormask & D_TRAPPED) {
             b_trapped("door", FINGER);
             door->doormask = D_NODOOR;
@@ -916,7 +1187,11 @@ doopen_indir(coordxy x, coordxy y)
     } else {
         exercise(A_STR, TRUE);
         set_msg_xy(cc.x, cc.y);
+#ifdef ZHLANG
+        pline_The("门纹丝不动！");
+#else
         pline_The("door resists!");
+#endif
     }
 
     return ECMD_TIME;
@@ -937,7 +1212,11 @@ obstructed(coordxy x, coordxy y, boolean quietly)
                 /* s_suffix() returns a modifiable buffer */
                 Mn = strcat(s_suffix(Mn), " tail");
 
+#ifdef ZHLANG
+            pline("%s挡住了路！", Mn);
+#else
             pline("%s blocks the way!", Mn);
+#endif
         }
         if (!canspotmon(mtmp))
             map_invisible(x, y);
@@ -946,7 +1225,11 @@ obstructed(coordxy x, coordxy y, boolean quietly)
     if (OBJ_AT(x, y)) {
  objhere:
         if (!quietly)
+#ifdef ZHLANG
+            pline("%s挡住了路。", Something);
+#else
             pline("%s's in the way.", Something);
+#endif
         return TRUE;
     }
     return FALSE;
@@ -962,12 +1245,20 @@ doclose(void)
     int res = ECMD_OK;
 
     if (nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You_cant("无法关闭任何东西——你没有手！");
+#else
         You_cant("close anything -- you have no hands!");
+#endif
         return ECMD_OK;
     }
 
     if (u.utrap && u.utraptype == TT_PIT) {
+#ifdef ZHLANG
+        You_cant("够不到坑的边缘。");
+#else
         You_cant("reach over the edge of the pit.");
+#endif
         return ECMD_OK;
     }
 
@@ -977,7 +1268,11 @@ doclose(void)
     x = u.ux + u.dx;
     y = u.uy + u.dy;
     if (u_at(x, y) && !Passes_walls) {
+#ifdef ZHLANG
+        You("挡住了路！");
+#else
         You("are in the way!");
+#endif
         return ECMD_TIME;
     }
 
@@ -1007,43 +1302,79 @@ doclose(void)
     if (portcullis || !IS_DOOR(door->typ)) {
         /* is_db_wall: closed portcullis */
         if (is_db_wall(x, y) || door->typ == DRAWBRIDGE_UP)
+#ifdef ZHLANG
+            pline_The("吊桥已经关闭了。");
+#else
             pline_The("drawbridge is already closed.");
+#endif
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
+#ifdef ZHLANG
+            There("没有明显的方式关闭吊桥。");
+#else
             There("is no obvious way to close the drawbridge.");
+#endif
         else {
  nodoor:
+#ifdef ZHLANG
+            You("那里%s有门。", Blind ? "没感觉到" : "没看到");
+#else
             You("%s no door there.", Blind ? "feel" : "see");
+#endif
         }
         return res;
     }
 
     if (door->doormask == D_NODOOR) {
+#ifdef ZHLANG
+        pline("这个门口没有门。");
+#else
         pline("This doorway has no door.");
+#endif
         return res;
     } else if (obstructed(x, y, FALSE)) {
         return res;
     } else if (door->doormask == D_BROKEN) {
+#ifdef ZHLANG
+        pline("这扇门坏了。");
+#else
         pline("This door is broken.");
+#endif
         return res;
     } else if (door->doormask & (D_CLOSED | D_LOCKED)) {
+#ifdef ZHLANG
+        pline("这扇门已经关上了。");
+#else
         pline("This door is already closed.");
+#endif
         return res;
     }
 
     if (door->doormask == D_ISOPEN) {
         if (verysmall(gy.youmonst.data) && !u.usteed) {
+#ifdef ZHLANG
+            pline("你太小了，推不上门。");
+#else
             pline("You're too small to push the door closed.");
+#endif
             return res;
         }
         if (u.usteed
             || rn2(25) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
+#ifdef ZHLANG
+            pline_The("门关上了。");
+#else
             pline_The("door closes.");
+#endif
             door->doormask = D_CLOSED;
             feel_newsym(x, y); /* the hero knows she closed it */
             block_point(x, y); /* vision:  no longer see there */
         } else {
             exercise(A_STR, TRUE);
+#ifdef ZHLANG
+            pline_The("门纹丝不动！");
+#else
             pline_The("door resists!");
+#endif
         }
     }
 
@@ -1062,7 +1393,11 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
     case SPE_WIZARD_LOCK:
         if (!obj->olocked) { /* lock it; fix if broken */
             Soundeffect(se_klunk, 50);
+#ifdef ZHLANG
+            pline("咔嚓！");
+#else
             pline("Klunk!");
+#endif
             obj->olocked = 1;
             obj->obroken = 0;
             if (Role_if(PM_WIZARD))
@@ -1076,7 +1411,11 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
     case SPE_KNOCK:
         if (obj->olocked) { /* unlock; isn't broken so doesn't need fixing */
             Soundeffect(se_klick, 50);
+#ifdef ZHLANG
+            pline("咔哒！");
+#else
             pline("Klick!");
+#endif
             obj->olocked = 0;
             res = 1;
             if (Role_if(PM_WIZARD))
@@ -1120,7 +1459,11 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
             door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
             newsym(x, y);
             if (cansee(x, y))
+#ifdef ZHLANG
+                pline("墙上出现了一扇门！");
+#else
                 pline("A door appears in the wall!");
+#endif
             if (otmp->otyp == WAN_OPENING || otmp->otyp == SPE_KNOCK)
                 return TRUE;
             break; /* striking: continue door handling below */
@@ -1139,21 +1482,38 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
 
             /* Can't have real locking in Rogue, so just hide doorway */
             if (vis) {
+#ifdef ZHLANG
+                pline("%s在更古老、更原始的门道中涌起。",
+                      dustcloud);
+#else
                 pline("%s springs up in the older, more primitive doorway.",
                       dustcloud);
+#endif
             } else {
                 Soundeffect(se_swoosh, 25);
+#ifdef ZHLANG
+                You_hear("一声呼嗖。");
+#else
                 You_hear("a swoosh.");
+#endif
             }
             if (obstructed(x, y, mysterywand)) {
                 if (vis)
+#ifdef ZHLANG
+                    pline_The("云%s。", quickly_dissipates);
+#else
                     pline_The("cloud %s.", quickly_dissipates);
+#endif
                 return FALSE;
             }
             block_point(x, y);
             door->typ = SDOOR, door->doormask = D_NODOOR;
             if (vis)
+#ifdef ZHLANG
+                pline_The("门道消失了！");
+#else
                 pline_The("doorway vanishes!");
+#endif
             newsym(x, y);
             return TRUE;
         }
@@ -1163,24 +1523,45 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
         /* & trap doors, but is it ever OK for anything else? */
         if (t_at(x, y)) {
             /* maketrap() clears doormask, so it should be NODOOR */
+#ifdef ZHLANG
+            pline("%s在门道中涌起，但%s。", dustcloud,
+                  quickly_dissipates);
+#else
             pline("%s springs up in the doorway, but %s.", dustcloud,
                   quickly_dissipates);
+#endif
             return FALSE;
         }
 
         switch (door->doormask & ~D_TRAPPED) {
         case D_CLOSED:
+#ifdef ZHLANG
+            msg = "门锁上了！";
+#else
             msg = "The door locks!";
+#endif
             break;
         case D_ISOPEN:
+#ifdef ZHLANG
+            msg = "门关上了，并且锁上了！";
+#else
             msg = "The door swings shut, and locks!";
+#endif
             break;
         case D_BROKEN:
+#ifdef ZHLANG
+            msg = "坏掉的门重新组装起来并锁上了！";
+#else
             msg = "The broken door reassembles and locks!";
+#endif
             break;
         case D_NODOOR:
+#ifdef ZHLANG
+            msg = "一团尘土涌起并自行组装成了一扇门！";
+#else
             msg =
                "A cloud of dust springs up and assembles itself into a door!";
+#endif
             break;
         default:
             res = FALSE;
@@ -1193,7 +1574,11 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
     case WAN_OPENING:
     case SPE_KNOCK:
         if (door->doormask & D_LOCKED) {
+#ifdef ZHLANG
+            msg = "门解锁了！";
+#else
             msg = "The door unlocks!";
+#endif
             door->doormask = D_CLOSED | (door->doormask & D_TRAPPED);
         } else
             res = FALSE;
@@ -1220,12 +1605,21 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                     if (flags.verbose) {
                         Soundeffect(se_kaboom_door_explodes, 75);
                         if ((sawit || seeit) && !Unaware) {
+#ifdef ZHLANG
+                            pline("轰隆！！你看到一扇门爆炸了。");
+#else
                             pline("KABOOM!!  You see a door explode.");
+#endif
                         } else if (!Deaf) {
                             Soundeffect(se_explosion, 75);
+#ifdef ZHLANG
+                            You_hear("一声%s的爆炸声。",
+                                     (distu(x, y) > 7 * 7) ? "遥远" : "附近");
+#else
                             You_hear("a %s explosion.",
                                      (distu(x, y) > 7 * 7) ? "distant"
                                                            : "nearby");
+#endif
                         }
                     }
                 }
@@ -1238,10 +1632,18 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
             newsym(x, y);
             if (flags.verbose) {
                 if ((sawit || seeit) && !Unaware) {
+#ifdef ZHLANG
+                    pline_The("门被撞开了！");
+#else
                     pline_The("door crashes open!");
+#endif
                 } else if (!Deaf) {
                     Soundeffect(se_crashing_sound, 100);
+#ifdef ZHLANG
+                    You_hear("一声撞击声。");
+#else
                     You_hear("a crashing sound.");
+#endif
                 }
             }
             /* force vision recalc before printing more messages */
@@ -1280,7 +1682,11 @@ chest_shatter_msg(struct obj *otmp)
     long save_HBlinded, save_BBlinded;
 
     if (otmp->oclass == POTION_CLASS) {
+#ifdef ZHLANG
+        You("%s到%s碎裂了！", Blind ? "听" : "看", an(bottlename()));
+#else
         You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
+#endif
         if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
             potionbreathe(otmp);
         return;
@@ -1293,28 +1699,60 @@ chest_shatter_msg(struct obj *otmp)
     HBlinded = save_HBlinded,  BBlinded = save_BBlinded;
     switch (objects[otmp->otyp].oc_material) {
     case PAPER:
+#ifdef ZHLANG
+        disposition = "被撕成了碎片";
+#else
         disposition = "is torn to shreds";
+#endif
         break;
     case WAX:
+#ifdef ZHLANG
+        disposition = "被压碎了";
+#else
         disposition = "is crushed";
+#endif
         break;
     case VEGGY:
+#ifdef ZHLANG
+        disposition = "被捣成了浆";
+#else
         disposition = "is pulped";
+#endif
         break;
     case FLESH:
+#ifdef ZHLANG
+        disposition = "被碾碎了";
+#else
         disposition = "is mashed";
+#endif
         break;
     case GLASS:
+#ifdef ZHLANG
+        disposition = "碎裂了";
+#else
         disposition = "shatters";
+#endif
         break;
     case WOOD:
+#ifdef ZHLANG
+        disposition = "裂成了碎片";
+#else
         disposition = "splinters to fragments";
+#endif
         break;
     default:
+#ifdef ZHLANG
+        disposition = "被摧毁了";
+#else
         disposition = "is destroyed";
+#endif
         break;
     }
+#ifdef ZHLANG
+    pline("%s%s！", An(thing), disposition);
+#else
     pline("%s %s!", An(thing), disposition);
+#endif
 }
 
 /*lock.c*/

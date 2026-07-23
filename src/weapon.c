@@ -75,11 +75,19 @@ static NEARDATA const char kebabable[] = {
 staticfn void
 give_may_advance_msg(int skill)
 {
+    #ifdef ZHLANG
+    You_feel("对自己的%s技能更加自信。",
+             (skill == P_NONE) ? ""
+                 : (skill <= P_LAST_WEAPON) ? "weapon "
+                     : (skill <= P_LAST_SPELL) ? "spell casting "
+                         : "fighting ");
+    #else
     You_feel("more confident in your %sskills.",
              (skill == P_NONE) ? ""
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
+    #endif
     (void) handle_tip(TIP_ENHANCE);
 }
 
@@ -455,6 +463,15 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
            rtyp will always be STRANGE_OBJECT) even if both rings are known
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
         both = ((ltyp == rtyp && l_dknown == r_dknown) || (l_ag && r_ag));
+#ifdef ZHLANG
+        Sprintf(rings, "戒指");
+        Your("%s%s%s%s！",
+             (l_ag || r_ag) ? "银制"
+             : both ? ""
+               : ((silverhit & W_RINGL) != 0L) ? "左手"
+                 : "右手",
+             rings, "灼烧了", mon_nam(mdef));
+#else
         Sprintf(rings, "ring%s", both ? "s" : "");
         Your("%s%s %s %s!",
              (l_ag || r_ag) ? "silver "
@@ -462,6 +479,7 @@ silver_sears(struct monst *magr UNUSED, struct monst *mdef,
                : ((silverhit & W_RINGL) != 0L) ? "left "
                  : "right ",
              rings, vtense(rings, "sear"), mon_nam(mdef));
+#endif
     }
 }
 
@@ -865,14 +883,29 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(mw_tmp))
                     mon_hand = makeplural(mon_hand);
+#ifdef ZHLANG
+                Sprintf(welded_buf, "%s焊接在%s的%s上",
+                        otense(mw_tmp, "是"), mhis(mon), mon_hand);
+#else
                 Sprintf(welded_buf, "%s welded to %s %s",
                         otense(mw_tmp, "are"), mhis(mon), mon_hand);
+#endif
 
                 if (obj->otyp == PICK_AXE) {
+                    #ifdef ZHLANG
+                    pline("由于%s的武器%s%s，", s_suffix(mon_nam(mon)),
+                          plur(mw_tmp->quan), welded_buf);
+                    #else
                     pline("Since %s weapon%s %s,", s_suffix(mon_nam(mon)),
                           plur(mw_tmp->quan), welded_buf);
+                    #endif
+                    #ifdef ZHLANG
+                    pline("%s无法装备那把%s。", mon_nam(mon),
+                          xname(obj));
+                    #else
                     pline("%s cannot wield that %s.", mon_nam(mon),
                           xname(obj));
+                    #endif
                 } else {
                     pline_mon(mon, "%s tries to wield %s.", Monnam(mon), doname(obj));
                     pline("%s %s!", Yname2(mw_tmp), welded_buf);
@@ -909,22 +942,39 @@ mon_wield_item(struct monst *mon)
 
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
+                #ifdef ZHLANG
+                pline("%s%s在%s的%s上！", Tobjnam(obj, "weld"),
+                      is_plural(obj) ? "themselves" : "itself",
+                      s_suffix(mon_nam(mon)), mon_hand);
+                #else
                 pline("%s %s to %s %s!", Tobjnam(obj, "weld"),
                       is_plural(obj) ? "themselves" : "itself",
                       s_suffix(mon_nam(mon)), mon_hand);
+                #endif
                 obj->bknown = 1;
             }
         }
         if (artifact_light(obj) && !obj->lamplit) {
             begin_burn(obj, FALSE);
             if (canseemon(mon))
+                #ifdef ZHLANG
+                pline("%s在%s的%s中%s！", Tobjnam(obj, "shine"),
+                      arti_light_description(obj), s_suffix(mon_nam(mon)),
+                      mbodypart(mon, HAND));
+                #else
                 pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
                       mbodypart(mon, HAND));
+                #endif
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
+                #ifdef ZHLANG
+                pline("光芒开始%s闪耀。",
+                      (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
+                #else
                 pline("Light begins shining %s.",
                       (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
+                #endif
         }
         obj->owornmask = W_WEP;
         return 1;
@@ -1201,9 +1251,15 @@ skill_advance(int skill)
     P_SKILL(skill)++;
     u.skill_record[u.skills_advanced++] = skill;
     /* subtly change the advance message to indicate no more advancement */
+    #ifdef ZHLANG
+    You("现在在%s方面%s熟练了。",
+        P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
+        P_NAME(skill));
+    #else
     You("are now %s skilled in %s.",
         P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
         P_NAME(skill));
+    #endif
 
     /* wizards discover spellbook IDs depending on spell 'school' skill limits;
        this allows them to successfully write books for unknown spells without
@@ -1308,7 +1364,11 @@ show_skills(void)
     winid win;
     menu_item *selected;
 
+#ifdef ZHLANG
+    pline("技能：");
+#else
     pline("Skills:");
+#endif
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     add_skills_to_menu(win, FALSE, FALSE);
@@ -1396,7 +1456,11 @@ enhance_weapon_skill(void)
             for (n = i = 0; i < P_NUM_SKILLS; i++) {
                 if (can_advance(i, speedy)) {
                     if (!speedy)
+                        #ifdef ZHLANG
+                        You_feel("你可以变得更加危险！");
+                        #else
                         You_feel("you could be more dangerous!");
+                        #endif
                     n++;
                     break;
                 }
@@ -1508,8 +1572,13 @@ drain_weapon_skill(int n) /* number of skills to drain */
 
     for (skill = 0; skill < P_NUM_SKILLS; skill++)
         if (tmpskills[skill]) {
+            #ifdef ZHLANG
+            You("忘记了在%s方面的%s训练。",
+                P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+            #else
             You("forget %syour training in %s.",
                 P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+            #endif
         }
 }
 
@@ -1818,9 +1887,15 @@ setmnotwielded(struct monst *mon, struct obj *obj)
     if (artifact_light(obj) && obj->lamplit) {
         end_burn(obj, FALSE);
         if (canseemon(mon))
+            #ifdef ZHLANG
+            pline("%s在%s%s中%s发光。", The(xname(obj)),
+                  s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
+                  otense(obj, "stop"));
+            #else
             pline("%s in %s %s %s shining.", The(xname(obj)),
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
                   otense(obj, "stop"));
+            #endif
     }
     if (MON_WEP(mon) == obj)
         MON_NOWEP(mon);

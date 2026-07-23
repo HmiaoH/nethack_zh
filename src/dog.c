@@ -118,7 +118,11 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
             if (!quietly)
                 /* have just been given "You <do something with>
                    the figurine and it transforms." message */
+#ifdef ZHLANG
+                pline("……变成了一堆灰尘。");
+#else
                 pline("... into a pile of dust.");
+#endif
             return (struct permonst *) 0;
         }
     } else if (!rn2(3)) {
@@ -129,7 +133,11 @@ pick_familiar_pm(struct obj *otmp, boolean quietly)
 
         pm = rndmonst_adj(0, max);
         if (!pm && !quietly)
+#ifdef ZHLANG
+            There("似乎没有可用的使魔。");
+#else
             There("seems to be nothing available for a familiar.");
+#endif
     }
     return pm;
 }
@@ -159,8 +167,12 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
             if (!mtmp) {
                 /* monster has been genocided or target spot is occupied */
                 if (!quietly)
+#ifdef ZHLANG
+                    pline_The("雕像扭动了一下，然后碎裂成了碎片！");
+#else
                     pline_The(
                            "figurine writhes and then shatters into pieces!");
+#endif
                 break;
             } else if (mtmp->isminion) {
                 /* Fixup for figurine of an Angel:  makemon() is willing to
@@ -191,7 +203,11 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
             reallytame = FALSE; /* not tame after all */
             if (chance == 2) {  /* hostile (cursed figurine) */
                 if (!quietly)
+#ifdef ZHLANG
+                    You("对此有一种不好的预感。");
+#else
                     You("get a bad feeling about this.");
+#endif
                 mtmp->mpeaceful = 0;
                 set_malign(mtmp);
             }
@@ -833,21 +849,38 @@ keepdogs(
                 mdrop_special_objs(mtmp); /* drop Amulet */
             } else if (mtmp->meating || mtmp->mtrapped) {
                 if (canseemon(mtmp))
+#ifdef ZHLANG
+                    pline_mon(mtmp, "%s还在%s。", Monnam(mtmp),
+                             mtmp->meating ? "吃东西" : "被困住");
+#else
                     pline_mon(mtmp, "%s is still %s.", Monnam(mtmp),
                              mtmp->meating ? "eating" : "trapped");
+#endif
                 stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
+#ifdef ZHLANG
+                    pline("%s一时显得非常迷茫。",
+                          Monnam(mtmp));
+#else
                     pline("%s seems very disoriented for a moment.",
                           Monnam(mtmp));
+#endif
                 stay_behind = TRUE;
             }
             if (stay_behind) {
                 if (mtmp->mleashed) {
+#ifdef ZHLANG
+                    pline("%s的牵绳突然松开了。",
+                          humanoid(mtmp->data)
+                              ? (mtmp->female ? "她的" : "他的")
+                              : "它的");
+#else
                     pline("%s leash suddenly comes loose.",
                           humanoid(mtmp->data)
                               ? (mtmp->female ? "Her" : "His")
                               : "Its");
+#endif
                     m_unleash(mtmp, FALSE);
                 }
                 if (mtmp == u.usteed) {
@@ -879,7 +912,11 @@ keepdogs(
         } else if (mtmp->mleashed) {
             /* this can happen if your quest leader ejects you from the
                "home" level while a leashed pet isn't next to you */
+#ifdef ZHLANG
+            pline("%s的牵绳松了。", s_suffix(Monnam(mtmp)));
+#else
             pline("%s leash goes slack.", s_suffix(Monnam(mtmp)));
+#endif
             m_unleash(mtmp, FALSE);
         }
     }
@@ -1169,8 +1206,13 @@ tamedog(
 
     /* worst case, at least it'll be peaceful. */
     if (givemsg && !mtmp->mpeaceful && canspotmon(mtmp)) {
+#ifdef ZHLANG
+        pline_mon(mtmp, "%s似乎%s。", Monnam(mtmp),
+              Hallucination ? "很冷静" : "更友好了");
+#else
         pline_mon(mtmp, "%s seems %s.", Monnam(mtmp),
               Hallucination ? "really chill" : "more amiable");
+#endif
         givemsg = FALSE; /* don't give another message below */
     }
     mtmp->mpeaceful = 1;
@@ -1204,11 +1246,21 @@ tamedog(
                 boolean big_corpse =
                     (obj->otyp == CORPSE && ismnum(obj->corpsenm)
                      && mons[obj->corpsenm].msize > mtmp->data->msize);
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s抓住了%s%s",
+                          Monnam(mtmp), the(xname(obj)),
+                         !big_corpse ? "。" : "，或者反过来！");
+#else
                 pline_mon(mtmp, "%s catches %s%s",
                           Monnam(mtmp), the(xname(obj)),
                          !big_corpse ? "." : ", or vice versa!");
+#endif
             } else if (cansee(mtmp->mx, mtmp->my))
+#ifdef ZHLANG
+                pline("%s停止了。", Tobjnam(obj, ""));
+#else
                 pline("%s.", Tobjnam(obj, "stop"));
+#endif
             /* dog_eat expects a floor object */
             place_object(obj, mtmp->mx, mtmp->my);
             (void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);
@@ -1270,8 +1322,13 @@ tamedog(
     }
 
     if (givemsg && canspotmon(mtmp))
+#ifdef ZHLANG
+        pline_mon(mtmp, "%s似乎相当%s。", Monnam(mtmp),
+              Hallucination ? "可亲" : "友好");
+#else
         pline_mon(mtmp, "%s seems quite %s.", Monnam(mtmp),
               Hallucination ? "approachable" : "friendly");
+#endif
 
     newsym(mtmp->mx, mtmp->my);
     if (mtmp->wormno)
@@ -1317,12 +1374,23 @@ wary_dog(struct monst *mtmp, boolean was_dead)
         if (!quietly && cansee(mtmp->mx, mtmp->my)) {
             if (haseyes(gy.youmonst.data)) {
                 if (haseyes(mtmp->data))
+#ifdef ZHLANG
+                    pline_mon(mtmp,
+                             "%s%s直视你的%s。", Monnam(mtmp),
+                             mtmp->mpeaceful ? "似乎无法" : "拒绝",
+                             body_part(EYE));
+#else
                     pline_mon(mtmp,
                              "%s %s to look you in the %s.", Monnam(mtmp),
                              mtmp->mpeaceful ? "seems unable" : "refuses",
                              body_part(EYE));
+#endif
                 else
+#ifdef ZHLANG
+                    pline_mon(mtmp, "%s避开了你的目光。", Monnam(mtmp));
+#else
                     pline_mon(mtmp, "%s avoids your gaze.", Monnam(mtmp));
+#endif
             }
         }
     } else {
@@ -1334,8 +1402,13 @@ wary_dog(struct monst *mtmp, boolean was_dead)
 
     if (!mtmp->mtame) {
         if (!quietly && canspotmon(mtmp))
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s%s。", Monnam(mtmp),
+                  mtmp->mpeaceful ? "不再被驯服" : "变得野性");
+#else
             pline_mon(mtmp, "%s %s.", Monnam(mtmp),
                   mtmp->mpeaceful ? "is no longer tame" : "has become feral");
+#endif
         newsym(mtmp->mx, mtmp->my);
         /* a life-saved monster might be leashed;
            don't leave it that way if it's no longer tame */

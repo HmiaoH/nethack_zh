@@ -543,8 +543,13 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     /* this used to take place sooner, but if a --More-- prompt was issued
        then the old map display was shown instead of the new one */
     if (is_teleport && flags.verbose)
+        #ifdef ZHLANG
+        You("出现在%s位置！",
+            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+        #else
         You("materialize in %s location!",
             (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+        #endif
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */
@@ -800,7 +805,11 @@ teleport_pet(struct monst *mtmp, boolean force_it)
             yelp(mtmp);
             return FALSE;
         } else {
+            #ifdef ZHLANG
+            Your("皮带松了。");
+            #else
             Your("leash goes slack.");
+            #endif
  release_it:
             m_unleash(mtmp, FALSE);
             return TRUE;
@@ -852,7 +861,11 @@ scrolltele(struct obj *scroll)
 
     /* Disable teleportation in stronghold && Vlad's Tower */
     if (noteleport_level(&gy.youmonst) && !wizard) {
+        #ifdef ZHLANG
+        pline("一股神秘的力量阻止你传送！");
+        #else
         pline("A mysterious force prevents you from teleporting!");
+        #endif
         if (scroll)
             learnscroll(scroll); /* this is obviously a teleport scroll */
         return;
@@ -863,7 +876,11 @@ scrolltele(struct obj *scroll)
         make_blinded(0L, FALSE);
 
     if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
+        #ifdef ZHLANG
+        You_feel("迷失方向了片刻。");
+        #else
         You_feel("disoriented for a moment.");
+        #endif
         /* don't discover the scroll [at least not yet for wizard override];
            disorientation doesn't reveal that this is a teleport attempt */
         if (!wizard || y_n("Override?") != 'y')
@@ -872,14 +889,22 @@ scrolltele(struct obj *scroll)
     if (((Teleport_control || (scroll && scroll->blessed)) && !Stunned)
         || wizard) {
         if (unconscious()) {
+            #ifdef ZHLANG
+            pline("你处于昏迷状态，无法控制传送。");
+            #else
             pline("Being unconscious, you cannot control your teleport.");
+            #endif
         } else {
             char whobuf[BUFSZ];
 
             Strcpy(whobuf, "you");
             if (u.usteed)
                 Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
+            #ifdef ZHLANG
+            pline("%s想要传送到哪里？", whobuf);
+            #else
             pline("Where do %s want to be teleported?", whobuf);
+            #endif
             if (scroll)
                 learnscroll(scroll);
             cc.x = u.ux;
@@ -900,7 +925,11 @@ scrolltele(struct obj *scroll)
                     iflags.travelcc.x = iflags.travelcc.y = 0;
                 return;
             }
+            #ifdef ZHLANG
+            pline("抱歉...");
+            #else
             pline("Sorry...");
+            #endif
         }
     }
 
@@ -1054,7 +1083,11 @@ dotele(
         } else if (trap->ttyp == TELEP_TRAP) {
             trap_once = trap->once; /* trap may get deleted, save this */
             if (trap->once) {
+                #ifdef ZHLANG
+                pline("这是一个保险库传送，仅可使用一次。");
+                #else
                 pline("This is a vault teleport, usable once only.");
+                #endif
                 if (y_n("Jump in?") == 'n') {
                     trap = 0;
                 } else {
@@ -1063,7 +1096,11 @@ dotele(
                 }
             }
             if (trap)
+                #ifdef ZHLANG
+                You("%s上传送陷阱。", u_locomotion("jump"));
+                #else
                 You("%s onto the teleportation trap.", u_locomotion("jump"));
+                #endif
         } else
             trap = 0;
     }
@@ -1079,10 +1116,17 @@ dotele(
             /* casting isn't inhibited by being Stunned (...it ought to be) */
             castit = (knownsp >= spe_Fresh && !Confusion);
             if (!castit && !break_the_rules) {
+#ifdef ZHLANG
+                You("%s。", (!Teleportation ? ((knownsp != spe_Unknown)
+                                              ? "无法施放那个法术"
+                                              : "不会那个法术")
+                            : "无法随意传送"));
+#else
                 You("%s.", (!Teleportation ? ((knownsp != spe_Unknown)
                                               ? "can't cast that spell"
                                               : "don't know that spell")
                             : "are not able to teleport at will"));
+#endif
                 return 0;
             }
         }
@@ -1113,18 +1157,39 @@ dotele(
         } else
 #endif
         if (u.uhunger <= 10) {
+#ifdef ZHLANG
+            cantdoit = "因饥饿而虚弱无力";
+#else
             cantdoit = "are too weak from hunger";
+#endif
         } else if (ACURR(A_STR) < 4) {
+#ifdef ZHLANG
+            cantdoit = "力量不足";
+#else
             cantdoit = "lack the strength";
+#endif
         } else if (energy > u.uen) {
+#ifdef ZHLANG
+            cantdoit = "能量不足";
+#else
             cantdoit = "lack the energy";
+#endif
         }
         if (cantdoit) {
+#ifdef ZHLANG
+            You("%s%s。", cantdoit,
+                castit ? "，无法施放传送法术" : "，无法传送");
+#else
             You("%s %s.", cantdoit,
                 castit ? "for a teleport spell" : "to teleport");
+#endif
             return 0;
         } else if (check_capacity(
+#ifdef ZHLANG
+                       "携带太多东西，你的注意力无法集中。")) {
+#else
                        "Your concentration falters from carrying so much.")) {
+#endif
             return 1; /* this failure in spelleffects() also uses the move */
         }
 
@@ -1184,7 +1249,11 @@ level_tele(void)
     }
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
+        #ifdef ZHLANG
+        You_feel("非常迷失方向了片刻。");
+        #else
         You_feel("very disoriented for a moment.");
+        #endif
         return;
     }
     if ((Teleport_control && !Stunned) || wizard) {
@@ -1213,7 +1282,11 @@ level_tele(void)
             if (!strcmp(buf, "*")) {
                 goto random_levtport;
             } else if (Confusion && rnl(5)) {
+                #ifdef ZHLANG
+                pline("哎呀...");
+                #else
                 pline("Oops...");
+                #endif
                 goto random_levtport;
             } else if (!strcmp(buf, "\033")) { /* cancelled */
                 return;
@@ -1256,19 +1329,42 @@ level_tele(void)
                 goto random_levtport;
             if (ynq("Go to Nowhere.  Are you sure?") != 'y')
                 return;
+            #ifdef ZHLANG
+            You("%s痛苦地扭动，你的身体开始扭曲...",
+                is_silent(gy.youmonst.data) ? "writhe" : "scream");
+            #else
             You("%s in agony as your body begins to warp...",
                 is_silent(gy.youmonst.data) ? "writhe" : "scream");
+            #endif
             display_nhwindow(WIN_MESSAGE, FALSE);
+            #ifdef ZHLANG
+            You("不再存在。");
+            #else
             You("cease to exist.");
+            #endif
             if (gi.invent)
+                #ifdef ZHLANG
+                Your("物品砰地落在%s上。",
+                     surface(u.ux, u.uy));
+                #else
                 Your("possessions land on the %s with a thud.",
                      surface(u.ux, u.uy));
+                #endif
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "committed suicide");
             done(DIED);
+            #ifdef ZHLANG
+            pline("一团充满能量的尘埃开始凝聚。");
+            #else
             pline("An energized cloud of dust begins to coalesce.");
+            #endif
+            #ifdef ZHLANG
+            Your("身体重新实体化%s。",
+                 gi.invent ? ", and you gather up all your possessions" : "");
+            #else
             Your("body rematerializes%s.",
                  gi.invent ? ", and you gather up all your possessions" : "");
+            #endif
             return;
         }
 
@@ -1332,17 +1428,37 @@ level_tele(void)
             gi.in_mklev = FALSE;
         }
         if (newlev <= -10) {
+            #ifdef ZHLANG
+            You("到达天堂。");
+            #else
             You("arrive in heaven.");
+            #endif
             SetVoice((struct monst *) 0, 0, 80, voice_deity);
+            #ifdef ZHLANG
+            verbalize("你来早了，但我们会接纳你。");
+            #else
             verbalize("Thou art early, but we'll admit thee.");
+            #endif
             svk.killer.format = NO_KILLER_PREFIX;
             Strcpy(svk.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
+            #ifdef ZHLANG
+            You_feel("欣喜若狂。");
+            #else
             You_feel("deliriously happy.");
+            #endif
+            #ifdef ZHLANG
+            pline("（事实上，你在九霄云外！）");
+            #else
             pline("(In fact, you're on Cloud 9!)");
+            #endif
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else
+            #ifdef ZHLANG
+            You("现在高高地在云层之上...");
+            #else
             You("are now high above the clouds...");
+            #endif
 
         if (svk.killer.name[0]) {
             ; /* arrival in heaven is pending */
@@ -1351,8 +1467,16 @@ level_tele(void)
         } else if (Flying) {
             escape_by_flying = "fly down to the ground";
         } else {
+            #ifdef ZHLANG
+            pline("不幸的是，你不知道如何飞行。");
+            #else
             pline("Unfortunately, you don't know how to fly.");
+            #endif
+            #ifdef ZHLANG
+            You("坠落数千英尺而亡。");
+            #else
             You("plummet a few thousand feet to your death.");
+            #endif
             Sprintf(svk.killer.name,
                     "teleported out of the dungeon and fell to %s death",
                     uhis());
@@ -1405,7 +1529,11 @@ level_tele(void)
          */
         if (!wizard && Inhell && !u.uevent.invoked && newlev >= deepest) {
             newlev = deepest - 1;
+            #ifdef ZHLANG
+            pline("抱歉...");
+            #else
             pline("Sorry...");
+            #endif
         }
         /* no teleporting out of quest dungeon */
         if (In_quest(&u.uz) && newlev < depth(&qstart_level))
@@ -1460,14 +1588,22 @@ domagicportal(struct trap *ttmp)
     if (!on_level(&u.uz, &u.uz0))
         return;
 
+    #ifdef ZHLANG
+    You("激活了一个魔法传送门！");
+    #else
     You("activated a magic portal!");
+    #endif
 
     /* prevent the poor shnook, whose amulet was stolen while in
      * the endgame, from accidently triggering the portal to the
      * next level, and thus losing the game
      */
     if (In_endgame(&u.uz) && !u.uhave.amulet) {
+        #ifdef ZHLANG
+        You_feel("眩晕了片刻，但什么也没有发生...");
+        #else
         You_feel("dizzy for a moment, but nothing happens...");
+        #endif
         return;
     }
 
@@ -1502,7 +1638,11 @@ tele_trap(struct trap *trap)
     if (In_endgame(&u.uz) || Antimagic || noteleport_level(&gy.youmonst)) {
         if (Antimagic)
             shieldeff(u.ux, u.uy);
+#ifdef ZHLANG
+        You_feel("一阵扭曲的感觉。");
+#else
         You_feel("a wrenching sensation.");
+#endif
     } else if (!next_to_u()) {
         You1(shudder_for_moment);
     } else if (trap->once) {
@@ -1545,13 +1685,21 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
         intentional = TRUE;
     } else
         Sprintf(verbbuf, "%s onto", u_locomotion("step"));
+    #ifdef ZHLANG
+    You("%s了一个楼层传送陷阱！", verbbuf);
+    #else
     You("%s a level teleport trap!", verbbuf);
+    #endif
 
     if (Antimagic && !intentional) {
         shieldeff(u.ux, u.uy);
     }
     if ((Antimagic && !intentional) || In_endgame(&u.uz)) {
+#ifdef ZHLANG
+        You_feel("一阵扭曲的感觉。");
+#else
         You_feel("a wrenching sensation.");
+#endif
         return;
     }
     deltrap(trap);
@@ -1559,9 +1707,17 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     level_tele();
 
     if (Hallucination || Teleport_control)
+        #ifdef ZHLANG
+        You("短暂地感到%s。", Hallucination ? "oriented" : "centered");
+        #else
         You("briefly feel %s.", Hallucination ? "oriented" : "centered");
+        #endif
     else
+        #ifdef ZHLANG
+        You_feel("%s迷失方向。", Confusion ? "even more " : "");
+        #else
         You_feel("%sdisoriented.", Confusion ? "even more " : "");
+        #endif
     /* magic portal traversal causes brief Stun; for level teleport, use
        confusion instead, and only when hero lacks control; do this after
        processing the level teleportation attempt because being confused
@@ -1663,7 +1819,11 @@ rloc_to_core(
             if (couldsee(x, y) || sensemon(mtmp)) {
                 telemsg = TRUE;
             } else {
+                #ifdef ZHLANG
+                pline("%s消失了！", Monnam(mtmp));
+                #else
                 pline("%s vanishes!", Monnam(mtmp));
+                #endif
             }
             /* avoid "It suddenly appears!" for a STRAT_APPEARMSG monster
                that has just teleported away if we won't see it after this
@@ -1708,8 +1868,21 @@ rloc_to_core(
         set_msg_xy(x, y);
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (mtmp == u.ustuck && !u_at(u.ux0, u.uy0)) {
+            #ifdef ZHLANG
+            You("和%s一起传送。", mon_nam(mtmp));
+            #else
             You("and %s teleport together.", mon_nam(mtmp));
+            #endif
         } else if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
+            #ifdef ZHLANG
+            pline("%s消失后又出现%s。",
+                  Monnam(mtmp),
+                  next ? next
+                  : nearu ? nearu
+                    : ((olddu = distu(oldx, oldy)) == du) ? ""
+                      : (du < olddu) ? " closer to you"
+                        : " farther away");
+            #else
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),
                   next ? next
@@ -1717,6 +1890,7 @@ rloc_to_core(
                     : ((olddu = distu(oldx, oldy)) == du) ? ""
                       : (du < olddu) ? " closer to you"
                         : " farther away");
+            #endif
         } else {
             pline("%s %s%s%s!",
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
@@ -1913,8 +2087,13 @@ control_mon_tele(
     if (!wizard || !iflags.mon_telecontrol)
         return FALSE;
 
+    #ifdef ZHLANG
+    pline("将%s传送到<%d,%d>哪里？",
+          noit_mon_nam(mon), mon->mx, mon->my);
+    #else
     pline("Teleport %s @ <%d,%d> where?",
           noit_mon_nam(mon), mon->mx, mon->my);
+    #endif
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
     Sprintf(tcbuf, "where to teleport %s", noit_mon_nam(mon));
     if (getpos(cc_p, FALSE, tcbuf) >= 0 && !u_at(cc_p->x, cc_p->y)) {
@@ -1929,7 +2108,11 @@ control_mon_tele(
                 return TRUE;
         }
     }
+#ifdef ZHLANG
+    pline("%s。", via_rloc ? "选择随机位置" : "使用派生位置");
+#else
     pline("%s destination.", via_rloc ? "Picking random" : "Using derived");
+#endif
     return FALSE;
 }
 
@@ -1951,8 +2134,13 @@ tele_restrict(struct monst *mon)
 {
     if (noteleport_level(mon)) {
         if (canseemon(mon))
+            #ifdef ZHLANG
+            pline("一股神秘的力量阻止%s传送！",
+                  mon_nam(mon));
+            #else
             pline("A mysterious force prevents %s from teleporting!",
                   mon_nam(mon));
+            #endif
         return TRUE;
     }
     return FALSE;
@@ -1993,9 +2181,17 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
 
         if (in_sight) {
             if (canseemon(mtmp))
+                #ifdef ZHLANG
+                pline("%s似乎迷失了方向。", monname);
+                #else
                 pline("%s seems disoriented.", monname);
+                #endif
             else
+                #ifdef ZHLANG
+                pline("%s突然消失了！", monname);
+                #else
                 pline("%s suddenly disappears!", monname);
+                #endif
             seetrap(trap);
         }
     }
@@ -2268,16 +2464,29 @@ u_teleport_mon(
 
     if (svl.level.flags.stasis_until >= svm.moves) {
         if (give_feedback)
+            #ifdef ZHLANG
+            pline("一股神秘的力量阻止你传送%s！",
+                  mon_nam(mtmp));
+            #else
             pline("A mysterious force prevents you teleporting %s!",
                   mon_nam(mtmp));
+            #endif
         return FALSE;
     } else if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE)) {
         if (give_feedback)
+            #ifdef ZHLANG
+            pline("%s抵抗了你的魔法！", Monnam(mtmp));
+            #else
             pline("%s resists your magic!", Monnam(mtmp));
+            #endif
         return FALSE;
     } else if (engulfing_u(mtmp) && noteleport_level(mtmp)) {
         if (give_feedback)
+            #ifdef ZHLANG
+            You("不再在%s内部了！", mon_nam(mtmp));
+            #else
             You("are no longer inside %s!", mon_nam(mtmp));
+            #endif
         unstuck(mtmp);
         if (!rloc(mtmp, RLOC_MSG))
             m_into_limbo(mtmp);

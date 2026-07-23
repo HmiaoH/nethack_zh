@@ -135,11 +135,19 @@ cursed_book(struct obj *bp)
 
     switch (rn2(lev)) {
     case 0:
+        #ifdef ZHLANG
+        You_feel("一阵扭曲的感觉。");
+        #else
         You_feel("a wrenching sensation.");
+        #endif
         tele(); /* teleport him */
         break;
     case 1:
+        #ifdef ZHLANG
+        You_feel("受到威胁。");
+        #else
         You_feel("threatened.");
+        #endif
         aggravate();
         break;
     case 2:
@@ -149,11 +157,19 @@ cursed_book(struct obj *bp)
         take_gold();
         break;
     case 4:
+        #ifdef ZHLANG
+        pline("这些符文实在太难看懂了。");
+        #else
         pline("These runes were just too much to comprehend.");
+        #endif
         make_confused(HConfusion + rn1(7, 16), FALSE);
         break;
     case 5:
+        #ifdef ZHLANG
+        pline_The("书上涂有接触性毒药！");
+        #else
         pline_The("book was coated with contact poison!");
+        #endif
         if (uarmg) {
             erode_obj(uarmg, "gloves", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
             break;
@@ -169,10 +185,19 @@ cursed_book(struct obj *bp)
     case 6:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+#ifdef ZHLANG
+            pline_The("书%s，但你毫发无损！", explodes);
+#else
             pline_The("book %s, but you are unharmed!", explodes);
+#endif
         } else {
+            #ifdef ZHLANG
+            pline("当你读这本书时，它在你%s%s！", explodes,
+                  body_part(FACE));
+            #else
             pline("As you read the book, it %s in your %s!", explodes,
                   body_part(FACE));
+            #endif
             dmg = 2 * rnd(10) + 5;
             losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
         }
@@ -192,16 +217,30 @@ confused_book(struct obj *spellbook)
 
     if (!rn2(3) && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
         spellbook->in_use = TRUE; /* in case called from learn() */
+        #ifdef ZHLANG
+        pline(
+         "由于混乱，你难以控制自己的行动。");
+        #else
         pline(
          "Being confused you have difficulties in controlling your actions.");
+        #endif
         display_nhwindow(WIN_MESSAGE, FALSE);
+        #ifdef ZHLANG
+        You("不小心把法术书撕成了碎片。");
+        #else
         You("accidentally tear the spellbook to pieces.");
+        #endif
         trycall(spellbook);
         useup(spellbook);
         gone = TRUE;
     } else {
+        #ifdef ZHLANG
+        You("发现自己一遍又一遍地读着第%s行。",
+            spellbook == svc.context.spbook.book ? "next" : "first");
+        #else
         You("find yourself reading the %s line over and over again.",
             spellbook == svc.context.spbook.book ? "next" : "first");
+        #endif
     }
     return gone;
 }
@@ -233,7 +272,11 @@ deadbook(struct obj *book2)
     struct monst *mtmp;
     coord mm;
 
+    #ifdef ZHLANG
+    You("翻阅着死亡之书的书页...");
+    #else
     You("turn the pages of the Book of the Dead...");
+    #endif
     makeknown(SPE_BOOK_OF_THE_DEAD);
     observe_object(book2); /* in case blind now and hasn't been seen yet */
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
@@ -251,13 +294,25 @@ deadbook(struct obj *book2)
         }
 
         if (!u.uhave.bell || !u.uhave.menorah) {
+            #ifdef ZHLANG
+            pline("一股寒意沿着你的%s直下。", body_part(SPINE));
+            #else
             pline("A chill runs down your %s.", body_part(SPINE));
+            #endif
             if (!u.uhave.bell) {
                 Soundeffect(se_faint_chime, 30);
+                #ifdef ZHLANG
+                You_hear("一阵微弱的铃声...");
+                #else
                 You_hear("a faint chime...");
+                #endif
             }
             if (!u.uhave.menorah)
+                #ifdef ZHLANG
+                pline("弗拉德的幻影觉得很有趣。");
+                #else
                 pline("Vlad's doppelganger is amused.");
+                #endif
             return;
         }
 
@@ -279,10 +334,18 @@ deadbook(struct obj *book2)
         }
 
         if (arti_cursed) {
+            #ifdef ZHLANG
+            pline_The("祈咒失败了！");
+            #else
             pline_The("invocation fails!");
+            #endif
             /* this used to say "your artifacts" but the invocation tools
                are not artifacts */
+            #ifdef ZHLANG
+            pline("你的至少一件遗物被诅咒了...");
+            #else
             pline("At least one of your relics is cursed...");
+            #endif
         } else if (arti1_primed && arti2_primed) {
             unsigned soon = (unsigned) d(2, 6); /* time til next intervene() */
 
@@ -296,7 +359,11 @@ deadbook(struct obj *book2)
             if (!u.udg_cnt || u.udg_cnt > soon)
                 u.udg_cnt = soon;
         } else { /* at least one relic not prepared properly */
+            #ifdef ZHLANG
+            You("有种感觉，%s不太对劲...", something);
+            #else
             You("have a feeling that %s is amiss...", something);
+            #endif
             goto raise_dead;
         }
         return;
@@ -306,7 +373,11 @@ deadbook(struct obj *book2)
     if (book2->cursed) {
  raise_dead:
 
+        #ifdef ZHLANG
+        You("复活了死者！");
+        #else
         You("raised the dead!");
+        #endif
         /* first maybe place a dangerous adversary */
         if (!rn2(3) && ((mtmp = makemon(&mons[PM_MASTER_LICH], u.ux, u.uy,
                                         NO_MINVENT)) != 0
@@ -326,13 +397,25 @@ deadbook(struct obj *book2)
     } else {
         switch (rn2(3)) {
         case 0:
+            #ifdef ZHLANG
+            Your("祖先对你感到不悦！");
+            #else
             Your("ancestors are annoyed with you!");
+            #endif
             break;
         case 1:
+            #ifdef ZHLANG
+            pline_The("墓地的墓碑开始移动！");
+            #else
             pline_The("headstones in the cemetery begin to move!");
+            #endif
             break;
         default:
+            #ifdef ZHLANG
+            pline("哦天！你的名字出现在书中！");
+            #else
             pline("Oh my!  Your name appears in the book!");
+            #endif
         }
     }
     return;
@@ -344,7 +427,11 @@ book_cursed(struct obj *book)
 {
     if (book->cursed && gm.multi >= 0
         && go.occupation == learn && svc.context.spbook.book == book) {
+        #ifdef ZHLANG
+        pline("%s合上了！", Tobjnam(book, "slam"));
+        #else
         pline("%s shut!", Tobjnam(book, "slam"));
+        #endif
         set_bknown(book, 1);
         stop_occupation();
     }
@@ -399,14 +486,23 @@ learn(void)
     } else if (spellid(i) == booktype) {
         /* normal book can be read and re-read a total of 4 times */
         if (book->spestudied > MAX_SPELL_STUDY) {
+            #ifdef ZHLANG
+            pline("这本法术书太模糊，无法再阅读了。");
+            #else
             pline("This spellbook is too faint to be read any more.");
+            #endif
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
-            Your("knowledge of %s is %s.", splname,
-                 spellknow(i) ? "keener" : "restored");
+#ifdef ZHLANG
+                Your("对%s的知识%s。", splname,
+                     spellknow(i) ? "更加敏锐" : "恢复");
+#else
+                Your("knowledge of %s is %s.", splname,
+                     spellknow(i) ? "keener" : "restored");
+#endif
             incrnknow(i, 1);
             book->spestudied++;
             exercise(A_WIS, TRUE); /* extra study */
@@ -417,7 +513,11 @@ learn(void)
            one less reading is available than when re-learning */
         if (book->spestudied >= MAX_SPELL_STUDY) {
             /* pre-used due to being the product of polymorph */
+            #ifdef ZHLANG
+            pline("这本法术书太模糊，连一次都无法阅读。");
+            #else
             pline("This spellbook is too faint to read even once.");
+            #endif
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
@@ -429,10 +529,19 @@ learn(void)
             book->spestudied++;
             if (!i)
                 /* first is always 'a', so no need to mention the letter */
+#ifdef ZHLANG
+                You("学会了%s。", splname);
+#else
                 You("learn %s.", splname);
+#endif
             else
+#ifdef ZHLANG
+                You("将%s添加到你的法术库中，作为'%c'。",
+                    splname, spellet(i));
+#else
                 You("add %s to your repertoire, as '%c'.",
                     splname, spellet(i));
+#endif
         }
     }
     if (i < MAXSPELL) {
@@ -485,8 +594,13 @@ study_book(struct obj *spellbook)
             eyes = body_part(EYE);
             if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
+            #ifdef ZHLANG
+            pline("这本书如此枯燥，你无法保持%s睁开。",
+                  eyes);
+            #else
             pline("This book is so dull that you can't keep your %s open.",
                   eyes);
+            #endif
             dullbook += rnd(2 * objects[booktype].oc_level);
             fall_asleep(-dullbook, TRUE);
             return 1;
@@ -498,13 +612,23 @@ study_book(struct obj *spellbook)
         /* handle the sequence: start reading, get interrupted, have
            svc.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
+#ifdef ZHLANG
+        You("继续努力%s。",
+            (booktype == SPE_NOVEL) ? "阅读小说"
+                                    : "记忆法术");
+#else
         You("continue your efforts to %s.",
             (booktype == SPE_NOVEL) ? "read the novel"
                                     : "memorize the spell");
+#endif
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
+            #ifdef ZHLANG
+            pline("这本法术书完全是空白的。");
+            #else
             pline("This spellbook is all blank.");
+            #endif
             makeknown(booktype);
             return 1;
         }
@@ -563,8 +687,13 @@ study_book(struct obj *spellbook)
             if (spellid(i) == booktype || spellid(i) == NO_SPELL)
                 break;
         if (spellid(i) == booktype && spellknow(i) > KEEN / 10) {
+#ifdef ZHLANG
+            You("已经对\"%s\"相当熟悉了。",
+                OBJ_NAME(objects[booktype]));
+#else
             You("know \"%s\" quite well already.",
                 OBJ_NAME(objects[booktype]));
+#endif
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             makeknown(booktype);
@@ -611,7 +740,11 @@ study_book(struct obj *spellbook)
             svc.context.spbook.delay = 0;
             if (gone || !rn2(3)) {
                 if (!gone)
+#ifdef ZHLANG
+                    pline_The("法术书化为灰烬！");
+#else
                     pline_The("spellbook crumbles to dust!");
+#endif
                 trycall(spellbook);
                 useup(spellbook);
             } else
@@ -629,8 +762,13 @@ study_book(struct obj *spellbook)
         }
         spellbook->in_use = FALSE;
 
+#ifdef ZHLANG
+        You("开始%s符文。",
+            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "吟诵" : "记忆");
+#else
         You("begin to %s the runes.",
             spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
+#endif
     }
 
     svc.context.spbook.book = spellbook;
@@ -688,10 +826,18 @@ rejectcasting(void)
 {
     /* rejections which take place before selecting a particular spell */
     if (Stunned) {
+        #ifdef ZHLANG
+        You("身体状态太差，无法施放法术。");
+        #else
         You("are too impaired to cast a spell.");
+        #endif
         return TRUE;
     } else if (!can_chant(&gy.youmonst)) {
+        #ifdef ZHLANG
+        You("无法吟唱咒文。");
+        #else
         You("are unable to chant the incantation.");
+        #endif
         return TRUE;
     } else if (!freehand() && !(uwep && uwep->otyp == QUARTERSTAFF)) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
@@ -701,7 +847,11 @@ rejectcasting(void)
          * But why isn't lack of free arms (for gesturing) an issue when
          * poly'd hero has no limbs?
          */
+        #ifdef ZHLANG
+        Your("手臂不自由，无法施法！");
+        #else
         Your("arms are not free to cast!");
+        #endif
         return TRUE;
     }
     return FALSE;
@@ -720,7 +870,11 @@ getspell(int *spell_no)
 
     nspells = num_spells();
     if (!nspells) {
+        #ifdef ZHLANG
+        You("现在不会任何法术。");
+        #else
         You("don't know any spells right now.");
+        #endif
         return FALSE;
     }
     if (rejectcasting())
@@ -758,7 +912,11 @@ getspell(int *spell_no)
                 /* limit is mainly to prevent the fuzzer from getting stuck
                    since hangup should hit the 'quitchars' case; fuzzer
                    would too, but after an arbitrary number of attempts */
+                #ifdef ZHLANG
+                pline("尝试次数够了。");
+                #else
                 pline("That's enough tries.");
+                #endif
                 return FALSE;
             }
             ilet = yn_function(qbuf, (char *) 0, '\0', TRUE);
@@ -771,7 +929,11 @@ getspell(int *spell_no)
 
             idx = spell_let_to_idx(ilet);
             if (idx < 0 || idx >= nspells) {
+                #ifdef ZHLANG
+                You("不会那个法术。");
+                #else
                 You("don't know that spell.");
+                #endif
                 continue; /* ask again */
             }
             *spell_no = idx;
@@ -1048,7 +1210,11 @@ cast_chain_lightning(void)
                     if (DEADMONSTER(mon)) {
                         xkilled(mon, XKILL_GIVEMSG);
                     } else {
+                        #ifdef ZHLANG
+                        pline("你电击了%s%s", mon_nam(mon), exclam(dmg));
+                        #else
                         pline("You shock %s%s", mon_nam(mon), exclam(dmg));
+                        #endif
                         /* if a long worm, only map 'I' for its head */
                         if (!canseemon(mon) && !gn.notonhead)
                             /* FIXME: this doesn't work, possibly because
@@ -1056,7 +1222,11 @@ cast_chain_lightning(void)
                             map_invisible(zap.x, zap.y);
                     }
                 } else if (canseemon(mon)) {
+                    #ifdef ZHLANG
+                    pline("%s抵抗住了。", Monnam(mon));
+                    #else
                     pline("%s resists.", Monnam(mon));
+                    #endif
                 }
                 if (!DEADMONSTER(mon)) {
                     /* wakeup is via attack, but since mon is already
@@ -1145,7 +1315,11 @@ cast_protection(void)
             const char *hgolden = hcolor(NH_GOLDEN), *atmosphere;
 
             if (u.uspellprot) {
+#ifdef ZHLANG
+                pline_The("你周围的%s雾气变得更加浓密。", hgolden);
+#else
                 pline_The("%s haze around you becomes more dense.", hgolden);
+#endif
             } else {
                 struct permonst *pm = u.ustuck ? u.ustuck->data : 0;
 
@@ -1161,8 +1335,13 @@ cast_protection(void)
                                      : IS_TREE(rmtyp) ? "vegetation"
                                        : IS_STWALL(rmtyp) ? "stone"
                                          : "air");
+#ifdef ZHLANG
+                pline_The("你周围的%s开始闪烁%s雾气。",
+                          atmosphere, an(hgolden));
+#else
                 pline_The("%s around you begins to shimmer with %s haze.",
                           atmosphere, an(hgolden));
+#endif
             }
         }
         u.uspellprot += gain;
@@ -1172,7 +1351,11 @@ cast_protection(void)
             u.usptime = u.uspmtime;
         find_ac();
     } else {
+#ifdef ZHLANG
+        Your("皮肤感到一阵温暖。");
+#else
         Your("skin feels warm for a moment.");
+#endif
     }
 }
 
@@ -1249,8 +1432,16 @@ spelleffects_check(int spell, int *res, int *energy)
      * decrement of spell knowledge is done every turn.
      */
     if (spellknow(spell) <= 0) {
+        #ifdef ZHLANG
+        Your("对这个法术的记忆扭曲了。");
+        #else
         Your("knowledge of this spell is twisted.");
+        #endif
+        #ifdef ZHLANG
+        pline("它在你的脑海中唤起了噩梦般的景象...");
+        #else
         pline("It invokes nightmarish images in your mind...");
+        #endif
         spell_backfire(spell);
         u.uen -= rnd(*energy);
         if (u.uen < 0)
@@ -1259,21 +1450,45 @@ spelleffects_check(int spell, int *res, int *energy)
         *res = ECMD_TIME;
         return TRUE;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
+        #ifdef ZHLANG
+        You("费力地回忆法术。");
+        #else
         You("strain to recall the spell.");
+        #endif
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
+        #ifdef ZHLANG
+        You("难以记起法术。");
+        #else
         You("have difficulty remembering the spell.");
+        #endif
     } else if (spellknow(spell) <= KEEN / 20) { /* 1000 turns left */
+        #ifdef ZHLANG
+        Your("对这个法术的记忆逐渐模糊。");
+        #else
         Your("knowledge of this spell is growing faint.");
+        #endif
     } else if (spellknow(spell) <= KEEN / 10) { /* 2000 turns left */
+        #ifdef ZHLANG
+        Your("对这个法术的回忆逐渐消退。");
+        #else
         Your("recall of this spell is gradually fading.");
+        #endif
     }
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
+        #ifdef ZHLANG
+        You("太饿了，无法施放那个法术。");
+        #else
         You("are too hungry to cast that spell.");
+        #endif
         *res = ECMD_OK;
         return TRUE;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
+        #ifdef ZHLANG
+        You("力量不足，无法施放法术。");
+        #else
         You("lack the strength to cast spells.");
+        #endif
         *res = ECMD_OK;
         return TRUE;
     } else if (check_capacity(
@@ -1288,7 +1503,11 @@ spelleffects_check(int spell, int *res, int *energy)
        the attempt may fail due to lack of energy after the draining, in
        which case a turn will be used up in addition to the energy loss */
     if (u.uhave.amulet && u.uen >= *energy) {
+        #ifdef ZHLANG
+        You_feel("护符在吸取你的能量。");
+        #else
         You_feel("the amulet draining your energy away.");
+        #endif
         /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
            so if amulet-induced cost was more than u.uen, nothing
            (except the "don't have enough energy" message) happened
@@ -1312,10 +1531,17 @@ spelleffects_check(int spell, int *res, int *energy)
          * isn't now (lost energy when losing levels or polymorphing into
          * new person or had some stripped away by traps or monsters).
          */
+        #ifdef ZHLANG
+        You("没有足够的能量来施放那个法术%s。",
+            (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
+            : (*energy > u.uenpeak) ? " yet" /* haven't ever had enough */
+              : " anymore");
+        #else
         You("don't have enough energy to cast that spell%s.",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
             : (*energy > u.uenpeak) ? " yet" /* haven't ever had enough */
-              : " anymore"); /* once had enough but have lost some since */
+              : " anymore");
+        #endif /* once had enough but have lost some since */
         return TRUE;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
@@ -1370,7 +1596,11 @@ spelleffects_check(int spell, int *res, int *energy)
 
     chance = percent_success(spell);
     if (confused || (rnd(100) > chance)) {
+        #ifdef ZHLANG
+        You("未能正确施放法术。");
+        #else
         You("fail to cast the spell correctly.");
+        #endif
         u.uen -= *energy / 2;
         disp.botl = TRUE;
         *res = ECMD_TIME;
@@ -1495,7 +1725,11 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                  * spelleffects() is organized means that aborting with
                  * "nevermind" is not an option.
                  */
+                #ifdef ZHLANG
+                pline_The("魔法能量被释放了！");
+                #else
                 pline_The("magical energy is released!");
+                #endif
             }
             if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
@@ -1561,7 +1795,11 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
          *  Sick +  Slimed -- You are no longer ill.  The slime disappears.
          */
         if (was_sick || !was_slimed)
+            #ifdef ZHLANG
+            You("%s生病。", was_sick ? "no longer" : "not");
+            #else
             You("are %s ill.", was_sick ? "no longer" : "not");
+            #endif
         if (was_slimed)
             make_slimed(0L, "The slime disappears!");
         break;
@@ -1576,7 +1814,11 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
             do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
         } else if (uarmh && uarmh->otyp == CORNUTHAUM)
+            #ifdef ZHLANG
+            You("感觉到你%s上有一顶尖顶帽。", body_part(HEAD));
+            #else
             You("sense a pointy hat on top of your %s.", body_part(HEAD));
+            #endif
         break;
     case SPE_PROTECTION:
         cast_protection();
@@ -1658,14 +1900,26 @@ throwspell(void)
     struct monst *mtmp;
 
     if (u.uinwater) {
+        #ifdef ZHLANG
+        pline("你在开玩笑吧！这种天气？");
+        #else
         pline("You're joking!  In this weather?");
+        #endif
         return 0;
     } else if (Is_waterlevel(&u.uz)) {
+        #ifdef ZHLANG
+        You("最好等太阳出来。");
+        #else
         You("had better wait for the sun to come out.");
+        #endif
         return 0;
     }
 
+    #ifdef ZHLANG
+    pline("你想在哪里施放法术？");
+    #else
     pline("Where do you want to cast the spell?");
+    #endif
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_spell_target_positions,
@@ -1676,10 +1930,18 @@ throwspell(void)
 
     /* The number of moves from hero to where the spell drops.*/
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
+        #ifdef ZHLANG
+        pline_The("法术在远处消散了！");
+        #else
         pline_The("spell dissipates over the distance!");
+        #endif
         return 0;
     } else if (u.uswallow) {
+        #ifdef ZHLANG
+        pline_The("法术被打断了！");
+        #else
         pline_The("spell is cut short!");
+        #endif
         exercise(A_WIS, FALSE); /* What were you THINKING! */
         u.dx = 0;
         u.dy = 0;
@@ -1687,7 +1949,11 @@ throwspell(void)
     } else if (((cc.x != u.ux || cc.y != u.uy) && !cansee(cc.x, cc.y)
                 && (!(mtmp = m_at(cc.x, cc.y)) || !canspotmon(mtmp)))
                || IS_STWALL(levl[cc.x][cc.y].typ)) {
+        #ifdef ZHLANG
+        Your("思维无法锁定那个位置！");
+        #else
         Your("mind fails to lock onto that location!");
+        #endif
         return 0;
     }
 
@@ -2025,7 +2291,11 @@ dovspell(void)
     struct spell spl_tmp;
 
     if (spellid(0) == NO_SPELL) {
+        #ifdef ZHLANG
+        You("现在不会任何法术。");
+        #else
         You("don't know any spells right now.");
+        #endif
     } else {
         while (dospellmenu("Currently known spells",
                            SPELLMENU_VIEW, &splnum)) {
@@ -2060,10 +2330,18 @@ show_spells(void)
 {
     int unused = SPELLMENU_DUMP;
     if (spellid(0) == NO_SPELL) {
+        #ifdef ZHLANG
+        pline("你之前不会任何法术。");
+        #else
         pline("You didn't know any spells.");
+        #endif
         pline("%s", "");
     } else {
+#ifdef ZHLANG
+        pline("法术：");
+#else
         pline("Spells:");
+#endif
         nhUse(dospellmenu("", SPELLMENU_DUMP, &unused));
     }
 }

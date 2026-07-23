@@ -115,7 +115,11 @@ setuwep(struct obj *obj)
     if (uwep == obj && artifact_light(olduwep) && olduwep->lamplit) {
         end_burn(olduwep, FALSE);
         if (!Blind)
+#ifdef ZHLANG
+            pline("%s不再发光了。", Tobjnam(olduwep, "停止"));
+#else
             pline("%s shining.", Tobjnam(olduwep, "stop"));
+#endif
     }
     if (uwep == obj
         && (u_wield_art(ART_OGRESMASHER)
@@ -144,9 +148,15 @@ cant_wield_corpse(struct obj *obj)
         return FALSE;
 
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
+#ifdef ZHLANG
+    You("赤手%s挥舞着%s。",
+        makeplural(body_part(HAND)),
+        corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
+#else
     You("wield %s in your bare %s.",
         corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
         makeplural(body_part(HAND)));
+#endif
     Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;
@@ -175,18 +185,32 @@ ready_weapon(struct obj *wep)
     if (!wep) {
         /* No weapon */
         if (uwep) {
+#ifdef ZHLANG
+            You("现在%s了。", empty_handed());
+#else
             You("are %s.", empty_handed());
+#endif
             setuwep((struct obj *) 0);
             res = ECMD_TIME;
         } else
+#ifdef ZHLANG
+            You("已经处于%s状态。", empty_handed());
+#else
             You("are already %s.", empty_handed());
+#endif
     } else if (wep->otyp == CORPSE && cant_wield_corpse(wep)) {
         /* hero must have been life-saved to get here; use a turn */
         res = ECMD_TIME; /* corpse won't be wielded */
     } else if (uarms && bimanual(wep)) {
+#ifdef ZHLANG
+        You("在装备盾牌时无法挥舞双手%s。",
+            is_sword(wep) ? "剑" : wep->otyp == BATTLE_AXE ? "斧"
+                                                               : "武器");
+#else
         You("cannot wield a two-handed %s while wearing a shield.",
             is_sword(wep) ? "sword" : wep->otyp == BATTLE_AXE ? "axe"
-                                                              : "weapon");
+                                                               : "weapon");
+#endif
         res = ECMD_FAIL;
     } else if (!retouch_object(&wep, FALSE)) {
         res = ECMD_TIME; /* takes a turn even though it doesn't get wielded */
@@ -200,12 +224,19 @@ ready_weapon(struct obj *wep)
                 tmp = thestr;
             else
                 tmp = "";
+#ifdef ZHLANG
+            pline("%s%s到你的%s%s！", tmp, aobjnam(wep, "粘在"),
+                  wep->quan == 1L ? "自身" : "它们",
+                  bimanual(wep) ? (const char *) makeplural(body_part(HAND))
+                                : body_part(HAND));
+#else
             pline("%s%s %s to your %s%s!", tmp, aobjnam(wep, "weld"),
                   (wep->quan == 1L) ? "itself" : "themselves", /* a3 */
                   bimanual(wep) ? "" :
                       (URIGHTY ? "dominant right " : "dominant left "),
                   bimanual(wep) ? (const char *) makeplural(body_part(HAND))
                                 : body_part(HAND));
+#endif
             set_bknown(wep, 1);
         } else {
             /* The message must be printed before setuwep (since
@@ -222,7 +253,11 @@ ready_weapon(struct obj *wep)
 
             wep->owornmask |= W_WEP;
             if (wep->otyp == AKLYS && (wep->owornmask & W_WEP) != 0)
+#ifdef ZHLANG
+                You("系紧了系绳。");
+#else
                 You("secure the tether.");
+#endif
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
         }
@@ -232,9 +267,15 @@ ready_weapon(struct obj *wep)
             /* skip this message if we already got "empty handed" one above;
                also, Null is not safe for neither TWOWEAPOK() or bimanual() */
             if (uwep)
+#ifdef ZHLANG
+                You("%s。", ((TWOWEAPOK(uwep) && !bimanual(uwep))
+                            ? "不再同时使用两把武器"
+                            : "无法再同时挥舞两把武器"));
+#else
                 You("%s.", ((TWOWEAPOK(uwep) && !bimanual(uwep))
                             ? are_no_longer_twoweap
                             : can_no_longer_twoweap));
+#endif
         }
 
         /* KMH -- Talking artifacts are finally implemented */
@@ -245,8 +286,13 @@ ready_weapon(struct obj *wep)
         if (artifact_light(wep) && !wep->lamplit) {
             begin_burn(wep, FALSE);
             if (!Blind)
+#ifdef ZHLANG
+                pline("%s散发出%s的光芒！", Tobjnam(wep, "开始"),
+                      arti_light_description(wep));
+#else
                 pline("%s to shine %s!", Tobjnam(wep, "begin"),
                       arti_light_description(wep));
+#endif
         }
 #if 0
         /* we'll get back to this someday, but it's not balanced yet */
@@ -264,11 +310,21 @@ ready_weapon(struct obj *wep)
                 != (struct monst *) 0) {
                 /* check msound because we don't have access to muteshk() */
                 if (!Deaf && this_shkp->data->msound > MS_ANIMAL)
+#ifdef ZHLANG
+                    pline("%s%s“小心点用我的%s！”",
+                          shkname(this_shkp), says(), xname(wep));
+#else
                     pline("%s %s \"You be careful with my %s!\"",
                           shkname(this_shkp), says(), xname(wep));
+#endif
                 else
+#ifdef ZHLANG
+                    pline("%s对你挥舞%s%s感到担忧。",
+                          shkname(this_shkp), mhis(this_shkp), xname(wep));
+#else
                     pline("%s looks apprehensive about your wielding %s %s.",
                           shkname(this_shkp), mhis(this_shkp), xname(wep));
+#endif
             }
         }
     }
@@ -366,7 +422,11 @@ dowield(void)
     /* May we attempt this? */
     gm.multi = 0;
     if (cantwield(gy.youmonst.data)) {
+#ifdef ZHLANG
+        pline("别开玩笑了！");
+#else
         pline("Don't be ridiculous!");
+#endif
         return ECMD_FAIL;
     }
     /* Keep going even if inventory is completely empty, since wielding '-'
@@ -380,7 +440,11 @@ dowield(void)
         return ECMD_CANCEL;
     } else if (wep == uwep) {
  already_wielded:
+#ifdef ZHLANG
+        You("已经在挥舞那个了！");
+#else
         You("are already wielding that!");
+#endif
         if (is_weptool(wep) || is_wet_towel(wep))
             gu.unweapon = FALSE; /* [see setuwep()] */
         return ECMD_FAIL;
@@ -415,8 +479,13 @@ dowield(void)
         /* offer to split stack if multiple are quivered */
         if (uquiver->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uquiver)) {
+#ifdef ZHLANG
+            Sprintf(qbuf, "你准备了%ld%s。要挥舞其中一个吗？",
+                    uquiver->quan, simpleonames(uquiver));
+#else
             Sprintf(qbuf, "You have %ld %s readied.  Wield one?",
                     uquiver->quan, simpleonames(uquiver));
+#endif
             switch (ynq(qbuf)) {
             case 'q':
                 return ECMD_OK;
@@ -428,25 +497,44 @@ dowield(void)
             default:
                 break;
             }
+#ifdef ZHLANG
+            Strcpy(qbuf, "改为挥舞所有物品？");
+#else
             Strcpy(qbuf, "Wield all of them instead?");
+#endif
         } else {
             boolean use_plural = (is_plural(uquiver) || pair_of(uquiver));
 
+#ifdef ZHLANG
+            Sprintf(qbuf, "你准备好了%s。改为挥舞%s？",
+                    !use_plural ? "那个物品" : "那些物品",
+                    !use_plural ? "它" : "它们");
+#else
             Sprintf(qbuf, "You have %s readied.  Wield %s instead?",
                     !use_plural ? "that" : "those",
                     !use_plural ? "it" : "them");
+#endif
         }
         /* require confirmation to wield the quivered weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uquiver); /* replace qbuf[] contents */
+#ifdef ZHLANG
+            pline("%s%s%s保持就绪状态。", qbuf,
+                  simpleonames(uquiver), otense(uquiver, ""));
+#else
             pline("%s%s %s readied.", qbuf,
                   simpleonames(uquiver), otense(uquiver, "remain"));
+#endif
             return ECMD_OK;
         }
         /* wielding whole readied stack, so no longer quivered */
         setuqwep((struct obj *) 0);
     } else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
+#ifdef ZHLANG
+        You("无法挥舞那个！");
+#else
         You("cannot wield that!");
+#endif
         return ECMD_FAIL;
     }
 
@@ -471,7 +559,11 @@ doswapweapon(void)
     /* May we attempt this? */
     gm.multi = 0;
     if (cantwield(gy.youmonst.data)) {
+#ifdef ZHLANG
+        pline("别开玩笑了！");
+#else
         pline("Don't be ridiculous!");
+#endif
         return ECMD_FAIL;
     }
     if (welded(uwep)) {
@@ -496,7 +588,11 @@ doswapweapon(void)
         if (uswapwep)
             prinv((char *) 0, uswapwep, 0L);
         else
+#ifdef ZHLANG
+            You("没有准备副武器。");
+#else
             You("have no secondary weapon readied.");
+#endif
     }
 
     if (u.twoweap && !can_twoweapon())
@@ -527,7 +623,11 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     if (!gi.invent) {
         /* could accept '-' to empty quiver, but there's no point since
            inventory is empty so uquiver is already Null */
+#ifdef ZHLANG
+        You("没有准备任何用于射击的物品。");
+#else
         You("have nothing to ready for firing.");
+#endif
         return ECMD_OK;
     }
 
@@ -542,11 +642,19 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else if (newquiver == &hands_obj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {
+#ifdef ZHLANG
+            You("现在没有准备任何弹药。");
+#else
             You("now have no ammunition readied.");
+#endif
             /* skip 'quivering: prinv()' */
             setuqwep((struct obj *) 0);
         } else {
+#ifdef ZHLANG
+            You("已经没有准备弹药了！");
+#else
             You("already have no ammunition readied!");
+#endif
         }
         return ECMD_OK;
     } else if (newquiver->o_id == svc.context.objsplit.child_oid) {
@@ -558,17 +666,29 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             goto already_quivered;
         } else if (newquiver->oclass == COIN_CLASS) {
             /* don't allow splitting a stack of coins into quiver */
+#ifdef ZHLANG
+            You("不能只准备一部分金币。");
+#else
             You("can't ready only part of your gold.");
+#endif
             unsplitobj(newquiver);
             return ECMD_OK;
         }
         finish_splitting(newquiver);
     } else if (newquiver == uquiver) {
  already_quivered:
+#ifdef ZHLANG
+        pline("那弹药已经准备好了！");
+#else
         pline("That ammunition is already readied!");
+#endif
         return ECMD_OK;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
+#ifdef ZHLANG
+        You("无法%s那个！", verb);
+#else
         You("cannot %s that!", verb);
+#endif
         return ECMD_OK;
     } else if (newquiver == uwep) {
         int weld_res = !uwep->bknown;
@@ -581,8 +701,13 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         /* offer to split stack if wielding more than 1 */
         if (uwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uwep)) {
+#ifdef ZHLANG
+            Sprintf(qbuf, "你正在挥舞%ld%s。要准备其中的%ld个吗？",
+                    uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+#else
             Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
                     uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+#endif
             switch (ynq(qbuf)) {
             case 'q':
                 return ECMD_OK;
@@ -594,19 +719,34 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
+#ifdef ZHLANG
+            Strcpy(qbuf, "改为全部准备？");
+#else
             Strcpy(qbuf, "Ready all of them instead?");
+#endif
         } else {
             boolean use_plural = (is_plural(uwep) || pair_of(uwep));
 
+#ifdef ZHLANG
+            Sprintf(qbuf, "你正在挥舞%s。改为准备%s？",
+                    !use_plural ? "那个物品" : "那些物品",
+                    !use_plural ? "它" : "它们");
+#else
             Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
                     !use_plural ? "that" : "those",
                     !use_plural ? "it" : "them");
+#endif
         }
         /* require confirmation to ready the main weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uwep); /* replace qbuf[] contents */
+#ifdef ZHLANG
+            pline("%s%s%s被挥舞着。", qbuf,
+                  simpleonames(uwep), otense(uwep, ""));
+#else
             pline("%s%s %s wielded.", qbuf,
                   simpleonames(uwep), otense(uwep, "remain"));
+#endif
             return ECMD_OK;
         }
         /* quivering main weapon, so no longer wielding it */
@@ -616,11 +756,18 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else if (newquiver == uswapwep) {
         if (uswapwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
             && splittable(uswapwep)) {
+#ifdef ZHLANG
+            Sprintf(qbuf, "%s%ld%s。要准备其中的%ld个吗？",
+                    u.twoweap ? "你正在双持" : "你的备用武器是",
+                    uswapwep->quan, simpleonames(uswapwep),
+                    uswapwep->quan - 1L);
+#else
             Sprintf(qbuf, "%s %ld %s.  Ready %ld of them?",
                     u.twoweap ? "You are dual wielding"
                               : "Your alternate weapon is",
                     uswapwep->quan, simpleonames(uswapwep),
                     uswapwep->quan - 1L);
+#endif
             switch (ynq(qbuf)) {
             case 'q':
                 return ECMD_OK;
@@ -632,21 +779,38 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
+#ifdef ZHLANG
+            Strcpy(qbuf, "改为全部准备？");
+#else
             Strcpy(qbuf, "Ready all of them instead?");
+#endif
         } else {
             boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
 
+#ifdef ZHLANG
+            Sprintf(qbuf, "%s你的%s武器。改为准备%s？",
+                    !use_plural ? "那是" : "那些是",
+                    u.twoweap ? "第二" : "备用",
+                    !use_plural ? "它" : "它们");
+#else
             Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
                     !use_plural ? "That is" : "Those are",
                     u.twoweap ? "second" : "alternate",
                     !use_plural ? "it" : "them");
+#endif
         }
         /* require confirmation to ready the alternate weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uswapwep); /* replace qbuf[] contents */
+#ifdef ZHLANG
+            pline("%s%s%s%s。", qbuf,
+                  simpleonames(uswapwep), otense(uswapwep, "被"),
+                  u.twoweap ? "挥舞着" : "作为副武器装备");
+#else
             pline("%s%s %s %s.", qbuf,
                   simpleonames(uswapwep), otense(uswapwep, "remain"),
                   u.twoweap ? "wielded" : "as secondary weapon");
+#endif
             return ECMD_OK;
         }
         /* quivering alternate weapon, so no more uswapwep */
@@ -663,7 +827,11 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else { /* verb=="fire", manually refilling quiver during 'f'ire */
         /* prefix item with description of action, so don't want that to
            include "(at the ready)" */
+#ifdef ZHLANG
+        prinv("你准备好了：", newquiver, 0L);
+#else
         prinv("You ready:", newquiver, 0L);
+#endif
         setuqwep(newquiver);
     }
 
@@ -674,10 +842,18 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
        something we're wielding that's vulnerable to its damage) */
     res = 0;
     if (was_uwep) {
+#ifdef ZHLANG
+        You("现在%s了。", empty_handed());
+#else
         You("are now %s.", empty_handed());
+#endif
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
+#ifdef ZHLANG
+        You("不再同时使用两把武器了。");
+#else
         You("%s.", are_no_longer_twoweap);
+#endif
         res = 1;
     }
     return res ? ECMD_TIME : ECMD_OK;
@@ -701,8 +877,13 @@ wield_tool(struct obj *obj,
                    || strstri(what, "s of ") != 0);
 
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
+#ifdef ZHLANG
+        You_cant("在穿戴%s时无法%s%s。", more_than_1 ? "它们" : "它",
+                 verb, yname(obj));
+#else
         You_cant("%s %s while wearing %s.", verb, yname(obj),
                  more_than_1 ? "them" : "it");
+#endif
         return FALSE;
     }
     if (uwep && welded(uwep)) {
@@ -713,22 +894,40 @@ wield_tool(struct obj *obj,
                 hand = makeplural(hand);
             if (strstri(what, "pair of ") != 0)
                 more_than_1 = FALSE;
+#ifdef ZHLANG
+            pline("由于武器粘在你的%s上，你无法%s%s%s。",
+                  hand, verb, more_than_1 ? "那些" : "那个", xname(obj));
+#else
             pline(
                "Since your weapon is welded to your %s, you cannot %s %s %s.",
                   hand, verb, more_than_1 ? "those" : "that", xname(obj));
+#endif
         } else {
+#ifdef ZHLANG
+            You_cant("这样做。");
+#else
             You_cant("do that.");
+#endif
         }
         return FALSE;
     }
     if (cantwield(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You_cant("无法牢牢握住%s。", more_than_1 ? "它们" : "它");
+#else
         You_cant("hold %s strongly enough.", more_than_1 ? "them" : "it");
+#endif
         return FALSE;
     }
     /* check shield */
     if (uarms && bimanual(obj)) {
+#ifdef ZHLANG
+        You("在装备盾牌时无法%s双手%s。", verb,
+            (obj->oclass == WEAPON_CLASS) ? "武器" : "工具");
+#else
         You("cannot %s a two-handed %s while wearing a shield.", verb,
             (obj->oclass == WEAPON_CLASS) ? "weapon" : "tool");
+#endif
         return FALSE;
     }
 
@@ -746,7 +945,11 @@ wield_tool(struct obj *obj,
             /* hope none of ready_weapon()'s early returns apply here... */
             (void) ready_weapon(obj);
         } else {
+#ifdef ZHLANG
+            You("现在挥舞着%s。", doname(obj));
+#else
             You("now wield %s.", doname(obj));
+#endif
             setuwep(obj);
         }
         if (flags.pushweapon && oldwep && uwep != oldwep)
@@ -769,33 +972,68 @@ can_twoweapon(void)
 
     if (!could_twoweap(gy.youmonst.data)) {
         if (Upolyd)
+#ifdef ZHLANG
+            You_cant("以你当前形态无法使用两把武器。");
+#else
             You_cant("use two weapons in your current form.");
+#endif
         else
+#ifdef ZHLANG
+            pline("%s无法同时使用两把武器。",
+                  makeplural((flags.female && gu.urole.name.f)
+                             ? gu.urole.name.f : gu.urole.name.m));
+#else
             pline("%s aren't able to use two weapons at once.",
                   makeplural((flags.female && gu.urole.name.f)
                              ? gu.urole.name.f : gu.urole.name.m));
+#endif
     } else if (!uwep || !uswapwep) {
         const char *hand_s = body_part(HAND);
 
         if (!uwep && !uswapwep)
             hand_s = makeplural(hand_s);
         /* "your hands are empty" or "your {left|right} hand is empty" */
+#ifdef ZHLANG
+        Your("%s%s是空的。", uwep ? "左" : uswapwep ? "右" : "",
+             hand_s);
+#else
         Your("%s%s %s empty.", uwep ? "left " : uswapwep ? "right " : "",
              hand_s, vtense(hand_s, "are"));
+#endif
     } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
         otmp = !TWOWEAPOK(uwep) ? uwep : uswapwep;
+#ifdef ZHLANG
+        pline("%s%s适合的%s武器%s。", Yname2(otmp),
+              is_plural(otmp) ? "不是" : "不是一个",
+              (otmp == uwep) ? "主" : "副",
+              plur(otmp->quan));
+#else
         pline("%s %s suitable %s weapon%s.", Yname2(otmp),
               is_plural(otmp) ? "aren't" : "isn't a",
               (otmp == uwep) ? "primary" : "secondary",
               plur(otmp->quan));
+#endif
     } else if (bimanual(uwep) || bimanual(uswapwep)) {
         otmp = bimanual(uwep) ? uwep : uswapwep;
+#ifdef ZHLANG
+        pline("%s不是单手武器。", Yname2(otmp));
+#else
         pline("%s isn't one-handed.", Yname2(otmp));
+#endif
     } else if (uarms) {
+#ifdef ZHLANG
+        You_cant("在装备盾牌时无法使用两把武器。");
+#else
         You_cant("use two weapons while wearing a shield.");
+#endif
     } else if (uswapwep->oartifact) {
+#ifdef ZHLANG
+        pline("%s抗拒被作为第二把武器使用！",
+              Yobjnam2(uswapwep, ""));
+#else
         pline("%s being held second to another weapon!",
               Yobjnam2(uswapwep, "resist"));
+#endif
     } else if (uswapwep->otyp == CORPSE && cant_wield_corpse(uswapwep)) {
         /* [Note: !TWOWEAPOK() check prevents ever getting here...] */
         ; /* must be life-saved to reach here; return FALSE */
@@ -823,15 +1061,28 @@ drop_uswapwep(void)
     Sprintf(left_hand, "left %s", body_part(HAND));
     if (!obj->cursed)
         /* attempting to two-weapon while Glib */
+#ifdef ZHLANG
+        pline("%s从你的%s滑落！", Yobjnam2(obj, ""), left_hand);
+#else
         pline("%s from your %s!", Yobjnam2(obj, "slip"), left_hand);
+#endif
     else if (!u.twoweap)
         /* attempting to two-weapon when uswapwep is cursed */
+#ifdef ZHLANG
+        pline("%s挣脱了你的抓握，从你的%s掉落！",
+              Yobjnam2(obj, ""), left_hand);
+#else
         pline("%s your grasp and %s from your %s!",
               Yobjnam2(obj, "evade"), otense(obj, "drop"), left_hand);
+#endif
     else
         /* already two-weaponing but can't anymore because uswapwep has
            become cursed */
+#ifdef ZHLANG
+        Your("%s抽搐了一下，丢掉了%s！", left_hand, yobjnam(obj, (char *) 0));
+#else
         Your("%s spasms and drops %s!", left_hand, yobjnam(obj, (char *) 0));
+#endif
     dropx(obj);
 }
 
@@ -851,7 +1102,11 @@ dotwoweapon(void)
 {
     /* You can always toggle it off */
     if (u.twoweap) {
+#ifdef ZHLANG
+        You("切换到你的主武器。");
+#else
         You("switch to your primary weapon.");
+#endif
         set_twoweap(FALSE); /* u.twoweap = FALSE */
         update_inventory();
         return ECMD_OK;
@@ -860,7 +1115,11 @@ dotwoweapon(void)
     /* May we use two weapons? */
     if (can_twoweapon()) {
         /* Success! */
+#ifdef ZHLANG
+        You("开始双持武器战斗。");
+#else
         You("begin two-weapon combat.");
+#endif
         set_twoweap(TRUE); /* u.twoweap = TRUE */
         update_inventory();
         return (rnd(20) > ACURR(A_DEX)) ? ECMD_TIME : ECMD_OK;
@@ -881,7 +1140,11 @@ uwepgone(void)
         if (artifact_light(uwep) && uwep->lamplit) {
             end_burn(uwep, FALSE);
             if (!Blind)
+#ifdef ZHLANG
+                pline("%s不再发光了。", Tobjnam(uwep, "停止"));
+#else
                 pline("%s shining.", Tobjnam(uwep, "stop"));
+#endif
         }
         setworn((struct obj *) 0, W_WEP);
         gu.unweapon = TRUE;
@@ -911,7 +1174,11 @@ void
 untwoweapon(void)
 {
     if (u.twoweap) {
+#ifdef ZHLANG
+        You("无法再同时挥舞两把武器了。");
+#else
         You("%s.", can_no_longer_twoweap);
+#endif
         set_twoweap(FALSE); /* u.twoweap = FALSE */
         update_inventory();
     }
@@ -932,18 +1199,32 @@ chwepon(struct obj *otmp, int amount)
 
         if (amount >= 0 && uwep && will_weld(uwep)) { /* cursed tin opener */
             if (!Blind) {
+#ifdef ZHLANG
+                Sprintf(buf, "%s%s的光晕。",
+                        Yobjnam2(uwep, "闪耀着"), an(hcolor(NH_AMBER)));
+#else
                 Sprintf(buf, "%s with %s aura.",
                         Yobjnam2(uwep, "glow"), an(hcolor(NH_AMBER)));
+#endif
                 uwep->bknown = !Hallucination; /* ok to bypass set_bknown() */
             } else {
                 /* cursed tin opener is wielded in right hand */
+#ifdef ZHLANG
+                Sprintf(buf, "你的右%s有刺痛感。", body_part(HAND));
+#else
                 Sprintf(buf, "Your right %s tingles.", body_part(HAND));
+#endif
             }
             uncurse(uwep);
             update_inventory();
         } else {
+#ifdef ZHLANG
+            Sprintf(buf, "你的%s%s。", makeplural(body_part(HAND)),
+                    (amount >= 0) ? "抽搐了一下" : "发痒");
+#else
             Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
                     (amount >= 0) ? "twitch" : "itch");
+#endif
         }
         strange_feeling(otmp, buf); /* pline()+docall()+useup() */
         exercise(A_DEX, (boolean) (amount >= 0));
@@ -956,8 +1237,13 @@ chwepon(struct obj *otmp, int amount)
     if (uwep->otyp == WORM_TOOTH && amount >= 0) {
         multiple = (uwep->quan > 1L);
         /* order: message, transformation, shop handling */
+#ifdef ZHLANG
+        Your("%s%s现在锋利多了。", simpleonames(uwep),
+             multiple ? "融合在一起，" : "");
+#else
         Your("%s %s much sharper now.", simpleonames(uwep),
              multiple ? "fuse, and become" : "is");
+#endif
         uwep->otyp = CRYSKNIFE;
         uwep->oerodeproof = 0;
         if (multiple) {
@@ -977,8 +1263,13 @@ chwepon(struct obj *otmp, int amount)
     } else if (uwep->otyp == CRYSKNIFE && amount < 0) {
         multiple = (uwep->quan > 1L);
         /* order matters: message, shop handling, transformation */
+#ifdef ZHLANG
+        Your("%s%s现在钝多了。", simpleonames(uwep),
+             multiple ? "融合在一起，" : "");
+#else
         Your("%s %s much duller now.", simpleonames(uwep),
              multiple ? "fuse, and become" : "is");
+#endif
         costly_alteration(uwep, COST_DEGRD); /* DECHNT? other? */
         uwep->otyp = WORM_TOOTH;
         uwep->oerodeproof = 0;
@@ -997,27 +1288,47 @@ chwepon(struct obj *otmp, int amount)
         wepname = ONAME(uwep);
     if (amount < 0 && uwep->oartifact && restrict_name(uwep, wepname)) {
         if (!Blind)
+#ifdef ZHLANG
+            pline("%s%s。", Yobjnam2(uwep, "发出微弱的"), color);
+#else
             pline("%s %s.", Yobjnam2(uwep, "faintly glow"), color);
+#endif
         return 1;
     }
     /* there is a (soft) upper and lower limit to uwep->spe */
     if (((uwep->spe > 5 && amount >= 0) || (uwep->spe < -5 && amount < 0))
         && rn2(3)) {
         if (!Blind)
+#ifdef ZHLANG
+            pline("%s剧烈地发光了一会儿然后%s了。",
+                  Yobjnam2(uwep, ""), color,
+                  otense(uwep, "蒸发"));
+#else
             pline("%s %s for a while and then %s.",
                   Yobjnam2(uwep, "violently glow"), color,
                   otense(uwep, "evaporate"));
+#endif
         else
+#ifdef ZHLANG
+            pline("%s消失了。", Yobjnam2(uwep, ""));
+#else
             pline("%s.", Yobjnam2(uwep, "evaporate"));
+#endif
 
         useupall(uwep); /* let all of them disappear */
         return 1;
     }
     if (!Blind) {
         xtime = (amount * amount == 1) ? "moment" : "while";
+#ifdef ZHLANG
+        pline("%s持续了%s的%s色光芒。",
+              Yobjnam2(uwep, amount == 0 ? "剧烈地闪耀" : "闪耀"), xtime,
+              color);
+#else
         pline("%s %s for a %s.",
               Yobjnam2(uwep, amount == 0 ? "violently glow" : "glow"), color,
               xtime);
+#endif
         if (otyp != STRANGE_OBJECT && uwep->known
             && (amount > 0 || (amount < 0 && otmp->bknown)))
             makeknown(otyp);
@@ -1039,15 +1350,24 @@ chwepon(struct obj *otmp, int amount)
      * spe dependent.  Give an obscure clue here.
      */
     if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {
+#ifdef ZHLANG
+        Your("右%s%s了一下！", body_part(HAND),
+             (((amount > 1) && (uwep->spe > 1)) ? "抽" : "抖"));
+#else
         Your("right %s %sches!", body_part(HAND),
              (((amount > 1) && (uwep->spe > 1)) ? "flin" : "it"));
+#endif
     }
 
     /* an elven magic clue, cookie@keebler */
     /* elven weapons vibrate warningly when enchanted beyond a limit */
     if ((uwep->spe > 5)
         && (is_elven_weapon(uwep) || uwep->oartifact || !rn2(7)))
+#ifdef ZHLANG
+        pline("%s突然振动了一下。", Yobjnam2(uwep, ""));
+#else
         pline("%s unexpectedly.", Yobjnam2(uwep, "suddenly vibrate"));
+#endif
 
     return 1;
 }
@@ -1074,7 +1394,11 @@ weldmsg(struct obj *obj)
     obj->owornmask = 0L; /* suppress doname()'s "(weapon in hand)";
                           * Yobjnam2() doesn't actually need this because
                           * it is based on xname() rather than doname() */
+#ifdef ZHLANG
+    pline("%s粘在你的%s上了！", Yobjnam2(obj, ""), hand);
+#else
     pline("%s welded to your %s!", Yobjnam2(obj, "are"), hand);
+#endif
     obj->owornmask = savewornmask;
 }
 

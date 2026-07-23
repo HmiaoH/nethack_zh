@@ -387,19 +387,40 @@ gold_detect(struct obj *sobj)
         char buf[BUFSZ];
 
         if (gy.youmonst.data == &mons[PM_GOLD_GOLEM])
+#ifdef ZHLANG
+            Sprintf(buf, "你感觉自己身价百万%s！", currency(2L));
+#else
             Sprintf(buf, "You feel like a million %s!", currency(2L));
+#endif
         else if (money_cnt(gi.invent) || hidden_gold(TRUE))
+#ifdef ZHLANG
+            Strcpy(buf, "你对自己未来的财务状况感到担忧。");
+#else
             Strcpy(buf,
                "You feel worried about your future financial situation.");
+#endif
         else if (steedgold)
+#ifdef ZHLANG
+            Sprintf(buf, "你对%s的财务状况产生了兴趣。",
+                    s_suffix(x_monnam(u.usteed,
+                                      u.usteed->mtame ? ARTICLE_YOUR
+                                                      : ARTICLE_THE,
+                                      (char *) 0,
+                                      SUPPRESS_SADDLE, FALSE)));
+#else
             Sprintf(buf, "You feel interested in %s financial situation.",
                     s_suffix(x_monnam(u.usteed,
                                       u.usteed->mtame ? ARTICLE_YOUR
                                                       : ARTICLE_THE,
                                       (char *) 0,
                                       SUPPRESS_SADDLE, FALSE)));
+#endif
         else
+#ifdef ZHLANG
+            Strcpy(buf, "你感觉自己物质上很贫穷。");
+#else
             Strcpy(buf, "You feel materially poor.");
+#endif
 
         strange_feeling(sobj, buf);
         return 1;
@@ -407,7 +428,11 @@ gold_detect(struct obj *sobj)
     /* only under me - no separate display required */
     if (stale)
         docrt();
+#ifdef ZHLANG
+    You("注意到你的%s之间有些金币。", makeplural(body_part(FOOT)));
+#else
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
+#endif
     return 0;
 
  outgoldmap:
@@ -465,7 +490,11 @@ gold_detect(struct obj *sobj)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* so autodescribe will recognize hero */
     }
+#ifdef ZHLANG
+    You_feel("非常贪婪，并感知到了金币！");
+#else
     You_feel("very greedy, and sense gold!");
+#endif
     exercise(A_WIS, TRUE);
 
     browse_map(ter_typ, "gold");
@@ -513,19 +542,34 @@ food_detect(struct obj *sobj)
         gk.known = stale && !confused;
         if (stale) {
             docrt();
+#ifdef ZHLANG
+            You("感知到附近缺乏%s。", what);
+#else
             You("sense a lack of %s nearby.", what);
+#endif
             if (sobj && sobj->blessed) {
                 if (!u.uedibility)
+#ifdef ZHLANG
+                    Your("%s开始发麻。", body_part(NOSE));
+#else
                     Your("%s starts to tingle.", body_part(NOSE));
+#endif
                 u.uedibility = 1;
             }
         } else if (sobj) {
             char buf[BUFSZ];
 
+#ifdef ZHLANG
+            Sprintf(buf, "你的%s抽动了一下%s。", body_part(NOSE),
+                    (sobj->blessed && !u.uedibility)
+                        ? "然后开始发麻"
+                        : "");
+#else
             Sprintf(buf, "Your %s twitches%s.", body_part(NOSE),
                     (sobj->blessed && !u.uedibility)
                         ? " then starts to tingle"
                         : "");
+#endif
             if (sobj->blessed && !u.uedibility) {
                 boolean savebeginner = flags.beginner;
 
@@ -539,10 +583,18 @@ food_detect(struct obj *sobj)
         return !stale;
     } else if (!ct) {
         gk.known = TRUE;
+#ifdef ZHLANG
+        You("在附近%s到%s。", sobj ? "闻" : "感知", what);
+#else
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
+#endif
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
+#ifdef ZHLANG
+                Your("%s开始发麻。", body_part(NOSE));
+#else
                 Your("%s starts to tingle.", body_part(NOSE));
+#endif
             u.uedibility = 1;
         }
     } else {
@@ -577,13 +629,26 @@ food_detect(struct obj *sobj)
         }
         if (sobj) {
             if (sobj->blessed) {
+#ifdef ZHLANG
+                Your("%s%s发麻，你闻到了%s。", body_part(NOSE),
+                     u.uedibility ? "继续" : "开始", what);
+#else
                 Your("%s %s to tingle and you smell %s.", body_part(NOSE),
                      u.uedibility ? "continues" : "starts", what);
+#endif
                 u.uedibility = 1;
             } else
+#ifdef ZHLANG
+                Your("%s发麻，你闻到了%s。", body_part(NOSE), what);
+#else
                 Your("%s tingles and you smell %s.", body_part(NOSE), what);
+#endif
         } else
+#ifdef ZHLANG
+            You("感知到%s。", what);
+#else
             You("sense %s.", what);
+#endif
         exercise(A_WIS, TRUE);
 
         browse_map(ter_typ, "food");
@@ -689,7 +754,11 @@ object_detect(struct obj *detector, /* object doing the detecting */
                 strange_feeling(detector, "You feel a lack of something.");
             return 1;
         }
+#ifdef ZHLANG
+        You("感知到附近有%s。", stuff);
+#else
         You("sense %s nearby.", stuff);
+#endif
         return 0;
     }
 
@@ -777,7 +846,11 @@ object_detect(struct obj *detector, /* object doing the detecting */
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON;
     }
+#ifdef ZHLANG
+    You("探测到%s的%s。", stuff, ct ? "存在" : "不存在");
+#else
     You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
+#endif
 
     if (!ct)
         display_nhwindow(WIN_MAP, TRUE);
@@ -815,9 +888,15 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
 
     if (!mcnt) {
         if (otmp)
+#ifdef ZHLANG
+            strange_feeling(otmp, Hallucination
+                                      ? "你感到一阵毛骨悚然。"
+                                      : "你感到受到威胁。");
+#else
             strange_feeling(otmp, Hallucination
                                       ? "You get the heebie jeebies."
                                       : "You feel threatened.");
+#endif
         return 1;
     } else {
         boolean unconstrained, woken = FALSE;
@@ -841,9 +920,15 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
         }
         if (!swallowed)
             display_self();
+#ifdef ZHLANG
+        You("感知到附近有怪物。");
+        if (woken)
+            pline("怪物感知到了你的存在。");
+#else
         You("sense the presence of monsters.");
         if (woken)
             pline("Monsters sense the presence of you.");
+#endif
 
         if ((otmp && otmp->blessed) && !unconstrained) {
             /* persistent detection--just show updated map */
@@ -995,7 +1080,11 @@ display_trap_map(int cursed_src)
         newsym(u.ux, u.uy);
         ter_typ |= TER_MON; /* for autodescribe at <u.ux,u.uy> */
     }
+#ifdef ZHLANG
+    You_feel("感到%s。", cursed_src ? "非常贪婪" : "陷入了陷阱");
+#else
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
+#endif
 
     browse_map(ter_typ, cursed_src ? "gold" : "trap of interest");
 
@@ -1211,7 +1300,11 @@ use_crystal_ball(struct obj **optr)
     boolean charged = (obj->spe > 0);
 
     if (Blind) {
+#ifdef ZHLANG
+        pline("可惜你看不到%s。", the(xname(obj)));
+#else
         pline("Too bad you can't see %s.", the(xname(obj)));
+#endif
         return;
     }
     oops = is_quest_artifact(obj) ? 8 : obj->blessed ? 16 : 20;
@@ -1220,30 +1313,58 @@ use_crystal_ball(struct obj **optr)
 
         switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
+#ifdef ZHLANG
+            pline("%s太令人费解了！", Tobjnam(obj, "are"));
+#else
             pline("%s too much to comprehend!", Tobjnam(obj, "are"));
+#endif
             break;
         case 2:
+#ifdef ZHLANG
+            pline("%s让你感到困惑！", The(xname(obj)));
+#else
             pline("%s you!", Tobjnam(obj, "confuse"));
+#endif
             make_confused((HConfusion & TIMEOUT) + impair, FALSE);
             break;
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
+#ifdef ZHLANG
+                pline("%s损害了你的视力！", The(xname(obj)));
+#else
                 pline("%s your vision!", Tobjnam(obj, "damage"));
+#endif
                 make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
+#ifdef ZHLANG
+                pline("%s冲击了你的视觉。", The(xname(obj)));
+#else
                 pline("%s your vision.", Tobjnam(obj, "assault"));
+#endif
+#ifdef ZHLANG
+                You("不受影响！");
+#else
                 You("are unaffected!");
+#endif
             }
             break;
         case 4:
+#ifdef ZHLANG
+            pline("%s冲击了你的心智！", The(xname(obj)));
+#else
             pline("%s your mind!", Tobjnam(obj, "zap"));
+#endif
             (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
                                      FALSE, 0L);
             break;
         case 5:
+#ifdef ZHLANG
+            pline("%s爆炸了！", The(xname(obj)));
+#else
             pline("%s!", Tobjnam(obj, "explode"));
+#endif
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
@@ -1262,31 +1383,61 @@ use_crystal_ball(struct obj **optr)
         gn.nomovemsg = "";
 
         if (!charged) {
+#ifdef ZHLANG
+            pline("你所看到的只是一片%s的奇异光芒。", hcolor((char *) 0));
+#else
             pline("All you see is funky %s haze.", hcolor((char *) 0));
+#endif
             if (obj->spe < 0)
                 goto implode; /* destroy it when it has been cancelled */
         } else {
             switch (rnd(6)) {
             case 1:
+#ifdef ZHLANG
+                You("领悟了一些炽热熔岩的炫酷光球。");
+#else
                 You("grok some groovy globs of incandescent lava.");
+#endif
                 break;
             case 2:
+#ifdef ZHLANG
+                pline("哇！迷幻的色彩，%s！",
+                      poly_gender() == 1 ? "美女" : "哥们");
+#else
                 pline("Whoa!  Psychedelic colors, %s!",
                       poly_gender() == 1 ? "babe" : "dude");
+#endif
                 break;
             case 3:
+#ifdef ZHLANG
+                pline_The("水晶闪烁着不祥的%s光芒！",
+                          hcolor((char *) 0));
+#else
                 pline_The("crystal pulses with sinister %s light!",
                           hcolor((char *) 0));
+#endif
                 break;
             case 4:
+#ifdef ZHLANG
+                You_see("金鱼在荧光石上方游动。");
+#else
                 You_see("goldfish swimming above fluorescent rocks.");
+#endif
                 break;
             case 5:
+#ifdef ZHLANG
+                You_see("微小的雪花围绕着一座微型农舍旋转。");
+#else
                 You_see(
                     "tiny snowflakes spinning around a miniature farmhouse.");
+#endif
                 break;
             default:
+#ifdef ZHLANG
+                pline("哦哇……就像万花筒一样！");
+#else
                 pline("Oh wow... like a kaleidoscope!");
+#endif
                 break;
             }
             consume_obj_charge(obj, TRUE);
@@ -1296,7 +1447,11 @@ use_crystal_ball(struct obj **optr)
 
     /* read a single character */
     if (flags.verbose)
+#ifdef ZHLANG
+        You("可以寻找一个物体、怪物或特殊地图符号。");
+#else
         You("may look for an object, monster, or special map symbol.");
+#endif
     ch = yn_function("What do you look for?", (char *) 0, '\0', TRUE);
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && strchr(quitchars, ch)) {
@@ -1309,17 +1464,29 @@ use_crystal_ball(struct obj **optr)
      *  for help in using the crystal ball.
      */
 
+#ifdef ZHLANG
+    You("凝视着%s……", the(xname(obj)));
+#else
     You("peer into %s...", the(xname(obj)));
+#endif
     nomul(-rnd(charged ? 10 : 2));
     gm.multi_reason = "gazing into a crystal ball";
     gn.nomovemsg = "";
 
     if (!charged) {
+#ifdef ZHLANG
+        pline_The("视野很模糊。");
+#else
         pline_The("vision is unclear.");
+#endif
 
         if (obj->spe < 0) { /* destroy ball if used after being cancelled */
  implode:   /* no damage to hero but 'multi' has a small negative value */
+#ifdef ZHLANG
+            pline("%s内爆了！", The(xname(obj)));
+#else
             pline("%s!", Tobjnam(obj, "implode"));
+#endif
             useup(obj);
             *optr = obj = (struct obj *) 0; /* it's gone */
             return;
@@ -1359,9 +1526,21 @@ use_crystal_ball(struct obj **optr)
 
         if (ret) {
             if (!rn2(100)) /* make them nervous */
+#ifdef ZHLANG
+                You_see("Yendor的巫师正在注视着你。");
+#else
                 You_see("the Wizard of Yendor gazing out at you.");
+#endif
             else
-                pline_The("vision is unclear.");
+#ifdef ZHLANG
+        pline_The("视野很模糊。");
+#else
+#ifdef ZHLANG
+        pline_The("视野很模糊。");
+#else
+        pline_The("vision is unclear.");
+#endif
+#endif
         }
     }
     return;
@@ -1552,7 +1731,11 @@ do_vicinity_map(
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that
            not-verbose users become aware of the prompting situation */
+#ifdef ZHLANG
+        You("感知你的周围环境。");
+#else
         You("sense your surroundings.");
+#endif
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
         browse_map(ter_typ, "anything of interest");
@@ -1752,9 +1935,15 @@ openone(coordxy zx, coordxy zy, genericptr_t num)
             if (distu(zx, zy) < 3)
                 b_trapped("door", NO_PART);
             else
+#ifdef ZHLANG
+                Norep("你%s到了一场爆炸！",
+                      cansee(zx, zy) ? "看" : (!Deaf ? "听"
+                                                      : "感受到了"));
+#else
                 Norep("You %s an explosion!",
                       cansee(zx, zy) ? "see" : (!Deaf ? "hear"
                                                       : "feel the shock of"));
+#endif
             wake_nearto(zx, zy, 11 * 11);
             levl[zx][zy].doormask = D_NODOOR;
         } else
@@ -1862,7 +2051,11 @@ findit(void)
         num += found.num_mons;
     }
     if (*buf)
+#ifdef ZHLANG
+        You("揭示了%s！", buf);
+#else
         You("reveal %s!", buf);
+#endif
 
     if (found.num_invis) {
         if (found.num_invis > 1)
@@ -1871,7 +2064,11 @@ findit(void)
         else
             Sprintf(buf, "%s unseen monster",
                     found.num_kept_invis ? "another" : "an");
+#ifdef ZHLANG
+        You("探测到%s！", buf);
+#else
         You("detect %s!", buf);
+#endif
         num += found.num_invis;
     }
 
@@ -1885,7 +2082,11 @@ findit(void)
     /* note: num_kept_invis is not included in the final result */
 
     if (!num)
+#ifdef ZHLANG
+        You("没有找到任何东西。");
+#else
         You("don't find anything.");
+#endif
 #if FOUND_FLASH_COUNT == 0
     else if (tmp_num) {
         flush_screen(1);
@@ -1907,9 +2108,17 @@ openit(void)
         if (digests(u.ustuck->data)) {
             /* purple worm */
             if (Blind)
+#ifdef ZHLANG
+                pline("它的嘴张开了！");
+#else
                 pline("Its mouth opens!");
+#endif
             else
+#ifdef ZHLANG
+                pline("%s张开了它的嘴！", Monnam(u.ustuck));
+#else
                 pline("%s opens its mouth!", Monnam(u.ustuck));
+#endif
 #if 0   /* expels() will take care of this */
         } else if (enfolds(u.ustuck->data)) {
             /* trapper or lurker above */
@@ -1953,7 +2162,11 @@ find_trap(struct trap *trap)
     }
 
     set_msg_xy(trap->tx, trap->ty);
+#ifdef ZHLANG
+    You("发现了%s。", an(trapname(trap->ttyp, FALSE)));
+#else
     You("find %s.", an(trapname(trap->ttyp, FALSE)));
+#endif
 
     if (cleared) {
         display_nhwindow(WIN_MAP, TRUE); /* wait */
@@ -2002,10 +2215,18 @@ mfind0(struct monst *mtmp, boolean via_warning)
         if (!canspotmon(mtmp)) {
             map_invisible(x, y);
             set_msg_xy(x, y);
+#ifdef ZHLANG
+            You_feel("一个看不见的怪物！");
+#else
             You_feel("an unseen monster!");
+#endif
         } else if (!sensemon(mtmp)) {
             set_msg_xy(x, y);
+#ifdef ZHLANG
+            You("发现了%s。", mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
+#else
             You("find %s.", mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
+#endif
         }
         return 1;
     }
@@ -2021,7 +2242,11 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 
     if (u.uswallow) {
         if (!aflag)
+#ifdef ZHLANG
+            Norep("你在找什么？出口吗？");
+#else
             Norep("What are you looking for?  The exit?");
+#endif
     } else {
         int fund = (uwep && uwep->oartifact
                     && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
@@ -2048,7 +2273,11 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
                     nomul(0);
                     feel_location(x, y); /* make sure it shows up */
                     set_msg_xy(x, y);
+#ifdef ZHLANG
+                    You("发现了一扇隐藏的门。");
+#else
                     You("find a hidden door.");
+#endif
                 } else if (levl[x][y].typ == SCORR) {
                     if (rnl(7 - fund))
                         continue;
@@ -2058,7 +2287,11 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
                     nomul(0);
                     feel_newsym(x, y); /* make sure it shows up */
                     set_msg_xy(x, y);
+#ifdef ZHLANG
+                    You("发现了一条隐藏的通道。");
+#else
                     You("find a hidden passage.");
+#endif
                 } else {
                     /* Be careful not to find anything in an SCORR or SDOOR */
                     if ((mtmp = m_at(x, y)) != 0 && !aflag) {
@@ -2360,7 +2593,11 @@ reveal_terrain(
     boolean full = (which_subset & TER_FULL) != 0; /* show whole map */
 
     if ((Hallucination || Stunned || Confusion) && !full) {
+#ifdef ZHLANG
+        You("现在太混乱了，无法做到这一点。");
+#else
         You("are too disoriented for this.");
+#endif
     } else {
         coordxy x, y;
         int glyph, default_glyph;
@@ -2401,7 +2638,11 @@ reveal_terrain(
                 Sprintf(eos(buf), "%s and monsters",
                         (keep_traps || keep_objs) ? "," : "");
         }
+#ifdef ZHLANG
+        pline("仅显示%s……", buf);
+#else
         pline("Showing %s only...", buf);
+#endif
 
         /* allow player to move cursor around and get autodescribe feedback
            based on what is visible now rather than what is on 'real' map */
