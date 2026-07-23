@@ -369,7 +369,11 @@ You(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    vpline(YouMessage(tmp, "", line), the_args);
+#else
     vpline(YouMessage(tmp, "You ", line), the_args);
+#endif
     va_end(the_args);
 }
 
@@ -380,7 +384,11 @@ Your(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    vpline(YouMessage(tmp, "", line), the_args);
+#else
     vpline(YouMessage(tmp, "Your ", line), the_args);
+#endif
     va_end(the_args);
 }
 
@@ -391,10 +399,17 @@ You_feel(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    if (Unaware)
+        YouPrefix(tmp, "", line);
+    else
+        YouPrefix(tmp, "", line);
+#else
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
     else
         YouPrefix(tmp, "You feel ", line);
+#endif
     vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }
@@ -406,7 +421,11 @@ You_cant(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    vpline(YouMessage(tmp, "", line), the_args);
+#else
     vpline(YouMessage(tmp, "You can't ", line), the_args);
+#endif
     va_end(the_args);
 }
 
@@ -417,7 +436,11 @@ pline_The(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    vpline(YouMessage(tmp, "", line), the_args);
+#else
     vpline(YouMessage(tmp, "The ", line), the_args);
+#endif
     va_end(the_args);
 }
 
@@ -428,7 +451,11 @@ There(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    vpline(YouMessage(tmp, "", line), the_args);
+#else
     vpline(YouMessage(tmp, "There ", line), the_args);
+#endif
     va_end(the_args);
 }
 
