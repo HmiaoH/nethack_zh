@@ -2299,7 +2299,11 @@ genl_player_setup(int screenheight)
                     /* pick a random role */
                     k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                     if (k < 0) {
+#ifdef ZHLANG
+                        pline("不兼容的职业！");
+#else
                         pline("Incompatible role!");
+#endif
                         k = randrole(FALSE);
                     }
                 } else {
@@ -2380,7 +2384,11 @@ genl_player_setup(int screenheight)
                 if (pick4u == 'y' || pick4u == 'a' || RACE == ROLE_RANDOM) {
                     k = pick_race(ROLE, GEND, ALGN, PICK_RANDOM);
                     if (k < 0) {
+#ifdef ZHLANG
+                        pline("不兼容的种族！");
+#else
                         pline("Incompatible race!");
+#endif
                         k = randrace(ROLE);
                     }
                 } else { /* pick4u == 'n' */
@@ -2468,7 +2476,11 @@ genl_player_setup(int screenheight)
                 if (pick4u == 'y' || pick4u == 'a' || GEND == ROLE_RANDOM) {
                     k = pick_gend(ROLE, RACE, ALGN, PICK_RANDOM);
                     if (k < 0) {
+#ifdef ZHLANG
+                        pline("不兼容的性别！");
+#else
                         pline("Incompatible gender!");
+#endif
                         k = randgend(ROLE, RACE);
                     }
                 } else { /* pick4u == 'n' */
@@ -2556,7 +2568,11 @@ genl_player_setup(int screenheight)
                 if (pick4u == 'y' || pick4u == 'a' || ALGN == ROLE_RANDOM) {
                     k = pick_align(ROLE, RACE, GEND, PICK_RANDOM);
                     if (k < 0) {
+#ifdef ZHLANG
+                        pline("不兼容的阵营！");
+#else
                         pline("Incompatible alignment!");
+#endif
                         k = randalign(ROLE, RACE);
                     }
                 } else { /* pick4u == 'n' */

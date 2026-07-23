@@ -585,7 +585,11 @@ mread(int fd, genericptr_t buf, unsigned len)
             return;
         } else {
 #ifndef SFCTOOL
+#ifdef ZHLANG
+            pline("读取了%d字节，应读取%u字节。", (int) rlen, len);
+#else
             pline("Read %d instead of %u bytes.", (int) rlen, len);
+#endif
             display_nhwindow(WIN_MESSAGE, TRUE); /* flush before error() */
             if (program_state.restoring) {
                 (void) nhclose(fd);

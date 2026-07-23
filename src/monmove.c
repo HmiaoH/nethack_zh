@@ -55,10 +55,19 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
 {
     if (flags.verbose) {
         if (canseeit && !Unaware)
+#ifdef ZHLANG
+            pline_mon(mtmp, "轰隆！！你看到一扇门爆炸了。");
+#else
             pline_mon(mtmp, "KABOOM!!  You see a door explode.");
+#endif
         else if (!Deaf)
+#ifdef ZHLANG
+            You_hear("一声%s爆炸声。",
+                     (mdistu(mtmp) > 7 * 7) ? "遥远的" : "附近的");
+#else
             You_hear("a %s explosion.",
                      (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
+#endif
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
@@ -121,7 +130,11 @@ mon_yells(struct monst *mon, const char *shout)
             pline_mon(mon, "%s yells:", Amonnam(mon));
         } else {
             /* Soundeffect(se_someone_yells, 75); */
+#ifdef ZHLANG
+            You_hear("有人大喊：");
+#else
             You_hear("someone yell:");
+#endif
         }
         SetVoice(mon, 0, 80, 0);
         verbalize1(shout);
@@ -149,9 +162,15 @@ m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
             if (!Deaf && (mdistu(mtmp) < 4*4)) {
                 if (canspotmon(mtmp))
                     set_msg_xy(mtmp->mx, mtmp->my);
+#ifdef ZHLANG
+                pline("%s喃喃地念着%s。",
+                      Monnam(mtmp),
+                      mtmp->ispriest ? "一段祷文" : "一段咒语");
+#else
                 pline("%s mutters %s.",
                       Monnam(mtmp),
                       mtmp->ispriest ? "a prayer" : "an incantation");
+#endif
             }
             mtmp->mspec_used += rn1(20, 10);
         }
@@ -366,7 +385,11 @@ release_hero(struct monst *mon)
             expels(mon, mon->data, TRUE);
         } else if (!sticks(gy.youmonst.data)) {
             unstuck(mon); /* let go */
+#ifdef ZHLANG
+            You("被释放了！");
+#else
             You("get released!");
+#endif
         }
     }
 }
@@ -511,10 +534,18 @@ monflee(
                           Monnam(mtmp), lsrc);
                 } else {
                     SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+                    verbalize("好亮的光！");
+#else
                     verbalize("Bright light!");
+#endif
                 }
             } else {
+#ifdef ZHLANG
+                pline_mon(mtmp, "%s转身逃走。", Monnam(mtmp));
+#else
                 pline_mon(mtmp, "%s turns to flee.", Monnam(mtmp));
+#endif
             }
         }
 
@@ -587,13 +618,25 @@ mind_blast(struct monst *mtmp)
     if (canseemon(mtmp))
         pline_mon(mtmp, "%s concentrates.", Monnam(mtmp));
     if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
+#ifdef ZHLANG
+        You("感应到一股微弱的灵能波动。");
+#else
         You("sense a faint wave of psychic energy.");
+#endif
         return;
     }
+#ifdef ZHLANG
+    pline("一股灵能波动涌遍你的全身！");
+#else
     pline("A wave of psychic energy pours over you!");
+#endif
     if (mtmp->mpeaceful
         && (!Conflict || resist_conflict(mtmp))) {
+#ifdef ZHLANG
+        pline("感觉非常舒缓。");
+#else
         pline("It feels quite soothing.");
+#endif
     } else if (!u.uinvulnerable) {
         int dmg;
         boolean m_sen = sensemon(mtmp);
@@ -612,10 +655,17 @@ mind_blast(struct monst *mtmp)
                 gy.youmonst.mappearance = 0;
                 newsym(u.ux, u.uy);
             }
+#ifdef ZHLANG
+            pline("它锁定了你的%s！",
+                    m_sen ? "心灵感应"
+                    : Blind_telepat ? "潜在心灵感应"
+                    : "心智"); /* note: hero is never mindless */
+#else
             pline("It locks on to your %s!",
                     m_sen ? "telepathy"
                     : Blind_telepat ? "latent telepathy"
                     : "mind"); /* note: hero is never mindless */
+#endif
             dmg = rnd(15);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
@@ -636,7 +686,11 @@ mind_blast(struct monst *mtmp)
             /* wake it up first, to bring hidden monster out of hiding */
             wakeup(m2, FALSE);
             if (cansee(m2->mx, m2->my))
+#ifdef ZHLANG
+                pline("它锁定了%s。", mon_nam(m2));
+#else
                 pline("It locks on to %s.", mon_nam(m2));
+#endif
             m2->mhp -= rnd(15);
             if (DEADMONSTER(m2))
                 monkilled(m2, "", AD_DRIN);
@@ -803,8 +857,13 @@ dochug(struct monst *mtmp)
     if (nearby && mdat->msound == MS_BRIBE && mtmp->mpeaceful && !mtmp->mtame
         && !u.uswallow) {
         if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
+#ifdef ZHLANG
+            pline("%s对着空气低语。",
+                  cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
+#else
             pline("%s whispers at thin air.",
                   cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
+#endif
 
             if (is_demon(gy.youmonst.data)) {
                 /* "Good hunting, brother" */
@@ -815,7 +874,11 @@ dochug(struct monst *mtmp)
                 /* Why?  For the same reason in real demon talk */
                 if (canseemon(mtmp))
                     set_msg_xy(mtmp->mx, mtmp->my);
+#ifdef ZHLANG
+                pline("%s发怒了！", Amonnam(mtmp));
+#else
                 pline("%s gets angry!", Amonnam(mtmp));
+#endif
                 mtmp->mpeaceful = 0;
                 set_malign(mtmp);
                 /* since no way is an image going to pay it off */
@@ -1567,9 +1630,17 @@ postmov(
                             pline_mon(mtmp, "%s unlocks and opens a door.",
                                   Monnam(mtmp));
                         } else if (canseeit) {
+#ifdef ZHLANG
+                            You_see("一扇门被解锁打开了。");
+#else
                             You_see("a door unlock and open.");
+#endif
                         } else if (!Deaf) {
+#ifdef ZHLANG
+                            You_hear("一扇门被解锁打开了。");
+#else
                             You_hear("a door unlock and open.");
+#endif
                         }
                     }
                 }
@@ -1584,9 +1655,17 @@ postmov(
                         if (canseeit && canspotmon(mtmp)) {
                             pline_mon(mtmp, "%s opens a door.", Monnam(mtmp));
                         } else if (canseeit) {
+#ifdef ZHLANG
+                            You_see("一扇门打开了。");
+#else
                             You_see("a door open.");
+#endif
                         } else if (!Deaf) {
+#ifdef ZHLANG
+                            You_hear("一扇门打开了。");
+#else
                             You_hear("a door open.");
+#endif
                         }
                     }
                 }
@@ -1609,9 +1688,17 @@ postmov(
                             pline_mon(mtmp, "%s smashes down a door.",
                                       Monnam(mtmp));
                         } else if (canseeit) {
+#ifdef ZHLANG
+                            You_see("一扇门被撞开了。");
+#else
                             You_see("a door crash open.");
+#endif
                         } else if (!Deaf) {
+#ifdef ZHLANG
+                            You_hear("一扇门被撞开了。");
+#else
                             You_hear("a door crash open.");
+#endif
                         }
                     }
                 }
@@ -1634,10 +1721,17 @@ postmov(
                 dissolve_bars(mtmp->mx, mtmp->my);
                 return MMOVE_DONE;
             } else if (flags.verbose && canseemon(mtmp))
+#ifdef ZHLANG
+                Norep("%s%s%s了铁栏杆。", Monnam(mtmp),
+                      /* pluralization fakes verb conjugation */
+                      makeplural(locomotion(ptr, "pass")),
+                      passes_walls(ptr) ? "穿过" : "挤过");
+#else
                 Norep("%s %s %s the iron bars.", Monnam(mtmp),
                       /* pluralization fakes verb conjugation */
                       makeplural(locomotion(ptr, "pass")),
                       passes_walls(ptr) ? "through" : "between");
+#endif
         } /* doors and bars */
 
         /* possibly dig */
@@ -1832,7 +1926,11 @@ m_move(struct monst *mtmp, int after)
     if (ptr == &mons[PM_MAIL_DAEMON]) {
         if (!Deaf && canseemon(mtmp)) {
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("我要迟到了！");
+#else
             verbalize("I'm late!");
+#endif
         }
         mongone(mtmp);
         return MMOVE_DIED;

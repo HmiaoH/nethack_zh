@@ -1419,7 +1419,11 @@ nhl_test(lua_State *L)
     y = (coordxy) get_table_int(L, "y");
     name = get_table_str_opt(L, "name", Player);
 
+#ifdef ZHLANG
+    pline("测试：{ x=%i, y=%i, name=\"%s\" }", (int) x, (int) y, name);
+#else
     pline("TEST:{ x=%i, y=%i, name=\"%s\" }", (int) x, (int) y, name);
+#endif
 
     free(name);
 
@@ -1743,7 +1747,11 @@ nhl_gamestate(lua_State *L)
 
         /* restore game state */
         svm.moves = gg.gmst_moves;
+#ifdef ZHLANG
+        pline("重置时间到第 #%ld 回合。", svm.moves);
+#else
         pline("Resetting time to move #%ld.", svm.moves);
+#endif
         gg.gmst_moves = 0L;
 
         gl.lastinvnr = 51;

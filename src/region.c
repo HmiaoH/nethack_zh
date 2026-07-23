@@ -458,7 +458,11 @@ run_regions(void)
     }
 
     if (gg.gas_cloud_diss_within) {
+#ifdef ZHLANG
+        pline_The("你周围的毒气云消散了。");
+#else
         pline_The("gas cloud around you dissipates.");
+#endif
         /* normally won't see additional dissipation when within */
         /* FIXME? this assumes that additional dissipation is close by */
         if (u.xray_range <= 1)
@@ -466,9 +470,14 @@ run_regions(void)
         gg.gas_cloud_diss_within = FALSE;
     }
     if (gg.gas_cloud_diss_seen) {
+#ifdef ZHLANG
+        You_see("%s毒气云消散了。",
+                (gg.gas_cloud_diss_seen == 1) ? "" : "几片");
+#else
         You_see("%s gas cloud%s dissipate.",
                 (gg.gas_cloud_diss_seen == 1) ? "a" : "some",
                 plur(gg.gas_cloud_diss_seen));
+#endif
         gg.gas_cloud_diss_seen = 0;
     }
 }
@@ -1111,13 +1120,23 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         if (m_poisongas_ok(&gy.youmonst) == M_POISONGAS_OK)
             return FALSE;
         if (!Blind) {
+#ifdef ZHLANG
+            Your("%s刺痛。", makeplural(body_part(EYE)));
+#else
             Your("%s sting.", makeplural(body_part(EYE)));
+#endif
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {
+#ifdef ZHLANG
+            pline("%s灼烧着你的%s！", Something,
+                  makeplural(body_part(LUNG)));
+            You("咳嗽着吐出血来！");
+#else
             pline("%s is burning your %s!", Something,
                   makeplural(body_part(LUNG)));
             You("cough and spit blood!");
+#endif
             wake_nearto(u.ux, u.uy, 2);
             dam = Maybe_Half_Phys(rnd(dam) + 5);
             if (Half_gas_damage) /* worn towel */
@@ -1126,7 +1145,11 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             monstunseesu(M_SEEN_POISON);
             return FALSE;
         } else {
+#ifdef ZHLANG
+            You("咳嗽了一声！");
+#else
             You("cough!");
+#endif
             wake_nearto(u.ux, u.uy, 2);
             monstseesu(M_SEEN_POISON);
             return FALSE;
@@ -1138,7 +1161,11 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             if (!is_silent(mtmp->data)) {
                 if (cansee(mtmp->mx, mtmp->my)
                     || (distu(mtmp->mx, mtmp->my) < 8))
+#ifdef ZHLANG
+                    pline("%s咳嗽了几声！", Monnam(mtmp));
+#else
                     pline("%s coughs!", Monnam(mtmp));
+#endif
                 wake_nearto(mtmp->mx, mtmp->my, 2);
             }
             if (heros_fault(reg))
@@ -1195,11 +1222,16 @@ make_gas_cloud(
     add_region(cloud);
 
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
+#ifdef ZHLANG
+        You("被%s笼罩了！",
+            damage ? "有毒气体" : "蒸汽");
+#else
         You("are enveloped in a cloud of %s!",
             /* FIXME: "steam" is wrong if this cloud is just the trail of
                a fog cloud's movement; changing to "vapor" would handle
                that but seems a step backward when it really is steam */
             damage ? "noxious gas" : "steam");
+#endif
         iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
     }
 }
@@ -1390,14 +1422,26 @@ region_safety(void)
         if (region_danger()) {
             set_itimeout(&HMagical_breathing, (long) (d(4, 4) + 4));
             /* not already Breathless or wouldn't be in region danger */
+#ifdef ZHLANG
+            You_feel("可以呼吸了。");
+#else
             You_feel("able to breathe.");
+#endif
         }
     } else if (r) {
         remove_region(r);
+#ifdef ZHLANG
+        pline_The("笼罩着你的毒气云消散了。");
+#else
         pline_The("gas cloud enveloping you dissipates.");
+#endif
     } else {
         /* cloud dissipated on its own, so nothing needs to be done */
+#ifdef ZHLANG
+        pline_The("毒气云已经消散了。");
+#else
         pline_The("gas cloud has dissipated.");
+#endif
     }
     /* maybe cure blindness too */
     if (BlindedTimeout == 1L)

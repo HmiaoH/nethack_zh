@@ -24,7 +24,11 @@ ballrelease(boolean showmsg)
 {
     if (carried(uball) && !welded(uball)) {
         if (showmsg)
+#ifdef ZHLANG
+            pline("你吓了一跳，丢掉了铁球。");
+#else
             pline("Startled, you drop the iron ball.");
+#endif
         if (uwep == uball)
             setuwep((struct obj *) 0);
         if (uswapwep == uball)
@@ -53,13 +57,25 @@ ballfall(void)
     if (gets_hit) {
         int dmg = rn1(7, 25);
 
+#ifdef ZHLANG
+        pline_The("铁球砸在了你的%s上。", body_part(HEAD));
+#else
         pline_The("iron ball falls on your %s.", body_part(HEAD));
+#endif
         if (uarmh) {
             if (hard_helmet(uarmh)) {
+#ifdef ZHLANG
+                pline("幸好你戴着一顶硬头盔。");
+#else
                 pline("Fortunately, you are wearing a hard helmet.");
+#endif
                 dmg = 3;
             } else if (flags.verbose)
+#ifdef ZHLANG
+                pline("%s无法保护你。", Yname2(uarmh));
+#else
                 pline("%s does not protect you.", Yname2(uarmh));
+#endif
         }
         losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
                NO_KILLER_PREFIX);
@@ -774,8 +790,13 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
  drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
+#ifdef ZHLANG
+        You("无法%s拖动沉重的铁球。",
+            gi.invent ? "拿上所有东西的同时" : "");
+#else
         You("cannot %sdrag the heavy iron ball.",
             gi.invent ? "carry all that and also " : "");
+#endif
         nomul(0);
         return FALSE;
     }
@@ -788,13 +809,21 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
         || ((t = t_at(uchain->ox, uchain->oy))
             && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
+#ifdef ZHLANG
+            You_feel("铁球传来一股拉力。");
+#else
             You_feel("a tug from the iron ball.");
+#endif
             if (t)
                 t->tseen = 1;
         } else {
             struct monst *victim;
 
+#ifdef ZHLANG
+            You("被铁球猛地拽了回去！");
+#else
             You("are jerked back by the iron ball!");
+#endif
             if ((victim = m_at(uchain->ox, uchain->oy)) != 0) {
                 int tmp;
                 int dieroll = rnd(20);
@@ -901,25 +930,49 @@ drop_ball(coordxy x, coordxy y)
             && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
+#ifdef ZHLANG
+                pline("铁球把你从陷阱中拽了出来！");
+#else
                 pline("%s%s!", pullmsg, "pit");
+#endif
                 break;
             case TT_WEB:
+#ifdef ZHLANG
+                pline("铁球把你从蛛网中拽了出来！");
+                Soundeffect(se_destroy_web, 30);
+                pline_The("蛛网被破坏了！");
+#else
                 pline("%s%s!", pullmsg, "web");
                 Soundeffect(se_destroy_web, 30);
                 pline_The("web is destroyed!");
+#endif
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
+#ifdef ZHLANG
+                pline("铁球把你从%s中拽了出来！", hliquid("lava"));
+#else
                 pline("%s%s!", pullmsg, hliquid("lava"));
+#endif
                 break;
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+#ifdef ZHLANG
+                pline("铁球把你从捕熊夹中拽了出来！");
+#else
                 pline("%s%s!", pullmsg, "bear trap");
+#endif
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
+#ifdef ZHLANG
+                    Your("%s%s受到了严重伤害。",
+                         (side == LEFT_SIDE) ? "左" : "右",
+                         body_part(LEG));
+#else
                     Your("%s %s is severely damaged.",
                          (side == LEFT_SIDE) ? "left" : "right",
                          body_part(LEG));
+#endif
                     losehp(Maybe_Half_Phys(2),
                            "leg damage from being pulled out of a bear trap",
                            KILLED_BY);
@@ -976,9 +1029,14 @@ litter(void)
         nextobj = otmp->nobj;
         if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
+#ifdef ZHLANG
+                You("丢下了%s，它顺着楼梯和你一起滚落。",
+                    yname(otmp));
+#else
                 You("drop %s and %s %s down the stairs with you.",
                     yname(otmp), (otmp->quan == 1L) ? "it" : "they",
                     otense(otmp, "fall"));
+#endif
                 setnotworn(otmp);
                 freeinv(otmp);
                 hitfloor(otmp, FALSE);
@@ -1004,14 +1062,22 @@ drag_down(void)
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
     if (carried(uball) && !welded(uball))
+#ifdef ZHLANG
+        You("没有抓牢铁球。");
+#else
         You("lose your grip on the iron ball.");
+#endif
 
     cls();  /* previous level is still displayed although you
                went down the stairs. Avoids bug C343-20 */
 
     if (forward) {
         if (rn2(6)) {
+#ifdef ZHLANG
+            pline_The("铁球拖着你往楼下滚去！");
+#else
             pline_The("iron ball drags you downstairs!");
+#endif
             losehp(Maybe_Half_Phys(rnd(6)),
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             litter();
@@ -1019,14 +1085,22 @@ drag_down(void)
     } else {
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
+#ifdef ZHLANG
+            pline_The("铁球猛地撞到了你！");
+#else
             pline_The("iron ball smacks into you!");
+#endif
             losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
+#ifdef ZHLANG
+            pline_The("铁球拖着你往楼下滚去！");
+#else
             pline_The("iron ball drags you downstairs!");
+#endif
             losehp(Maybe_Half_Phys(rnd(3)),
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);

@@ -52,14 +52,26 @@ moveloop_preamble(boolean resuming)
     /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();
     if (flags.moonphase == FULL_MOON) {
+#ifdef ZHLANG
+        You("很幸运！今晚是满月。");
+#else
         You("are lucky!  Full moon tonight.");
+#endif
         change_luck(1);
     } else if (flags.moonphase == NEW_MOON) {
+#ifdef ZHLANG
+        pline("小心！今晚是新月。");
+#else
         pline("Be careful!  New moon tonight.");
+#endif
     }
     flags.friday13 = friday_13th();
     if (flags.friday13) {
+#ifdef ZHLANG
+        pline("当心！13号星期五可能会有坏事发生。");
+#else
         pline("Watch out!  Bad things can happen on Friday the 13th.");
+#endif
         change_luck(-1);
     }
 
@@ -687,7 +699,11 @@ stop_occupation(void)
 {
     if (go.occupation) {
         if (!maybe_finished_meal(TRUE))
+#ifdef ZHLANG
+            You("停止%s。", go.occtxt);
+#else
             You("stop %s.", go.occtxt);
+#endif
         go.occupation = (int (*)(void)) 0;
         disp.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
@@ -900,12 +916,20 @@ welcome(boolean new_game) /* false => restoring an old game */
     /* skip "welcome back" if restoring a doomed character */
     if (!new_game && Upolyd && ugenocided()) {
         /* death via self-genocide is pending */
+#ifdef ZHLANG
+        pline("你回来了，但内心仍感到%s。", udeadinside());
+#else
         pline("You're back, but you still feel %s inside.", udeadinside());
+#endif
         return;
     }
 
     if (Hallucination)
+#ifdef ZHLANG
+        pline("NetHack是在亡灵演播室观众面前录制的。");
+#else
         pline("NetHack is filmed in front of an undead studio audience.");
+#endif
 
     /*
      * The "welcome back" message always describes your innate form
@@ -949,8 +973,13 @@ welcome(boolean new_game) /* false => restoring an old game */
             (currentgend && gu.urole.name.f) ? gu.urole.name.f
                                              : gu.urole.name.m);
 
+#ifdef ZHLANG
+    pline(new_game ? "%s%s，欢迎来到NetHack！你是%s。"
+                   : "%s%s，%s，欢迎回到NetHack！",
+#else
     pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
                    : "%s %s, the%s, welcome back to NetHack!",
+#endif
           Hello((struct monst *) 0), svp.plname, buf);
 
     if (new_game) {

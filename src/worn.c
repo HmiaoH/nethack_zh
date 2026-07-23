@@ -549,13 +549,27 @@ mon_adjust_speed(
             /* mimic the player's petrification countdown; "slowing down"
                even if fast movement rate retained via worn speed boots */
             if (flags.verbose)
+#ifdef ZHLANG
+                pline_mon(mon, "%s速度变慢了。", Monnam(mon));
+#else
                 pline_mon(mon, "%s is slowing down.", Monnam(mon));
+#endif
         } else if (adjust > 0 || mon->mspeed == MFAST)
+#ifdef ZHLANG
+            pline_mon(mon, "%s突然移动%s更快了。",
+                      Monnam(mon), howmuch);
+#else
             pline_mon(mon, "%s is suddenly moving %sfaster.",
                       Monnam(mon), howmuch);
+#endif
         else
+#ifdef ZHLANG
+            pline_mon(mon, "%s似乎移动%s更慢了。",
+                      Monnam(mon), howmuch);
+#else
             pline_mon(mon, "%s seems to be moving %sslower.",
                       Monnam(mon), howmuch);
+#endif
 
         /* might discover an object if we see the speed change happen */
         if (obj != 0)
@@ -947,11 +961,21 @@ m_dowear_type(
                     (void) strsubst(newarm, "an ", "another ");
                 newarm[BUFSZ - 1] = '\0';
             }
+#ifdef ZHLANG
+            pline_mon(mon, "%s%s穿上了%s。", Monnam(mon), buf, newarm);
+#else
             pline_mon(mon, "%s%s puts on %s.", Monnam(mon), buf, newarm);
+#endif
             if (autocurse)
+#ifdef ZHLANG
+                pline("%s的%s%s闪耀了片刻%s光芒。", s_suffix(Monnam(mon)),
+                      simpleonames(best), otense(best, "glow"),
+                      hcolor(NH_BLACK));
+#else
                 pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),
                       simpleonames(best), otense(best, "glow"),
                       hcolor(NH_BLACK));
+#endif
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
         mon->mfrozen = m_delay;
@@ -978,22 +1002,42 @@ m_dowear_type(
             const char *adesc = arti_light_description(best);
 
             if (sawmon) /* could already see monster */
+#ifdef ZHLANG
+                pline("%s开始发出%s的光芒。", Yname2(best), adesc);
+#else
                 pline("%s %s to shine %s.", Yname2(best),
                       otense(best, "begin"), adesc);
+#endif
             else if (canseemon(mon)) /* didn't see it until new light */
+#ifdef ZHLANG
+                pline("%s正发出%s的光芒。", Yname2(best), adesc);
+#else
                 pline("%s %s shining %s.", Yname2(best),
                       otense(best, "are"), adesc);
+#endif
             else if (sawloc) /* saw location but not invisible monster */
+#ifdef ZHLANG
+                pline("某物开始发出%s的光芒。", adesc);
+#else
                 pline("%s begins to shine %s.", Something, adesc);
+#endif
             else /* didn't see location until new light */
+#ifdef ZHLANG
+                pline("某物正发出%s的光芒。", adesc);
+#else
                 pline("%s is shining %s.", Something, adesc);
+#endif
         }
     }
     update_mon_extrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa */
     if (!creation && (sawmon ^ canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
+#ifdef ZHLANG
+            pline("突然你无法看见%s了。", nambuf);
+#else
             pline("Suddenly you cannot see %s.", nambuf);
+#endif
             makeknown(best->otyp);
         /* } else if (!mon->minvis) {
          *     pline("%s suddenly appears!", Amonnam(mon)); */
@@ -1193,10 +1237,19 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             } else {
                 Soundeffect(se_cracking_sound, 100);
                 if (vis)
+#ifdef ZHLANG
+                    pline_mon(mon, "%s挣脱了%s的盔甲！",
+                              Monnam(mon), ppronoun);
+#else
                     pline_mon(mon, "%s breaks out of %s armor!",
                               Monnam(mon), ppronoun);
+#endif
                 else
+#ifdef ZHLANG
+                    You_hear("一阵破裂声。");
+#else
                     You_hear("a cracking sound.");
+#endif
             }
             m_useup(mon, otmp);
         }
@@ -1205,25 +1258,48 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (otmp->oartifact) {
                 if (vis)
+#ifdef ZHLANG
+                    pline_mon(mon, "%s的%s脱落了！", s_suffix(Monnam(mon)),
+                          cloak_simple_name(otmp));
+#else
                     pline_mon(mon, "%s %s falls off!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
+#endif
                 m_lose_armor(mon, otmp, polyspot);
             } else {
                 Soundeffect(se_ripping_sound, 100);
                 if (vis)
+#ifdef ZHLANG
+                    pline_mon(mon, "%s的%s撕裂了！", s_suffix(Monnam(mon)),
+                          cloak_simple_name(otmp));
+#else
                     pline_mon(mon, "%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
+#endif
                 else
+#ifdef ZHLANG
+                    You_hear("一阵撕裂声。");
+#else
                     You_hear("a ripping sound.");
+#endif
                 m_useup(mon, otmp);
             }
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s的衬衣撕成了碎片！",
+                          s_suffix(Monnam(mon)));
+#else
                 pline_mon(mon, "%s shirt rips to shreds!",
                           s_suffix(Monnam(mon)));
+#endif
             else
+#ifdef ZHLANG
+                You_hear("一阵撕裂声。");
+#else
                 You_hear("a ripping sound.");
+#endif
             m_useup(mon, otmp);
         }
     } else if (sliparm(mdat)) {
@@ -1233,10 +1309,19 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             Soundeffect(se_thud, 50);
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s的盔甲从%s身上脱落了！",
+                          s_suffix(Monnam(mon)), pronoun);
+#else
                 pline_mon(mon, "%s armor falls around %s!",
                           s_suffix(Monnam(mon)), pronoun);
+#endif
             else
+#ifdef ZHLANG
+                You_hear("一声闷响。");
+#else
                 You_hear("a thud.");
+#endif
             m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0
@@ -1244,23 +1329,44 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (vis) {
                 if (is_whirly(mon->data))
+#ifdef ZHLANG
+                    pline_mon(mon, "%s的%s无人支撑，脱落了！",
+                              s_suffix(Monnam(mon)), cloak_simple_name(otmp));
+#else
                     pline_mon(mon, "%s %s falls, unsupported!",
                               s_suffix(Monnam(mon)), cloak_simple_name(otmp));
+#endif
                 else
+#ifdef ZHLANG
+                    pline_mon(mon, "%s缩小了，从%s的%s中滑出！",
+                              Monnam(mon), ppronoun,
+                              cloak_simple_name(otmp));
+#else
                     pline_mon(mon, "%s shrinks out of %s %s!",
                               Monnam(mon), ppronoun,
                               cloak_simple_name(otmp));
+#endif
             }
             m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
                 if (passes_thru_clothes)
+#ifdef ZHLANG
+                    pline_mon(mon, "%s直接渗过了%s的衬衣！",
+                              Monnam(mon), ppronoun);
+#else
                     pline_mon(mon, "%s seeps right through %s shirt!",
                               Monnam(mon), ppronoun);
+#endif
                 else
+#ifdef ZHLANG
+                    pline_mon(mon, "%s变得太小，%s的衬衣穿不上了！",
+                          Monnam(mon), ppronoun);
+#else
                     pline_mon(mon, "%s becomes much too small for %s shirt!",
                           Monnam(mon), ppronoun);
+#endif
             }
             m_lose_armor(mon, otmp, polyspot);
         }
@@ -1269,18 +1375,33 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         /* [caller needs to handle weapon checks] */
         if ((otmp = which_armor(mon, W_ARMG)) != 0) {
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s丢下了%s的手套%s！",
+                          Monnam(mon), ppronoun,
+                          MON_WEP(mon) ? "和武器" : "");
+#else
                 pline_mon(mon, "%s drops %s gloves%s!",
                           Monnam(mon), ppronoun,
                           MON_WEP(mon) ? " and weapon" : "");
+#endif
             m_lose_armor(mon, otmp, polyspot);
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
             Soundeffect(se_clank, 50);
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s再也拿不住%s的盾牌了！",
+                          Monnam(mon), ppronoun);
+#else
                 pline_mon(mon, "%s can no longer hold %s shield!",
                           Monnam(mon), ppronoun);
+#endif
             else
+#ifdef ZHLANG
+                You_hear("一声铿锵。");
+#else
                 You_hear("a clank.");
+#endif
             m_lose_armor(mon, otmp, polyspot);
         }
     }
@@ -1289,10 +1410,19 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             /* flimsy test for horns matches polyself handling */
             && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s的头盔掉到了%s上！",
+                          s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
+#else
                 pline_mon(mon, "%s helmet falls to the %s!",
                           s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
+#endif
             else
+#ifdef ZHLANG
+                You_hear("一声铿锵。");
+#else
                 You_hear("a clank.");
+#endif
             m_lose_armor(mon, otmp, polyspot);
         }
     }
@@ -1300,12 +1430,23 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARMF)) != 0) {
             if (vis) {
                 if (is_whirly(mon->data))
+#ifdef ZHLANG
+                    pline_mon(mon, "%s的靴子脱落了！",
+                              s_suffix(Monnam(mon)));
+#else
                     pline_mon(mon, "%s boots fall away!",
                               s_suffix(Monnam(mon)));
+#endif
                 else
+#ifdef ZHLANG
+                    pline_mon(mon, "%s的靴子从%s脚上%s！",
+                              s_suffix(Monnam(mon)), ppronoun,
+                          verysmall(mdat) ? "滑落" : "被挤掉");
+#else
                     pline_mon(mon, "%s boots %s off %s feet!",
                               s_suffix(Monnam(mon)),
                           verysmall(mdat) ? "slide" : "are pushed", ppronoun);
+#endif
             }
             m_lose_armor(mon, otmp, polyspot);
         }
@@ -1314,17 +1455,29 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_SADDLE)) != 0) {
             m_lose_armor(mon, otmp, polyspot);
             if (vis)
+#ifdef ZHLANG
+                pline_mon(mon, "%s的马鞍脱落了。", s_suffix(Monnam(mon)));
+#else
                 pline_mon(mon, "%s saddle falls off.", s_suffix(Monnam(mon)));
+#endif
         }
         if (mon == u.usteed)
             noride = TRUE;
     }
     if (noride || (mon == u.usteed && !can_ride(mon))) {
+#ifdef ZHLANG
+        You("无法再骑乘%s了。", mon_nam(mon));
+#else
         You("can no longer ride %s.", mon_nam(mon));
+#endif
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             char buf[BUFSZ];
 
+#ifdef ZHLANG
+            You("触碰了%s。", mon_nam(u.usteed));
+#else
             You("touch %s.", mon_nam(u.usteed));
+#endif
             Sprintf(buf, "falling off %s",
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);

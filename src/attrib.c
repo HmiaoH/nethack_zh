@@ -175,12 +175,20 @@ adjattrib(
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
+#ifdef ZHLANG
+                pline("你已经%s达到%s的极限了。",
+#else
                 pline("You're %s as %s as you can get.",
+#endif
                       abonflg ? "currently" : "already", attrstr);
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
+#ifdef ZHLANG
+                Your("天生的%s已经%s。", attrname[ndx],
+#else
                 Your("innate %s has %s.", attrname[ndx],
+#endif
                      (incr > 0) ? "improved" : "declined");
             }
         }
@@ -192,7 +200,11 @@ adjattrib(
 
     disp.botl = TRUE;
     if (msgflg <= 0)
+#ifdef ZHLANG
+        You_feel("%s%s！", (incr > 1 || incr < -1) ? "非常" : "", attrstr);
+#else
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
+#endif
     if (program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         encumber_msg();
     return TRUE;
@@ -331,7 +343,11 @@ poisoned(
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
 
         /* avoid "The" Orcus's sting was poisoned... */
+#ifdef ZHLANG
+        pline("%s%s%s中毒了！",
+#else
         pline("%s%s %s poisoned!",
+#endif
               isupper((uchar) *reason) ? "" : "The ", reason,
               plural ? "were" : "was");
     }
@@ -1049,15 +1065,27 @@ adjabil(int oldlevel, int newlevel)
                 *(abil->ability) |= mask;
             if (!(*(abil->ability) & INTRINSIC & ~mask)) {
                 if (*(abil->gainstr))
+#ifdef ZHLANG
+                    You_feel("%s！", abil->gainstr);
+#else
                     You_feel("%s!", abil->gainstr);
+#endif
             }
         } else if (oldlevel >= abil->ulevel && newlevel < abil->ulevel) {
             *(abil->ability) &= ~mask;
             if (!(*(abil->ability) & INTRINSIC)) {
                 if (*(abil->losestr))
+#ifdef ZHLANG
+                    You_feel("%s！", abil->losestr);
+#else
                     You_feel("%s!", abil->losestr);
+#endif
                 else if (*(abil->gainstr))
+#ifdef ZHLANG
+                    You_feel("不再%s！", abil->gainstr);
+#else
                     You_feel("less %s!", abil->gainstr);
+#endif
             }
         }
         if (prevabil != *(abil->ability)) /* it changed */
@@ -1335,14 +1363,22 @@ uchangealign(
         /* worn helm of opposite alignment might block change */
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
             u.ualign.type = u.ualignbase[A_CURRENT];
+#ifdef ZHLANG
+        You("产生了一种%s找到新方向的感觉。",
+#else
         You("have a %ssense of a new direction.",
+#endif
             (u.ualign.type != oldalign) ? "sudden " : "");
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;
         if (reason == A_CG_HELM_ON) {
             adjalign(-7); /* for abuse -- record will be cleared shortly */
+#ifdef ZHLANG
+            Your("大脑%s震荡了一下。", Hallucination ? "疯狂地" : "短暂地");
+#else
             Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+#endif
             make_confused(rn1(2, 3), FALSE);
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);

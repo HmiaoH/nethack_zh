@@ -157,12 +157,24 @@ is_pure(boolean talk)
 
     if (wizard && talk) {
         if (u.ualign.type != original_alignment) {
+#ifdef ZHLANG
+            You("当前是%s，而非%s。", align_str(u.ualign.type),
+#else
             You("are currently %s instead of %s.", align_str(u.ualign.type),
+#endif
                 align_str(original_alignment));
         } else if (u.ualignbase[A_CURRENT] != original_alignment) {
+#ifdef ZHLANG
+            You("已经转换了阵营。");
+#else
             You("have converted.");
+#endif
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
+#ifdef ZHLANG
+            You("当前为%d，需要%d。", u.ualign.record,
+#else
             You("are currently %d and require %d.", u.ualign.record,
+#endif
                 MIN_QUEST_ALIGN);
             if (yn_function("adjust?", (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
@@ -240,10 +252,19 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
         if (obj->otyp == AMULET_OF_YENDOR) {
             qt_pager("hasamulet");
         } else if (obj->otyp == FAKE_AMULET_OF_YENDOR) {
+#ifdef ZHLANG
+            verbalize(
+      "很遗憾，这只是真正的Yendor护符的仿制品。");
+#else
             verbalize(
       "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
+#endif
         } else {
+#ifdef ZHLANG
+            verbalize("啊，看来你找到了%s。", the(xname(obj)));
+#else
             verbalize("Ah, I see you've found %s.", the(xname(obj)));
+#endif
         }
         return;
     }
@@ -454,9 +475,17 @@ prisoner_speaks(struct monst *mtmp)
         && (mtmp->mstrategy & STRAT_WAITMASK)) {
         /* Awaken the prisoner */
         if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline("%s说：", Monnam(mtmp));
+#else
             pline("%s speaks:", Monnam(mtmp));
+#endif
         SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+        verbalize("我终于自由了！");
+#else
         verbalize("I'm finally free!");
+#endif
         mtmp->mstrategy &= ~STRAT_WAITMASK;
         mtmp->mpeaceful = 1;
 

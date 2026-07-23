@@ -221,7 +221,11 @@ losexp(
        without reducing level and that isn't fatal so suppress the message
        in that situation */
     if (u.ulevel > 1 || drainer)
+#ifdef ZHLANG
+        pline("%s 第 %d 级。", Goodbye(), u.ulevel);
+#else
         pline("%s level %d.", Goodbye(), u.ulevel);
+#endif
 
     if (u.ulevel > 1) {
         u.ulevel -= 1;
@@ -312,7 +316,11 @@ pluslvl(
     int hpinc, eninc;
 
     if (!incr)
+#ifdef ZHLANG
+        You_feel("更加经验丰富了。");
+#else
         You_feel("more experienced.");
+#endif
 
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */
@@ -347,7 +355,11 @@ pluslvl(
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
+#ifdef ZHLANG
+        pline("欢迎%s到经验等级 %d。",
+#else
         pline("Welcome %sto experience level %d.",
+#endif
               (u.ulevelmax < u.ulevel) ? "" : "back ",
               u.ulevel);
         if (u.ulevelmax < u.ulevel)

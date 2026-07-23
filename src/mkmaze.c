@@ -1510,7 +1510,11 @@ fumaroles(void)
         }
     }
     if (snd && !Deaf)
+#ifdef ZHLANG
+        Norep("你听到了%s呼啸声！", loud ? "响亮" : "");  /* Deaf-aware */
+#else
         Norep("You hear a %swhoosh!", loud ? "loud " : "");  /* Deaf-aware */
+#endif
 }
 
 /*
@@ -1716,7 +1720,11 @@ water_friction(void)
         eff = TRUE;
     }
     if (eff)
+#ifdef ZHLANG
+        pline("水流的波动影响了你的移动。");
+#else
         pline("Water turbulence affects your movements.");
+#endif
 }
 
 void

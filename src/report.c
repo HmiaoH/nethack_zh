@@ -461,7 +461,11 @@ int
 dobugreport(void)
 {
     if (!submit_web_report(2, NULL, "#bugreport command")) {
+#ifdef ZHLANG
+        pline("无法发送错误报告。请访问 %s。",
+#else
         pline("Unable to send bug report.  Please visit %s instead.",
+#endif
               (sysopt.crashreporturl && *sysopt.crashreporturl)
               ? sysopt.crashreporturl
               : DEVTEAM_URL

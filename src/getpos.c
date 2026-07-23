@@ -649,6 +649,15 @@ auto_describe(coordxy cx, coordxy cy)
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
+#ifdef ZHLANG
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U),
+                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    (iflags.autodescribe
+                     && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
+                      ? "（无效目标）" : "",
+                    (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
+                      ? "（无路径）" : "");
+#else
         custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U),
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
@@ -656,6 +665,7 @@ auto_describe(coordxy cx, coordxy cy)
                       ? " (invalid target)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
+#endif
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
@@ -677,9 +687,15 @@ getpos_menu(coord *ccp, int gloc)
 
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
+#ifdef ZHLANG
+        You("无法%s%s。",
+            (iflags.getloc_filter == GFILTER_VIEW) ? "看到" : "检测到",
+            gloc_descr[gloc][0]);
+#else
         You("cannot %s %s.",
             (iflags.getloc_filter == GFILTER_VIEW) ? "see" : "detect",
             gloc_descr[gloc][0]);
+#endif
         return FALSE;
     }
 
@@ -841,8 +857,13 @@ getpos(coord *ccp, boolean force, const char *goal)
     if (!goal)
         goal = "desired location";
     if (flags.verbose) {
+#ifdef ZHLANG
+        pline("（输入'%s'查看帮助）",
+              visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
+#else
         pline("(For instructions type a '%s')",
               visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
+#endif
         msg_given = TRUE;
     }
     cx = gg.getposx = ccp->x;
@@ -858,7 +879,11 @@ getpos(coord *ccp, boolean force, const char *goal)
     lock_mouse_buttons(TRUE);
     for (;;) {
         if (show_goal_msg) {
+#ifdef ZHLANG
+            pline("将光标移动到%s：", goal);
+#else
             pline("Move cursor to %s:", goal);
+#endif
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
@@ -961,9 +986,14 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
+#ifdef ZHLANG
+            pline("自动描述功能%s。",
+                  iflags.autodescribe ? "已开启" : "已关闭");
+#else
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
                   iflags.autodescribe ? "on" : "off");
+#endif
             if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
@@ -983,15 +1013,24 @@ getpos(coord *ccp, boolean force, const char *goal)
                 }
                 gidx[i] = gcount[i] = 0;
             }
+#ifdef ZHLANG
+            pline("%s。", view_filters[iflags.getloc_filter]);
+#else
             pline("%s.", view_filters[iflags.getloc_filter]);
+#endif
             msg_given = TRUE;
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
+#ifdef ZHLANG
+            pline("%s菜单显示可能的目标。",
+                  iflags.getloc_usemenu ? "启用" : "禁用");
+#else
             pline("%s a menu to show possible targets%s.",
                   iflags.getloc_usemenu ? "Using" : "Not using",
                   iflags.getloc_usemenu
                       ? " for 'm|M', 'o|O', 'd|D', and 'x|X'" : "");
+#endif
             msg_given = TRUE;
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SELF]) {
@@ -1004,8 +1043,13 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
+#ifdef ZHLANG
+            pline("%s跳过相似地形。",
+                  iflags.getloc_moveskip ? "启用" : "禁用");
+#else
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
+#endif
             msg_given = TRUE;
             goto nxtc;
         } else if ((cp = strchr(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
@@ -1111,7 +1155,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                             } /* column */
                         }     /* row */
                     }         /* pass */
+#ifdef ZHLANG
+                    pline("找不到地牢特征'%c'。", c);
+#else
                     pline("Can't find dungeon feature '%c'.", c);
+#endif
                     msg_given = TRUE;
                     goto nxtc;
                 } else {
@@ -1126,14 +1174,23 @@ getpos(coord *ccp, boolean force, const char *goal)
                                 visctrl(cmd_from_func(do_move_north)),
                                 visctrl(cmd_from_func(do_move_east)),
                                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
+#ifdef ZHLANG
+                    pline("未知方向：'%s'（%s）。", visctrl((char) c),
+                          note);
+#else
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
+#endif
                     msg_given = TRUE;
                 } /* k => matching */
             }     /* !quitchars */
             if (force)
                 goto nxtc;
+#ifdef ZHLANG
+            pline("完成。");
+#else
             pline("Done.");
+#endif
             msg_given = FALSE; /* suppress clear */
             cx = -1;
             cy = 0;

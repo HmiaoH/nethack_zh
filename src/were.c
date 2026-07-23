@@ -33,7 +33,11 @@ were_change(struct monst *mon)
                 }
                 if (howler) {
                     Soundeffect(se_canine_howl, 50);
+#ifdef ZHLANG
+                    You_hear("一声%s对着月亮嚎叫。", howler);
+#else
                     You_hear("a %s howling at the moon.", howler);
+#endif
                     wake_nearto(mon->mx, mon->my, 4 * 4);
                 }
             }
@@ -111,7 +115,11 @@ new_were(struct monst *mon)
     }
 
     if (canseemon(mon) && !Hallucination)
+#ifdef ZHLANG
+        pline("%s 变成了 %s。", Monnam(mon),
+#else
         pline("%s changes into a %s.", Monnam(mon),
+#endif
               is_human(&mons[pm]) ? "human"
                                   /* pmname()+4: skip past "were" prefix */
                                   : pmname(&mons[pm], Mgender(mon)) + 4);
@@ -215,7 +223,11 @@ you_unwere(boolean purify)
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (purify) {
+#ifdef ZHLANG
+        You_feel("净化了。");
+#else
         You_feel("purified.");
+#endif
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(gy.youmonst.data)

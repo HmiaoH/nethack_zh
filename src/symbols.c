@@ -1118,7 +1118,11 @@ do_symset(boolean rogueflag)
             nothing_to_do = TRUE;
     } else if (!res) {
         /* The symbols file could not be accessed */
+#ifdef ZHLANG
+        pline("无法访问\"%s\"文件。", SYMBOLS);
+#else
         pline("Unable to access \"%s\" file.", SYMBOLS);
+#endif
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */

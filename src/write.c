@@ -85,11 +85,20 @@ dowrite(struct obj *pen)
     int spell_knowledge;
 
     if (nohands(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You("需要双手才能书写！");
+#else
         You("need hands to be able to write!");
+#endif
         return ECMD_OK;
     } else if (Glib) {
+#ifdef ZHLANG
+        pline("%s从你的%s滑落。", Tobjnam(pen, "slip"),
+              fingers_or_gloves(FALSE));
+#else
         pline("%s from your %s.", Tobjnam(pen, "slip"),
               fingers_or_gloves(FALSE));
+#endif
         dropx(pen);
         return ECMD_TIME;
     }
@@ -105,18 +114,31 @@ dowrite(struct obj *pen)
                  : "scroll";
     if (Blind) {
         if (!paper->dknown) {
+#ifdef ZHLANG
+            You("不知道那%s是否是空白的。", typeword);
+#else
             You("don't know whether that %s is blank or not.", typeword);
+#endif
             return ECMD_OK;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
+#ifdef ZHLANG
+            pline("%s无法创建盲文。",
+                  upstart(ysimple_name(pen)));
+#else
             pline("%s can't create braille text.",
                   upstart(ysimple_name(pen)));
+#endif
             return ECMD_OK;
         }
     }
     observe_object(paper);
     if (paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
+#ifdef ZHLANG
+        pline("那%s不是空白的！", typeword);
+#else
         pline("That %s is not blank!", typeword);
+#endif
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
@@ -209,35 +231,68 @@ dowrite(struct obj *pen)
  found:
 
     if (i == SCR_BLANK_PAPER || i == SPE_BLANK_PAPER) {
+#ifdef ZHLANG
+        You_cant("书写那个！");
+        pline("这太亵渎了！");
+#else
         You_cant("write that!");
         pline("It's obscene!");
+#endif
         return ECMD_TIME;
     } else if (i == SPE_NOVEL) {
         boolean fanfic = !rn2(3), tearup = !rn2(3);
 
         if (!fanfic) {
+#ifdef ZHLANG
+            You("%s写伟大的Yendor小说，但%s灵感。",
+                !tearup ? "准备" : "试图",
+                !Hallucination ? "缺乏" : "有太多");
+#else
             You("%s to write the Great Yendorian Novel, but %s inspiration.",
                 !tearup ? "prepare" : "try",
                 !Hallucination ? "lack" : "have too much");
+#endif
         } else {
+#ifdef ZHLANG
+            You("%s创作了非常%s的同人小说。",
+                !tearup ? "开始" : "",
+                !Hallucination ? "烂" : "棒");
+#else
             You("%sproduce really %s fan-fiction.",
                 !tearup ? "start to " : "",
                 !Hallucination ? "lame" : "awesome");
+#endif
         }
         if (!tearup) {
+#ifdef ZHLANG
+            You("放弃了这个念头。");
+#else
             You("give up on the idea.");
+#endif
         } else {
+#ifdef ZHLANG
+            You("撕毁了它。");
+#else
             You("tear it up.");
+#endif
             useup(paper);
         }
         return ECMD_TIME;
     } else if (i == SPE_BOOK_OF_THE_DEAD) {
+#ifdef ZHLANG
+        pline("普通地牢冒险者无法写出那样的东西。");
+#else
         pline("No mere dungeon adventurer could write that.");
+#endif
         return ECMD_TIME;
     } else if (by_descr && paper->oclass == SPBOOK_CLASS
                && !objects[i].oc_name_known) {
         /* can't write unknown spellbooks by description */
+#ifdef ZHLANG
+        pline("可惜你没有足够的信息来继续。");
+#else
         pline("Unfortunately you don't have enough information to go on.");
+#endif
         return ECMD_TIME;
     }
 
@@ -255,7 +310,11 @@ dowrite(struct obj *pen)
     /* see if there's enough ink */
     basecost = cost(new_obj);
     if (pen->spe < basecost / 2) {
+#ifdef ZHLANG
+        Your("马克笔太干，无法书写！");
+#else
         Your("marker is too dry to write that!");
+#endif
         obfree(new_obj, (struct obj *) 0);
         return ECMD_TIME;
     }
@@ -268,13 +327,25 @@ dowrite(struct obj *pen)
     /* dry out marker */
     if (pen->spe < actualcost) {
         pen->spe = 0;
+#ifdef ZHLANG
+        Your("马克笔用干了！");
+#else
         Your("marker dries out!");
+#endif
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
+#ifdef ZHLANG
+            pline_The("法术书未完成，你的笔迹逐渐消失。");
+#else
             pline_The("spellbook is left unfinished and your writing fades.");
+#endif
             update_inventory(); /* pen charges */
         } else {
+#ifdef ZHLANG
+            pline_The("卷轴现已无用，消失了！");
+#else
             pline_The("scroll is now useless and disappears!");
+#endif
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -319,11 +390,19 @@ dowrite(struct obj *pen)
         && rnl(((Role_if(PM_WIZARD) && paper->oclass != SPBOOK_CLASS)
                 || spell_knowledge == spe_GoingStale)
                ? 5 : 15)) {
+#ifdef ZHLANG
+        You("%s书写那个。", by_descr ? "失败" : "不知道如何");
+#else
         You("%s to write that.", by_descr ? "fail" : "don't know how");
+#endif
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
+#ifdef ZHLANG
+            You("用你最好的笔迹写下：\"我的日记\"，但它很快褪色了。");
+#else
             You(
       "write in your best handwriting:  \"My Diary\", but it quickly fades.");
+#endif
             update_inventory(); /* pen charges */
         } else {
             if (by_descr) {
@@ -331,7 +410,11 @@ dowrite(struct obj *pen)
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
                 Sprintf(namebuf, "%s was here!", svp.plname);
+#ifdef ZHLANG
+            You("写下\"%s\"，卷轴消失了。", namebuf);
+#else
             You("write \"%s\" and the scroll disappears.", namebuf);
+#endif
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -345,7 +428,11 @@ dowrite(struct obj *pen)
            have passed the write-an-unknown scroll test
            above we can still fail this one, so it's doubly
            hard to write an unknown scroll while blind */
+#ifdef ZHLANG
+        You("未能正确书写卷轴，它消失了。");
+#else
         You("fail to write the scroll correctly and it disappears.");
+#endif
         useup(paper);
         obfree(new_obj, (struct obj *) 0);
         return ECMD_TIME;
@@ -357,8 +444,13 @@ dowrite(struct obj *pen)
     /* success */
     if (new_obj->oclass == SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
+#ifdef ZHLANG
+        pline_The("法术书奇怪地扭曲，然后变成了%s。",
+                  new_book_description(new_obj->otyp, namebuf));
+#else
         pline_The("spellbook warps strangely, then turns %s.",
                   new_book_description(new_obj->otyp, namebuf));
+#endif
     }
     new_obj->blessed = (curseval > 0);
     new_obj->cursed = (curseval < 0);

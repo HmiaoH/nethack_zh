@@ -176,16 +176,33 @@ do_write_config_file(void)
     char tmp[BUFSZ];
 
     if (!configfile[0]) {
+#ifdef ZHLANG
+        pline("奇怪，无法确定配置文件名。");
+#else
         pline("Strange, could not figure out config file name.");
+#endif
         return ECMD_OK;
     }
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
+#ifdef ZHLANG
+        pline("警告：saveoptions 功能高度实验性！");
+#else
         pline("Warning: saveoptions is highly experimental!");
+#endif
         wait_synch();
+#ifdef ZHLANG
+        pline("某些设置不会被保存！");
+#else
         pline("Some settings are not saved!");
+#endif
         wait_synch();
+#ifdef ZHLANG
+        pline("所有手动自定义和注释已从文件中移除"
+              "！");
+#else
         pline("All manual customization and comments are removed"
               " from the file!");
+#endif
         wait_synch();
     }
 #define overwrite_prompt "Overwrite config file %.*s?"
@@ -207,7 +224,11 @@ do_write_config_file(void)
         fclose(fp);
         strbuf_empty(&buf);
         if (wrote != len)
+#ifdef ZHLANG
+            pline("发生错误，仅写入部分数据（%zu/%zu）。",
+#else
             pline("An error occurred, wrote only partial data (%zu/%zu).",
+#endif
                   wrote, len);
     }
     return ECMD_OK;
@@ -1627,7 +1648,11 @@ config_error_done(void)
     if (n) {
         boolean cmdline = !strcmp(config_error_data->source, "command line");
 
+#ifdef ZHLANG
+        pline("\n%d 个错误%s %s %s。\n", n, plur(n), cmdline ? "位于" : "在",
+#else
         pline("\n%d error%s %s %s.\n", n, plur(n), cmdline ? "on" : "in",
+#endif
               *config_error_data->source ? config_error_data->source
                                          : configfile);
         wait_synch();

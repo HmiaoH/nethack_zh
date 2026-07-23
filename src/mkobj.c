@@ -803,9 +803,15 @@ costly_alteration(struct obj *obj, int alter_type)
         if (shkp) {
             SetVoice(shkp, 0, 80, 0);
         }
+#ifdef ZHLANG
+        verbalize("你把%s%s%s，你得赔偿%s！",
+                  alteration_verbs[alter_type], those, simpleonames(obj),
+                  them);
+#else
         verbalize("You %s %s %s, you pay for %s!",
                   alteration_verbs[alter_type], those, simpleonames(obj),
                   them);
+#endif
         bill_dummy_object(obj);
         break;
     case OBJ_FLOOR:
@@ -815,8 +821,13 @@ costly_alteration(struct obj *obj, int alter_type)
             if (shkp) {
                 SetVoice(shkp, 0, 80, 0);
             }
+#ifdef ZHLANG
+            verbalize("你把%s%s了，你得赔偿%s！",
+                      alteration_verbs[alter_type], those, them);
+#else
             verbalize("You %s %s, you pay for %s!",
                       alteration_verbs[alter_type], those, them);
+#endif
             bill_dummy_object(obj);
         } else {
             (void) stolen_value(obj, ox, oy, FALSE, FALSE);
@@ -1602,10 +1613,15 @@ shrink_glob(
        inside-container-in-invent, and going away when can-see-on-floor */
     if (ininv) {
         if (shrink || gone)
+#ifdef ZHLANG
+            pline("%s%s。", globnambuf,
+                  gone ? "完全消融了" : "收缩了");
+#else
             pline("%s %s.", globnambuf,
                   /* globs always have quantity 1 so we don't need otense()
                      because the verb always references a singular item */
                   gone ? "dissolves completely" : "shrinks");
+#endif
         updinv = TRUE;
     } else if (contnr) {
         /* when in a container, it might be nested so find outermost one */
@@ -1629,6 +1645,10 @@ shrink_glob(
                however, always say the bag is lighter for the 'gone' case */
             if (gone || (shrink && topcontnr->owt != old_top_owt)
                 || near_capacity() != go.oldcap)
+#ifdef ZHLANG
+                pline("%s变轻了%s。", Yname2(topcontnr),
+                      !gone ? "一点" : "");
+#else
                 pline("%s %s%s lighter.", Yname2(topcontnr),
                       /* containers also always have quantity 1 */
                       (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
@@ -1636,6 +1656,7 @@ shrink_glob(
                          is changing (from "very large" to "large",
                          "large" to "medium", or "medium to "small") */
                       !gone ? " slightly" : "");
+#endif
             updinv = TRUE;
         }
     }
@@ -1656,7 +1677,11 @@ shrink_glob(
                 /* fortunately none of the glob adjectives warrant "An " */
                 (void) strsubst(globnambuf, "The ", "A ");
             /* again, quantity is always 1 so no need for otense()/vtense() */
+#ifdef ZHLANG
+            pline("%s消失了。", globnambuf);
+#else
             pline("%s fades away.", globnambuf);
+#endif
         }
     } else {
         /* schedule next shrink ~25 turns from now */
@@ -1727,9 +1752,15 @@ maybe_adjust_light(struct obj *obj, int old_range)
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
+#ifdef ZHLANG
+                pline("%s%s%s。", buf,
+                      (abs(delta) > 1) ? "亮了很多" :
+                      (delta > 0) ? "更亮了" : "没那么亮了");
+#else
                 pline("%s %s %s%s.", buf, otense(obj, "shine"),
                       (abs(delta) > 1) ? "much " : "",
                       (delta > 0) ? "brighter" : "less brightly");
+#endif
             }
         }
     }
@@ -2854,7 +2885,11 @@ hornoplenty(
     if (!horn || horn->otyp != HORN_OF_PLENTY) {
         impossible("bad horn o' plenty");
     } else if (horn->spe < 1) {
+#ifdef ZHLANG
+        pline1("什么也没有发生。");
+#else
         pline1(nothing_happens);
+#endif
         if (!horn->cknown) {
             horn->cknown = 1;
             update_inventory();
@@ -2882,7 +2917,11 @@ hornoplenty(
             what = "Some food";
         }
         ++objcount;
+#ifdef ZHLANG
+        pline("%s洒了出来。", what);
+#else
         pline("%s %s out.", what, vtense(what, "spill"));
+#endif
         obj->blessed = horn->blessed;
         obj->cursed = horn->cursed;
         obj->owt = weight(obj);
@@ -2894,6 +2933,18 @@ hornoplenty(
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {
+#ifdef ZHLANG
+            obj = hold_another_object(obj,
+                                      u.uswallow
+                                        ? "哎呀！%s从你手中滑落！"
+                                        : (Is_airlevel(&u.uz)
+                                           || Is_waterlevel(&u.uz)
+                                           || levl[u.ux][u.uy].typ < IRONBARS
+                                           || levl[u.ux][u.uy].typ >= ICE)
+                                          ? "哎呀！%s从你身边滑走！"
+                                          : "哎呀！%s掉到了地上！",
+                                      The(aobjnam(obj, "slip")), (char *) 0);
+#else
             obj = hold_another_object(obj,
                                       u.uswallow
                                         ? "Oops!  %s out of your reach!"
@@ -2904,6 +2955,7 @@ hornoplenty(
                                           ? "Oops!  %s away from you!"
                                           : "Oops!  %s to the floor!",
                                       The(aobjnam(obj, "slip")), (char *) 0);
+#endif
             nhUse(obj);
         } else if (targetbox) {
             add_to_container(targetbox, obj);
@@ -2923,8 +2975,13 @@ hornoplenty(
                 if (IS_ALTAR(levl[u.ux][u.uy].typ))
                     doaltarobj(obj); /* does its own drop message */
                 else
+#ifdef ZHLANG
+                    pline("%s掉到了%s上。", Doname2(obj),
+                          surface(u.ux, u.uy));
+#else
                     pline("%s %s to the %s.", Doname2(obj),
                           otense(obj, "drop"), surface(u.ux, u.uy));
+#endif
                 dropy(obj);
             }
         }
@@ -3826,9 +3883,17 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
     if ((!Blind && visible) || inpack) {
         if (Hallucination) {
             if (onfloor) {
+#ifdef ZHLANG
+                You_see("地板的一部分在融化！");
+#else
                 You_see("parts of the floor melting!");
+#endif
             } else if (inpack) {
+#ifdef ZHLANG
+                Your("背包伸出来抓住了什么东西！");
+#else
                 Your("pack reaches out and grabs something!");
+#endif
             }
             /* even though we can see where they should be,
              * they'll be out of our view (minvent or container)
@@ -3837,14 +3902,25 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
             boolean adj = ((otmp->ox != u.ux || otmp->oy != u.uy)
                            && (otmp2->ox != u.ux || otmp2->oy != u.uy));
 
+#ifdef ZHLANG
+            pline("%s%s合并了%s。",
+                  (onfloor && adj) ? "相邻的" : "",
+                  obj_typename(otmp->otyp),
+                  inpack ? "在你的背包里" : "");
+#else
             pline("The %s%s coalesce%s.",
                   (onfloor && adj) ? "adjacent " : "",
                   makeplural(obj_typename(otmp->otyp)),
                   inpack ? " inside your pack" : "");
+#endif
         }
     } else {
         Soundeffect(se_faint_sloshing, 25);
+#ifdef ZHLANG
+        You_hear("微弱的液体晃动声。");
+#else
         You_hear("a faint sloshing sound.");
+#endif
     }
 }
 

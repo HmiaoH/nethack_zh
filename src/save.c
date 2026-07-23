@@ -49,7 +49,11 @@ dosave(void)
             nomul(0);
     } else {
         clear_nhwindow(WIN_MESSAGE);
+#ifdef ZHLANG
+        pline("正在保存...");
+#else
         pline("Saving...");
+#endif
 #if defined(HANGUPHANDLING)
         program_state.done_hup = 0;
 #endif
@@ -114,7 +118,11 @@ dosave0(void)
         if (nhfp) {
             close_nhfile(nhfp);
             clear_nhwindow(WIN_MESSAGE);
+#ifdef ZHLANG
+            There("似乎有一个旧的存档文件。");
+#else
             There("seems to be an old save file.");
+#endif
             if (y_n("Overwrite the old file?") == 'n') {
                 nh_sfconvert(fq_save);
                 nh_compress(fq_save);
@@ -127,7 +135,12 @@ dosave0(void)
 
     nhfp = create_savefile();
     if (!nhfp) {
-        HUP pline("Cannot open save file.");
+        HUP
+#ifdef ZHLANG
+        pline("无法打开存档文件。");
+#else
+        pline("Cannot open save file.");
+#endif
         (void) delete_savefile(); /* ab@unido */
         goto done;
     }
@@ -364,7 +377,11 @@ tricked_fileremoved(NHFILE *nhfp, char *whynot)
 {
     if (!nhfp) {
         pline1(whynot);
+#ifdef ZHLANG
+        pline("可能有人把它删除了。");
+#else
         pline("Probably someone removed it.");
+#endif
         Strcpy(svk.killer.name, whynot);
         done(TRICKED);
         return TRUE;

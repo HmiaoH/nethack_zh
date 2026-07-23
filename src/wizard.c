@@ -75,11 +75,23 @@ amulet(void)
             if (ttmp->ttyp == MAGIC_PORTAL) {
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
+#ifdef ZHLANG
+                    pline("%s发烫！", Tobjnam(amu, "feel"));
+#else
                     pline("%s hot!", Tobjnam(amu, "feel"));
+#endif
                 else if (du <= 64)
+#ifdef ZHLANG
+                    pline("%s非常温暖。", Tobjnam(amu, "feel"));
+#else
                     pline("%s very warm.", Tobjnam(amu, "feel"));
+#endif
                 else if (du <= 144)
+#ifdef ZHLANG
+                    pline("%s温暖。", Tobjnam(amu, "feel"));
+#else
                     pline("%s warm.", Tobjnam(amu, "feel"));
+#endif
                 /* else, the amulet feels normal */
                 break;
             }
@@ -95,8 +107,12 @@ amulet(void)
         if (mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
             mtmp->msleeping = 0;
             if (!m_next2u(mtmp))
+#ifdef ZHLANG
+                You("感到一阵不安，似乎有人注意到了你拿走了护符。");
+#else
                 You(
       "get the creepy feeling that somebody noticed your taking the Amulet.");
+#endif
             return;
         }
     }
@@ -441,8 +457,13 @@ tactics(struct monst *mtmp)
 
                 if ((otmp = on_ground(which_arti(targ))) != 0) {
                     if (cansee(mtmp->mx, mtmp->my))
+#ifdef ZHLANG
+                        pline("%s捡起了%s。", Monnam(mtmp),
+                              distant_name(otmp, doname));
+#else
                         pline("%s picks up %s.", Monnam(mtmp),
                               distant_name(otmp, doname));
+#endif
                     obj_extract_self(otmp);
                     (void) mpickobj(mtmp, otmp);
                     return 1;
@@ -772,9 +793,15 @@ resurrect(void)
         mtmp->mtame = 0, mtmp->mpeaceful = 0; /* paranoia */
         set_malign(mtmp);
         if (!Deaf) {
+#ifdef ZHLANG
+            pline("一个声音轰然响起……");
+            SetVoice(mtmp, 0, 80, 0);
+            verbalize("你以为你能%s我，蠢货。", verb);
+#else
             pline("A voice booms out...");
             SetVoice(mtmp, 0, 80, 0);
             verbalize("So thou thought thou couldst %s me, fool.", verb);
+#endif
         }
     }
 }
@@ -790,11 +817,19 @@ intervene(void)
     switch (which) {
     case 0:
     case 1:
+#ifdef ZHLANG
+        You_feel("隐约感到不安。");
+#else
         You_feel("vaguely nervous.");
+#endif
         break;
     case 2:
         if (!Blind)
+#ifdef ZHLANG
+            You("注意到你周围环绕着一层%s光芒。", hcolor(NH_BLACK));
+#else
             You("notice a %s glow surrounding you.", hcolor(NH_BLACK));
+#endif
         rndcurse();
         break;
     case 3:
@@ -849,24 +884,49 @@ cuss(struct monst *mtmp)
         return;
     if (mtmp->iswiz) {
         if (!rn2(5)) { /* typical bad guy action */
+#ifdef ZHLANG
+            pline("%s发出恶魔般的笑声。", Monnam(mtmp));
+#else
             pline("%s laughs fiendishly.", Monnam(mtmp));
+#endif
         } else if (u.uhave.amulet && !rn2(SIZE(random_insult))) {
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("交出护符，%s！",
+                      ROLL_FROM(random_insult));
+#else
             verbalize("Relinquish the amulet, %s!",
                       ROLL_FROM(random_insult));
+#endif
         } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize(rn2(2) ? "此刻你的生命之力正在流逝，%s！"
+                             : "好好呼吸吧，%s，这是你的最后一口气了！",
+                      ROLL_FROM(random_insult));
+#else
             verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
                              : "Savor thy breath, %s, it be thy last!",
                       ROLL_FROM(random_insult));
+#endif
         } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("我会回来的。");
+#else
             verbalize(rn2(2) ? "I shall return." : "I'll be back.");
+#endif
         } else {
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("%s，%s！",
+                      ROLL_FROM(random_malediction),
+                      ROLL_FROM(random_insult));
+#else
             verbalize("%s %s!",
                       ROLL_FROM(random_malediction),
                       ROLL_FROM(random_insult));
+#endif
         }
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
@@ -875,7 +935,11 @@ cuss(struct monst *mtmp)
           + QT_ANGELIC);*/
     } else {
         if (!rn2(is_minion(mtmp->data) ? 100 : 5))
+#ifdef ZHLANG
+            pline("%s对你的出身进行了诽谤。", Monnam(mtmp));
+#else
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
+#endif
         else
             com_pager("demon_cuss");
     }

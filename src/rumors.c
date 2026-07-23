@@ -278,7 +278,11 @@ rumor_check(void)
        we didn't bother trying again this time */
     } else if (gt.true_rumor_size < 0L) {
  no_rumors: /* file could be opened but init_rumors() didn't like it */
+#ifdef ZHLANG
+        pline("无法访问传闻。");
+#else
         pline("rumors not accessible.");
+#endif
         /* engravings, epitaphs, and bogus monsters will still be shown,
            and in tmpwin rather than via additional pline() calls */
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
@@ -531,7 +535,11 @@ outrumor(
     int mechanism)
 {
     static const char fortune_msg[] =
+#ifdef ZHLANG
+        "这块饼干里有一张纸条。";
+#else
         "This cookie has a scrap of paper inside.";
+#endif
     const char *line;
     char buf[BUFSZ];
     boolean reading = (mechanism == BY_COOKIE || mechanism == BY_PAPER);
@@ -543,7 +551,11 @@ outrumor(
         } else if (Blind) {
             if (mechanism == BY_COOKIE)
                 pline(fortune_msg);
-            pline("What a pity that you cannot read it!");
+    #ifdef ZHLANG
+        pline("可惜你看不到上面的内容！");
+#else
+        pline("What a pity that you cannot read it!");
+#endif
             return;
         }
     }
@@ -554,7 +566,11 @@ outrumor(
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
+#ifdef ZHLANG
+        pline("如她所言，神谕%s%s：",
+#else
         pline("True to her word, the Oracle %s%s: ",
+#endif
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))),
@@ -568,7 +584,11 @@ outrumor(
         FALLTHROUGH;
     /* FALLTHRU */
     case BY_PAPER:
+#ifdef ZHLANG
+        pline("上面写着：");
+#else
         pline("It reads:");
+#endif
         break;
     }
     pline1(line);
@@ -705,13 +725,25 @@ doconsult(struct monst *oracl)
     umoney = money_cnt(gi.invent);
 
     if (!oracl) {
+#ifdef ZHLANG
+        There("这里没有可以咨询的人。");
+#else
         There("is no one here to consult.");
+#endif
         return ECMD_OK;
     } else if (!oracl->mpeaceful) {
+#ifdef ZHLANG
+        pline("%s没有心情进行咨询。", Monnam(oracl));
+#else
         pline("%s is in no mood for consultations.", Monnam(oracl));
+#endif
         return ECMD_OK;
     } else if (!umoney) {
+#ifdef ZHLANG
+        You("没有金币。");
+#else
         You("have no gold.");
+#endif
         return ECMD_OK;
     }
 
@@ -723,7 +755,11 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     case 'y':
         if (umoney < (long) minor_cost) {
+#ifdef ZHLANG
+            You("连那么多金币都没有！");
+#else
             You("don't even have enough gold for that!");
+#endif
             return ECMD_OK;
         }
         u_pay = minor_cost;

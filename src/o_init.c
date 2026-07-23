@@ -854,7 +854,11 @@ dodiscovered(void) /* free after Robert Viduya */
         }
     }
     if (ct == 0) {
+#ifdef ZHLANG
+        You("尚未发现任何东西……");
+#else
         You("haven't discovered anything yet...");
+#endif
     } else {
         if (sorted_ct) {
             /* if we're alphabetizing by class, we've already shown the
@@ -891,10 +895,30 @@ int
 doclassdisco(void)
 {
     static NEARDATA const char
-        prompt[] = "View discoveries for which sort of objects?",
-        havent_discovered_any[] = "haven't discovered any %s yet.",
-        unique_items[] = "unique items or relics",
-        artifact_items[] = "artifacts";
+        prompt[] =
+#ifdef ZHLANG
+            "查看哪类物品的发现记录？",
+#else
+            "View discoveries for which sort of objects?",
+#endif
+        havent_discovered_any[] =
+#ifdef ZHLANG
+            "尚未发现任何%s。",
+#else
+            "haven't discovered any %s yet.",
+#endif
+        unique_items[] =
+#ifdef ZHLANG
+            "独特物品或神器",
+#else
+            "unique items or relics",
+#endif
+        artifact_items[] =
+#ifdef ZHLANG
+            "神器";
+#else
+            "artifacts";
+#endif
     winid tmpwin = WIN_ERR;
     menu_item *pick_list = 0;
     anything any;
@@ -1178,9 +1202,17 @@ rename_disco(void)
         }
     }
     if (ct == 0) {
+#ifdef ZHLANG
+        You("尚未发现任何东西……");
+#else
         You("haven't discovered anything yet...");
+#endif
     } else if (mn == 0) {
+#ifdef ZHLANG
+        pline("你的发现记录中没有可以命名的物品……");
+#else
         pline("None of your discoveries can be assigned names...");
+#endif
     } else {
         end_menu(tmpwin, "Pick an object type to name");
         dis = STRANGE_OBJECT;

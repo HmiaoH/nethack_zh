@@ -3154,7 +3154,11 @@ type_to_name(int type)
 staticfn void
 error4(coordxy x, coordxy y, int a, int b, int c, int dd)
 {
+#ifdef ZHLANG
+    pline("墙壁状态设置：%s @ (%d,%d) %s%s%s%s",
+#else
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
+#endif
           type_to_name(levl[x][y].typ), x, y,
           a ? "1" : "", b ? "2" : "", c ? "3" : "", dd ? "4" : "");
     bad_count[levl[x][y].typ]++;
@@ -3387,9 +3391,17 @@ set_wall_state(void)
         if (bad_count[x]) {
             if (y == 0) {
                 y = 1; /* only prcoordxy once */
+#ifdef ZHLANG
+                pline("墙壁类型设置：墙壁模式存在问题：");
+#else
                 pline("set_wall_type: wall mode problems with: ");
+#endif
             }
+#ifdef ZHLANG
+            pline("%s %d；", type_names[x], bad_count[x]);
+#else
             pline("%s %d;", type_names[x], bad_count[x]);
+#endif
         }
 #endif /* WA_VERBOSE */
 }

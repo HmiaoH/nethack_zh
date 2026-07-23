@@ -638,18 +638,30 @@ shkinit(const struct shclass *shp, struct mkroom *sroom)
 #ifdef DEBUG
         /* Said to happen sometimes, but I have never seen it. */
         /* Supposedly fixed by fdoor change in mklev.c */
-        if (wizard) {
-            int j = sroom->doorct;
+                if (wizard) {
+                    int j = sroom->doorct;
 
-            impossible("Where is shopdoor?");
-            pline("Room at (%d,%d),(%d,%d).", sroom->lx, sroom->ly, sroom->hx,
-                  sroom->hy);
-            pline("doormax=%d doorct=%d fdoor=%d", gd.doorindex, sroom->doorct,
-                  sh);
-            while (j--) {
-                pline("door [%d,%d]", svd.doors[sh].x, svd.doors[sh].y);
-                sh++;
-            }
+                    impossible("Where is shopdoor?");
+#ifdef ZHLANG
+                    pline("房间位于（%d,%d），（%d,%d）。", sroom->lx, sroom->ly, sroom->hx,
+#else
+                    pline("Room at (%d,%d),(%d,%d).", sroom->lx, sroom->ly, sroom->hx,
+#endif
+                          sroom->hy);
+#ifdef ZHLANG
+                    pline("最大门数=%d 门数=%d 首门=%d", gd.doorindex, sroom->doorct,
+#else
+                    pline("doormax=%d doorct=%d fdoor=%d", gd.doorindex, sroom->doorct,
+#endif
+                          sh);
+                    while (j--) {
+#ifdef ZHLANG
+                        pline("门 [%d,%d]", svd.doors[sh].x, svd.doors[sh].y);
+#else
+                        pline("door [%d,%d]", svd.doors[sh].x, svd.doors[sh].y);
+#endif
+                        sh++;
+                    }
             display_nhwindow(WIN_MESSAGE, FALSE);
         }
 #endif

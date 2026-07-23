@@ -399,7 +399,11 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
+#ifdef ZHLANG
+            pline("文件 \"%s\" 版本不匹配。", filename);
+#else
             pline("Version mismatch for file \"%s\".", filename);
+#endif
             if (WIN_MESSAGE != WIN_ERR)
                  display_nhwindow(WIN_MESSAGE, TRUE);
         }
@@ -413,7 +417,11 @@ check_version(
         ) {
 #ifndef SFCTOOL
         if (complain) {
+#ifdef ZHLANG
+            pline("文件 \"%s\" 配置不兼容。", filename);
+#else
             pline("Configuration incompatibility for file \"%s\".", filename);
+#endif
             display_nhwindow(WIN_MESSAGE, TRUE);
         }
 #endif

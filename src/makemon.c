@@ -2124,7 +2124,11 @@ grow_up(struct monst *mtmp, struct monst *victim)
 
         if (svm.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
+#ifdef ZHLANG
+                pline("随着 %s 成长为 %s，%s %s！", mon_nam(mtmp),
+#else
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
+#endif
                       an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
             set_mon_data(mtmp, ptr); /* keep svm.mvitals[] accurate */

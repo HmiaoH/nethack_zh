@@ -119,7 +119,11 @@ inven_inuse(boolean quietly)
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
             if (!quietly)
+#ifdef ZHLANG
+                pline("正在用完%s……", xname(otmp));
+#else
                 pline("Finishing off %s...", xname(otmp));
+#endif
             useup(otmp);
         }
     }
@@ -552,7 +556,11 @@ restgamestate(NHFILE *nhfp)
         if (!gc.converted_savefile_loaded)
             /* for wizard mode, issue a reminder; for others, treat it
              * as an attempt to cheat and refuse to restore this file */
+#ifdef ZHLANG
+            pline("该存档不属于你。");
+#else
             pline("Saved game was not yours.");
+#endif
         if (wizard || gc.converted_savefile_loaded) {
             if (gc.converted_savefile_loaded)
                 gc.converted_savefile_loaded = FALSE;
@@ -638,7 +646,11 @@ restgamestate(NHFILE *nhfp)
 #endif
     if (u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
         u.ux = u.uy = 0; /* affects pline() [hence You()] */
+#ifdef ZHLANG
+        You("身体虚弱，未能成功恢复。");
+#else
         You("were not healthy enough to survive restoration.");
+#endif
         /* wiz1_level.dlevel is used by mklev.c to see if lots of stuff is
          * uninitialized, so we only have to set it and not the other stuff.
          */
@@ -873,7 +885,11 @@ dorecover(NHFILE *nhfp)
         clear_nhwindow(WIN_MAP);
 #endif
     clear_nhwindow(WIN_MESSAGE);
+#ifdef ZHLANG
+    You("回到%2$s的第%1$d层%3$s。", depth(&u.uz),
+#else
     You("return to level %d in %s%s.", depth(&u.uz),
+#endif
         svd.dungeons[u.uz.dnum].dname,
         flags.debug ? " while in debug mode"
                     : flags.explore ? " while in explore mode" : "");
@@ -1058,9 +1074,21 @@ rest_levl(NHFILE *nhfp)
 void
 trickery(char *reason)
 {
+#ifdef ZHLANG
+    pline("奇怪，这张地图和记忆中的不一样。");
+#else
     pline("Strange, this map is not as I remember it.");
+#endif
+#ifdef ZHLANG
+    pline("有人在玩什么把戏……");
+#else
     pline("Somebody is trying some trickery here...");
+#endif
+#ifdef ZHLANG
+    pline("本局游戏无效。");
+#else
     pline("This game is void.");
+#endif
     Strcpy(svk.killer.name, reason ? reason : "");
     done(TRICKED);
 }

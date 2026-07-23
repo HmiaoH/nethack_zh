@@ -371,7 +371,11 @@ mplayer_talk(struct monst *mtmp)
         return; /* will drop to humanoid talk */
 
     SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+    verbalize("谈何容易？——%s", mtmp->data == &mons[gu.urole.mnum]
+#else
     verbalize("Talk? -- %s", mtmp->data == &mons[gu.urole.mnum]
+#endif
                                 ? same_class_msg[rn2(3)]
                                 : other_class_msg[rn2(3)]);
 }

@@ -1758,7 +1758,11 @@ optfn_fruit(
                been created since the previous name was put in place */
             (void) fruitadd(svp.pl_fruit, forig);
             if (give_opt_msg)
+#ifdef ZHLANG
+                pline("水果现在是\"%s\"。", svp.pl_fruit);
+#else
                 pline("Fruit is now \"%s\".", svp.pl_fruit);
+#endif
         }
         /* If initial, then initoptions is allowed to do it instead
          * of here (initoptions always has to do it even if there's
@@ -4000,12 +4004,21 @@ optfn_sortvanquished(
 
         /* return handler_sortvanquished(); */
         (void) set_vanq_order(TRUE); /* insight.c */
+#ifdef ZHLANG
+        pline("'%s' %s \"%s: %s\".", optname,
+              (flags.vanq_sortmode == prev_sortmode)
+                 ? "未改变，仍为"
+                 : "已改为",
+              vanqorders[flags.vanq_sortmode][0],
+              vanqorders[flags.vanq_sortmode][1]);
+#else
         pline("'%s' %s \"%s: %s\".", optname,
               (flags.vanq_sortmode == prev_sortmode)
                  ? "not changed, still"
                  : "changed to",
               vanqorders[flags.vanq_sortmode][0],
               vanqorders[flags.vanq_sortmode][1]);
+#endif
     }
     return optn_ok;
 }
@@ -4512,9 +4525,15 @@ optfn_versinfo(
     } else if (req == do_handler) {
         /* return handler_versinfo(); */
         (void) handler_versinfo();
+#ifdef ZHLANG
+        pline("'%s' %s %u。", optname,
+              (flags.versinfo == vi) ? "未改变，仍为" : "已改为",
+              flags.versinfo);
+#else
         pline("'%s' %s %u.", optname,
               (flags.versinfo == vi) ? "not changed, still" : "changed to",
               flags.versinfo);
+#endif
     } else if (req == get_val) {
         char vbuf[QBUFSZ];
         boolean g = (vi & VI_NAME) != 0,
@@ -5313,8 +5332,12 @@ optfn_boolean(
             break;
 #ifndef IDLECHECKPOINT
         case opt_idlecheckpoint:
+#ifdef ZHLANG
+            pline("编译版本未包含'idlecheckpoint'的底层支持。");
+#else
             pline("There is no underlying support for 'idlecheckpoint'"
                   " compiled in.");
+#endif
             iflags.idlecheckpoint = FALSE;
             give_opt_msg = FALSE;
             break;
@@ -5437,8 +5460,13 @@ optfn_boolean(
            still be pending at this point (mainly for opt_need_redraw);
            give the toggled message now regardless */
         if (give_opt_msg)
+#ifdef ZHLANG
+            pline("选项'%s'已切换为%s。", allopt[optidx].name,
+                  !negated ? "开启" : "关闭");
+#else
             pline("'%s' option toggled %s.", allopt[optidx].name,
                   !negated ? "on" : "off");
+#endif
 
         return optn_ok;
     }
@@ -5578,8 +5606,13 @@ handler_menustyle(void)
     destroy_nhwindow(tmpwin);
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
+#ifdef ZHLANG
+        pline("'menustyle'%s\"%s\"。", chngd ? "已改为" : "仍为",
+              menutype[(int) flags.menu_style][0]);
+#else
         pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
               menutype[(int) flags.menu_style][0]);
+#endif
     return optn_ok;
 }
 
@@ -5666,8 +5699,13 @@ handler_autounlock(int optidx)
     chngd = (flags.autounlock != oldflags);
     if ((chngd || flags.verbose) && give_opt_msg) {
         optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
+#ifdef ZHLANG
+        pline("'%s'%s'%s'。", optname,
+              chngd ? "已改为" : "仍为", buf);
+#else
         pline("'%s' %s '%s'.", optname,
               chngd ? "changed to" : "is still", buf);
+#endif
     }
     return res;
 }
@@ -5880,13 +5918,23 @@ handler_msg_window(void)
         if (chngd || flags.verbose) {
             (void) optfn_msg_window(opt_msg_window, get_val,
                                     FALSE, buf, empty_optstr);
+#ifdef ZHLANG
+            pline("'msg_window'%.20s\"%.20s\"。",
+                  chngd ? "已改为" : "仍为", buf);
+#else
             pline("'msg_window' %.20s \"%.20s\".",
                   chngd ? "changed to" : "is still", buf);
+#endif
         }
     } else
 #endif /* PREV_MSGS (for tty or curses) */
+#ifdef ZHLANG
+        pline("'%s'选项在'%s'中不受支持。",
+              allopt[opt_msg_window].name, windowprocs.name);
+#else
         pline("'%s' option is not supported for '%s'.",
               allopt[opt_msg_window].name, windowprocs.name);
+#endif
     return optn_ok;
 }
 
@@ -6059,9 +6107,15 @@ handler_perminv_mode(void)
     if (n >= 0) { /* not ESC */
         buf[0] = '\0';
         (void) optfn_perminv_mode(opt_perm_invent, get_val, FALSE, buf, NULL);
+#ifdef ZHLANG
+        pline("'perminv_mode'%s'%s' (%s)。",
+              (new_pi != old_pi) ? "已改为" : "仍为",
+              perminv_modes[new_pi][0], buf);
+#else
         pline("'perminv_mode' %s '%s' (%s).",
               (new_pi != old_pi) ? "changed to" : "is still",
               perminv_modes[new_pi][0], buf);
+#endif
         if (new_pi != InvOptNone && !old_perm_invent)
             iflags.perm_invent = can_set_perm_invent();
         else if (new_pi == InvOptNone && old_perm_invent)
@@ -6440,7 +6494,11 @@ handler_menu_colors(void)
             && (mcclr = query_color((char *) 0, NO_COLOR)) != -1
                 && (mcattr = query_attr((char *) 0, ATR_NONE)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+#ifdef ZHLANG
+            pline("添加菜单颜色时出错。");
+#else
             pline("Error adding the menu color.");
+#endif
             wait_synch();
         }
         goto menucolors_again;
@@ -6521,7 +6579,11 @@ handler_msgtype(void)
             && test_regex_pattern(mtbuf, "MSGTYPE regex")
             && (mttyp = query_msgtype()) != -1
             && !msgtype_add(mttyp, mtbuf)) {
+#ifdef ZHLANG
+            pline("添加消息类型时出错。");
+#else
             pline("Error adding the message type.");
+#endif
             wait_synch();
         }
         goto msgtypes_again;
@@ -6813,10 +6875,19 @@ staticfn void
 rejectoption(const char *optname)
 {
 #ifdef MICRO
+#ifdef ZHLANG
+    pline("\"%s\"只能从%s设置。", optname, get_configfile());
+#else
     pline("\"%s\" settable only from %s.", optname, get_configfile());
+#endif
+#else
+#ifdef ZHLANG
+    pline("%s只能从NETHACKOPTIONS或%s设置。", optname,
+          get_configfile());
 #else
     pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
           get_configfile());
+#endif
 #endif
 }
 
@@ -7596,9 +7667,15 @@ feature_alert_opts(char *op, const char *optn)
     if (!go.opt_initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
+#ifdef ZHLANG
+        pline(
+          "已禁用NetHack %s及更早版本的功能变更提醒。",
+              buf);
+#else
         pline(
           "Feature change alerts disabled for NetHack %s features and prior.",
               buf);
+#endif
     }
     return 1;
 }
@@ -8099,7 +8176,11 @@ void
 add_menu_cmd_alias(char from_ch, char to_ch)
 {
     if (gn.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
+#ifdef ZHLANG
+        pline("菜单映射空间不足。");
+#else
         pline("out of menu map space.");
+#endif
     } else {
         gm.mapped_menu_cmds[gn.n_menu_mapped] = from_ch;
         gm.mapped_menu_op[gn.n_menu_mapped] = to_ch;
@@ -9289,7 +9370,11 @@ dotogglepickup(void)
     } else {
         Strcpy(buf, "OFF");
     }
+#ifdef ZHLANG
+    pline("自动拾取：%s。", buf);
+#else
     pline("Autopickup: %s.", buf);
+#endif
     return ECMD_OK;
 }
 

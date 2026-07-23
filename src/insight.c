@@ -2535,10 +2535,18 @@ do_gamelog(void)
     if (gg.gamelog) {
         show_gamelog(ENL_GAMEINPROGRESS);
     } else {
+#ifdef ZHLANG
+        pline("没有编年事件记录。");
+#else
         pline("No chronicled events.");
+#endif
     }
 #else
+#ifdef ZHLANG
+    pline("编年史功能在编译时已被关闭。");
+#else
     pline("Chronicle was turned off during compile-time.");
+#endif
 #endif /* !CHRONICLE */
     return ECMD_OK;
 }
@@ -2940,7 +2948,11 @@ list_vanquished(char defquery, boolean ask)
      */
     } else if (!program_state.gameover) {
         /* #vanquished rather than final disclosure, so pline() is ok */
+#ifdef ZHLANG
+        pline("没有怪物被消灭。");
+#else
         pline("No creatures have been vanquished.");
+#endif
 #ifdef DUMPLOG
     } else if (dumping) {
         putstr(0, 0, "No creatures were vanquished."); /* not pline() */
@@ -3122,7 +3134,11 @@ list_genocided(char defquery, boolean ask)
     } else if (!program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
+#ifdef ZHLANG
+        pline("没有种族被灭绝%s。", genoing ? "尚未" : "");
+#else
         pline("No creatures have been genocided%s.", genoing ? " yet" : "");
+#endif
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, "No species were genocided or became extinct.");
@@ -3392,7 +3408,11 @@ mstatusline(struct monst *mtmp)
     Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_YOUR, (char *) 0,
                                (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
 
+#ifdef ZHLANG
+    pline("%s 的状态（%s，%s）：等级 %d  HP %d(%d)  AC %d%s。",
+#else
     pline("Status of %s (%s, %s):  Level %d  HP %d(%d)  AC %d%s.",
+#endif
           monnambuf, align_str(alignment), size_str(mtmp->data->msize),
           mtmp->m_lev, mtmp->mhp, mtmp->mhpmax, find_mac(mtmp), info);
 }
@@ -3482,7 +3502,11 @@ ustatusline(void)
         Snprintf(eos(info), sizeof info - ln, ", in a cloud of %s",
                  reg_damg(reg) ? "poison gas" : "vapor");
 
+#ifdef ZHLANG
+    pline("%s 的状态（%s）：等级 %d  HP %d(%d)  AC %d%s。", svp.plname,
+#else
     pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", svp.plname,
+#endif
           piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);

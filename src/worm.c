@@ -437,11 +437,19 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     if (!new_worm) {
         place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (svc.context.mon_moving) {
-            if (canspotmon(worm))
+                if (canspotmon(worm))
+#ifdef ZHLANG
+                pline("%s 尾巴的一部分被切断了。",
+#else
                 pline("Part of %s tail has been cut off.",
+#endif
                       s_suffix(mon_nam(worm)));
         } else
+#ifdef ZHLANG
+            You("切断了 %s 的一部分尾巴。", mon_nam(worm));
+#else
             You("cut part of the tail off of %s.", mon_nam(worm));
+#endif
         toss_wsegs(new_tail, TRUE);
         if (worm->mhp > 1)
             worm->mhp /= 2;
@@ -471,9 +479,17 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     place_wsegs(new_worm, worm);
 
     if (svc.context.mon_moving)
+#ifdef ZHLANG
+        pline("%s 被切成两半。", Monnam(worm));
+#else
         pline("%s is cut in half.", Monnam(worm));
+#endif
     else
+#ifdef ZHLANG
+        You("把 %s 切成两半。", mon_nam(worm));
+#else
         You("cut %s in half.", mon_nam(worm));
+#endif
 }
 
 /*

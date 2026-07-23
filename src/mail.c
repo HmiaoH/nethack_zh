@@ -132,7 +132,11 @@ getmailstatus(void)
 
     if (mailbox && stat(mailbox, &omstat)) {
 #ifdef PERMANENT_MAILBOX
+#ifdef ZHLANG
+        pline("无法获取MAIL=\"%s\"的状态。", mailbox);
+#else
         pline("Cannot get status of MAIL=\"%s\".", mailbox);
+#endif
         free_maildata(); /* set 'mailbox' to Null */
 #else
         omstat.st_mtime = 0;
@@ -339,7 +343,11 @@ md_rush(struct monst *md,
             if (mon)
                 verbalize1(md_exclamations());
             else if (u_at(fx, fy))
+#ifdef ZHLANG
+                verbalize("借过一下。");
+#else
                 verbalize("Excuse me.");
+#endif
         }
 
         if (mon)
@@ -370,9 +378,17 @@ md_rush(struct monst *md,
         newsym(fx, fy);
         if (!Deaf) {
             SetVoice(md, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("这地方太挤了。我走了。");
+#else
             verbalize("This place's too crowded.  I'm outta here.");
+#endif
         } else {
+#ifdef ZHLANG
+            pline("%s。", Never_mind);
+#else
             pline("%s.", Never_mind);
+#endif
         }
         remove_monster(fx, fy);
 
@@ -415,9 +431,17 @@ newmail(struct mail_info *info)
     message_seen = TRUE;
     if (!Deaf) {
         SetVoice(md, 0, 80, 0);
+#ifdef ZHLANG
+        verbalize("%s，%s！%s。", Hello(md), svp.plname, info->display_txt);
+#else
         verbalize("%s, %s!  %s.", Hello(md), svp.plname, info->display_txt);
+#endif
     } else {
+#ifdef ZHLANG
+        pline("消息：%s。", info->display_txt);
+#else
         pline("Message:  %s.", info->display_txt);
+#endif
     }
 
     if (info->message_typ) {
@@ -431,7 +455,11 @@ newmail(struct mail_info *info)
         if (!m_next2u(md)) {
             if (!Deaf) {
                 SetVoice(md, 0, 80, 0);
+#ifdef ZHLANG
+                verbalize("接住！");
+#else
                 verbalize("Catch!");
+#endif
             } else {
                 /* don't bother with nonverbal alternative ... */
                 ;
@@ -452,7 +480,11 @@ newmail(struct mail_info *info)
  give_up:
     /* deliver some classes of messages even if no daemon ever shows up */
     if (!message_seen && info->message_typ == MSG_OTHER)
+#ifdef ZHLANG
+        pline("听！\"%s。\"", info->display_txt);
+#else
         pline("Hark!  \"%s.\"", info->display_txt);
+#endif
 }
 
 #if !defined(UNIX) && !defined(VMS)
@@ -531,12 +563,24 @@ readmail(struct obj *otmp UNUSED)
         }
     }
     if (Blind) {
+#ifdef ZHLANG
+        pline("可惜你看不到上面写着什么。");
+#else
         pline("Unfortunately you cannot see what it says.");
+#endif
     } else {
         if (delivery == subst_delivery)
+#ifdef ZHLANG
             pline(junk_templates[i], it_reads, recipient, "\"");
+#else
+            pline(junk_templates[i], it_reads, recipient, "\"");
+#endif
         else if (delivery == normal_delivery)
+#ifdef ZHLANG
             pline("%s%s\"", it_reads, junk_templates[i]);
+#else
+            pline("%s%s\"", it_reads, junk_templates[i]);
+#endif
     }
 }
 
@@ -561,7 +605,11 @@ ckmailstatus(void)
     laststattime = svm.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
+#ifdef ZHLANG
+        pline("无法再获取MAIL=\"%s\"的状态。", mailbox);
+#else
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
+#endif
         free_maildata();
 #else
         nmstat.st_mtime = 0;
@@ -623,8 +671,13 @@ read_simplemail(const char *mbox, boolean adminmsg)
             fl.l_type = F_UNLCK;
             fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
+#ifdef ZHLANG
+            There("这个卷轴上有一条%s消息。",
+                  seen_one_already ? "另一条" : "");
+#else
             There("is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
+#endif
         }
         msg = strchr(curline, ':');
 
@@ -643,11 +696,24 @@ read_simplemail(const char *mbox, boolean adminmsg)
             endpunct = ".";
 
         if (adminmsg) {
+#ifdef ZHLANG
+            urgent_pline("%s的声音在洞穴中回荡：",
+                         curline);
+#else
             urgent_pline("The voice of %s booms through the caverns:",
                          curline);
+#endif
         } else {
+#ifdef ZHLANG
+            pline("这条消息来自'%s'。", curline);
+#else
             pline("This message is from '%s'.", curline);
+#endif
+#ifdef ZHLANG
+            pline("上面写着：");
+#else
             pline("It reads:");
+#endif
         }
         pline("\"%s\"%s", msg, endpunct);
 
@@ -676,7 +742,11 @@ read_simplemail(const char *mbox, boolean adminmsg)
  bail:
     /* bail out _professionally_ */
     if (!adminmsg)
+#ifdef ZHLANG
+        pline("看起来全是胡言乱语。");
+#else
         pline("It appears to be all gibberish.");
+#endif
 }
 
 #endif /* SIMPLE_MAIL */
