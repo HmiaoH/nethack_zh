@@ -98,3 +98,33 @@ util/*.lib
 util/*.exp
 submodules/CHKSUMS.tmp
 sys/amiga/regex/
+
+# Generated build files (Unix)
+src/nethack
+src/recover
+src/tile.c
+dat/bogusmon
+dat/data
+dat/engrave
+dat/epitaph
+dat/nhdat
+dat/options
+dat/oracles
+dat/rumors
+dat/quest_levs
+dat/spec_levs
+doc/Guidebook*
+include/date.h
+include/nhlua.h
+src/Sys*
+src/*.o.tmp
+util/dlb
+util/makedefs
+util/recover
+util/tilemap
+util/nhlua
+lib/lua/
+lib/lua-*/
+
+# Release packages
+nethack-zh-*.tar.gz
