@@ -1,6 +1,11 @@
-# NetHack 5.0 汉化版
+# NetHack 5.0 汉化
 
-NetHack 5.0 的中文汉化插件项目。基于官方 [NetHack 5.0](https://github.com/NetHack/NetHack) 源码，通过 `-DZHLANG` 编译选项实现全中文游戏体验。
+这是一个自己闲着没事干想顺畅入坑NetHack的无聊小工作。
+
+既然做都做完了，不妨就发出来给大家一起玩一玩。
+此版本不定期更新，也不大可能长期维护～
+
+基于官方 [NetHack 5.0](https://github.com/NetHack/NetHack) 源码，通过 `-DZHLANG` 编译选项实现全中文游戏体验。
 
 ## 汉化范围
 
