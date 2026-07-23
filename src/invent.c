@@ -4210,7 +4210,11 @@ look_here(
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
+#ifdef ZHLANG
+            You("这里没有物品。");
+#else
             You("%s no objects here.", verb);
+#endif
         }
         return (!!Blind ? ECMD_TIME : ECMD_OK);
     }
@@ -4291,8 +4295,13 @@ look_here(
 
         /* hardcoded "is" worked here because "iron bars" is actually
            "set of iron bars"; use vtense() instead of relying on that */
+#ifdef ZHLANG
+        Sprintf(fbuf, "这里%s着%s。", vtense(dfeature, "有"), dfeature);
+    }
+#else
         Sprintf(fbuf, "There %s %s here.", vtense(dfeature, "are"), dfeature);
     }
+#endif
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {
@@ -4300,8 +4309,13 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (!skip_objects && (Blind || !dfeature))
-            You("%s no objects here.", verb);
-        return (!!Blind ? ECMD_TIME : ECMD_OK);
+#ifdef ZHLANG
+         You("这里没有物品。");
+#else
+         You("%s no objects here.", verb);
+#endif
+         return (!!Blind ? ECMD_TIME : ECMD_OK);
+
     }
     /* we know there is something here */
 
@@ -4335,7 +4349,11 @@ look_here(
         if (dfeature && !skip_dfeature)
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
-        You("%s here %s.", verb, doname_with_price(otmp));
+#ifdef ZHLANG
+         You("在这里看到了%s。", doname_with_price(otmp));
+#else
+         You("%s here %s.", verb, doname_with_price(otmp));
+#endif
         iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
         if (otmp->otyp == CORPSE)
             feel_cockatrice(otmp, FALSE);
@@ -4348,9 +4366,14 @@ look_here(
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
+#ifdef ZHLANG
+        Sprintf(buf, "%s：",
+                picked_some ? "其他物品" : "这里的物品");
+#else
         Sprintf(buf, "%s that %s here:",
                 picked_some ? "Other things" : "Things",
                 Blind ? "you feel" : "are");
+#endif
         putstr(tmpwin, 0, buf);
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
