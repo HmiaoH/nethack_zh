@@ -4247,7 +4247,11 @@ look_here(
 
         if (dfeature && !strncmp(dfeature, "altar ", 6)) {
             /* don't say "altar" twice, dfeature has more info */
+#ifdef ZHLANG
+            You("试着摸索这里有什么。");
+#else
             You("try to feel what is here.");
+#endif
         } else if (SURFACE_AT(u.ux, u.uy) == ICE) {
             /* using describe_decor() to handle ice is simpler than
                replicating it in the conditional message construction */
@@ -4255,7 +4259,11 @@ look_here(
                 force_decor(FALSE);
             /* plain "ice" if blind and levitating, otherwise "solid ice" &c;
               "There is [thin ]ice here.  You try to feel what is on it." */
+#ifdef ZHLANG
+            You("试着摸索上面有什么。");
+#else
             You("try to feel what is on it.");
+#endif
             skip_dfeature = TRUE; /* ice already described */
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
@@ -4264,8 +4272,12 @@ look_here(
                                            : "lying here on the ",
                        *onwhat = cant_reach ? "" : surf;
 
+#ifdef ZHLANG
+            You("摸索周围，却没有发现什么。");
+#else
             You("try to feel what is %s%s.", drift ? "floating here" : where,
                 drift ? "" : onwhat);
+#endif
 
             if (dfeature && !drift && !strcmp(dfeature, surf))
                 skip_dfeature = TRUE; /* terrain feature already identified */
@@ -4350,9 +4362,9 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
 #ifdef ZHLANG
-         You("在这里看到了%s。", doname_with_price(otmp));
+            You("在这里看到了%s。", doname_with_price(otmp));
 #else
-         You("%s here %s.", verb, doname_with_price(otmp));
+            You("%s here %s.", verb, doname_with_price(otmp));
 #endif
         iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
         if (otmp->otyp == CORPSE)

@@ -280,8 +280,8 @@ dosounds(void)
                     if (gold_in_vault) {
                         #ifdef ZHLANG
                         You_hear(!hallu
-                                     ? "someone counting gold coins."
-                                     : "the quarterback calling the play.");
+                                     ? "有人在数金币。"
+                                     : "四分卫在布置战术。");
                         #else
                         You_hear(!hallu
                                      ? "someone counting gold coins."

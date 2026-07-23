@@ -468,12 +468,16 @@ You_hear(const char *line, ...)
     if ((Deaf && !Unaware) || !flags.acoustics)
         return;
     va_start(the_args, line);
+#ifdef ZHLANG
+    YouPrefix(tmp, "", line);
+#else
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
     else if (Unaware)
         YouPrefix(tmp, "You dream that you hear ", line);
     else
         YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
+#endif
     vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }
@@ -485,12 +489,16 @@ You_see(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+#ifdef ZHLANG
+    YouPrefix(tmp, "", line);
+#else
     if (Unaware)
         YouPrefix(tmp, "You dream that you see ", line);
     else if (Blind) /* caller should have caught this... */
         YouPrefix(tmp, "You sense ", line);
     else
         YouPrefix(tmp, "You see ", line);
+#endif
     vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }

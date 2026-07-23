@@ -253,7 +253,11 @@ cannot_push_msg(struct obj *otmp, coordxy sx, coordxy sy)
         pline("%s tries to move %s, but cannot.",
               YMonnam(u.usteed), what);
     else
+#ifdef ZHLANG
+        You("试图推开%s，但徒劳无功。", what);
+#else
         You("try to move %s, but in vain.", what);
+#endif
     if (Blind)
         feel_location(sx, sy);
 }
@@ -463,7 +467,11 @@ moverock_core(coordxy sx, coordxy sy)
                     deliver_part1 = TRUE;
                 } else {
                     Soundeffect(se_monster_behind_boulder, 50);
+#ifdef ZHLANG
+                    You_hear("%s后面有怪物。", the(xname(otmp)));
+#else
                     You_hear("a monster behind %s.", the(xname(otmp)));
+#endif
                     if (!Deaf)
                         deliver_part1 = TRUE;
                     map_invisible(rx, ry);
@@ -471,13 +479,26 @@ moverock_core(coordxy sx, coordxy sy)
                 if (flags.verbose) {
                     char you_or_steed[BUFSZ];
 
+#ifdef ZHLANG
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "你");
+#else
                     Strcpy(you_or_steed,
                            u.usteed ? y_monnam(u.usteed) : "you");
+#endif
+#ifdef ZHLANG
+                    pline("%s%s推不动%s。",
+                          deliver_part1 ? "或许这就是为什么" : "",
+                          deliver_part1 ? you_or_steed
+                                        : upstart(you_or_steed),
+                          deliver_part1 ? "它" : the(xname(otmp)));
+#else
                     pline("%s%s cannot move %s.",
                           deliver_part1 ? "Perhaps that's why " : "",
                           deliver_part1 ? you_or_steed
                                         : upstart(you_or_steed),
                           deliver_part1 ? "it" : the(xname(otmp)));
+#endif
                 }
                 return cannot_push(otmp, sx, sy);
             }
@@ -3930,7 +3951,11 @@ lookaround(void)
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
     if (NODIAG(u.umonnum) && u.dx && u.dy) {
+#ifdef ZHLANG
+        You("无法对角移动。");
+#else
         You("cannot move diagonally.");
+#endif
         nomul(0);
         return;
     }
