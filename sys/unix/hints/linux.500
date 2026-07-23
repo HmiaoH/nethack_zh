@@ -29,7 +29,7 @@ HINTSINCLNAMES := dirs-perms \
 		linuxdistro \
 		multiw-1 multiw-2 misc \
 		multisnd1-pre multisnd2-pre multisnd-post \
-		response
+		response chinese
 HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
 endif
 endif
@@ -44,6 +44,8 @@ endif
 # note: '#-INCLUDE' is not just a comment
 #        it pulls in the contents of dirs-perms.500
 #-INCLUDE dirs-perms.500
+
+#-INCLUDE chinese.500
 
 #-INCLUDE linuxdistro.500
 

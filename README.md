@@ -31,21 +31,33 @@ cd nethack-zh-*
 ## 从源码构建
 
 ```bash
-# 需要：C 编译器 + make + macOS/Linux
 git clone --recursive https://github.com/HmiaoH/nethack_zh.git
 cd nethack_zh
-
-# macOS
-cd sys/unix && sh setup.sh hints/macos.500 && cd ../..
-make fetch-Lua
-make all
-
-# 运行
-make install
-/Users/$USER/bin/nethack
 ```
 
-汉化通过 `sys/unix/hints/include/chinese.500` 中的 `-DZHLANG` 编译标志启用，默认已开启。
+### macOS
+
+```bash
+cd sys/unix && sh setup.sh hints/macos.500 && cd ../..
+make fetch-Lua && make all && make install
+/usr/local/bin/nethack      # 或 ~/bin/nethack
+```
+
+### Linux
+
+```bash
+cd sys/unix && sh setup.sh hints/linux.500 && cd ../..
+make fetch-Lua && make all && make install
+nethack
+```
+
+### 清理与重编译
+
+```bash
+make spotless        # 清除所有编译产物
+```
+
+汉化通过 `sys/unix/hints/include/chinese.500` 中的 `-DZHLANG` 编译标志启用。macOS 和 Linux hints 文件默认已开启。如只需英文版，从对应 hints 文件中移除 `chinese` 即可。
 
 ## 技术方案
 
