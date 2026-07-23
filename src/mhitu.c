@@ -37,43 +37,75 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
     if ((compat = could_seduce(mtmp, &gy.youmonst, mattk)) != 0
         && !mtmp->mcan && !mtmp->mspec_used) {
 #ifdef ZHLANG
-        pline_mon(mtmp, "%s %s you %s.", Monst_name,
-              !Blind ? "smiles at" : !Deaf ? "talks to" : "touches",
-              (compat == 2) ? "engagingly" : "seductively");
+         pline_mon(mtmp, "%s对你%s了%s。", Monst_name,
+              !Blind ? "微笑" : !Deaf ? "说话" : "碰触",
+              (compat == 2) ? "迷人地" : "诱惑地");
 #else
-        pline_mon(mtmp, "%s %s you %s.", Monst_name,
+         pline_mon(mtmp, "%s %s you %s.", Monst_name,
               !Blind ? "smiles at" : !Deaf ? "talks to" : "touches",
               (compat == 2) ? "engagingly" : "seductively");
 #endif
     } else {
         switch (mattk->aatyp) {
         case AT_BITE:
+#ifdef ZHLANG
+            verb = "咬";
+#else
             verb = "bites";
+#endif
             break;
         case AT_KICK:
             if (thick_skinned(gy.youmonst.data))
-                punct = ".";
+                punct = "。";
+#ifdef ZHLANG
+            verb = "踢";
+#else
             verb = "kicks";
+#endif
             break;
         case AT_STNG:
+#ifdef ZHLANG
+            verb = "蜇";
+#else
             verb = "stings";
+#endif
             break;
         case AT_BUTT:
+#ifdef ZHLANG
+            verb = "撞";
+#else
             verb = "butts";
+#endif
             break;
         case AT_TUCH:
+#ifdef ZHLANG
+            verb = "碰了你";
+#else
             verb = "touches you";
+#endif
             break;
         case AT_TENT:
+#ifdef ZHLANG
+            verb = "的触手吸食你的大脑";
+#else
             verb = "tentacles suck your brain";
+#endif
             Monst_name = s_suffix(Monst_name);
             break;
         case AT_EXPL:
         case AT_BOOM:
+#ifdef ZHLANG
+            verb = "爆炸了";
+#else
             verb = "explodes";
+#endif
             break;
         default:
+#ifdef ZHLANG
+            verb = "打";
+#else
             verb = "hits";
+#endif
         }
         /* if a monster hits more than once with similar attack, say so */
         again = (mtmp->m_id == gh.hitmsg_mid
@@ -81,7 +113,7 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
                  && mattk == gh.hitmsg_prev + 1
                  && mattk->aatyp == gh.hitmsg_prev->aatyp) ? " again" : "";
 #ifdef ZHLANG
-        pline_mon(mtmp, "%s %s%s%s", Monst_name, verb, again, punct);
+        pline_mon(mtmp, "%s %s了%s%s", Monst_name, verb, again, punct);
 #else
         pline_mon(mtmp, "%s %s%s%s", Monst_name, verb, again, punct);
 #endif
@@ -102,14 +134,13 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 
     if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
 #ifdef ZHLANG
-        pline_mon(mtmp, "%s pretends to be friendly.", Monnam(mtmp));
+        pline_mon(mtmp, "%s假装表示友好。", Monnam(mtmp));
 #else
         pline_mon(mtmp, "%s pretends to be friendly.", Monnam(mtmp));
 #endif
     else
 #ifdef ZHLANG
-        pline_mon(mtmp, "%s %smisses!", Monnam(mtmp),
-                  (nearmiss && flags.verbose) ? "just " : "");
+        pline_mon(mtmp, "%s打空了！", Monnam(mtmp));
 #else
         pline_mon(mtmp, "%s %smisses!", Monnam(mtmp),
                   (nearmiss && flags.verbose) ? "just " : "");
