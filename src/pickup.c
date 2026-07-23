@@ -292,8 +292,13 @@ fatal_corpse_mistake(struct obj *obj, boolean remotely)
         return FALSE;
     }
 
-    pline("Touching %s is a fatal mistake.",
+    #ifdef ZHLANG
+pline("触碰%s是致命的错误。",
           corpse_xname(obj, (const char *) 0, CXN_SINGULAR | CXN_ARTICLE));
+#else
+pline("Touching %s is a fatal mistake.",
+          corpse_xname(obj, (const char *) 0, CXN_SINGULAR | CXN_ARTICLE));
+#endif
     instapetrify(killer_xname(obj));
     return TRUE;
 }
@@ -305,8 +310,13 @@ rider_corpse_revival(struct obj *obj, boolean remotely)
     if (!obj || obj->otyp != CORPSE || !is_rider(&mons[obj->corpsenm]))
         return FALSE;
 
-    pline("At your %s, the corpse suddenly moves...",
+    #ifdef ZHLANG
+pline("在你%s时，尸体突然动了起来……",
+          remotely ? "尝试获取" : "触碰");
+#else
+pline("At your %s, the corpse suddenly moves...",
           remotely ? "attempted acquisition" : "touch");
+#endif
     (void) revive_corpse(obj);
     exercise(A_WIS, FALSE);
     return TRUE;
@@ -398,7 +408,11 @@ describe_decor(void)
             dfeature = an(dfeature);
 
         if (flags.verbose) {
-            Sprintf(outbuf, "There is %s here.", dfeature);
+            #ifdef ZHLANG
+Sprintf(outbuf, "这里有%s。", dfeature);
+#else
+Sprintf(outbuf, "There is %s here.", dfeature);
+#endif
         } else {
             if (dfeature != fbuf)
                 Strcpy(fbuf, dfeature);
@@ -727,7 +741,11 @@ pickup(int what) /* should be a long */
             check_here(FALSE);
             if (notake(gy.youmonst.data) && OBJ_AT(u.ux, u.uy)
                 && (autopickup || flags.pickup))
-                You("are physically incapable of picking anything up.");
+                #ifdef ZHLANG
+You("身体上无法捡起任何东西。");
+#else
+You("are physically incapable of picking anything up.");
+#endif
             return 0;
         }
 
@@ -763,7 +781,11 @@ pickup(int what) /* should be a long */
         if (count) { /* looking for N of something */
             char qbuf[QBUFSZ];
 
+#ifdef ZHLANG
+            Sprintf(qbuf, "捡起%d个什么？", count);
+#else
             Sprintf(qbuf, "Pick %d of what?", count);
+#endif
             gv.val_for_n_or_more = count; /* set up callback selector */
             n = query_objlist(qbuf, objchain_p, traverse_how,
                               &pick_list, PICK_ONE, n_or_more);
@@ -771,9 +793,15 @@ pickup(int what) /* should be a long */
             for (i = 0; i < n; i++)
                 pick_list[i].count = count;
         } else {
+#ifdef ZHLANG
+            n = query_objlist("捡起什么？", objchain_p,
+                              (traverse_how | FEEL_COCKATRICE),
+                              &pick_list, PICK_ANY, all_but_uchain);
+#else
             n = query_objlist("Pick up what?", objchain_p,
                               (traverse_how | FEEL_COCKATRICE),
                               &pick_list, PICK_ANY, all_but_uchain);
+#endif
         }
 
  menu_pickup:
@@ -819,7 +847,11 @@ pickup(int what) /* should be a long */
         } else if (ct >= 2) {
             int via_menu = 0;
 
-            There("are %s objects here.", (ct <= 10) ? "several" : "many");
+            #ifdef ZHLANG
+There("这里有%s物品。", (ct <= 10) ? "几件" : "很多");
+#else
+There("are %s objects here.", (ct <= 10) ? "several" : "many");
+#endif
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
@@ -1183,11 +1215,19 @@ query_objlist(const char *qstr,        /* query string */
                 /* this isn't actually possible; fake item representing
                    hero is only included for look here (':'), not pickup,
                    and that's PICK_NONE so we can't get here from there */
-                You_cant("pick yourself up!");
+                #ifdef ZHLANG
+You_cant("不能把自己捡起来！");
+#else
+You_cant("pick yourself up!");
+#endif
                 continue;
             }
             if (engulfer_minvent && curr->owornmask != 0L) {
-                You_cant("pick %s up.", ysimple_name(curr));
+                #ifdef ZHLANG
+You_cant("捡不起%s。", ysimple_name(curr));
+#else
+You_cant("pick %s up.", ysimple_name(curr));
+#endif
                 continue;
             }
             if (mi->count == -1L || mi->count > curr->quan)
@@ -1502,7 +1542,11 @@ query_category(
         free((genericptr_t) *pick_list), *pick_list = 0;
         /* the menu entry description is "Auto-select every relevant item"
            [not sure whether issuing a message here is a good idea...] */
-        pline("No relevant items selected.");
+        #ifdef ZHLANG
+pline("没有选择相关物品。");
+#else
+pline("No relevant items selected.");
+#endif
     }
  query_done:
     destroy_nhwindow(win);
@@ -1680,8 +1724,13 @@ carry_count(struct obj *obj,            /* object to pick up... */
     /* we can carry qq of them */
     if (qq > 0) {
         if (qq < count)
-            You("can only %s %s of the %s %s.", verb,
+            #ifdef ZHLANG
+You("只能%s%s%s中的%s。", verb,
+                (qq == 1L) ? "一个" : "一些", obj_nambuf, where);
+#else
+You("can only %s %s of the %s %s.", verb,
                 (qq == 1L) ? "one" : "some", obj_nambuf, where);
+#endif
         *wt_after = wt;
         return qq;
     }
@@ -1715,8 +1764,13 @@ lift_object(
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
     if (obj->otyp == BOULDER && Sokoban) {
-        You("cannot get your %s around this %s.", body_part(HAND),
+        #ifdef ZHLANG
+You("没法用%s抓住这个%s。", body_part(HAND),
             xname(obj));
+#else
+You("cannot get your %s around this %s.", body_part(HAND),
+            xname(obj));
+#endif
         return -1;
     }
     /* override weight consideration for loadstone picked up by anybody
@@ -1732,8 +1786,13 @@ lift_object(
            [this was using simpleonames(obj) for shortest description, but
            that's suboptimal for loadstones because it omits user-assigned
            type name which is something of interest for gray stones] */
-        You("are carrying too much stuff to pick up %s %s.",
+        #ifdef ZHLANG
+You("携带的东西太多，捡不起%s%s。",
+            (obj->quan == 1L) ? "另一个" : "更多", xname(obj));
+#else
+You("are carrying too much stuff to pick up %s %s.",
             (obj->quan == 1L) ? "another" : "more", xname(obj));
+#endif
         return -1;
     }
 
@@ -1855,9 +1914,15 @@ pickup_object(
         } else if (!obj->spe && !obj->cursed) {
             obj->spe = 1;
         } else {
-            pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
+            #ifdef ZHLANG
+pline_The("卷轴%s%s，在你%s起%s时化为了灰烬。", plur(obj->quan),
+                      otense(obj, "turn"), telekinesis ? "举起" : "捡",
+                      (obj->quan == 1L) ? "它" : "它们");
+#else
+pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
                       otense(obj, "turn"), telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
+#endif
             trycall(obj);
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but
@@ -1986,35 +2051,70 @@ encumber_msg(void)
     if (go.oldcap < newcap) {
         switch (newcap) {
         case 1:
-            Your("movements are slowed slightly because of your load.");
+            #ifdef ZHLANG
+Your("动作因为负重而稍微变慢了。");
+#else
+Your("movements are slowed slightly because of your load.");
+#endif
             break;
         case 2:
-            You("rebalance your load.  Movement is difficult.");
+            #ifdef ZHLANG
+You("重新调整了负重。行动困难。");
+#else
+You("rebalance your load.  Movement is difficult.");
+#endif
             break;
         case 3:
-            You("%s under your heavy load.  Movement is very hard.",
+            #ifdef ZHLANG
+You("在沉重的负重下%s。行动非常困难。",
+                stagger(gy.youmonst.data, "蹒跚"));
+#else
+You("%s under your heavy load.  Movement is very hard.",
                 stagger(gy.youmonst.data, "stagger"));
+#endif
             break;
         default:
-            You("%s move a handspan with this load!",
+            #ifdef ZHLANG
+You("在这种负重下%s移动一寸！",
+                newcap == 4 ? "勉强能" : "甚至不能");
+#else
+You("%s move a handspan with this load!",
                 newcap == 4 ? "can barely" : "can't even");
+#endif
             break;
         }
         disp.botl = TRUE;
     } else if (go.oldcap > newcap) {
         switch (newcap) {
         case 0:
-            Your("movements are now unencumbered.");
+            #ifdef ZHLANG
+Your("动作现在不再受负重影响了。");
+#else
+Your("movements are now unencumbered.");
+#endif
             break;
         case 1:
-            Your("movements are only slowed slightly by your load.");
+            #ifdef ZHLANG
+Your("动作只是略微受到负重的影响。");
+#else
+Your("movements are only slowed slightly by your load.");
+#endif
             break;
         case 2:
-            You("rebalance your load.  Movement is still difficult.");
+            #ifdef ZHLANG
+You("重新调整了负重。行动仍然困难。");
+#else
+You("rebalance your load.  Movement is still difficult.");
+#endif
             break;
         case 3:
-            You("%s under your load.  Movement is still very hard.",
+            #ifdef ZHLANG
+You("在负重下%s。行动仍然非常困难。",
+                stagger(gy.youmonst.data, "蹒跚"));
+#else
+You("%s under your load.  Movement is still very hard.",
                 stagger(gy.youmonst.data, "stagger"));
+#endif
             break;
         }
         disp.botl = TRUE;
@@ -2058,15 +2158,29 @@ able_to_loot(
     } else if ((is_pool(x, y) && (looting || !Underwater)) || is_lava(x, y)) {
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
-        You("cannot %s things that are deep in the %s.", verb,
+        #ifdef ZHLANG
+You("无法%s深陷在%s中的东西。", verb,
             hliquid(is_lava(x, y) ? "lava" : "water"));
+#else
+You("cannot %s things that are deep in the %s.", verb,
+            hliquid(is_lava(x, y) ? "lava" : "water"));
+#endif
         return FALSE;
     } else if (nolimbs(gy.youmonst.data)) {
-        pline("Without limbs, you cannot %s anything.", verb);
+        #ifdef ZHLANG
+pline("没有肢体，无法%s任何东西。", verb);
+#else
+pline("Without limbs, you cannot %s anything.", verb);
+#endif
         return FALSE;
     } else if (looting && !freehand()) {
-        pline("Without a free %s, you cannot loot anything.",
+        #ifdef ZHLANG
+pline("没有空闲的%s，无法搜刮任何东西。",
               body_part(HAND));
+#else
+pline("Without a free %s, you cannot loot anything.",
+              body_part(HAND));
+#endif
         return FALSE;
     }
     return TRUE;
@@ -2108,9 +2222,17 @@ do_loot_cont(
         else
 #endif
         if (cobj->lknown)
-            pline("%s is locked.", The(xname(cobj)));
+            #ifdef ZHLANG
+pline("%s锁住了。", The(xname(cobj)));
+#else
+pline("%s is locked.", The(xname(cobj)));
+#endif
         else
-            pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
+            #ifdef ZHLANG
+pline("嗯，%s原来是锁住的。", the(xname(cobj)));
+#else
+pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
+#endif
         cobj->lknown = 1;
 
         if (flags.autounlock) {
@@ -2154,8 +2276,16 @@ do_loot_cont(
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
 
-        You("carefully open %s...", the(xname(cobj)));
-        pline("It develops a huge set of teeth and bites you!");
+        #ifdef ZHLANG
+You("小心翼翼地打开%s……", the(xname(cobj)));
+#else
+You("carefully open %s...", the(xname(cobj)));
+#endif
+        #ifdef ZHLANG
+pline("它长出了一排巨大的牙齿，咬了你一口！");
+#else
+pline("It develops a huge set of teeth and bites you!");
+#endif
         tmp = rnd(10);
         losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
@@ -2200,14 +2330,22 @@ doloot_core(void)
         return ECMD_OK;
     }
     if (nohands(gy.youmonst.data)) {
-        You("have no hands!"); /* not `body_part(HAND)' */
+        #ifdef ZHLANG
+You("没有手！");
+#else
+You("have no hands!");
+#endif /* not `body_part(HAND)' */
         return ECMD_OK;
     }
     if (Confusion) {
         if (rn2(6) && reverse_loot())
             return ECMD_TIME;
         if (rn2(2)) {
-            pline("Being confused, you find nothing to loot.");
+            #ifdef ZHLANG
+pline("迷迷糊糊的，你找不到可以搜刮的东西。");
+#else
+pline("Being confused, you find nothing to loot.");
+#endif
             return ECMD_TIME; /* costs a turn */
         }             /* else fallthrough to normal looting */
     }
@@ -2293,7 +2431,11 @@ doloot_core(void)
                 c = 'y';
         }
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
-        You("need to dig up the grave to effectively loot it...");
+        #ifdef ZHLANG
+You("需要把坟墓挖开才能有效搜刮……");
+#else
+You("need to dig up the grave to effectively loot it...");
+#endif
     }
 
     /*
@@ -2309,8 +2451,12 @@ doloot_core(void)
         if (underfoot && container_at(cc.x, cc.y, FALSE))
             goto lootcont;
         if (u.dz < 0) {
-            You("%s to loot on the %s.", dont_find_anything,
+            #ifdef ZHLANG
+You("在%s上%s到可以搜刮的东西。", ceiling(cc.x, cc.y), "没找");
+#else
+You("%s to loot on the %s.", dont_find_anything,
                 ceiling(cc.x, cc.y));
+#endif
             return ECMD_TIME;
         }
         mtmp = m_at(cc.x, cc.y);
@@ -2336,7 +2482,11 @@ doloot_core(void)
                              prev_inquiry ? "else " : "", mon_nam(mtmp));
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
-                    You("have to be at a container to loot it.");
+                    #ifdef ZHLANG
+You("必须在容器旁边才能搜刮。");
+#else
+You("have to be at a container to loot it.");
+#endif
                 }
             } else {
                 You("%s %s%shere to loot.", dont_find_anything,
@@ -2391,7 +2541,11 @@ reverse_loot(void)
         dropx(goldob);
         /* the dropped gold might have fallen to lower level */
         if (g_at(x, y))
-            pline("Ok, now there is loot here.");
+            #ifdef ZHLANG
+pline("好了，现在这里有战利品了。");
+#else
+pline("Ok, now there is loot here.");
+#endif
     } else {
         /* find original coffers chest if present, otherwise use nearest */
         otmp = 0;
@@ -2408,7 +2562,11 @@ reverse_loot(void)
 
         if (coffers) {
             SetVoice((struct monst *) 0, 0, 80, 0);
-            verbalize("Thank you for your contribution to reduce the debt.");
+            #ifdef ZHLANG
+verbalize("感谢你为减少债务所做的贡献。");
+#else
+verbalize("Thank you for your contribution to reduce the debt.");
+#endif
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);
             coffers->owt = weight(coffers);
@@ -2421,11 +2579,19 @@ reverse_loot(void)
                    && (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
             freeinv(goldob);
             add_to_minv(mon, goldob);
-            pline("The exchequer accepts your contribution.");
+            #ifdef ZHLANG
+pline("国库接受了你的贡献。");
+#else
+pline("The exchequer accepts your contribution.");
+#endif
             if (!rn2(10))
                 levl[x][y].looted = T_LOOTED;
         } else {
-            You("drop %s.", doname(goldob));
+            #ifdef ZHLANG
+You("丢下了%s。", doname(goldob));
+#else
+You("drop %s.", doname(goldob));
+#endif
             dropx(goldob);
         }
     }
@@ -2454,20 +2620,35 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(gy.youmonst.data)) {
-                You_cant("do that without limbs."); /* not body_part(HAND) */
+                #ifdef ZHLANG
+You_cant("没有肢体做不到。");
+#else
+You_cant("do that without limbs.");
+#endif /* not body_part(HAND) */
                 return 0;
             }
             if (otmp->cursed) {
-                You("can't.  The saddle seems to be stuck to %s.",
+                #ifdef ZHLANG
+You("做不到。鞍似乎粘在了%s身上。",
                     x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
+#else
+You("can't.  The saddle seems to be stuck to %s.",
+                    x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                             SUPPRESS_SADDLE, FALSE));
+#endif
                 /* the attempt costs you time */
                 return 1;
             }
             extract_from_minvent(mtmp, otmp, TRUE, FALSE);
             if (flags.verbose)
-                You("take %s off of %s.",
+                #ifdef ZHLANG
+You("从%s身上取下了%s。",
+                    mon_nam(mtmp), thesimpleoname(otmp));
+#else
+You("take %s off of %s.",
                     thesimpleoname(otmp), mon_nam(mtmp));
+#endif
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
             nhUse(otmp);
@@ -2572,18 +2753,35 @@ in_container(struct obj *obj)
         impossible("<in> no gc.current_container?");
         return 0;
     } else if (obj == uball || obj == uchain) {
-        You("must be kidding.");
+        #ifdef ZHLANG
+You("一定是在开玩笑。");
+#else
+You("must be kidding.");
+#endif
         return 0;
     } else if (obj == gc.current_container) {
-        pline("That would be an interesting topological exercise.");
+        #ifdef ZHLANG
+pline("那会是个有趣的拓扑学练习。");
+#else
+pline("That would be an interesting topological exercise.");
+#endif
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-        Norep("You cannot %s %s you are wearing.",
+        #ifdef ZHLANG
+Norep("你不能%s正在穿戴的%s。",
+              Icebox ? "冷藏" : "存放", something);
+#else
+Norep("You cannot %s %s you are wearing.",
               Icebox ? "refrigerate" : "stash", something);
+#endif
         return 0;
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
-        pline_The("stone%s won't leave your person.", plur(obj->quan));
+        #ifdef ZHLANG
+pline_The("石头%s不肯离开你。", plur(obj->quan));
+#else
+pline_The("stone%s won't leave your person.", plur(obj->quan));
+#endif
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION
@@ -2593,10 +2791,18 @@ in_container(struct obj *obj)
          * steal them.  It also becomes a pain to check to see if someone
          * has the Amulet.  Ditto for the Candelabrum, the Bell and the Book.
          */
-        pline("%s cannot be confined in such trappings.", The(xname(obj)));
+        #ifdef ZHLANG
+pline("%s不能被这种容器束缚。", The(xname(obj)));
+#else
+pline("%s cannot be confined in such trappings.", The(xname(obj)));
+#endif
         return 0;
     } else if (obj->otyp == LEASH && obj->leashmon != 0) {
-        pline("%s attached to your pet.", Tobjnam(obj, "are"));
+        #ifdef ZHLANG
+pline("%s拴在你的宠物身上。", Tobjnam(obj, "are"));
+#else
+pline("%s attached to your pet.", Tobjnam(obj, "are"));
+#endif
         return 0;
     } else if (obj == uwep) {
         if (welded(obj)) {
@@ -2624,7 +2830,11 @@ in_container(struct obj *obj)
         || (obj->otyp == STATUE && bigmonst(&mons[obj->corpsenm]))) {
         /* consumes multiple obufs but not enough to overwrite the result */
         Strcpy(buf, the(xname(obj)));
-        You("cannot fit %s into %s.", buf, the(xname(gc.current_container)));
+        #ifdef ZHLANG
+You("无法把%s放进%s里。", buf, the(xname(gc.current_container)));
+#else
+You("cannot fit %s into %s.", buf, the(xname(gc.current_container)));
+#endif
         return 0;
     }
 
@@ -2665,9 +2875,15 @@ in_container(struct obj *obj)
     } else if (Is_mbag(gc.current_container) && mbag_explodes(obj, 0)) {
         livelog_printf(LL_ACHIEVE, "just blew up %s bag of holding", uhis());
         /* explicitly mention what item is triggering the explosion */
-        urgent_pline(
+        #ifdef ZHLANG
+urgent_pline(
+              "当你要把%s放进去时，被一阵魔法爆炸轰击了！",
+                     doname(obj));
+#else
+urgent_pline(
               "As you put %s inside, you are blasted by a magical explosion!",
                      doname(obj));
+#endif
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
@@ -2702,7 +2918,11 @@ in_container(struct obj *obj)
 
     if (gc.current_container) {
         Strcpy(buf, the(xname(gc.current_container)));
-        You("put %s into %s.", doname(obj), buf);
+        #ifdef ZHLANG
+You("把%s放进了%s里。", doname(obj), buf);
+#else
+You("put %s into %s.", doname(obj), buf);
+#endif
 
         /* gold in container always needs to be added to credit */
         if (floor_container && obj->oclass == COIN_CLASS)
@@ -2814,9 +3034,17 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
 
     if (!silent) {
         if (item->dknown)
-            pline("%s %s vanished!", Doname2(item), otense(item, "have"));
+            #ifdef ZHLANG
+pline("%s%s消失了！", Doname2(item), otense(item, "have"));
+#else
+pline("%s %s vanished!", Doname2(item), otense(item, "have"));
+#endif
         else
-            You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
+            #ifdef ZHLANG
+You("%s%s消失了！", Blind ? "注意到" : "看到", doname(item));
+#else
+You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
+#endif
     }
 
     if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0) {
@@ -2857,11 +3085,21 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             set_malign(livecat);
             if (givemsg) {
                 if (!canspotmon(livecat))
-                    You("think %s brushed your %s.", something,
+                    #ifdef ZHLANG
+You("觉得有什么东西擦过了你的%s。",
                         body_part(FOOT));
+#else
+You("think %s brushed your %s.", something,
+                        body_part(FOOT));
+#endif
                 else
-                    pline("%s inside the box is still alive!",
+                    #ifdef ZHLANG
+pline("盒子里的%s还活着！",
                           Monnam(livecat));
+#else
+pline("%s inside the box is still alive!",
+                          Monnam(livecat));
+#endif
             }
             (void) christen_monst(livecat, sc);
             if (deadcat) {
@@ -2881,8 +3119,13 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
     } else {
         box->spe = 0; /* now an ordinary box (with a cat corpse inside) */
         if (givemsg)
-            pline_The("%s inside the box is dead!",
+            #ifdef ZHLANG
+pline_The("盒子里的%s死了！",
+                      Hallucination ? rndmonnam((char *) 0) : "家猫");
+#else
+pline_The("%s inside the box is dead!",
                       Hallucination ? rndmonnam((char *) 0) : "housecat");
+#endif
         if (deadcat) {
             /* set_corpsenm() will start the rot timer that was removed
                when makemon() created SchroedingersBox; start it from

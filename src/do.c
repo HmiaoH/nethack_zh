@@ -103,16 +103,26 @@ boulder_hits_pool(
                 pline("%s %s %s into the %s.", upstart(whobuf),
                       vtense(whobuf, "push"), the(xname(otmp)), what);
                 if (flags.verbose && !Blind)
-                    pline("Now you can cross it!");
+                    #ifdef ZHLANG
+pline("现在你可以过去了！");
+#else
+pline("Now you can cross it!");
+#endif
                 /* no splashing in this case */
             }
         }
         if (!fills_up || !pushing) { /* splashing occurs */
             if (!u.uinwater) {
                 if (pushing ? !Blind : cansee(rx, ry)) {
-                    There("is a large splash as %s %s the %s.",
+                    #ifdef ZHLANG
+There("随着%s%s了%s，传来巨大的扑通声。",
                           the(xname(otmp)), fills_up ? "fills" : "falls into",
                           what);
+#else
+There("is a large splash as %s %s the %s.",
+                          the(xname(otmp)), fills_up ? "fills" : "falls into",
+                          what);
+#endif
                 } else if (!Deaf) {
                     if (lava) {
                         Soundeffect(se_sizzling, 100);
@@ -128,19 +138,32 @@ boulder_hits_pool(
                 set_uinwater(0); /* u.uinwater = 0 */
                 docrt();
                 gv.vision_full_recalc = 1;
-                You("find yourself on dry land again!");
+                #ifdef ZHLANG
+You("发现自己又站在陆地上了！");
+#else
+You("find yourself on dry land again!");
+#endif
             } else if (lava && next2u(rx, ry)) {
                 int dmg;
 
-                You("are hit by molten %s%c",
+                #ifdef ZHLANG
+You("被熔化的%s击中了%c",
                     hliquid("lava"), Fire_resistance ? '.' : '!');
+#else
+You("are hit by molten %s%c",
+                    hliquid("lava"), Fire_resistance ? '.' : '!');
+#endif
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
                        "molten lava", KILLED_BY);
             } else if (!fills_up && flags.verbose
                        && (pushing ? !Blind : cansee(rx, ry))) {
-                pline("It sinks without a trace!");
+                #ifdef ZHLANG
+pline("它沉没得无影无踪！");
+#else
+pline("It sinks without a trace!");
+#endif
             }
         }
 
@@ -276,9 +299,17 @@ flooreffects(
         if ((Blind || (Levitation || Flying)) && !Deaf && u_at(x, y)) {
             if (!Underwater) {
                 if (weight(obj) > WT_SPLASH_THRESHOLD) {
-                    pline("Splash!");
+                    #ifdef ZHLANG
+pline("扑通！");
+#else
+pline("Splash!");
+#endif
                 } else if (Levitation || Flying) {
-                    pline("Plop!");
+                    #ifdef ZHLANG
+pline("啪嗒！");
+#else
+pline("Plop!");
+#endif
                 }
             }
             map_background(x, y, 0);
@@ -347,7 +378,11 @@ flooreffects(
                 pline("%s from the heat!",
                       is_plural(obj) ? "They shatter" : "It shatters");
             } else {
-                You_hear("a shattering noise.");
+                #ifdef ZHLANG
+You_hear("碎裂的声音。");
+#else
+You_hear("a shattering noise.");
+#endif
             }
             breakobj(obj, x, y, FALSE, FALSE);
             res = TRUE;
@@ -377,9 +412,15 @@ doaltarobj(struct obj *obj)
     }
 
     if (obj->blessed || obj->cursed) {
-        There("is %s flash as %s %s the altar.",
+        #ifdef ZHLANG
+There("一道%s光芒闪过，%s%s了祭坛。",
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
               otense(obj, "hit"));
+#else
+There("is %s flash as %s %s the altar.",
+              an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
+              otense(obj, "hit"));
+#endif
         if (!Hallucination)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     } else {
@@ -501,11 +542,19 @@ dosinkring(struct obj *obj)
     boolean ideed = TRUE;
     boolean nosink = FALSE;
 
-    You("drop %s down the drain.", doname(obj));
+    #ifdef ZHLANG
+You("把%s丢进了下水道。", doname(obj));
+#else
+You("drop %s down the drain.", doname(obj));
+#endif
     obj->in_use = TRUE;  /* block free identification via interrupt */
     switch (obj->otyp) { /* effects that can be noticed without eyes */
     case RIN_SEARCHING:
-        You("thought %s got lost in the sink, but there it is!", yname(obj));
+        #ifdef ZHLANG
+You("以为%s掉进了水槽，但它还在！", yname(obj));
+#else
+You("thought %s got lost in the sink, but there it is!", yname(obj));
+#endif
         goto giveback;
     case RIN_SLOW_DIGESTION:
         pline_The("ring is regurgitated!");
@@ -525,11 +574,19 @@ dosinkring(struct obj *obj)
               Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
         break;
     case RIN_SHOCK_RESISTANCE:
-        pline("Static electricity surrounds the sink.");
+        #ifdef ZHLANG
+pline("水槽周围充满了静电。");
+#else
+pline("Static electricity surrounds the sink.");
+#endif
         break;
     case RIN_CONFLICT:
         Soundeffect(se_drain_noises, 50);
-        You_hear("loud noises coming from the drain.");
+        #ifdef ZHLANG
+You_hear("排水管传来巨大的噪音。");
+#else
+You_hear("loud noises coming from the drain.");
+#endif
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
         pline_The("%s flow seems fixed.", hliquid("water"));
@@ -570,7 +627,11 @@ dosinkring(struct obj *obj)
         break;
     case MEAT_RING:
         /* Not the same as aggravate monster; besides, it's obvious. */
-        pline("Several flies buzz around the sink.");
+        #ifdef ZHLANG
+pline("几只苍蝇在水槽周围嗡嗡叫。");
+#else
+pline("Several flies buzz around the sink.");
+#endif
         break;
     case RIN_TELEPORTATION:
         nosink = teleport_sink();
@@ -599,7 +660,11 @@ dosinkring(struct obj *obj)
             pline_The("sink looks as good as new.");
             break;
         case RIN_INVISIBILITY:
-            You("don't see anything happen to the sink.");
+            #ifdef ZHLANG
+You("没看到水槽发生任何变化。");
+#else
+You("don't see anything happen to the sink.");
+#endif
             break;
         case RIN_FREE_ACTION:
             You_see("the ring slide right down the drain!");
@@ -644,7 +709,11 @@ dosinkring(struct obj *obj)
         trycall(obj);
     } else if (!nosink) {
         Soundeffect(se_ring_in_drain, 50);
-        You_hear("the ring bouncing down the drainpipe.");
+        #ifdef ZHLANG
+You_hear("戒指在排水管里弹跳的声音。");
+#else
+You_hear("the ring bouncing down the drainpipe.");
+#endif
     }
     if (!rn2(20) && !nosink) {
         pline_The("sink backs up, leaving %s.", doname(obj));
@@ -690,8 +759,13 @@ canletgo(struct obj *obj, const char *word)
                implicitly forced to be 1; replicate its kludge... */
             if (!strcmp(word, "throw") && obj->quan > 1L)
                 obj->corpsenm = 1;
-            pline("For some reason, you cannot %s%s the stone%s!", word,
+            #ifdef ZHLANG
+pline("不知为何，你%s%s不了那块石头%s！", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
+#else
+pline("For some reason, you cannot %s%s the stone%s!", word,
+                  obj->corpsenm ? " any of" : "", plur(obj->quan));
+#endif
         }
         obj->corpsenm = 0; /* reset */
         set_bknown(obj, 1);
@@ -747,7 +821,11 @@ drop(struct obj *obj)
             }
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
 
-            You("drop %s into %s.", onam_p, mnam_p);
+            #ifdef ZHLANG
+You("把%s丢进了%s。", onam_p, mnam_p);
+#else
+You("drop %s into %s.", onam_p, mnam_p);
+#endif
         }
     } else {
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
@@ -764,7 +842,11 @@ drop(struct obj *obj)
             if (levhack)
                 ELevitation = W_ART; /* other than W_ARTI */
             if (flags.verbose)
-                You("drop %s.", doname(obj));
+                #ifdef ZHLANG
+You("丢下了%s。", doname(obj));
+#else
+You("drop %s.", doname(obj));
+#endif
             freeinv(obj);
             hitfloor(obj, TRUE);
             if (levhack)
@@ -772,7 +854,11 @@ drop(struct obj *obj)
             return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
-            You("drop %s.", doname(obj));
+            #ifdef ZHLANG
+You("丢下了%s。", doname(obj));
+#else
+You("drop %s.", doname(obj));
+#endif
     }
     obj->how_lost = LOST_DROPPED;
     dropx(obj);
@@ -867,7 +953,11 @@ engulfer_digests_food(struct obj *obj)
             could_slime = TRUE;
         }
         /* see or feel the effect */
-        pline("%s instantly digested!", Tobjnam(obj, "are"));
+        #ifdef ZHLANG
+pline("%s被立刻消化了！", Tobjnam(obj, "are"));
+#else
+pline("%s instantly digested!", Tobjnam(obj, "are"));
+#endif
 
         if (could_poly || could_slime) {
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
@@ -1111,16 +1201,27 @@ u_stuck_cannot_go(const char *updn)
 {
     if (u.ustuck) {
         if (u.uswallow || !sticks(gy.youmonst.data)) {
-            You("are %s, and cannot go %s.",
+            #ifdef ZHLANG
+You("正被%s，无法%s。",
                 !u.uswallow ? "being held"
                 : digests(u.ustuck->data) ? "swallowed"
                 : "engulfed", updn);
+#else
+You("are %s, and cannot go %s.",
+                !u.uswallow ? "being held"
+                : digests(u.ustuck->data) ? "swallowed"
+                : "engulfed", updn);
+#endif
             return TRUE;
         } else {
             struct monst *mtmp = u.ustuck;
 
             set_ustuck((struct monst *) 0);
-            You("release %s.", mon_nam(mtmp));
+            #ifdef ZHLANG
+You("松开了%s。", mon_nam(mtmp));
+#else
+You("release %s.", mon_nam(mtmp));
+#endif
         }
     }
     return FALSE;
@@ -1169,7 +1270,11 @@ dodown(void)
             if (float_down(I_SPECIAL | TIMEOUT, W_ARTI)) {
                 return ECMD_TIME; /* came down, so moved */
             } else if (!HLevitation && !ELevitation) {
-                Your("latent levitation ceases.");
+                #ifdef ZHLANG
+Your("你潜在的飘浮能力停止了。");
+#else
+Your("latent levitation ceases.");
+#endif
                 return ECMD_TIME; /* did something, effectively moved */
             }
         }
@@ -1190,7 +1295,11 @@ dodown(void)
                 ladder_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
-            You("are floating in the %s.", surface(u.ux, u.uy));
+            #ifdef ZHLANG
+You("正飘浮在%s。", surface(u.ux, u.uy));
+#else
+You("are floating in the %s.", surface(u.ux, u.uy));
+#endif
         else if (Is_waterlevel(&u.uz))
             You("are floating in %s.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
@@ -1204,9 +1313,17 @@ dodown(void)
     if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected) {
         u.uundetected = 0;
         if (Flying) { /* lurker above */
-            You("fly out of hiding.");
+            #ifdef ZHLANG
+You("从隐藏处飞了出来。");
+#else
+You("fly out of hiding.");
+#endif
         } else { /* piercer */
-            You("drop to the %s.", surface(u.ux, u.uy));
+            #ifdef ZHLANG
+You("向%s落下。", surface(u.ux, u.uy));
+#else
+You("drop to the %s.", surface(u.ux, u.uy));
+#endif
             if (is_pool_or_lava(u.ux, u.uy)) {
                 pooleffects(FALSE);
             } else {
@@ -1240,16 +1357,32 @@ dodown(void)
         }
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
-        You("are standing at the gate to Gehennom.");
-        pline("Unspeakable cruelty and harm lurk down there.");
+        #ifdef ZHLANG
+You("正站在地狱之门前。");
+#else
+You("are standing at the gate to Gehennom.");
+#endif
+        #ifdef ZHLANG
+pline("说不出的残忍和危险潜藏在那下面。");
+#else
+pline("Unspeakable cruelty and harm lurk down there.");
+#endif
         if (y_n("Are you sure you want to enter?") != 'y')
             return ECMD_OK;
-        pline("So be it.");
+        #ifdef ZHLANG
+pline("那就这样吧。");
+#else
+pline("So be it.");
+#endif
         u.uevent.gehennom_entered = 1; /* don't ask again */
     }
 
     if (!next_to_u()) {
-        You("are held back by your pet!");
+        #ifdef ZHLANG
+You("被你的宠物拉住了！");
+#else
+You("are held back by your pet!");
+#endif
         return ECMD_OK;
     }
 
@@ -1260,7 +1393,11 @@ dodown(void)
         if (gy.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
 
-            You("don't fit %s easily.", down_or_thru);
+            #ifdef ZHLANG
+You("不太能%s。", down_or_thru);
+#else
+You("don't fit %s easily.", down_or_thru);
+#endif
             Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
@@ -1268,15 +1405,24 @@ dodown(void)
                     losehp(Maybe_Half_Phys(rnd(4)),
                            "contusion from a small passage", KILLED_BY);
                 } else {
-                    You("were unable to fit %s.", down_or_thru);
+                    #ifdef ZHLANG
+You("无法%s。", down_or_thru);
+#else
+You("were unable to fit %s.", down_or_thru);
+#endif
                     return ECMD_OK;
                 }
             } else {
                 return ECMD_OK;
             }
         }
-        You("%s %s the %s.", actn, down_or_thru,
+        #ifdef ZHLANG
+You("%s了%s%s。", actn, down_or_thru,
             trap->ttyp == HOLE ? "hole" : "trap door");
+#else
+You("%s %s the %s.", actn, down_or_thru,
+            trap->ttyp == HOLE ? "hole" : "trap door");
+#endif
     }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
@@ -1323,8 +1469,13 @@ doup(void)
 
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
-        Your("load is too heavy to climb the %s.",
+        #ifdef ZHLANG
+Your("你背的东西太重了，无法爬上%s。",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
+#else
+Your("load is too heavy to climb the %s.",
+             levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
+#endif
         return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
@@ -1334,7 +1485,11 @@ doup(void)
             return ECMD_OK;
     }
     if (!next_to_u()) {
-        You("are held back by your pet!");
+        #ifdef ZHLANG
+You("被你的宠物拉住了！");
+#else
+You("are held back by your pet!");
+#endif
         return ECMD_OK;
     }
     ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
@@ -1442,7 +1597,11 @@ u_collide_m(struct monst *mtmp)
            here, but it's not impossible and we're prepared to cope
            with the situation, so only say something when debugging */
         if (wizard)
-            pline("(monster in hero's way)");
+            #ifdef ZHLANG
+pline("（怪物挡住了英雄的路）");
+#else
+pline("(monster in hero's way)");
+#endif
         if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0)
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
@@ -1560,7 +1719,11 @@ goto_level(
             if (diff == 0)
                 assign_level(newlevel, &u.uz);
 
-            pline("A mysterious force momentarily surrounds you...");
+            #ifdef ZHLANG
+pline("一股神秘力量暂时包围了你……");
+#else
+pline("A mysterious force momentarily surrounds you...");
+#endif
             /* each time it kicks in, the chance of doing so again may drop;
                that drops faster, on average, when being sent down farther so
                while the impact is reduced for everybody compared to earlier
@@ -1581,7 +1744,11 @@ goto_level(
      * (s)he has been given the go-ahead by the leader.
      */
     if (on_level(&u.uz, &qstart_level) && !newdungeon && !ok_to_quest()) {
-        pline("A mysterious force prevents you from descending.");
+        #ifdef ZHLANG
+pline("一股神秘力量阻止你下降。");
+#else
+pline("A mysterious force prevents you from descending.");
+#endif
         return;
     }
 
@@ -1780,11 +1947,20 @@ goto_level(
                 ; /* stayed on same level? (no transit effects) */
             } else if (Flying) {
                 if (flags.verbose)
-                    You("fly down %s.",
+                    #ifdef ZHLANG
+You("飞下了%s。",
                         ga.at_ladder ? "along the ladder" : "the stairs");
+#else
+You("fly down %s.",
+                        ga.at_ladder ? "along the ladder" : "the stairs");
+#endif
             } else if (near_capacity() > UNENCUMBERED
                        || Punished || Fumbling) {
-                You("fall down the %s.", ga.at_ladder ? "ladder" : "stairs");
+                #ifdef ZHLANG
+You("跌下了%s。", ga.at_ladder ? "ladder" : "stairs");
+#else
+You("fall down the %s.", ga.at_ladder ? "ladder" : "stairs");
+#endif
                 if (Punished) {
                     drag_down();
                     if (!welded(uball))
@@ -1801,8 +1977,13 @@ goto_level(
                 selftouch("Falling, you");
             } else { /* ordinary descent */
                 if (flags.verbose)
-                    You("%s.", ga.at_ladder ? "climb down the ladder"
+                    #ifdef ZHLANG
+You("你%s。", ga.at_ladder ? "climb down the ladder"
                                          : "descend the stairs");
+#else
+You("%s.", ga.at_ladder ? "climb down the ladder"
+                                         : "descend the stairs");
+#endif
             }
         }
     } else { /* trap door or level_tele or In_endgame */
@@ -1865,13 +2046,21 @@ goto_level(
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
         if (Is_valley(&u.uz)) {
-            You("arrive at the Valley of the Dead...");
+            #ifdef ZHLANG
+You("来到了死亡之谷……");
+#else
+You("arrive at the Valley of the Dead...");
+#endif
             pline_The("odor of burnt flesh and decay pervades the air.");
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
             Soundeffect(se_groans_and_moans, 25);
-            You_hear("groans and moans everywhere.");
+            #ifdef ZHLANG
+You_hear("到处都是呻吟声。");
+#else
+You_hear("groans and moans everywhere.");
+#endif
         }
 
         record_achievement(ACH_HELL); /* reached Gehennom */
@@ -1898,9 +2087,17 @@ goto_level(
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
         if (new || !svm.mvitals[PM_CROESUS].died) {
-            You("have penetrated a high security area!");
+            #ifdef ZHLANG
+You("闯入了一个高度警戒的区域！");
+#else
+You("have penetrated a high security area!");
+#endif
             Soundeffect(se_alarm, 100);
-            pline("An alarm sounds!");
+            #ifdef ZHLANG
+pline("警报响了！");
+#else
+pline("An alarm sounds!");
+#endif
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
                     continue;
@@ -1915,7 +2112,11 @@ goto_level(
             record_achievement(ACH_SOKO);
     } else {
         if (new && Is_rogue_level(&u.uz)) {
-            You("enter what seems to be an older, more primitive world.");
+            #ifdef ZHLANG
+You("你似乎进入了一个更古老、更原始的世界。");
+#else
+You("enter what seems to be an older, more primitive world.");
+#endif
         } else if (new && Is_bigroom(&u.uz)) {
             record_achievement(ACH_BGRM);
         }
@@ -2008,8 +2209,13 @@ void
 hellish_smoke_mesg(void)
 {
     if (svl.level.flags.temperature)
-        pline("It is %s here.",
+        #ifdef ZHLANG
+pline("这里很%s。",
               svl.level.flags.temperature > 0 ? "hot" : "cold");
+#else
+pline("It is %s here.",
+              svl.level.flags.temperature > 0 ? "hot" : "cold");
+#endif
 
     if (In_hell(&u.uz) && svl.level.flags.temperature > 0)
         You("%s smoke...",
@@ -2028,7 +2234,11 @@ temperature_change_msg(schar prev_temperature)
                       In_hell(&u.uz0)
                       ? "and smoke are" : "is");
         else if (prev_temperature < 0)
-            You("are out of the cold.");
+            #ifdef ZHLANG
+You("你走出了寒冷。");
+#else
+You("are out of the cold.");
+#endif
     }
 }
 
@@ -2160,7 +2370,11 @@ revive_corpse(struct obj *corpse)
             if (is_uwep)
                 pline_The("%s writhes out of your grasp!", cname);
             else
-                You_feel("squirming in your backpack!");
+                #ifdef ZHLANG
+You_feel("背包里有东西在蠕动！");
+#else
+You_feel("squirming in your backpack!");
+#endif
             break;
 
         case OBJ_FLOOR:
@@ -2233,7 +2447,11 @@ revive_corpse(struct obj *corpse)
                     newsym(mtmp->mx, mtmp->my);
                 } else if (mdistu(mtmp) < 5*5) {
                     Soundeffect(se_scratching, 50);
-                    You_hear("scratching noises.");
+                    #ifdef ZHLANG
+You_hear("刮擦的声音。");
+#else
+You_hear("scratching noises.");
+#endif
                 }
                 fill_pit(mtmp->mx, mtmp->my);
                 break;
@@ -2376,7 +2594,11 @@ wipeoff(void)
     incr_itimeout(&HBlinded, -ldelta); /*HBlinded -= min(BlindedTimeout,4L);*/
 
     if (!HBlinded) {
-        pline("You've got the glop off.");
+        #ifdef ZHLANG
+pline("你把黏糊糊的东西弄掉了。");
+#else
+pline("You've got the glop off.");
+#endif
         u.ucreamed = 0;
         if (!gulp_blnd_check()) {
             set_itimeout(&HBlinded, 1L);
@@ -2384,7 +2606,11 @@ wipeoff(void)
         }
         return 0;
     } else if (!u.ucreamed) {
-        Your("%s feels clean now.", body_part(FACE));
+        #ifdef ZHLANG
+Your("你的%s现在感觉干净了。", body_part(FACE));
+#else
+Your("%s feels clean now.", body_part(FACE));
+#endif
         return 0;
     }
     return 1; /* still busy */
@@ -2404,7 +2630,11 @@ dowipe(void)
          */
         return ECMD_TIME;
     }
-    Your("%s is already clean.", body_part(FACE));
+    #ifdef ZHLANG
+Your("你的%s已经很干净了。", body_part(FACE));
+#else
+Your("%s is already clean.", body_part(FACE));
+#endif
     return ECMD_TIME;
 }
 

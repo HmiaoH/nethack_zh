@@ -606,9 +606,15 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_BLACK_UNICORN:
         if (mtmp->mrevived && rn2(2)) {
             if (canseemon(mtmp))
-                pline_mon(mtmp,
+                #ifdef ZHLANG
+pline_mon(mtmp,
+                      "%s新长出的角碎裂成了灰烬。",
+                      s_suffix(Monnam(mtmp)));
+#else
+pline_mon(mtmp,
                       "%s recently regrown horn crumbles to dust.",
                       s_suffix(Monnam(mtmp)));
+#endif
         } else {
             obj = mksobj_at(UNICORN_HORN, x, y, TRUE, FALSE);
             if (obj && mtmp->mrevived)
@@ -994,7 +1000,11 @@ minliquid_core(struct monst *mtmp)
         int dam = d(2, 6);
 
         if (cansee(mtmp->mx, mtmp->my))
-            pline_mon(mtmp, "%s rusts.", Monnam(mtmp));
+            #ifdef ZHLANG
+pline_mon(mtmp, "%s生锈了。", Monnam(mtmp));
+#else
+pline_mon(mtmp, "%s rusts.", Monnam(mtmp));
+#endif
         mtmp->mhp -= dam;
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
@@ -1025,10 +1035,17 @@ minliquid_core(struct monst *mtmp)
                     struct attack *dummy = &mtmp->data->mattk[0];
                     const char *how = on_fire(mtmp->data, dummy);
 
-                    pline_mon(mtmp, "%s %s.", Monnam(mtmp),
+                    #ifdef ZHLANG
+pline_mon(mtmp, "%s%s。", Monnam(mtmp),
+                          !strcmp(how, "boiling") ? "被煮沸消失了"
+                             : !strcmp(how, "melting") ? "被熔化了"
+                                : "被烧成了灰烬");
+#else
+pline_mon(mtmp, "%s %s.", Monnam(mtmp),
                           !strcmp(how, "boiling") ? "boils away"
                              : !strcmp(how, "melting") ? "melts away"
                                 : "burns to a crisp");
+#endif
                 }
                 /* unlike fire -> melt ice -> pool, there's no way for the
                    hero to create lava beneath a monster, so the !mon_moving
@@ -1042,11 +1059,20 @@ minliquid_core(struct monst *mtmp)
                 mtmp->mhp -= 1;
                 if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
-                        pline_mon(mtmp, "%s surrenders to the fire.",
+                        #ifdef ZHLANG
+pline_mon(mtmp, "%s屈服于火焰。",
                                   Monnam(mtmp));
+#else
+pline_mon(mtmp, "%s surrenders to the fire.",
+                                  Monnam(mtmp));
+#endif
                     mondead(mtmp); /* no corpse */
                 } else if (cansee(mtmp->mx, mtmp->my)) {
-                    pline_mon(mtmp, "%s burns slightly.", Monnam(mtmp));
+                    #ifdef ZHLANG
+pline_mon(mtmp, "%s轻微烧伤了。", Monnam(mtmp));
+#else
+pline_mon(mtmp, "%s burns slightly.", Monnam(mtmp));
+#endif
                 }
             }
             if (!DEADMONSTER(mtmp)) {
@@ -1080,16 +1106,29 @@ minliquid_core(struct monst *mtmp)
             }
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (svc.context.mon_moving)
-                    pline_mon(mtmp, "%s drowns.", Monnam(mtmp));
+                    #ifdef ZHLANG
+pline_mon(mtmp, "%s淹死了。", Monnam(mtmp));
+#else
+pline_mon(mtmp, "%s drowns.", Monnam(mtmp));
+#endif
                 else
                     /* hero used fire to melt ice that monster was on */
-                    You("drown %s.", mon_nam(mtmp));
+                    #ifdef ZHLANG
+You("淹死了%s。", mon_nam(mtmp));
+#else
+You("drown %s.", mon_nam(mtmp));
+#endif
             }
             if (engulfing_u(mtmp)) {
                 /* This can happen after a purple worm plucks you off a
                    flying steed while you are over water. */
-                pline("%s sinks as %s rushes in and flushes you out.",
+                #ifdef ZHLANG
+pline("%s沉了下去，%s涌入把你冲了出来。",
                       Monnam(mtmp), hliquid("water"));
+#else
+pline("%s sinks as %s rushes in and flushes you out.",
+                      Monnam(mtmp), hliquid("water"));
+#endif
             }
             if (svc.context.mon_moving)
                 mondied(mtmp); /* ok to leave corpse despite water */
@@ -1369,9 +1408,15 @@ meatbox(struct monst *mon, struct obj *otmp)
       the floor; this is arbitrary, but otherwise g-cubes are too
       powerful */
     if (!engulf_contents && cansee(x, y)) {
-        pline("%s contents spill out onto the %s.",
+        #ifdef ZHLANG
+pline("%s的内容物洒在了%s上。",
               s_suffix(The(distant_name(otmp, xname))),
               surface(x, y));
+#else
+pline("%s contents spill out onto the %s.",
+              s_suffix(The(distant_name(otmp, xname))),
+              surface(x, y));
+#endif
     }
     while ((cobj = otmp->cobj) != 0) {
         obj_extract_self(cobj);
@@ -1439,8 +1484,13 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
                 mon_to_stone(mtmp);
             } else if (!resists_ston(mtmp)) {
                 if (vis)
-                    pline_mon(mtmp, "%s turns to stone!",
+                    #ifdef ZHLANG
+pline_mon(mtmp, "%s变成了石头！",
                               Monnam(mtmp));
+#else
+pline_mon(mtmp, "%s turns to stone!",
+                              Monnam(mtmp));
+#endif
                 monstone(mtmp);
             }
         }
@@ -1492,8 +1542,13 @@ meatmetal(struct monst *mtmp)
                        !verbose so won't be printed */
                     otmpname = distant_name(otmp, doname);
                     if (flags.verbose)
-                        pline_mon(mtmp, "%s eats %s!",
+                        #ifdef ZHLANG
+pline_mon(mtmp, "%s吃掉了%s！",
                                   Monnam(mtmp), otmpname);
+#else
+pline_mon(mtmp, "%s eats %s!",
+                                  Monnam(mtmp), otmpname);
+#endif
                 }
                 /* The object's rustproofing is gone now */
                 otmp->oerodeproof = 0;
@@ -1502,8 +1557,13 @@ meatmetal(struct monst *mtmp)
                     /* (see above; format even if it won't be printed) */
                     otmpname = distant_name(otmp, doname);
                     if (flags.verbose)
-                        pline_mon(mtmp, "%s spits %s out in disgust!",
+                        #ifdef ZHLANG
+pline_mon(mtmp, "%s厌恶地把%s吐了出来！",
                               Monnam(mtmp), otmpname);
+#else
+pline_mon(mtmp, "%s spits %s out in disgust!",
+                              Monnam(mtmp), otmpname);
+#endif
                 }
             } else {
                 if (cansee(mtmp->mx, mtmp->my)) {
@@ -1515,7 +1575,11 @@ meatmetal(struct monst *mtmp)
                 } else {
                     if (flags.verbose) {
                         Soundeffect(se_crunching_sound, 50);
-                        You_hear("a crunching sound.");
+                        #ifdef ZHLANG
+You_hear("嘎吱嘎吱的声音。");
+#else
+You_hear("a crunching sound.");
+#endif
                     }
                 }
                 mtmp->meating = otmp->owt / 2 + 1;
@@ -1606,9 +1670,17 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
                the result won't be printed */
             otmpname = distant_name(otmp, doname);
             if (ecount == 1)
-                Sprintf(buf, "%s engulfs %s.", Monnam(mtmp), otmpname);
+                #ifdef ZHLANG
+Sprintf(buf, "%s吞没了%s。", Monnam(mtmp), otmpname);
+#else
+Sprintf(buf, "%s engulfs %s.", Monnam(mtmp), otmpname);
+#endif
             else if (ecount == 2)
-                Sprintf(buf, "%s engulfs several objects.", Monnam(mtmp));
+                #ifdef ZHLANG
+Sprintf(buf, "%s吞没了好几件物品。", Monnam(mtmp));
+#else
+Sprintf(buf, "%s engulfs several objects.", Monnam(mtmp));
+#endif
             obj_extract_self(otmp);
             (void) mpickobj(mtmp, otmp); /* slurp */
 
@@ -1629,7 +1701,11 @@ meatobj(struct monst *mtmp) /* for gelatinous cubes */
             } else {
                 Soundeffect(se_slurping_sound, 30);
                 if (flags.verbose)
-                    You_hear("a slurping sound.");
+                    #ifdef ZHLANG
+You_hear("咕噜咕噜的声音。");
+#else
+You_hear("a slurping sound.");
+#endif
             }
             m_consume_obj(mtmp, otmp);
             /* in case it polymorphed or died */
@@ -1708,7 +1784,11 @@ meatcorpse(
         } else {
             Soundeffect(se_masticating_sound, 50);
             if (flags.verbose)
-                You_hear("a masticating sound.");
+                #ifdef ZHLANG
+You_hear("咀嚼的声音。");
+#else
+You_hear("a masticating sound.");
+#endif
         }
 
         m_consume_obj(mtmp, otmp);
@@ -1810,10 +1890,17 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
             Strcpy(mtmpbuf, Monnam(mtmp));
             mon_set_minvis(mtmp, FALSE);
             if (vis)
-                pline_mon(mtmp, "%s %s.", mtmpbuf,
+                #ifdef ZHLANG
+pline_mon(mtmp, "%s%s。", mtmpbuf,
+                      !canspotmon(mtmp) ? "消失了"
+                      : mtmp->invis_blkd ? "似乎闪烁了一下"
+                        : "变得隐形了");
+#else
+pline_mon(mtmp, "%s %s.", mtmpbuf,
                       !canspotmon(mtmp) ? "vanishes"
                       : mtmp->invis_blkd ? "seems to flicker"
                         : "becomes invisible");
+#endif
         }
         mtmp->mstun = 1; /* no timeout but will eventually wear off */
         return;
@@ -1840,8 +1927,13 @@ mpickgold(struct monst *mtmp)
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
             if (flags.verbose && !mtmp->isgd)
-                pline_mon(mtmp, "%s picks up some %s.", Monnam(mtmp),
+                #ifdef ZHLANG
+pline_mon(mtmp, "%s捡起了一些%s。", Monnam(mtmp),
+                         mat_idx == GOLD ? "金币" : "钱");
+#else
+pline_mon(mtmp, "%s picks up some %s.", Monnam(mtmp),
                          mat_idx == GOLD ? "gold" : "money");
+#endif
             newsym(mtmp->mx, mtmp->my);
         }
     }
@@ -1900,8 +1992,13 @@ mpickstuff(struct monst *mtmp)
                 char *otmpname = distant_name(otmp, doname);
 
                 if (flags.verbose)
-                    pline_mon(mtmp, "%s picks up %s.",
+                    #ifdef ZHLANG
+pline_mon(mtmp, "%s捡起了%s。",
                               Monnam(mtmp), otmpname);
+#else
+pline_mon(mtmp, "%s picks up %s.",
+                              Monnam(mtmp), otmpname);
+#endif
             }
             obj_extract_self(otmp3);      /* remove from floor */
             (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */

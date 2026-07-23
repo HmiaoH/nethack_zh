@@ -410,7 +410,11 @@ doread(void)
             /* we will be displaying a sentence; need ending punctuation */
             if (ln > 0 && !strchr(".!?", mesg[ln - 1]))
                 endpunct = ".";
-            pline("It reads:");
+            #ifdef ZHLANG
+pline("上面写着：");
+#else
+pline("It reads:");
+#endif
         }
         pline("\"%s\"%s", mesg, endpunct);
         return ECMD_TIME;
@@ -469,7 +473,11 @@ doread(void)
             You("feel the embossed numbers:");
         } else {
             if (flags.verbose)
-                pline("It reads:");
+                #ifdef ZHLANG
+pline("上面写着：");
+#else
+pline("It reads:");
+#endif
             pline("\"%s\"",
                   scroll->oartifact
                       ? card_msgs[SIZE(card_msgs) - 1]
@@ -507,10 +515,19 @@ doread(void)
             return ECMD_OK;
         }
         if (flags.verbose)
-            pline("It reads:");
+            #ifdef ZHLANG
+pline("上面写着：");
+#else
+pline("It reads:");
+#endif
         Sprintf(buf, "%s", pmname(pm, NEUTRAL));
-        pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
+        #ifdef ZHLANG
+pline("\"Magic Marker(TM) %s 红色墨水记号笔。水溶性。\"",
               upwords(buf));
+#else
+pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
+              upwords(buf));
+#endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a magic marker");
@@ -521,7 +538,11 @@ doread(void)
             You("feel the embossed words:");
         else if (flags.verbose)
             You("read:");
-        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
+        #ifdef ZHLANG
+pline("\"1 Zorkmid.  857 GUE.  我们信仰Frobs。\"");
+#else
+pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
+#endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a coin's engravings");
@@ -531,8 +552,16 @@ doread(void)
         if (Blind)
             You("feel the engraved signature:");
         else
-            pline("It is signed:");
-        pline("\"Odin.\"");
+            #ifdef ZHLANG
+pline("上面签名是：");
+#else
+pline("It is signed:");
+#endif
+        #ifdef ZHLANG
+pline("\"奥丁。\"");
+#else
+pline("\"Odin.\"");
+#endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                    "became literate by reading the divine signature of Odin");
@@ -546,7 +575,11 @@ doread(void)
             return ECMD_OK;
         }
         if (!*wrapper) {
-            pline("The candy bar's wrapper is blank.");
+            #ifdef ZHLANG
+pline("糖果棒的包装纸是空白的。");
+#else
+pline("The candy bar's wrapper is blank.");
+#endif
             return ECMD_OK;
         }
         pline("The wrapper reads: \"%s\".", wrapper);
@@ -627,7 +660,11 @@ doread(void)
                               : "As you read the scroll, it disappears.");
         if (confused) {
             if (Hallucination)
-                pline("Being so trippy, you screw up...");
+                #ifdef ZHLANG
+pline("因为太迷幻了，你搞砸了……");
+#else
+pline("Being so trippy, you screw up...");
+#endif
             else
                 pline("Being confused, you %s the magic words...",
                       silently ? "misunderstand" : "mispronounce");
@@ -656,7 +693,11 @@ stripspe(struct obj *obj)
         pline1(nothing_happens);
     } else {
         /* order matters: message, shop handling, actual transformation */
-        pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+        #ifdef ZHLANG
+pline("%s短暂地闪烁了一下。", Yobjnam2(obj, "vibrate"));
+#else
+pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+#endif
         costly_alteration(obj, COST_UNCHRG);
         obj->spe = 0;
         if (obj->otyp == OIL_LAMP || obj->otyp == BRASS_LANTERN)
@@ -667,7 +708,11 @@ stripspe(struct obj *obj)
 staticfn void
 p_glow1(struct obj *otmp)
 {
-    pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
+    #ifdef ZHLANG
+pline("%s短暂地闪烁了一下。", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
+#else
+pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
+#endif
 }
 
 staticfn void
@@ -899,7 +944,11 @@ recharge(struct obj *obj, int curse_bless)
                 stripspe(obj);
                 if (obj->lamplit) {
                     if (!Blind)
-                        pline("%s out!", Tobjnam(obj, "go"));
+                        #ifdef ZHLANG
+pline("%s灭了！", Tobjnam(obj, "go"));
+#else
+pline("%s out!", Tobjnam(obj, "go"));
+#endif
                     end_burn(obj, TRUE);
                 }
             } else if (is_blessed) {
@@ -925,7 +974,11 @@ recharge(struct obj *obj, int curse_bless)
                     p_glow2(obj, NH_BLACK);
                     curse(obj);
                 } else {
-                    pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+                    #ifdef ZHLANG
+pline("%s短暂地闪烁了一下。", Yobjnam2(obj, "vibrate"));
+#else
+pline("%s briefly.", Yobjnam2(obj, "vibrate"));
+#endif
                 }
                 if (obj->spe > 0)
                     costly_alteration(obj, COST_UNCHRG);
@@ -1151,8 +1204,13 @@ seffect_enchant_armor(struct obj **sobjp)
         }
         if (new_erodeproof && (otmp->oeroded || otmp->oeroded2)) {
             otmp->oeroded = otmp->oeroded2 = 0;
-            pline("%s as good as new!",
+            #ifdef ZHLANG
+pline("%s看起来焕然一新！",
                   Yobjnam2(otmp, Blind ? "feel" : "look"));
+#else
+pline("%s as good as new!",
+                  Yobjnam2(otmp, Blind ? "feel" : "look"));
+#endif
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1251,13 +1309,23 @@ seffect_enchant_armor(struct obj **sobjp)
             maybe_adjust_light(otmp, old_light);
         return;
     }
-    pline("%s %s%s%s%s for a %s.", Yname2(otmp),
+    #ifdef ZHLANG
+pline("%s%s%s%s%s了%s。", Yname2(otmp),
           (s == 0) ? "violently " : "",
           otense(otmp, Blind ? "vibrate" : "glow"),
           (!Blind && !same_color) ? " " : "",
           (Blind || same_color)
           ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
           (s * s > 1) ? "while" : "moment");
+#else
+pline("%s %s%s%s%s for a %s.", Yname2(otmp),
+          (s == 0) ? "violently " : "",
+          otense(otmp, Blind ? "vibrate" : "glow"),
+          (!Blind && !same_color) ? " " : "",
+          (Blind || same_color)
+          ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
+          (s * s > 1) ? "while" : "moment");
+#endif
     /* [this cost handling will need updating if shop pricing is
        ever changed to care about curse/bless status of armor] */
     if (s < 0)
@@ -1354,7 +1422,11 @@ seffect_destroy_armor(struct obj **sobjp)
     if (scursed) {
         if (otmp && otmp->cursed) {
             /* armor and scroll both cursed */
-            pline("%s.", Yobjnam2(otmp, "vibrate"));
+            #ifdef ZHLANG
+pline("你%s。", Yobjnam2(otmp, "vibrate"));
+#else
+pline("%s.", Yobjnam2(otmp, "vibrate"));
+#endif
             if (otmp->spe >= -6) {
                 otmp->spe += -1;
                 adj_abon(otmp, -1);
@@ -1372,7 +1444,11 @@ seffect_destroy_armor(struct obj **sobjp)
             struct obj *atmp;
 
             if (!objects[sobj->otyp].oc_name_known)
-                pline("This is %s!", an(actualoname(sobj)));
+                #ifdef ZHLANG
+pline("这是一张%s！", an(actualoname(sobj)));
+#else
+pline("This is %s!", an(actualoname(sobj)));
+#endif
             gk.known = TRUE;
             atmp = getobj("destroy", any_worn_armor_ok, GETOBJ_PROMPT);
             /* check the return value, if user picked non-valid obj */
@@ -1654,8 +1730,13 @@ seffect_enchant_weapon(struct obj **sobjp)
         }
         if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
             uwep->oeroded = uwep->oeroded2 = 0;
-            pline("%s as good as new!",
+            #ifdef ZHLANG
+pline("%s看起来焕然一新！",
                   Yobjnam2(uwep, Blind ? "feel" : "look"));
+#else
+pline("%s as good as new!",
+                  Yobjnam2(uwep, Blind ? "feel" : "look"));
+#endif
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
@@ -1758,7 +1839,11 @@ seffect_light(struct obj **sobjp)
         int pm = scursed ? PM_BLACK_LIGHT : PM_YELLOW_LIGHT;
 
         if ((svm.mvitals[pm].mvflags & G_GONE)) {
-            pline("Tiny lights sparkle in the air momentarily.");
+            #ifdef ZHLANG
+pline("微小的光芒在空气中短暂闪烁。");
+#else
+pline("Tiny lights sparkle in the air momentarily.");
+#endif
         } else {
             /* surround with cancelled tame lights which won't explode */
             struct monst *mon;
@@ -1778,7 +1863,11 @@ seffect_light(struct obj **sobjp)
                 }
             }
             if (sawlights) {
-                pline("Lights appear all around you!");
+                #ifdef ZHLANG
+pline("光芒出现在你周围！");
+#else
+pline("Lights appear all around you!");
+#endif
                 gk.known = TRUE;
             }
         }
@@ -1814,7 +1903,11 @@ seffect_charging(struct obj **sobjp)
     }
     /* known = TRUE; -- handled inline here */
     if (!already_known) {
-        pline("This is a charging scroll.");
+        #ifdef ZHLANG
+pline("这是一张充能卷轴。");
+#else
+pline("This is a charging scroll.");
+#endif
         learnscroll(sobj);
     }
     /* use it up now to prevent it from showing in the
@@ -1843,7 +1936,11 @@ seffect_amnesia(struct obj **sobjp)
     else if (rn2(2))
         pline("Who was that Maud person anyway?");
     else
-        pline("Thinking of Maud you forget everything else.");
+        #ifdef ZHLANG
+pline("想着Maud，你忘记了其他一切。");
+#else
+pline("Thinking of Maud you forget everything else.");
+#endif
     exercise(A_WIS, FALSE);
 }
 
@@ -1893,9 +1990,17 @@ seffect_fire(struct obj **sobjp)
     } else {
         if (sblessed) {
             if (!already_known)
-                pline("This is a scroll of fire!");
+                #ifdef ZHLANG
+pline("这是一张火焰卷轴！");
+#else
+pline("This is a scroll of fire!");
+#endif
             dam *= 5;
-            pline("Where do you want to center the explosion?");
+            #ifdef ZHLANG
+pline("你想把爆炸中心放在哪里？");
+#else
+pline("Where do you want to center the explosion?");
+#endif
             getpos_sethilite(display_stinking_cloud_positions,
                              can_center_cloud);
             (void) getpos(&cc, TRUE, "the desired position");
@@ -1932,7 +2037,11 @@ seffect_earth(struct obj **sobjp)
 
         /* Identify the scroll */
         if (u.uswallow) {
-            You_hear("rumbling.");
+            #ifdef ZHLANG
+You_hear("轰隆声。");
+#else
+You_hear("rumbling.");
+#endif
         } else {
             if (!avoid_ceiling(&u.uz)) {
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
@@ -1969,7 +2078,11 @@ seffect_earth(struct obj **sobjp)
         if (!sblessed) {
             drop_boulder_on_player(confused, !scursed, TRUE, FALSE);
         } else if (!nboulders)
-            pline("But nothing else happens.");
+            #ifdef ZHLANG
+pline("但没有其他事情发生。");
+#else
+pline("But nothing else happens.");
+#endif
     }
 }
 
@@ -1982,7 +2095,11 @@ seffect_punishment(struct obj **sobjp)
 
     gk.known = TRUE;
     if (confused || sblessed) {
-        You_feel("guilty.");
+        #ifdef ZHLANG
+You_feel("有罪。");
+#else
+You_feel("guilty.");
+#endif
         return;
     }
     punish(sobj);
@@ -2008,7 +2125,11 @@ seffect_blank_paper(struct obj **sobjp UNUSED)
     if (Blind)
         You("don't remember there being any magic words on this scroll.");
     else
-        pline("This scroll seems to be blank.");
+        #ifdef ZHLANG
+pline("这张卷轴看起来是空白的。");
+#else
+pline("This scroll seems to be blank.");
+#endif
     gk.known = TRUE;
 }
 
@@ -2075,7 +2196,11 @@ seffect_identify(struct obj **sobjp)
         if (confused || (scursed && !already_known))
             You("identify this as an identify scroll.");
         else if (!already_known)
-            pline("This is an identify scroll.");
+            #ifdef ZHLANG
+pline("这是一张鉴定卷轴。");
+#else
+pline("This is an identify scroll.");
+#endif
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
         if (confused || (scursed && !already_known))
@@ -2113,7 +2238,11 @@ seffect_magic_mapping(struct obj **sobjp)
         if (svl.level.flags.nommap) {
             Your("mind is filled with crazy lines!");
             if (Hallucination)
-                pline("Wow!  Modern art.");
+                #ifdef ZHLANG
+pline("哇！现代艺术。");
+#else
+pline("Wow!  Modern art.");
+#endif
             else
                 Your("%s spins in bewilderment.", body_part(HEAD));
             make_confused(HConfusion + rnd(30), FALSE);
@@ -2140,7 +2269,11 @@ seffect_magic_mapping(struct obj **sobjp)
         make_confused(HConfusion + rnd(30), FALSE);
         return;
     }
-    pline("A map coalesces in your mind!");
+    #ifdef ZHLANG
+pline("一张地图在你的脑海中凝固成形！");
+#else
+pline("A map coalesces in your mind!");
+#endif
     cval = (scursed && !confused);
     if (cval)
         HConfusion = 1; /* to screw up map */
@@ -2149,7 +2282,11 @@ seffect_magic_mapping(struct obj **sobjp)
     notice_mon_on();
     if (cval) {
         HConfusion = 0; /* restore */
-        pline("Unfortunately, you can't grasp the details.");
+        #ifdef ZHLANG
+pline("不幸的是，你无法掌握细节。");
+#else
+pline("Unfortunately, you can't grasp the details.");
+#endif
     }
 }
 
@@ -2182,7 +2319,11 @@ seffect_mail(struct obj **sobjp)
         /* unreachable since with MAIL undefined, sobj->spe won't be 0;
            as a precaution, be prepared to give arbitrary feedback;
            caller has already reported that it disappears upon reading */
-        pline("That was a scroll of mail?");
+        #ifdef ZHLANG
+pline("那是一张邮件卷轴？");
+#else
+pline("That was a scroll of mail?");
+#endif
 #endif
         break;
     }
@@ -2314,7 +2455,11 @@ drop_boulder_on_player(
     otmp2->owt = weight(otmp2);
     if (!amorphous(gy.youmonst.data) && !Passes_walls
         && !noncorporeal(gy.youmonst.data) && !unsolid(gy.youmonst.data)) {
-        You("are hit by %s!", doname(otmp2));
+        #ifdef ZHLANG
+You("你被%s击中了！", doname(otmp2));
+#else
+You("are hit by %s!", doname(otmp2));
+#endif
         dmg = (int) (dmgval(otmp2, &gy.youmonst) * otmp2->quan);
         if (uarmh && helmet_protects) {
             if (hard_helmet(uarmh)) {
@@ -2374,7 +2519,11 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                     pline("Fortunately, %s is wearing a hard helmet.",
                           mon_nam(mtmp));
                 else if (!Deaf)
-                    You_hear("a clanging sound.");
+                    #ifdef ZHLANG
+You_hear("叮当声。");
+#else
+You_hear("a clanging sound.");
+#endif
                 if (mdmg > 2)
                     mdmg = 2;
             } else {
@@ -2660,12 +2809,21 @@ do_class_genocide(void)
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
         if (!*buf) {
-            pline("%s.", (j + 1 < 5)
+            #ifdef ZHLANG
+pline("你%s。", (j + 1 < 5)
                          ? "Type letter (or punctuation)"
                            " or name used for a class of monsters or 'none'"
                          /* next iteration gives "that's enough tries"
                             so don't suggest typing anything this time */
                          : "No class of monsters specified");
+#else
+pline("%s.", (j + 1 < 5)
+                         ? "Type letter (or punctuation)"
+                           " or name used for a class of monsters or 'none'"
+                         /* next iteration gives "that's enough tries"
+                            so don't suggest typing anything this time */
+                         : "No class of monsters specified");
+#endif
             continue; /* try again */
         }
         /* choosing "none" preserves genocideless conduct */
@@ -2700,7 +2858,11 @@ do_class_genocide(void)
         if (!goodcnt && class != mons[gu.urole.mnum].mlet
             && class != mons[gu.urace.mnum].mlet) {
             if (gonecnt)
-                pline("All such monsters are already nonexistent.");
+                #ifdef ZHLANG
+pline("所有这种怪物都已不存在。");
+#else
+pline("All such monsters are already nonexistent.");
+#endif
             else if (immunecnt || class == S_invisible)
                 You("aren't permitted to genocide such monsters.");
             else if (wizard && buf[0] == '*') {
@@ -2714,7 +2876,11 @@ do_class_genocide(void)
                     mongone(mtmp);
                     gonecnt++;
                 }
-                pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
+                #ifdef ZHLANG
+pline("消灭了%d只怪物%s。", gonecnt, plur(gonecnt));
+#else
+pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
+#endif
                 return;
             } else
                 pline("That %s does not represent any monster.",
@@ -2749,7 +2915,11 @@ do_class_genocide(void)
                     svm.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
-                    pline("Wiped out all %s.", nam);
+                    #ifdef ZHLANG
+pline("消灭了所有%s。", nam);
+#else
+pline("Wiped out all %s.", nam);
+#endif
                     if (Upolyd && vampshifted(&gy.youmonst)
                         /* current shifted form or base vampire form */
                         && (i == u.umonnum || i == gy.youmonst.cham))
@@ -2758,7 +2928,11 @@ do_class_genocide(void)
                         u.mh = -1;
                         if (Unchanging) {
                             if (!feel_dead++)
-                                urgent_pline("You die.");
+                                #ifdef ZHLANG
+urgent_pline("你死了。");
+#else
+urgent_pline("You die.");
+#endif
                             /* finish genociding this class of
                                monsters before ultimately dying */
                             gameover = TRUE;
@@ -2775,7 +2949,11 @@ do_class_genocide(void)
                                 You_feel("%s inside.", udeadinside());
                         } else {
                             if (!feel_dead++)
-                                urgent_pline("You die.");
+                                #ifdef ZHLANG
+urgent_pline("你死了。");
+#else
+urgent_pline("You die.");
+#endif
                             gameover = TRUE;
                         }
                     }
@@ -2864,11 +3042,19 @@ do_genocide(
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
             if (!*buf) {
-                pline("%s.", (i + 1 < 5)
+                #ifdef ZHLANG
+pline("你%s。", (i + 1 < 5)
                              ? "Type the name of a type of monster or 'none'"
                              /* next iteration gives "that's enough tries"
                                 so don't suggest typing anything this time */
                              : "No type of monster specified");
+#else
+pline("%s.", (i + 1 < 5)
+                             ? "Type the name of a type of monster or 'none'"
+                             /* next iteration gives "that's enough tries"
+                                so don't suggest typing anything this time */
+                             : "No type of monster specified");
+#endif
                 continue; /* try again */
             }
             /* choosing "none" preserves genocideless conduct */
@@ -2922,7 +3108,11 @@ do_genocide(
                               " through the caverns:");
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     /* FIXME? shouldn't this override deafness? */
-                    verbalize("No, mortal!  That will not be done.");
+                    #ifdef ZHLANG
+verbalize("不，凡人！那是不被允许的。");
+#else
+verbalize("No, mortal!  That will not be done.");
+#endif
                 }
                 continue;
             }
@@ -2963,8 +3153,13 @@ do_genocide(
 
         /* setting no-corpse affects wishing and random tin generation */
         svm.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
-        pline("Wiped out %s%s.", which,
+        #ifdef ZHLANG
+pline("消灭了%s%s。", which,
               (*which != 'a') ? buf : makeplural(buf));
+#else
+pline("Wiped out %s%s.", which,
+              (*which != 'a') ? buf : makeplural(buf));
+#endif
 
         if (killplayer) {
             u.uhp = -1;
@@ -3009,8 +3204,13 @@ do_genocide(
             /* accumulated 'cnt' doesn't take groups into account;
                assume bringing in new mon(s) didn't remove any old ones */
             cnt = monster_census(FALSE) - census;
-            pline("Sent in %s%s.", (cnt > 1) ? "some " : "",
+            #ifdef ZHLANG
+pline("送来了%s%s。", (cnt > 1) ? "some " : "",
                   (cnt > 1) ? makeplural(buf) : an(buf));
+#else
+pline("Sent in %s%s.", (cnt > 1) ? "some " : "",
+                  (cnt > 1) ? makeplural(buf) : an(buf));
+#endif
         } else
             pline1(nothing_happens);
     }
@@ -3028,16 +3228,28 @@ punish(struct obj *sobj)
 
     /* KMH -- Punishment is still okay when you are riding */
     if (!reuse_ball)
-        You("are being punished for your misbehavior!");
+        #ifdef ZHLANG
+You("你因为你的不当行为正被惩罚！");
+#else
+You("are being punished for your misbehavior!");
+#endif
     if (Punished) {
-        Your("iron ball gets heavier.");
+        #ifdef ZHLANG
+Your("你的铁球变得更重了。");
+#else
+Your("iron ball gets heavier.");
+#endif
         uball->owt += WT_IRON_BALL_INCR * (1 + cursed_levy);
         return;
     }
     if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
         || unsolid(gy.youmonst.data)) {
         if (!reuse_ball) {
-            pline("A ball and chain appears, then falls away.");
+            #ifdef ZHLANG
+pline("一个球和链条出现了，然后掉落了。");
+#else
+pline("A ball and chain appears, then falls away.");
+#endif
             dropy(mkobj(BALL_CLASS, TRUE));
         } else {
             dropy(reuse_ball);
@@ -3094,7 +3306,11 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
         return;
     } else if (!can_center_cloud(cc.x, cc.y)) {
         if (Hallucination)
-            pline("Ugh... someone cut the cheese.");
+            #ifdef ZHLANG
+pline("呃……有人放屁了。");
+#else
+pline("Ugh... someone cut the cheese.");
+#endif
         else
             pline("%s a whiff of rotten eggs.",
                   sobj->oclass == SCROLL_CLASS ? "The scroll crumbles with"
@@ -3390,9 +3606,17 @@ create_particular(void)
 
         /* no good; try again... */
         if (*bufp || altmsg || tryct < 2) {
-            pline("I've never heard of such monsters.");
+            #ifdef ZHLANG
+pline("我从没听说过这种怪物。");
+#else
+pline("I've never heard of such monsters.");
+#endif
         } else {
-            pline("Try again (type * for random, ESC to cancel).");
+            #ifdef ZHLANG
+pline("再试一次（输入*随机，ESC取消）。");
+#else
+pline("Try again (type * for random, ESC to cancel).");
+#endif
             ++altmsg;
         }
         /* when a second try is needed, expand the prompt */

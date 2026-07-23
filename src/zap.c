@@ -197,7 +197,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (disguised_mimic && !disguised_as_mon(mtmp))
                 seemimic(mtmp);
             shieldeff(mtmp->mx, mtmp->my);
-            pline("Boing!");
+            #ifdef ZHLANG
+pline("嘣！");
+#else
+pline("Boing!");
+#endif
             /* 5.0: used to 'break' to avoid setting learn_it here */
         } else if (u.uswallow || rnd(20) < 10 + find_mac(mtmp)) {
             if (disguised_mimic)
@@ -224,8 +228,16 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             check_gear_next_turn(mtmp); /* might want speed boots */
 
             if (engulfing_u(mtmp) && is_whirly(mtmp->data)) {
-                You("disrupt %s!", mon_nam(mtmp));
-                pline("A huge hole opens up...");
+                #ifdef ZHLANG
+You("扰乱了%s！", mon_nam(mtmp));
+#else
+You("disrupt %s!", mon_nam(mtmp));
+#endif
+                #ifdef ZHLANG
+pline("一个巨大的洞打开了……");
+#else
+pline("A huge hole opens up...");
+#endif
                 expels(mtmp, mtmp->data, TRUE);
             }
         }
@@ -538,7 +550,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             } else {
                 mtmp->m_lev--;
                 if (canseemon(mtmp))
-                    pline("%s suddenly seems weaker!", Monnam(mtmp));
+                    #ifdef ZHLANG
+pline("%s突然看起来更虚弱了！", Monnam(mtmp));
+#else
+pline("%s suddenly seems weaker!", Monnam(mtmp));
+#endif
             }
         }
         break;
@@ -586,7 +602,11 @@ release_hold(void)
             if (!Blind)
                 pline("%s opens its mouth!", Monnam(mtmp));
             else
-                You_feel("a sudden rush of air!");
+                #ifdef ZHLANG
+You_feel("一股突然的气流！");
+#else
+You_feel("a sudden rush of air!");
+#endif
         }
         /* gives "you get regurgitated" or "you get expelled from <mon>" */
         expels(mtmp, mtmp->data, TRUE);
@@ -595,7 +615,11 @@ release_hold(void)
            set_ustuck() will set flag for botl update, You() pline will
            trigger a status update with "UHold" removed */
         set_ustuck((struct monst *) 0);
-        You("release %s.", mon_nam(mtmp));
+        #ifdef ZHLANG
+You("松开了%s。", mon_nam(mtmp));
+#else
+You("release %s.", mon_nam(mtmp));
+#endif
     } else { /* held but not swallowed */
         char relbuf[BUFSZ];
 
@@ -971,8 +995,13 @@ revive(struct obj *corpse, boolean by_hero)
     if (corpse->norevive
         || (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))) {
         if (cansee(x, y))
-            pline("%s twitches feebly.",
+            #ifdef ZHLANG
+pline("%s虚弱地抽动了一下。",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+#else
+pline("%s twitches feebly.",
+                upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+#endif
         return (struct monst *) 0;
     }
 
@@ -1054,7 +1083,11 @@ revive(struct obj *corpse, boolean by_hero)
         } else if (shkp) {
             /* need some prior description of the corpse since
                stolen_value() will refer to the object as "it" */
-            pline("A corpse is resuscitated.");
+            #ifdef ZHLANG
+pline("一具尸体被复苏了。");
+#else
+pline("A corpse is resuscitated.");
+#endif
         }
         /* don't charge for shopkeeper's own corpse if we just revived him */
         if (shkp && mtmp != shkp)
@@ -1241,10 +1274,18 @@ unturn_you(void)
     (void) unturn_dead(&gy.youmonst); /* hit carried corpses and eggs */
 
     if (is_undead(gy.youmonst.data)) {
-        You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
+        #ifdef ZHLANG
+You_feel("感到恐惧，%s被震慑。", Stunned ? "even more " : "");
+#else
+You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
+#endif
         make_stunned((HStun & TIMEOUT) + (long) rnd(30), FALSE);
     } else {
-        You("shudder in dread.");
+        #ifdef ZHLANG
+You("恐惧地颤抖着。");
+#else
+You("shudder in dread.");
+#endif
     }
 }
 
@@ -1991,11 +2032,19 @@ poly_obj(struct obj *obj, int id)
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
-                    pline("%s gets angry!", Shknam(shkp));
+                    #ifdef ZHLANG
+pline("%s生气了！", Shknam(shkp));
+#else
+pline("%s gets angry!", Shknam(shkp));
+#endif
                     hot_pursuit(shkp);
                 }
             } else
-                Norep("%s is furious!", Shknam(shkp));
+                #ifdef ZHLANG
+Norep("%s大怒！", Shknam(shkp));
+#else
+Norep("%s is furious!", Shknam(shkp));
+#endif
         }
     }
     delobj(obj);
@@ -2117,9 +2166,17 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
            non-eating, or something stranger) */
         if (Role_if(PM_MONK) || !u.uconduct.unvegetarian
             || !carnivorous(gy.youmonst.data))
-            Norep("You smell the odor of meat.");
+            #ifdef ZHLANG
+Norep("你闻到了肉的气味。");
+#else
+Norep("You smell the odor of meat.");
+#endif
         else
-            Norep("You smell a delicious smell.");
+            #ifdef ZHLANG
+Norep("你闻到了美味的香气。");
+#else
+Norep("You smell a delicious smell.");
+#endif
     }
     newsym(oox, ooy);
     return res;
@@ -2244,21 +2301,37 @@ bhito(struct obj *obj, struct obj *otmp)
                        statues; plural handling here and the "empty" case
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
-                        pline("%s trapped!", Tobjnam(obj, "are"));
+                        #ifdef ZHLANG
+pline("%s有陷阱！", Tobjnam(obj, "are"));
+#else
+pline("%s trapped!", Tobjnam(obj, "are"));
+#endif
                     obj->tknown = 1;
                 }
 
                 if (!obj->cobj) {
-                    pline("%s empty.", Tobjnam(obj, "are"));
+                    #ifdef ZHLANG
+pline("%s是空的。", Tobjnam(obj, "are"));
+#else
+pline("%s empty.", Tobjnam(obj, "are"));
+#endif
                 } else if (SchroedingersBox(obj)) {
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
                        so just make probing be inconclusive for it */
-                    You("aren't sure whether %s has %s or its corpse inside.",
+                    #ifdef ZHLANG
+You("你不确定%s里面是装了%s还是它的尸体。",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
                            picks a form which can't leave a corpse */
                         an(Hallucination ? rndmonnam((char *) 0) : "cat"));
+#else
+You("aren't sure whether %s has %s or its corpse inside.",
+                        the(xname(obj)),
+                        /* unfortunately, we can't tell whether rndmonnam()
+                           picks a form which can't leave a corpse */
+                        an(Hallucination ? rndmonnam((char *) 0) : "cat"));
+#endif
                     obj->cknown = 0;
                 } else {
                     struct obj *o;
@@ -2296,7 +2369,11 @@ bhito(struct obj *obj, struct obj *otmp)
                 if (cansee(obj->ox, obj->oy))
                     pline_The("boulder falls apart.");
                 else
-                    You_hear("a crumbling sound.");
+                    #ifdef ZHLANG
+You_hear("碎裂的声音。");
+#else
+You_hear("a crumbling sound.");
+#endif
                 fracture_rock(obj);
             } else if (obj->otyp == STATUE) {
                 if (break_statue(obj)) {
@@ -2306,7 +2383,11 @@ bhito(struct obj *obj, struct obj *otmp)
                         else
                             pline_The("statue shatters.");
                     } else
-                        You_hear("a crumbling sound.");
+                        #ifdef ZHLANG
+You_hear("碎裂的声音。");
+#else
+You_hear("a crumbling sound.");
+#endif
                 }
             } else {
                 int oox = obj->ox, ooy = obj->oy;
@@ -2370,8 +2451,13 @@ bhito(struct obj *obj, struct obj *otmp)
                 } else {
                     if (cansee(ox, oy)) {
                         if (canspotmon(mtmp)) {
-                            pline("%s is resurrected!",
+                            #ifdef ZHLANG
+pline("%s被复活了！",
                                   mtmp->mtame ? YMonnam(mtmp) : Monnam(mtmp));
+#else
+pline("%s is resurrected!",
+                                  mtmp->mtame ? YMonnam(mtmp) : Monnam(mtmp));
+#endif
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         } else {
                             /* saw corpse but don't see monster: maybe
@@ -2379,7 +2465,11 @@ bhito(struct obj *obj, struct obj *otmp)
                                a different spot than <ox,oy> */
                             if (!type_is_pname(&mons[corpsenm]))
                                 corpsname = The(corpsname);
-                            pline("%s disappears.", corpsname);
+                            #ifdef ZHLANG
+pline("%s消失了。", corpsname);
+#else
+pline("%s disappears.", corpsname);
+#endif
                         }
                     } else {
                         /* couldn't see corpse's location */
@@ -2388,9 +2478,17 @@ bhito(struct obj *obj, struct obj *otmp)
                             if (!type_is_pname(&mons[corpsenm]))
                                 corpsname = an(corpsname);
                             if (!Hallucination)
-                                You_hear("%s reviving.", corpsname);
+                                #ifdef ZHLANG
+You_hear("%s复活的声音。", corpsname);
+#else
+You_hear("%s reviving.", corpsname);
+#endif
                             else
-                                You_hear("a defibrillator.");
+                                #ifdef ZHLANG
+You_hear("除颤器的声音。");
+#else
+You_hear("a defibrillator.");
+#endif
                             learn_it = by_u ? TRUE : gz.zap_oseen;
                         }
                         if (canspotmon(mtmp))
@@ -2538,7 +2636,11 @@ zappable(struct obj *wand)
 void
 do_enlightenment_effect(void)
 {
-    You_feel("self-knowledgeable...");
+    #ifdef ZHLANG
+You_feel("有自知之明……");
+#else
+You_feel("self-knowledgeable...");
+#endif
     display_nhwindow(WIN_MESSAGE, FALSE);
     enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
     pline_The("feeling subsides.");
@@ -2588,7 +2690,11 @@ zapnodir(struct obj *obj)
         break;
     case WAN_WISHING:
         if (Luck + rn2(5) < 0) {
-            pline("Unfortunately, nothing happens.");
+            #ifdef ZHLANG
+pline("不幸的是，什么都没发生。");
+#else
+pline("Unfortunately, nothing happens.");
+#endif
             known = FALSE;
         } else {
             known = !!obj->dknown;
@@ -2621,7 +2727,11 @@ backfire(struct obj *otmp)
     int dmg;
 
     otmp->in_use = TRUE; /* in case losehp() is fatal */
-    pline("%s suddenly explodes!", The(xname(otmp)));
+    #ifdef ZHLANG
+pline("%s突然爆炸了！", The(xname(otmp)));
+#else
+pline("%s suddenly explodes!", The(xname(otmp)));
+#endif
     dmg = d(otmp->spe + 2, 6);
     losehp(Maybe_Half_Phys(dmg), "exploding wand", KILLED_BY_AN);
     useupall(otmp);
@@ -2666,7 +2776,11 @@ dozap(void)
         return ECMD_TIME;
     } else if (need_dir && !getdir((char *) 0)) {
         if (!Blind)
-            pline("%s glows and fades.", The(xname(obj)));
+            #ifdef ZHLANG
+pline("%s闪烁着光芒然后消退了。", The(xname(obj)));
+#else
+pline("%s glows and fades.", The(xname(obj)));
+#endif
         /* make him pay for knowing !NODIR */
     } else if (need_dir && !u.dx && !u.dy && !u.dz) {
         if ((damage = zapyourself(obj, TRUE)) != 0) {
@@ -2689,7 +2803,11 @@ dozap(void)
         gc.current_wand = 0;
     }
     if (obj && obj->spe < 0) {
-        pline("%s to dust.", Tobjnam(obj, "turn"));
+        #ifdef ZHLANG
+pline("%s化为了灰烬。", Tobjnam(obj, "turn"));
+#else
+pline("%s to dust.", Tobjnam(obj, "turn"));
+#endif
         useupall(obj); /* calls freeinv() -> update_inventory() */
     } else
         update_inventory(); /* maybe used a charge */
@@ -2728,11 +2846,19 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE;
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline("Boing!");
+            #ifdef ZHLANG
+pline("嘣！");
+#else
+pline("Boing!");
+#endif
             monstseesu(M_SEEN_MAGR);
         } else {
             if (ordinary) {
-                You("bash yourself!");
+                #ifdef ZHLANG
+You("猛击了自己！");
+#else
+You("bash yourself!");
+#endif
                 damage = d(2, 12);
             } else
                 damage = d(1 + obj->spe, 6);
@@ -2745,13 +2871,21 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE;
         orig_dmg = d(12, 6);
         if (!Shock_resistance) {
-            You("shock yourself!");
+            #ifdef ZHLANG
+You("电击了自己！");
+#else
+You("shock yourself!");
+#endif
             damage = orig_dmg;
             exercise(A_CON, FALSE);
             monstunseesu(M_SEEN_ELEC);
         } else {
             shieldeff(u.ux, u.uy);
-            You("zap yourself, but seem unharmed.");
+            #ifdef ZHLANG
+You("对自己施放魔法，但似乎没有受伤。");
+#else
+You("zap yourself, but seem unharmed.");
+#endif
             monstseesu(M_SEEN_ELEC);
             ugolemeffects(AD_ELEC, orig_dmg);
         }
@@ -2760,7 +2894,11 @@ zapyourself(struct obj *obj, boolean ordinary)
         break;
 
     case SPE_FIREBALL:
-        You("explode a fireball on top of yourself!");
+        #ifdef ZHLANG
+You("在你自己头顶引爆了一个火球！");
+#else
+You("explode a fireball on top of yourself!");
+#endif
         explode(u.ux, u.uy, 11, d(6, 6), WAND_CLASS, EXPL_FIERY);
         break;
     case WAN_FIRE:
@@ -2769,7 +2907,11 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("rather warm.");
+            #ifdef ZHLANG
+You_feel("相当温暖。");
+#else
+You_feel("rather warm.");
+#endif
             monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, orig_dmg);
         } else {
@@ -2790,7 +2932,11 @@ zapyourself(struct obj *obj, boolean ordinary)
         orig_dmg = d(12, 6);
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
-            You_feel("a little chill.");
+            #ifdef ZHLANG
+You_feel("一丝凉意。");
+#else
+You_feel("a little chill.");
+#endif
             monstseesu(M_SEEN_COLD);
             ugolemeffects(AD_COLD, orig_dmg);
         } else {
@@ -2810,7 +2956,11 @@ zapyourself(struct obj *obj, boolean ordinary)
             monstseesu(M_SEEN_MAGR);
         } else {
             damage = d(4, 6);
-            pline("Idiot!  You've shot yourself!");
+            #ifdef ZHLANG
+pline("白痴！你打中了自己！");
+#else
+pline("Idiot!  You've shot yourself!");
+#endif
             monstunseesu(M_SEEN_MAGR);
         }
         break;
@@ -2844,7 +2994,11 @@ zapyourself(struct obj *obj, boolean ordinary)
 
         if (BInvis && uarmc->otyp == MUMMY_WRAPPING) {
             /* A mummy wrapping absorbs it and protects you */
-            You_feel("rather itchy under %s.", yname(uarmc));
+            #ifdef ZHLANG
+You_feel("在%s下面感到很痒。", yname(uarmc));
+#else
+You_feel("rather itchy under %s.", yname(uarmc));
+#endif
             break;
         }
         incr_itimeout(&HInvis, rn1(15, 31));
@@ -2867,13 +3021,21 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE;
         if (Sleep_resistance) {
             shieldeff(u.ux, u.uy);
-            You("don't feel sleepy!");
+            #ifdef ZHLANG
+You("你不觉得困！");
+#else
+You("don't feel sleepy!");
+#endif
             monstseesu(M_SEEN_SLEEP);
         } else {
             if (ordinary)
                 pline_The("sleep ray hits you!");
             else
-                You("fall asleep!");
+                #ifdef ZHLANG
+You("你睡着了！");
+#else
+You("fall asleep!");
+#endif
             monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(50), TRUE);
         }
@@ -2909,8 +3071,16 @@ zapyourself(struct obj *obj, boolean ordinary)
         svk.killer.format = NO_KILLER_PREFIX;
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
-        urgent_pline("You irradiate yourself with pure energy!");
-        urgent_pline("You die.");
+        #ifdef ZHLANG
+urgent_pline("你对自己辐射了纯粹的能量！");
+#else
+urgent_pline("You irradiate yourself with pure energy!");
+#endif
+        #ifdef ZHLANG
+urgent_pline("你死了。");
+#else
+urgent_pline("You die.");
+#endif
         /* They might survive with an amulet of life saving */
         done(DIED);
         break;
@@ -2924,7 +3094,11 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE; /* (no effect for spells...) */
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
                (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
-        You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+        #ifdef ZHLANG
+You_feel("%s好多了。", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+#else
+You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+#endif
         break;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
@@ -3053,7 +3227,11 @@ lightdamage(
             dmg = 10 + rnd(dmg - 10);
         if (dmg > 20)
             dmg = 20;
-        pline("Ow, that light hurts%c", (dmg > 2 || u.mh <= 5) ? '!' : '.');
+        #ifdef ZHLANG
+pline("嗷，那光真疼%c", (dmg > 2 || u.mh <= 5) ? '!' : '.');
+#else
+pline("Ow, that light hurts%c", (dmg > 2 || u.mh <= 5) ? '!' : '.');
+#endif
         /* [composing killer/reason is superfluous here; if fatal, cause
            of death will always be "killed while stuck in creature form"] */
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
@@ -3199,7 +3377,11 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
                 if (!Blind)
                     pline(writing_vanishes, your);
                 else /* note: "dark" rather than "heavy" is intentional... */
-                    You_feel("%s headed.", Hallucination ? "dark" : "light");
+                    #ifdef ZHLANG
+You_feel("头很%s。", Hallucination ? "dark" : "light");
+#else
+You_feel("%s headed.", Hallucination ? "dark" : "light");
+#endif
                 u.mh = 0; /* fatal; death handled by rehumanize() */
             }
             if (Unchanging && u.mh > 0)
@@ -3250,7 +3432,11 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
     case WAN_PROBING:
         ptmp = 0;
         if (u.dz < 0) {
-            You("probe towards the %s.", ceiling(x, y));
+            #ifdef ZHLANG
+You("你向%s探测。", ceiling(x, y));
+#else
+You("probe towards the %s.", ceiling(x, y));
+#endif
         } else { /* down */
             const char *surf;
             schar ltyp, rememberedltyp = update_mapseen_for(x, y);
@@ -3268,7 +3454,11 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             } else {
                 surf = the(surface(x, y));
             }
-            You("probe beneath %s.", surf);
+            #ifdef ZHLANG
+You("你向%s底下探测。", surf);
+#else
+You("probe beneath %s.", surf);
+#endif
             ptmp += display_binventory(x, y, TRUE);
         }
         if (!ptmp)
@@ -3340,9 +3530,17 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                 if (Blind && !ttmp->tseen) {
                     pline("%s beneath you shatters.", Something);
                 } else if (!ttmp->tseen) { /* => !Blind */
-                    pline("There's a trapdoor beneath you; it shatters.");
+                    #ifdef ZHLANG
+pline("你脚下有一个活板门；它碎裂了。");
+#else
+pline("There's a trapdoor beneath you; it shatters.");
+#endif
                 } else {
-                    pline("The trapdoor beneath you shatters.");
+                    #ifdef ZHLANG
+pline("你脚下的活板门碎裂了。");
+#else
+pline("The trapdoor beneath you shatters.");
+#endif
                     disclose = TRUE;
                 }
                 ttmp->ttyp = HOLE;
@@ -3359,7 +3557,11 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                 } else {
                     ttmp->tseen = 1;
                     newsym(x, y);
-                    pline("A trapdoor appears beneath you.");
+                    #ifdef ZHLANG
+pline("一个活板门出现在你脚下。");
+#else
+pline("A trapdoor appears beneath you.");
+#endif
                     disclose = TRUE;
                 }
                 /* hadn't fallen down hole; won't fall now */
@@ -3436,7 +3638,11 @@ zapwrapup(void)
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
     if (go.obj_zapped)
-        You_feel("shuddering vibrations.");
+        #ifdef ZHLANG
+You_feel("阵阵震动的感觉。");
+#else
+You_feel("shuddering vibrations.");
+#endif
     go.obj_zapped = FALSE;
 }
 
@@ -3754,7 +3960,11 @@ zap_map(
             recalc_block_point(x, y);
             newsym(x, y);
             if (cansee(x, y)) {
-                pline("Probing reveals a secret door.");
+                #ifdef ZHLANG
+pline("探测发现了一扇密门。");
+#else
+pline("Probing reveals a secret door.");
+#endif
                 learn_it = TRUE;
             } else if (Is_rogue_level(&u.uz)) { /* from zap_over_floor() */
                 draft_message(FALSE); /* "You feel a draft." (open doorway) */
@@ -3767,7 +3977,11 @@ zap_map(
             levl[x][y].typ = CORR;
             unblock_point(x, y);
             newsym(x, y);
-            pline("Probing exposes a secret corridor.");
+            #ifdef ZHLANG
+pline("探测发现了一条秘密走廊。");
+#else
+pline("Probing exposes a secret corridor.");
+#endif
             learn_it = TRUE;
 
         /* if on or over ice, describe it ("solid ice", "thin ice", &c);
@@ -3801,9 +4015,15 @@ zap_map(
                 use_the = !hallu ? (ttmp->ttyp == VIBRATING_SQUARE
                                     && Invocation_lev(&u.uz))
                                  : !rn2(4);
-                You("find %s%c",
+                #ifdef ZHLANG
+You("你发现了%s%c",
                     use_the ? the(ttmpname) : an(ttmpname),
                     use_the ? '!' : '.');
+#else
+You("find %s%c",
+                    use_the ? the(ttmpname) : an(ttmpname),
+                    use_the ? '!' : '.');
+#endif
                 learn_it = !hallu;
             }
         } /* t_at() */
@@ -4233,7 +4453,11 @@ boomhit(struct obj *obj, int dx, int dy)
         if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
             Soundeffect(se_boomerang_klonk, 75);
             if (!Deaf)
-                pline("Klonk!");
+                #ifdef ZHLANG
+pline("哐当！");
+#else
+pline("Klonk!");
+#endif
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 20);
             break; /* boomerang falls on sink */
         }
