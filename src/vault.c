@@ -111,7 +111,11 @@ clear_fcorr(struct monst *grd, boolean forceshow)
        died: no message, quit: message) */
     if (IS_OBSTRUCTED(levl[u.ux][u.uy].typ) && (Upolyd ? u.mh : u.uhp) > 0
         && !silently)
+        #ifdef ZHLANG
         You("are encased in rock.");
+        #else
+        You("are encased in rock.");
+        #endif
     return TRUE;
 }
 
@@ -269,7 +273,11 @@ uleftvault(struct monst *grd)
         && um_dist(grd->mx, grd->my, 1)) {
         if (grd->mpeaceful) {
             if (canspotmon(grd)) /* see or sense via telepathy */
+                #ifdef ZHLANG
                 pline("%s becomes irate.", Monnam(grd));
+                #else
+                pline("%s becomes irate.", Monnam(grd));
+                #endif
             grd->mpeaceful = 0; /* bypass setmangry() */
         }
         /* if arriving outside guard's temporary corridor, give the
@@ -445,11 +453,20 @@ invault(void)
         }
         spotted = canspotmon(guard);
         if (spotted) {
+            #ifdef ZHLANG
             pline("Suddenly one of the Vault's %s enters!",
                   makeplural(pmname(guard->data, Mgender(guard))));
+            #else
+            pline("Suddenly one of the Vault's %s enters!",
+                  makeplural(pmname(guard->data, Mgender(guard))));
+            #endif
             newsym(guard->mx, guard->my);
         } else {
+            #ifdef ZHLANG
             pline("Someone else has entered the Vault.");
+            #else
+            pline("Someone else has entered the Vault.");
+            #endif
             /* make sure that hero who can't see the guard knows where the
                wall is breeched, otherwise we couldn't follow the guard out;
                the breech isn't necessarily adjacent to the hero */
@@ -460,7 +477,11 @@ invault(void)
             /* can't interrogate hero, don't interrogate engulfer */
             if (!Deaf) {
                 SetVoice(guard, 0, 80, 0);
+                #ifdef ZHLANG
                 verbalize("What's going on here?");
+                #else
+                verbalize("What's going on here?");
+                #endif
             }
             if (!spotted)
                 pline_The("other presence vanishes.");
@@ -472,11 +493,20 @@ invault(void)
                 && gy.youmonst.mappearance != GOLD_PIECE)
                 if (!Deaf) {
                     SetVoice(guard, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize("Hey!  Who left that %s in here?",
                               mimic_obj_name(&gy.youmonst));
+                    #else
+                    verbalize("Hey!  Who left that %s in here?",
+                              mimic_obj_name(&gy.youmonst));
+                    #endif
                 }
             /* You're mimicking some object or you're hidden. */
+            #ifdef ZHLANG
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
+            #else
+            pline("Puzzled, %s turns around and leaves.", mhe(guard));
+            #endif
             mongone(guard);
             return;
         }
@@ -485,10 +515,18 @@ invault(void)
                been given in order to vary it upon repeat visits, but
                discarding the monster and its egd data renders that hard] */
             if (Deaf) {
+                #ifdef ZHLANG
                 pline("%s huffs and turns to leave.", noit_Monnam(guard));
+                #else
+                pline("%s huffs and turns to leave.", noit_Monnam(guard));
+                #endif
             } else {
                 SetVoice(guard, 0, 80, 0);
+                #ifdef ZHLANG
                 verbalize("I'll be back when you're ready to speak to me!");
+                #else
+                verbalize("I'll be back when you're ready to speak to me!");
+                #endif
             }
             mongone(guard);
             return;
@@ -518,23 +556,42 @@ invault(void)
             if (!svm.mvitals[PM_CROESUS].died) {
                 if (Deaf) {
                     if (!Blind)
+                        #ifdef ZHLANG
                         pline("%s waves goodbye.", noit_Monnam(guard));
+                        #else
+                        pline("%s waves goodbye.", noit_Monnam(guard));
+                        #endif
                 } else {
                     SetVoice(guard, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize(
                          "Oh, yes, of course.  Sorry to have disturbed you.");
+                    #else
+                    verbalize(
+                         "Oh, yes, of course.  Sorry to have disturbed you.");
+                    #endif
                 }
                 mongone(guard);
             } else {
                 setmangry(guard, FALSE);
                 if (Deaf) {
                    if (!Blind)
+                        #ifdef ZHLANG
                         pline("%s mouths something and looks very angry!",
                               noit_Monnam(guard));
+                        #else
+                        pline("%s mouths something and looks very angry!",
+                              noit_Monnam(guard));
+                        #endif
                 } else {
                    SetVoice(guard, 0, 80, 0);
+                   #ifdef ZHLANG
                    verbalize(
                            "Back from the dead, are you?  I'll remedy that!");
+                   #else
+                   verbalize(
+                           "Back from the dead, are you?  I'll remedy that!");
+                   #endif
                 }
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {
@@ -545,44 +602,87 @@ invault(void)
             return;
         }
         if (Deaf) {
+            #ifdef ZHLANG
             pline("%s doesn't %srecognize you.", noit_Monnam(guard),
                     (Blind) ? "" : "appear to ");
+            #else
+            pline("%s doesn't %srecognize you.", noit_Monnam(guard),
+                    (Blind) ? "" : "appear to ");
+            #endif
         } else {
             SetVoice(guard, 0, 80, 0);
+            #ifdef ZHLANG
             verbalize("I don't know you.");
+            #else
+            verbalize("I don't know you.");
+            #endif
         }
         umoney = money_cnt(gi.invent);
         if (!umoney && !hidden_gold(TRUE)) {
             if (Deaf) {
+                #ifdef ZHLANG
                 pline("%s stomps%s.", noit_Monnam(guard),
                       (Blind) ? "" : " and beckons");
+                #else
+                pline("%s stomps%s.", noit_Monnam(guard),
+                      (Blind) ? "" : " and beckons");
+                #endif
             } else {
                 SetVoice(guard, 0, 80, 0);
+                #ifdef ZHLANG
                 verbalize("Please follow me.");
+                #else
+                verbalize("Please follow me.");
+                #endif
             }
         } else {
             if (!umoney) {
                 if (Deaf) {
                     if (!Blind)
+                        #ifdef ZHLANG
                         pline("%s glares at you%s.", noit_Monnam(guard),
                               gi.invent ? "r stuff" : "");
+                        #else
+                        pline("%s glares at you%s.", noit_Monnam(guard),
+                              gi.invent ? "r stuff" : "");
+                        #endif
                 } else {
                    SetVoice(guard, 0, 80, 0);
+                   #ifdef ZHLANG
                    verbalize("You have hidden gold.");
+                   #else
+                   verbalize("You have hidden gold.");
+                   #endif
                 }
             }
             if (Deaf) {
                 if (!Blind)
+                    #ifdef ZHLANG
                     pline(
                        "%s holds out %s palm and beckons with %s other hand.",
                           noit_Monnam(guard), noit_mhis(guard),
                           noit_mhis(guard));
+                    #else
+                    pline(
+                       "%s holds out %s palm and beckons with %s other hand.",
+                          noit_Monnam(guard), noit_mhis(guard),
+                          noit_mhis(guard));
+                    #endif
             } else {
                 SetVoice(guard, 0, 80, 0);
+                #ifdef ZHLANG
                 verbalize(
                     "Most likely all your gold was stolen from this vault.");
+                #else
+                verbalize(
+                    "Most likely all your gold was stolen from this vault.");
+                #endif
                 SetVoice(guard, 0, 80, 0);
+                #ifdef ZHLANG
                 verbalize("Please drop that gold and follow me.");
+                #else
+                verbalize("Please drop that gold and follow me.");
+                #endif
             }
             EGD(guard)->dropgoldcnt++;
         }
@@ -723,11 +823,23 @@ wallify_vault(struct monst *grd)
 
     if (movedgold || fixed) {
         if (in_fcorridor(grd, grd->mx, grd->my) || cansee(grd->mx, grd->my))
+            #ifdef ZHLANG
             pline("%s whispers an incantation.", noit_Monnam(grd));
+            #else
+            pline("%s whispers an incantation.", noit_Monnam(grd));
+            #endif
         else
+            #ifdef ZHLANG
             You_hear("a distant chant.");
+            #else
+            You_hear("a distant chant.");
+            #endif
         if (movedgold)
+            #ifdef ZHLANG
             pline("A mysterious force moves the gold into the vault.");
+            #else
+            pline("A mysterious force moves the gold into the vault.");
+            #endif
         if (fixed)
             pline_The("damaged vault's walls are magically restored!");
     }
@@ -741,7 +853,11 @@ gd_mv_monaway(struct monst *grd, int nx, int ny)
     if (mtmp && mtmp != grd) {
         if (!Deaf) {
             SetVoice(grd, 0, 80, 0);
+            #ifdef ZHLANG
             verbalize("Out of my way, scum!");
+            #else
+            verbalize("Out of my way, scum!");
+            #endif
         }
         if (!rloc(mtmp, RLOC_ERR | RLOC_MSG) || MON_AT(nx, ny))
             m_into_limbo(mtmp);
@@ -817,10 +933,17 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     }
 
     if (see_it) { /* cansee(goldx, goldy) */
+        #ifdef ZHLANG
         pline("%s%s picks up the gold%s.", Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
                  ? " calms down and" : "",
               under_u ? " from beneath you" : "");
+        #else
+        pline("%s%s picks up the gold%s.", Some_Monnam(grd),
+              (grd->mpeaceful && EGD(grd)->warncnt > 5)
+                 ? " calms down and" : "",
+              under_u ? " from beneath you" : "");
+        #endif
     }
 
     /* if guard was moved to get the gold, move him back */
@@ -862,7 +985,11 @@ gd_move_cleanup(
                 grd->isgd ? " attempt" : "");
     if (!semi_dead && (in_fcorridor(grd, u.ux, u.uy) || cansee(x, y))) {
         if (!disappear_msg_seen && see_guard)
+            #ifdef ZHLANG
             pline("Suddenly, %s disappears.", noit_mon_nam(grd));
+            #else
+            pline("Suddenly, %s disappears.", noit_mon_nam(grd));
+            #endif
         return 1;
     }
     return -2;
@@ -872,16 +999,31 @@ staticfn void
 gd_letknow(struct monst *grd)
 {
     if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
+        #ifdef ZHLANG
         You_hear("%s.",
                     m_carrying(grd, TIN_WHISTLE)
                         ? "the shrill sound of a guard's whistle"
                         : "angry shouting");
+        #else
+        You_hear("%s.",
+                    m_carrying(grd, TIN_WHISTLE)
+                        ? "the shrill sound of a guard's whistle"
+                        : "angry shouting");
+        #endif
     else
+        #ifdef ZHLANG
         You(um_dist(grd->mx, grd->my, 2)
                 ? "see %s approaching."
                 : "are confronted by %s.",
             /* "an angry guard" */
             x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+        #else
+        You(um_dist(grd->mx, grd->my, 2)
+                ? "see %s approaching."
+                : "are confronted by %s.",
+            /* "an angry guard" */
+            x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+        #endif
 }
 
 /*
@@ -936,8 +1078,13 @@ gd_move(struct monst *grd)
     if (egrd->witness) {
         if (!Deaf) {
             SetVoice(grd, 0, 80, 0);
+            #ifdef ZHLANG
             verbalize("How dare you %s that gold, scoundrel!",
                       (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+            #else
+            verbalize("How dare you %s that gold, scoundrel!",
+                      (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+            #endif
         }
         egrd->witness = 0;
         grd->mpeaceful = 0;
@@ -957,9 +1104,17 @@ gd_move(struct monst *grd)
                                      : "");
                 SetVoice(grd, 0, 80, 0);
                 if (egrd->dropgoldcnt || !u_carry_gold)
+                    #ifdef ZHLANG
                     verbalize("I repeat, %s", buf);
+                    #else
+                    verbalize("I repeat, %s", buf);
+                    #endif
                 else
+                    #ifdef ZHLANG
                     verbalize("%s", upstart(buf));
+                    #else
+                    verbalize("%s", upstart(buf));
+                    #endif
                 if (u_carry_gold)
                     egrd->dropgoldcnt++;
             }
@@ -968,7 +1123,11 @@ gd_move(struct monst *grd)
                 n = grd->my;
                 if (!Deaf) {
                     SetVoice(grd, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize("You've been warned, knave!");
+                    #else
+                    verbalize("You've been warned, knave!");
+                    #endif
                 }
                 grd->mpeaceful = 0;
                 mnexto(grd, RLOC_NOMSG);
@@ -1001,7 +1160,11 @@ gd_move(struct monst *grd)
             } else {
                 if (!Deaf) {
                     SetVoice(grd, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize("Well, begone.");
+                    #else
+                    verbalize("Well, begone.");
+                    #endif
                 }
                 egrd->gddone = 1;
                 return gd_move_cleanup(grd, semi_dead, FALSE);
@@ -1014,7 +1177,11 @@ gd_move(struct monst *grd)
             && !egrd->gddone && !in_fcorridor(grd, u.ux, u.uy)
             && (levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
                 == egrd->fakecorr[0].ftyp)) {
+            #ifdef ZHLANG
             pline("%s, confused, disappears.", noit_Monnam(grd));
+            #else
+            pline("%s, confused, disappears.", noit_Monnam(grd));
+            #endif
             return gd_move_cleanup(grd, semi_dead, TRUE);
         }
         if (u_carry_gold && (in_fcorridor(grd, u.ux, u.uy)
@@ -1028,21 +1195,39 @@ gd_move(struct monst *grd)
                 egrd->warncnt = 6;
                 if (Deaf) {
                     if (!Blind)
+                        #ifdef ZHLANG
                         pline("%s holds out %s palm demandingly!",
                               noit_Monnam(grd), noit_mhis(grd));
+                        #else
+                        pline("%s holds out %s palm demandingly!",
+                              noit_Monnam(grd), noit_mhis(grd));
+                        #endif
                 } else {
                     SetVoice(grd, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize("Drop all your gold, scoundrel!");
+                    #else
+                    verbalize("Drop all your gold, scoundrel!");
+                    #endif
                 }
                 return 0;
             } else {
                 if (Deaf) {
                     if (!Blind)
+                        #ifdef ZHLANG
                         pline("%s rubs %s hands with enraged delight!",
                               noit_Monnam(grd), noit_mhis(grd));
+                        #else
+                        pline("%s rubs %s hands with enraged delight!",
+                              noit_Monnam(grd), noit_mhis(grd));
+                        #endif
                 } else {
                     SetVoice(grd, 0, 80, 0);
+                    #ifdef ZHLANG
                     verbalize("So be it, rogue!");
+                    #else
+                    verbalize("So be it, rogue!");
+                    #endif
                 }
                 grd->mpeaceful = 0;
                 return -1;
@@ -1070,7 +1255,11 @@ gd_move(struct monst *grd)
         if (!egrd->gddone && !rn2(10) && !Deaf && !u.uswallow
             && !(u.ustuck && !sticks(gy.youmonst.data))) {
             SetVoice(grd, 0, 80, 0);
+            #ifdef ZHLANG
             verbalize("Move along!");
+            #else
+            verbalize("Move along!");
+            #endif
         }
         restfakecorr(grd);
         return 0; /* didn't move */
@@ -1177,7 +1366,11 @@ gd_move(struct monst *grd)
         /* We're stuck, so try to find a new destination. */
         if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)
             || (egrd->gdx == ggx && egrd->gdy == ggy)) {
+            #ifdef ZHLANG
             pline("%s, confused, disappears.", Monnam(grd));
+            #else
+            pline("%s, confused, disappears.", Monnam(grd));
+            #endif
             return gd_move_cleanup(grd, semi_dead, TRUE);
         } else
             goto nextpos;
@@ -1196,7 +1389,11 @@ gd_move(struct monst *grd)
            it and give an inappropriate message */
         mpickgold(grd);
         if (canspotmon(grd))
+            #ifdef ZHLANG
             pline("%s picks up some gold.", Monnam(grd));
+            #else
+            pline("%s picks up some gold.", Monnam(grd));
+            #endif
     } else
         newsym(grd->mx, grd->my);
     restfakecorr(grd);
@@ -1228,7 +1425,11 @@ paygd(boolean silently)
 
         mnexto(grd, RLOC_NOMSG);
         if (!silently)
+            #ifdef ZHLANG
             pline("%s remits your gold to the vault.", Monnam(grd));
+            #else
+            pline("%s remits your gold to the vault.", Monnam(grd));
+            #endif
         gdx = svr.rooms[EGD(grd)->vroom].lx + rn2(2);
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",

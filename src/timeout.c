@@ -144,7 +144,11 @@ stoned_dialogue(void)
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
         if (nolimbs(gy.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
+#ifdef ZHLANG
         urgent_pline("%s", buf);
+#else
+        urgent_pline("%s", buf);
+#endif
     }
     switch ((int) i) {
     case 5: /* slowing down */
@@ -252,7 +256,11 @@ vomiting_dialogue(void)
                [vomit() issues its own message for the cantvomit() case
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
+#ifdef ZHLANG
                 You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+#else
+                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+#endif
         }
         vomit();
         break;
@@ -270,7 +278,11 @@ sleep_dialogue(void)
     long i = (HSleepy & TIMEOUT);
 
     if (i == 4)
+#ifdef ZHLANG
         You("yawn.");
+#else
+        You("yawn.");
+#endif
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
@@ -298,15 +310,28 @@ choke_dialogue(void)
 
     if (i > 0 && i <= SIZE(choke_texts)) {
         if (Breathless || !rn2(50)) {
+#ifdef ZHLANG
             urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
                          body_part(NECK));
+#else
+            urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
+                         body_part(NECK));
+#endif
         } else {
             const char *str = choke_texts[SIZE(choke_texts) - i];
 
             if (strchr(str, '%'))
+#ifdef ZHLANG
                 urgent_pline(str, hcolor(NH_BLUE));
+#else
+                urgent_pline(str, hcolor(NH_BLUE));
+#endif
             else
+#ifdef ZHLANG
                 urgent_pline("%s", str);
+#else
+                urgent_pline("%s", str);
+#endif
             stop_occupation();
         }
     }
@@ -339,7 +364,11 @@ sickness_dialogue(void)
                        care whether or not that has already happened */
                     upstart(pronounbuf), vtense(pronounbuf, "are"));
         }
+#ifdef ZHLANG
         urgent_pline("%s", buf);
+#else
+        urgent_pline("%s", buf);
+#endif
     }
     exercise(A_CON, FALSE);
 }
@@ -369,10 +398,19 @@ levitation_dialogue(void)
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
 
+#ifdef ZHLANG
             urgent_pline(s, danger ? "over" : "in",
                          danger ? surface(u.ux, u.uy) : "air");
+#else
+            urgent_pline(s, danger ? "over" : "in",
+                         danger ? surface(u.ux, u.uy) : "air");
+#endif
         } else
+#ifdef ZHLANG
             pline1(s);
+#else
+            pline1(s);
+#endif
         stop_occupation();
     }
 }
@@ -411,13 +449,26 @@ slime_dialogue(void)
         if (strchr(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
                 if (!Blind) /* [what if you're already green?] */
+#ifdef ZHLANG
                     urgent_pline(buf, hcolor(NH_GREEN));
+#else
+                    urgent_pline(buf, hcolor(NH_GREEN));
+#endif
             } else {
+#ifdef ZHLANG
                 urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
                                                    : "green slime"));
+#else
+                urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
+                                                   : "green slime"));
+#endif
             }
         } else {
+#ifdef ZHLANG
             urgent_pline("%s", buf);
+#else
+            urgent_pline("%s", buf);
+#endif
         }
     }
 
@@ -506,10 +557,18 @@ slimed_to_death(struct kinfo *kptr)
         Strcpy(slimebuf, "green slime has been genocided...");
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
+#ifdef ZHLANG
             urgent_pline("Yes, you do.  %s", upstart(slimebuf));
+#else
+            urgent_pline("Yes, you do.  %s", upstart(slimebuf));
+#endif
         else
             /* follows "The medallion crumbles to dust." */
+#ifdef ZHLANG
             urgent_pline("Unfortunately, %s", slimebuf);
+#else
+            urgent_pline("Unfortunately, %s", slimebuf);
+#endif
         /* die again; no possibility of amulet this time */
         done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
@@ -539,7 +598,11 @@ phaze_dialogue(void)
         return;
 
     if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
+#ifdef ZHLANG
         pline("%s", phaze_texts[SIZE(phaze_texts) - i]);
+#else
+        pline("%s", phaze_texts[SIZE(phaze_texts) - i]);
+#endif
 }
 
 /* Similar to Passes_walls, if prayer tries to save hero from a poison
@@ -565,7 +628,11 @@ region_dialogue(void)
         return;
 
     if ((r % 2L) && i > 0L && i <= SIZE(region_texts))
+#ifdef ZHLANG
         pline("%s", region_texts[SIZE(region_texts) - i]);
+#else
+        pline("%s", region_texts[SIZE(region_texts) - i]);
+#endif
 }
 
 /* when a status timeout is fatal, keep the status line indicator shown
@@ -656,14 +723,23 @@ nh_timeout(void)
             u.uspellprot--;
             find_ac();
             if (!Blind)
+#ifdef ZHLANG
                 Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
                       u.uspellprot ? "becomes less dense" : "disappears");
+#else
+                Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
+                      u.uspellprot ? "becomes less dense" : "disappears");
+#endif
         }
     }
 
     if (u.ugallop) {
         if (--u.ugallop == 0L && u.usteed)
+#ifdef ZHLANG
             pline("%s stops galloping.", Monnam(u.usteed));
+#else
+            pline("%s stops galloping.", Monnam(u.usteed));
+#endif
     }
 
     was_flying = Flying;
@@ -694,13 +770,21 @@ nh_timeout(void)
                    but not other forms of illness */
                 if ((u.usick_type & SICK_NONVOMITABLE) == 0
                     && rn2(100) < ACURR(A_CON)) {
+#ifdef ZHLANG
                     You("have recovered from your illness.");
+#else
+                    You("have recovered from your illness.");
+#endif
                     make_sick(0, NULL, FALSE, SICK_ALL);
                     exercise(A_CON, FALSE);
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
+#ifdef ZHLANG
                 urgent_pline("You die from your illness.");
+#else
+                urgent_pline("You die from your illness.");
+#endif
                 if (kptr && kptr->name[0]) {
                     svk.killer.format = kptr->format;
                     Strcpy(svk.killer.name, kptr->name);
@@ -724,8 +808,13 @@ nh_timeout(void)
                 break;
             case FAST:
                 if (!Very_fast)
+#ifdef ZHLANG
                     You_feel("yourself slow down%s.",
                              Fast ? " a bit" : "");
+#else
+                    You_feel("yourself slow down%s.",
+                             Fast ? " a bit" : "");
+#endif
                 break;
             case CONFUSION:
                 /* So make_confused works properly */
@@ -759,9 +848,15 @@ nh_timeout(void)
             case INVIS:
                 newsym(u.ux, u.uy);
                 if (!Invis && !BInvis && !Blind) {
+#ifdef ZHLANG
                     You(!See_invisible
                             ? "are no longer invisible."
                             : "can no longer see through yourself.");
+#else
+                    You(!See_invisible
+                            ? "are no longer invisible."
+                            : "can no longer see through yourself.");
+#endif
                     stop_occupation();
                 }
                 break;
@@ -785,7 +880,11 @@ nh_timeout(void)
                 if (unconscious() || Sleep_resistance) {
                     incr_itimeout(&HSleepy, rnd(100));
                 } else if (Sleepy) {
+#ifdef ZHLANG
                     You("fall asleep.");
+#else
+                    You("fall asleep.");
+#endif
                     sleeptime = rnd(20);
                     fall_asleep(-sleeptime, TRUE);
                     incr_itimeout(&HSleepy, sleeptime + rnd(100));
@@ -806,7 +905,11 @@ nh_timeout(void)
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
                     disp.botl = TRUE;
+#ifdef ZHLANG
                     You("land.");
+#else
+                    You("land.");
+#endif
                     spoteffects(TRUE);
                 }
                 break;
@@ -820,7 +923,11 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
+#ifdef ZHLANG
                         You("no longer feel safe from acid.");
+#else
+                        You("no longer feel safe from acid.");
+#endif
                 }
                 break;
             case STONE_RES:
@@ -833,7 +940,11 @@ nh_timeout(void)
                         break;
                     }
                     if (!Unaware)
+#ifdef ZHLANG
                         You("no longer feel secure from petrification.");
+#else
+                        You("no longer feel secure from petrification.");
+#endif
                     /* no-op if not wielding a cockatrice corpse;
                        uswapwep case is always a no-op because two-weapon
                        combat is only possible with two one-handed weapons
@@ -848,12 +959,20 @@ nh_timeout(void)
                    attempts fail to relocate hero; skip timeout message
                    if hero has acquired fire resistance in the meantime */
                 if (!Fire_resistance)
+#ifdef ZHLANG
                     Your("temporary ability to survive burning has ended.");
+#else
+                    Your("temporary ability to survive burning has ended.");
+#endif
                 break;
             case WWALKING:
                 /* [see fire resistance] */
                 if (!Wwalking)
+#ifdef ZHLANG
                     Your("temporary ability to walk on liquid has ended.");
+#else
+                    Your("temporary ability to walk on liquid has ended.");
+#endif
                 break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
@@ -867,24 +986,43 @@ nh_timeout(void)
                     svc.context.warntype.species = (struct permonst *) 0;
                     svc.context.warntype.speciesidx = NON_PM;
                     if (wptr)
+#ifdef ZHLANG
                         You("are no longer warned about %s.",
                             makeplural(wptr->pmnames[NEUTRAL]));
+#else
+                        You("are no longer warned about %s.",
+                            makeplural(wptr->pmnames[NEUTRAL]));
+#endif
                 }
                 break;
             case PASSES_WALLS:
                 if (!Passes_walls) {
                     if (stuck_in_wall())
+#ifdef ZHLANG
                         You_feel("hemmed in again.");
+#else
+                        You_feel("hemmed in again.");
+#endif
                     else
+#ifdef ZHLANG
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");
+#else
+                        pline("You're back to your %s self again.",
+                              !Upolyd ? "normal" : "unusual");
+#endif
                 }
                 break;
             case MAGICAL_BREATHING:
                 if (!Breathless) {
                     if (region_danger())
+#ifdef ZHLANG
                         You("cough%s",
                             Poison_resistance ? "." : " and spit blood!");
+#else
+                        You("cough%s",
+                            Poison_resistance ? "." : " and spit blood!");
+#endif
                 }
                 break;
             case STRANGLED:
@@ -895,7 +1033,11 @@ nh_timeout(void)
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
+#ifdef ZHLANG
                     Your("amulet vanishes!");
+#else
+                    Your("amulet vanishes!");
+#endif
                     useup(uamul);
                 }
                 break;
@@ -913,7 +1055,11 @@ nh_timeout(void)
                      */
                     if ((inv_weight() > (WT_NOISY_INV * -1))) {
                         if (!Deaf)
+#ifdef ZHLANG
                             You("make a lot of noise!");
+#else
+                            You("make a lot of noise!");
+#endif
                         wake_nearby(FALSE);
                     }
                 }
@@ -1110,27 +1256,53 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_INVENT:
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
+#ifdef ZHLANG
                 You_feel("%s %s from your pack!", something,
                          locomotion(mon->data, "drop"));
+#else
+                You_feel("%s %s from your pack!", something,
+                         locomotion(mon->data, "drop"));
+#endif
             else
+#ifdef ZHLANG
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
+#else
+                You_see("%s %s out of your pack!", monnambuf,
+                        locomotion(mon->data, "drop"));
+#endif
             if (yours) {
+#ifdef ZHLANG
                 pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
                       ing_suffix(cry_sound(mon)),
                       (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
+#else
+                pline("%s %s %s like \"%s%s\"",
+                      siblings ? "Their" : "Its",
+                      ing_suffix(cry_sound(mon)),
+                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
+                      flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
+#endif
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
-                verbalize("Gleep!"); /* Mything eggs :-) */
+#ifdef ZHLANG
+                verbalize("Gleep!");
+#else
+                verbalize("Gleep!");
+#endif /* Mything eggs :-) */
             }
             break;
 
         case OBJ_FLOOR:
             if (cansee_hatchspot) {
                 knows_egg = TRUE;
+#ifdef ZHLANG
                 You_see("%s hatch.", monnambuf);
+#else
+                You_see("%s hatch.", monnambuf);
+#endif
                 redraw = TRUE; /* update egg's map location */
             }
             break;
@@ -1149,8 +1321,13 @@ hatch_egg(anything *arg, long timeout)
                 } else {
                     Strcpy(carriedby, "thin air");
                 }
+#ifdef ZHLANG
                 You_see("%s %s out of %s!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
+#else
+                You_see("%s %s out of %s!", monnambuf,
+                        locomotion(mon->data, "drop"), carriedby);
+#endif
             }
             break;
 #if 0
@@ -1248,10 +1425,19 @@ slip_or_trip(void)
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
+#ifdef ZHLANG
             pline("Egads!  %s bite%s your %s!", what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
+#else
+            pline("Egads!  %s bite%s your %s!", what,
+                  (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
+#endif
         } else {
+#ifdef ZHLANG
             You("trip over %s.", what);
+#else
+            You("trip over %s.", what);
+#endif
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
@@ -1263,6 +1449,7 @@ slip_or_trip(void)
         /* is fumbling from ice alone? */
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
+#ifdef ZHLANG
         pline("%s %s %s the ice.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
@@ -1274,6 +1461,19 @@ slip_or_trip(void)
               /* sometimes slipping due to ice occurs during turn that hero
                  has just moved off the ice; phrase things differently then */
               is_ice(u.ux, u.uy) ? "on" : "off");
+#else
+        pline("%s %s %s the ice.",
+              u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
+                                          SUPPRESS_SADDLE, FALSE))
+                       : "You",
+              /* "steed": arbitrary value that will use third person verb
+                 regardless of what u.usteed might be named, as opposed to
+                 "you" (second person, which won't have final 's' added) */
+              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
+              /* sometimes slipping due to ice occurs during turn that hero
+                 has just moved off the ice; phrase things differently then */
+              is_ice(u.ux, u.uy) ? "on" : "off");
+#endif
         /* fumbling outside of ice while mounted always causes the hero to
            fall from the saddle (unless it is cursed), so to avoid a
            counterintuitive effect where ice makes riding _less_ hazardous,
@@ -1282,7 +1482,11 @@ slip_or_trip(void)
             && ((saddle = which_armor(u.usteed, W_SADDLE)) == 0
                 || !saddle->cursed)
             && (!ice_only || !rn2(3))) {
+#ifdef ZHLANG
             You("lose your balance.");
+#else
+            You("lose your balance.");
+#endif
             dismount_steed(DISMOUNT_FELL);
         } else if (!rn2(10 + ACURR(A_DEX))) {
             /* Maybe slip in a random direction.  This takes place after
@@ -1301,18 +1505,36 @@ slip_or_trip(void)
         if (on_foot) {
             switch (rn2(4)) {
             case 1:
+#ifdef ZHLANG
                 You("trip over your own %s.",
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
+#else
+                You("trip over your own %s.",
+                    Hallucination ? "elbow" : makeplural(body_part(FOOT)));
+#endif
                 break;
             case 2:
+#ifdef ZHLANG
                 You("slip %s.",
                     Hallucination ? "on a banana peel" : "and nearly fall");
+#else
+                You("slip %s.",
+                    Hallucination ? "on a banana peel" : "and nearly fall");
+#endif
                 break;
             case 3:
+#ifdef ZHLANG
                 You("flounder.");
+#else
+                You("flounder.");
+#endif
                 break;
             default:
+#ifdef ZHLANG
                 You("stumble.");
+#else
+                You("stumble.");
+#endif
                 break;
             }
 
@@ -1322,17 +1544,34 @@ slip_or_trip(void)
                    || !saddle->cursed) {
             switch (rn2(4)) {
             case 1:
+#ifdef ZHLANG
                 Your("%s slip out of the stirrups.",
                      makeplural(body_part(FOOT)));
+#else
+                Your("%s slip out of the stirrups.",
+                     makeplural(body_part(FOOT)));
+#endif
                 break;
             case 2:
+#ifdef ZHLANG
                 You("let go of the reins.");
+#else
+                You("let go of the reins.");
+#endif
                 break;
             case 3:
+#ifdef ZHLANG
                 You("bang into the saddle-horn.");
+#else
+                You("bang into the saddle-horn.");
+#endif
                 break;
             default:
+#ifdef ZHLANG
                 You("slide to one side of the saddle.");
+#else
+                You("slide to one side of the saddle.");
+#endif
                 break;
             }
             dismount_steed(DISMOUNT_FELL);
@@ -1347,10 +1586,18 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
     switch (obj->where) {
     case OBJ_INVENT:
     case OBJ_MINVENT:
+#ifdef ZHLANG
         pline("%s flickers%s.", Yname2(obj), tailer);
+#else
+        pline("%s flickers%s.", Yname2(obj), tailer);
+#endif
         break;
     case OBJ_FLOOR:
+#ifdef ZHLANG
         You_see("%s flicker%s.", an(xname(obj)), tailer);
+#else
+        You_see("%s flicker%s.", an(xname(obj)), tailer);
+#endif
         break;
     }
 }
@@ -1362,15 +1609,31 @@ lantern_message(struct obj *obj)
     /* from adventure */
     switch (obj->where) {
     case OBJ_INVENT:
+#ifdef ZHLANG
         Your("lantern is getting dim.");
+#else
+        Your("lantern is getting dim.");
+#endif
         if (Hallucination)
+#ifdef ZHLANG
             pline("Batteries have not been invented yet.");
+#else
+            pline("Batteries have not been invented yet.");
+#endif
         break;
     case OBJ_FLOOR:
+#ifdef ZHLANG
         You_see("a lantern getting dim.");
+#else
+        You_see("a lantern getting dim.");
+#endif
         break;
     case OBJ_MINVENT:
+#ifdef ZHLANG
         pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
+#else
+        pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
+#endif
         break;
     }
 }
@@ -1449,10 +1712,18 @@ burn_object(anything *arg, long timeout)
                 FALLTHROUGH;
                 /*FALLTHRU*/
             case OBJ_MINVENT:
+#ifdef ZHLANG
                 pline("%spotion of oil has burnt away.", whose);
+#else
+                pline("%spotion of oil has burnt away.", whose);
+#endif
                 break;
             case OBJ_FLOOR:
+#ifdef ZHLANG
                 You_see("a burning potion of oil go out.");
+#else
+                You_see("a burning potion of oil go out.");
+#endif
                 need_newsym = TRUE;
                 break;
             }
@@ -1494,10 +1765,18 @@ burn_object(anything *arg, long timeout)
                     switch (obj->where) {
                     case OBJ_INVENT:
                     case OBJ_MINVENT:
+#ifdef ZHLANG
                         pline("%s seems about to go out.", Yname2(obj));
+#else
+                        pline("%s seems about to go out.", Yname2(obj));
+#endif
                         break;
                     case OBJ_FLOOR:
+#ifdef ZHLANG
                         You_see("%s about to go out.", an(xname(obj)));
+#else
+                        You_see("%s about to go out.", an(xname(obj)));
+#endif
                         break;
                     }
                 }
@@ -1514,15 +1793,31 @@ burn_object(anything *arg, long timeout)
                     /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
+#ifdef ZHLANG
                         pline("%slantern has run out of power.", whose);
+#else
+                        pline("%slantern has run out of power.", whose);
+#endif
                     else
+#ifdef ZHLANG
                         pline("%s has gone out.", Yname2(obj));
+#else
+                        pline("%s has gone out.", Yname2(obj));
+#endif
                     break;
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
+#ifdef ZHLANG
                         You_see("a lantern run out of power.");
+#else
+                        You_see("a lantern run out of power.");
+#endif
                     else
+#ifdef ZHLANG
                         You_see("%s go out.", an(xname(obj)));
+#else
+                        You_see("%s go out.", an(xname(obj)));
+#endif
                     break;
                 }
             }
@@ -1552,15 +1847,28 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
+#ifdef ZHLANG
                     pline("%s%scandle%s getting short.", whose,
                           menorah ? "candelabrum's " : "",
                           many ? "s are" : " is");
+#else
+                    pline("%s%scandle%s getting short.", whose,
+                          menorah ? "candelabrum's " : "",
+                          many ? "s are" : " is");
+#endif
                     break;
                 case OBJ_FLOOR:
+#ifdef ZHLANG
                     You_see("%scandle%s getting short.",
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s" : "");
+#else
+                    You_see("%scandle%s getting short.",
+                            menorah ? "a candelabrum's " : many ? "some "
+                                                                : "a ",
+                            many ? "s" : "");
+#endif
                     break;
                 }
             break;
@@ -1570,15 +1878,28 @@ burn_object(anything *arg, long timeout)
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
+#ifdef ZHLANG
                     pline("%s%scandle%s flame%s flicker%s low!", whose,
                           menorah ? "candelabrum's " : "", many ? "s'" : "'s",
                           many ? "s" : "", many ? "" : "s");
+#else
+                    pline("%s%scandle%s flame%s flicker%s low!", whose,
+                          menorah ? "candelabrum's " : "", many ? "s'" : "'s",
+                          many ? "s" : "", many ? "" : "s");
+#endif
                     break;
                 case OBJ_FLOOR:
+#ifdef ZHLANG
                     You_see("%scandle%s flame%s flicker low!",
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s'" : "'s", many ? "s" : "");
+#else
+                    You_see("%scandle%s flame%s flicker low!",
+                            menorah ? "a candelabrum's " : many ? "some "
+                                                                : "a ",
+                            many ? "s'" : "'s", many ? "s" : "");
+#endif
                     break;
                 }
             break;
@@ -1593,12 +1914,22 @@ burn_object(anything *arg, long timeout)
                         FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
+#ifdef ZHLANG
                         pline("%scandelabrum's flame%s.", whose,
                               many ? "s die" : " dies");
+#else
+                        pline("%scandelabrum's flame%s.", whose,
+                              many ? "s die" : " dies");
+#endif
                         break;
                     case OBJ_FLOOR:
+#ifdef ZHLANG
                         You_see("a candelabrum's flame%s die.",
                                 many ? "s" : "");
+#else
+                        You_see("a candelabrum's flame%s die.",
+                                many ? "s" : "");
+#endif
                         break;
                     }
                 } else {
@@ -1609,25 +1940,42 @@ burn_object(anything *arg, long timeout)
                            FALLTHROUGH;
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
+#ifdef ZHLANG
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
+#else
+                        pline("%s %s consumed!", Yname2(obj),
+                              many ? "are" : "is");
+#endif
                         break;
                     case OBJ_FLOOR:
                         /*
                           You see some wax candles consumed!
                           You see a wax candle consumed!
                          */
+#ifdef ZHLANG
                         You_see("%s%s consumed!", many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
+#else
+                        You_see("%s%s consumed!", many ? "some " : "",
+                                many ? xname(obj) : an(xname(obj)));
+#endif
                         need_newsym = TRUE;
                         break;
                     }
 
                     /* post message */
+#ifdef ZHLANG
                     pline(Hallucination
                               ? (many ? "They shriek!" : "It shrieks!")
                               : Blind ? "" : (many ? "Their flames die."
                                                    : "Its flame dies."));
+#else
+                    pline(Hallucination
+                              ? (many ? "They shriek!" : "It shrieks!")
+                              : Blind ? "" : (many ? "Their flames die."
+                                                   : "Its flame dies."));
+#endif
                 }
             }
             end_burn(obj, FALSE);
@@ -1877,8 +2225,16 @@ do_storms(void)
     if (levl[u.ux][u.uy].typ == CLOUD) {
         /* Inside a cloud during a thunderstorm is deafening. */
         /* Even if already deaf, we sense the thunder's vibrations. */
+#ifdef ZHLANG
         Soundeffect(se_kaboom_boom_boom, 80);
+#else
+        Soundeffect(se_kaboom_boom_boom, 80);
+#endif
+#ifdef ZHLANG
         pline("Kaboom!!!  Boom!!  Boom!!");
+#else
+        pline("Kaboom!!!  Boom!!  Boom!!");
+#endif
         incr_itimeout(&HDeaf, rn1(20, 30));
         disp.botl = TRUE;
         if (!u.uinvulnerable) {
@@ -1888,7 +2244,11 @@ do_storms(void)
             gn.nomovemsg = 0;
         }
     } else
+#ifdef ZHLANG
         You_hear("a rumbling noise.");
+#else
+        You_hear("a rumbling noise.");
+#endif
 }
 
 /* -------------------------------------------------------------------------

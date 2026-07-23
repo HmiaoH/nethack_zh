@@ -609,19 +609,38 @@ impossible(const char *s, ...)
         return;
     }
 
+#ifdef ZHLANG
+    Strcpy(pbuf2, "程序出错了！");
+    if (program_state.something_worth_saving)
+        Strcat(pbuf2, "（保存并重新加载可能可以解决此问题。）");
+#else
     Strcpy(pbuf2, "Program in disorder!");
     if (program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
+#endif
     pline("%s", pbuf2);
+#ifdef ZHLANG
+    pline("请向 %s 报告这些信息。", DEVTEAM_EMAIL);
+#else
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+#endif
     if (sysopt.support) {
+#ifdef ZHLANG
+        pline("或者，联系本地支持：%s", sysopt.support);
+#else
         pline("Alternatively, contact local support: %s", sysopt.support);
+#endif
     }
 
 #ifdef CRASHREPORT
     if (sysopt.crashreporturl) {
-        boolean report = ('y' == yn_function("Report now?", ynchars,
-                                             'n', FALSE));
+        boolean report = ('y' == yn_function(
+#ifdef ZHLANG
+                                              "立即报告？",
+#else
+                                              "Report now?",
+#endif
+                                              ynchars, 'n', FALSE));
 
         raw_print(""); /* prove to the user the character was accepted */
         if (report) {
@@ -667,7 +686,11 @@ execplinehandler(const char *line)
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
+#ifdef ZHLANG
+        pline("%s", "创建消息处理程序进程失败。");
+#else
         pline("%s", "Fork to message handler failed.");
+#endif
     }
 #elif defined(WIN32)
     {

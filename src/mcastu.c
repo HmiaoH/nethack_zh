@@ -65,6 +65,19 @@ cursetxt(struct monst *mtmp, boolean undirected)
     if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
         const char *point_msg; /* spellcasting monsters are impolite */
 
+#ifdef ZHLANG
+        if (undirected)
+            point_msg = "向四周看了看，然后咒骂着";
+        else if ((Invis && !perceives(mtmp->data)
+                  && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+                 || is_obj_mappear(&gy.youmonst, STRANGE_OBJECT)
+                 || u.uundetected)
+            point_msg = "并朝你的大致方向咒骂着";
+        else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+            point_msg = "并朝你的偏移影像咒骂着";
+        else
+            point_msg = "指向你，然后咒骂着";
+#else
         if (undirected)
             point_msg = "all around, then curses";
         else if ((Invis && !perceives(mtmp->data)
@@ -76,11 +89,16 @@ cursetxt(struct monst *mtmp, boolean undirected)
             point_msg = "and curses at your displaced image";
         else
             point_msg = "at you, then curses";
+#endif
 
         pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
     } else if ((!(svm.moves % 4) || !rn2(4))) {
         if (!Deaf)
+#ifdef ZHLANG
+            Norep("你听到一句含糊的咒骂。");
+#else
             Norep("You hear a mumbled curse.");   /* Deaf-aware */
+#endif
     }
 }
 
@@ -197,10 +215,17 @@ castmu(
      */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(spellnum)) {
+#ifdef ZHLANG
+        pline_mon(mtmp, "%s 朝%s施放法术！",
+                 canseemon(mtmp) ? Monnam(mtmp) : "某个东西",
+                 is_waterwall(mtmp->mux, mtmp->muy) ? "空水"
+                                                    : "虚空");
+#else
         pline_mon(mtmp, "%s casts a spell at %s!",
                  canseemon(mtmp) ? Monnam(mtmp) : "Something",
                  is_waterwall(mtmp->mux, mtmp->muy) ? "empty water"
                                                     : "thin air");
+#endif
         return M_ATTK_MISS;
     }
 
@@ -209,11 +234,26 @@ castmu(
         Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf) {
             set_msg_xy(mtmp->mx, mtmp->my);
+#ifdef ZHLANG
+            pline_The("空气在%s周围噼啪作响。", mon_nam(mtmp));
+#else
             pline_The("air crackles around %s.", mon_nam(mtmp));
+#endif
         }
         return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(spellnum)) {
+#ifdef ZHLANG
+        pline_mon(mtmp, "%s施放了一个法术%s！",
+                 canspotmon(mtmp) ? Monnam(mtmp) : "某个东西",
+                 is_undirected_spell(spellnum) ? ""
+                 : (Invis && !perceives(mtmp->data)
+                    && !u_at(mtmp->mux, mtmp->muy))
+                   ? "在你附近的位置"
+                   : (Displaced && !u_at(mtmp->mux, mtmp->muy))
+                     ? "在你的偏移影像上"
+                     : "指向你");
+#else
         pline_mon(mtmp, "%s casts a spell%s!",
                  canspotmon(mtmp) ? Monnam(mtmp) : "Something",
                  is_undirected_spell(spellnum) ? ""
@@ -223,6 +263,7 @@ castmu(
                    : (Displaced && !u_at(mtmp->mux, mtmp->muy))
                      ? " at your displaced image"
                      : " at you");
+#endif
     }
 
     /*
@@ -251,10 +292,18 @@ castmu(
      */
     switch (mattk->adtyp) {
     case AD_FIRE:
+#ifdef ZHLANG
+        pline("你被火焰吞没了。");
+#else
         pline("You're enveloped in flames.");
+#endif
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
+#ifdef ZHLANG
+            pline("但你抵抗了效果。");
+#else
             pline("But you resist the effects.");
+#endif
             monstseesu(M_SEEN_FIRE);
             dmg = 0;
         } else {
@@ -265,10 +314,18 @@ castmu(
         mon_spell_hits_spot(mtmp, AD_FIRE, u.ux, u.uy);
         break;
     case AD_COLD:
+#ifdef ZHLANG
+        pline("你被霜覆盖了。");
+#else
         pline("You're covered in frost.");
+#endif
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
+#ifdef ZHLANG
+            pline("但你抵抗了效果。");
+#else
             pline("But you resist the effects.");
+#endif
             monstseesu(M_SEEN_COLD);
             dmg = 0;
         } else {
@@ -280,10 +337,18 @@ castmu(
         mon_spell_hits_spot(mtmp, AD_COLD, u.ux, u.uy);
         break;
     case AD_MAGM:
+#ifdef ZHLANG
+        You("被一阵飞弹击中了！");
+#else
         You("are hit by a shower of missiles!");
+#endif
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+#ifdef ZHLANG
+            pline_The("飞弹弹开了！");
+#else
             pline_The("missiles bounce off!");
+#endif
             monstseesu(M_SEEN_MAGR);
             dmg = 0;
         } else {
@@ -309,7 +374,11 @@ m_cure_self(struct monst *mtmp, int dmg)
 {
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s看起来好多了。", Monnam(mtmp));
+#else
             pline_mon(mtmp, "%s looks better.", Monnam(mtmp));
+#endif
         /* note: player healing does 6d4; this used to do 1d8 */
         healmon(mtmp, d(3, 6), 0);
         dmg = 0;
@@ -328,7 +397,11 @@ touch_of_death(struct monst *mtmp)
 
     /* if we get here, we know that hero isn't magic resistant and isn't
        poly'd into an undead or demon */
+#ifdef ZHLANG
+    You_feel("被抽干了……");
+#else
     You_feel("drained...");
+#endif
     (void) death_inflicted_by(kbuf, "the touch of death", mtmp);
 
     if (Upolyd) {
@@ -388,12 +461,24 @@ death_inflicted_by(
 staticfn void
 mcast_death_touch(struct monst *mtmp)
 {
+#ifdef ZHLANG
+    pline("哦不，%s使用了死亡之触！", mhe(mtmp));
+#else
     pline("Oh no, %s's using the touch of death!", mhe(mtmp));
+#endif
     if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You("看起来和之前一样死气沉沉。");
+#else
         You("seem no deader than before.");
+#endif
     } else if (!Antimagic && rn2(mtmp->m_lev) > 12) {
         if (Hallucination) {
+#ifdef ZHLANG
+            You("有一种灵魂出窍的体验。");
+#else
             You("have an out of body experience.");
+#endif
         } else {
             touch_of_death(mtmp);
         }
@@ -403,7 +488,11 @@ mcast_death_touch(struct monst *mtmp)
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_MAGR);
         }
+#ifdef ZHLANG
+        pline("算你走运，它没起作用！");
+#else
         pline("Lucky for you, it didn't work!");
+#endif
     }
 }
 
@@ -411,7 +500,11 @@ staticfn void
 mcast_clone_wiz(struct monst *mtmp)
 {
     if (mtmp->iswiz && svc.context.no_of_wizards == 1) {
+#ifdef ZHLANG
+        pline("双重麻烦……");
+#else
         pline("Double Trouble...");
+#endif
         clonewiz();
     } else
         impossible("bad wizard cloning?");
@@ -426,23 +519,46 @@ mcast_summon_mons(struct monst *mtmp)
         ; /* nothing was created? */
     } else if (mtmp->iswiz) {
         SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+        verbalize("消灭窃贼，我的宠物%s！", plur(count));
+#else
         verbalize("Destroy the thief, my pet%s!", plur(count));
+#endif
     } else {
         boolean one = (count == 1);
+#ifdef ZHLANG
+        const char *mappear = one ? "一个怪物出现"
+                                  : "怪物们出现";
+#else
         const char *mappear = one ? "A monster appears"
                                   : "Monsters appear";
+#endif
 
         /* messages not quite right if plural monsters created but
            only a single monster is seen */
         if (Invis && !perceives(mtmp->data)
             && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+#ifdef ZHLANG
+            pline("%s%s你附近的位置！", mappear,
+                  one ? "在" : "在");
+#else
             pline("%s %s a spot near you!", mappear,
                   one ? "at" : "around");
+#endif
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
+#ifdef ZHLANG
+            pline("%s%s你的偏移影像！", mappear,
+                  one ? "在" : "在");
+#else
             pline("%s %s your displaced image!", mappear,
                   one ? "by" : "around");
+#endif
         else
+#ifdef ZHLANG
+            pline("%s从虚空中出现！", mappear);
+#else
             pline("%s from nowhere!", mappear);
+#endif
     }
 }
 
@@ -452,9 +568,17 @@ mcast_destroy_armor(void)
     if (Antimagic) {
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_MAGR);
+#ifdef ZHLANG
+        pline("一股力场包围了你！");
+#else
         pline("A field of force surrounds you!");
+#endif
     } else if (!destroy_arm()) {
+#ifdef ZHLANG
+        Your("皮肤发痒。");
+#else
         Your("skin itches.");
+#endif
     } else {
         /* monsters only realize you aren't magic-protected if armor is
            actually destroyed */
@@ -468,11 +592,19 @@ mcast_weaken_you(struct monst *mtmp, int dmg)
     if (Antimagic) {
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_MAGR);
+#ifdef ZHLANG
+        You_feel("暂时被削弱了。");
+#else
         You_feel("momentarily weakened.");
+#endif
     } else {
         char kbuf[BUFSZ];
 
+#ifdef ZHLANG
+        You("突然感觉更弱了！");
+#else
         You("suddenly feel weaker!");
+#endif
         dmg = mtmp->m_lev - 6;
         if (dmg < 1) /* paranoia since only chosen when m_lev is high */
             dmg = 1;
@@ -491,8 +623,13 @@ mcast_disappear(struct monst *mtmp)
 {
     if (!mtmp->minvis && !mtmp->invis_blkd) {
         if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s突然%s！", Monnam(mtmp),
+                      !See_invisible ? "消失了" : "变得透明");
+#else
             pline_mon(mtmp, "%s suddenly %s!", Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
+#endif
         mon_set_minvis(mtmp, FALSE);
         if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
@@ -507,10 +644,18 @@ mcast_stun_you(int dmg)
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_MAGR);
         if (!Stunned)
+#ifdef ZHLANG
+            You_feel("暂时迷失方向。");
+#else
             You_feel("momentarily disoriented.");
+#endif
         make_stunned(1L, FALSE);
     } else {
+#ifdef ZHLANG
+        You(Stunned ? "挣扎着保持平衡。" : "摇摇晃晃……");
+#else
         You(Stunned ? "struggle to keep your balance." : "reel...");
+#endif
         dmg = d(ACURR(A_DEX) < 12 ? 6 : 4, 4);
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
@@ -525,7 +670,11 @@ mcast_geyser(int dmg)
     /* this is physical damage (force not heat),
      * not magical damage or fire damage
      */
+#ifdef ZHLANG
+    pline("突然一股间歇泉从不知何处向你猛冲而来！");
+#else
     pline("A sudden geyser slams into you from nowhere!");
+#endif
     dmg = d(8, 6);
     if (Half_physical_damage)
         dmg = (dmg + 1) / 2;
@@ -541,7 +690,11 @@ mcast_fire_pillar(struct monst *mtmp, int dmg)
 {
     int orig_dmg;
 
+#ifdef ZHLANG
+    pline("一道火柱在你周围燃起！");
+#else
     pline("A pillar of fire strikes all around you!");
+#endif
     orig_dmg = dmg = d(8, 6);
     if (Fire_resistance) {
         shieldeff(u.ux, u.uy);
@@ -569,8 +722,16 @@ mcast_lightning(struct monst *mtmp, int dmg)
     boolean reflects;
 
     Soundeffect(se_bolt_of_lightning, 80);
+#ifdef ZHLANG
+    pline("一道闪电从上方劈向你！");
+#else
     pline("A bolt of lightning strikes down at you from above!");
+#endif
+#ifdef ZHLANG
+    reflects = ureflects("它从你的%s%s弹开了。", "");
+#else
     reflects = ureflects("It bounces off your %s%s.", "");
+#endif
     orig_dmg = dmg = d(8, 6);
     if (reflects || Shock_resistance) {
         shieldeff(u.ux, u.uy);
@@ -610,13 +771,29 @@ mcast_psi_bolt(int dmg)
         monstunseesu(M_SEEN_MAGR);
     }
     if (dmg <= 5)
+#ifdef ZHLANG
+        You("感到轻微的%s痛。", body_part(HEAD));
+#else
         You("get a slight %sache.", body_part(HEAD));
+#endif
     else if (dmg <= 10)
+#ifdef ZHLANG
+        Your("大脑在燃烧！");
+#else
         Your("brain is on fire!");
+#endif
     else if (dmg <= 20)
+#ifdef ZHLANG
+        Your("%s突然疼痛难忍！", body_part(HEAD));
+#else
         Your("%s suddenly aches painfully!", body_part(HEAD));
+#endif
     else
+#ifdef ZHLANG
+        Your("%s突然剧痛无比！", body_part(HEAD));
+#else
         Your("%s suddenly aches very painfully!", body_part(HEAD));
+#endif
     return dmg;
 }
 
@@ -631,13 +808,29 @@ mcast_open_wounds(int dmg)
         monstunseesu(M_SEEN_MAGR);
     }
     if (dmg <= 5)
+#ifdef ZHLANG
+        Your("皮肤短暂地剧烈发痒。");
+#else
         Your("skin itches badly for a moment.");
+#endif
     else if (dmg <= 10)
+#ifdef ZHLANG
+        pline("伤口出现在你的身上！");
+#else
         pline("Wounds appear on your body!");
+#endif
     else if (dmg <= 20)
+#ifdef ZHLANG
+        pline("严重的伤口出现在你的身上！");
+#else
         pline("Severe wounds appear on your body!");
+#endif
     else
+#ifdef ZHLANG
+        Your("全身布满了疼痛的伤口！");
+#else
         Your("body is covered with painful wounds!");
+#endif
     return dmg;
 }
 
@@ -673,7 +866,11 @@ mcast_insects(struct monst *mtmp)
 
     /* not canspotmon() which includes unseen things sensed via warning */
     seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters;
+#ifdef ZHLANG
+    what = (let == S_SNAKE) ? "蛇" : "昆虫";
+#else
     what = (let == S_SNAKE) ? "snakes" : "insects";
+#endif
     if (Hallucination)
         what = makeplural(bogusmon(whatbuf, (char *) 0));
 
@@ -682,7 +879,11 @@ mcast_insects(struct monst *mtmp)
         if (newseen <= oldseen || Unaware) {
             /* unseen caster fails or summons unseen critters,
                or unconscious hero ("You dream that you hear...") */
+#ifdef ZHLANG
+            You_hear("有人在召唤%s。", what);
+#else
             You_hear("someone summoning %s.", what);
+#endif
         } else {
             char *arg;
 
@@ -693,10 +894,18 @@ mcast_insects(struct monst *mtmp)
                                            : whatbuf;
             if (!Deaf) {
                 Soundeffect(se_someone_summoning, 100);
+#ifdef ZHLANG
+                You_hear("有人召唤了什么东西，然后%s出现了。", arg);
+#else
                 You_hear("someone summoning something, and %s %s.", arg,
                          vtense(arg, "appear"));
+#endif
             } else {
+#ifdef ZHLANG
+                pline("%s出现了。", upstart(arg));
+#else
                 pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+#endif
             }
         }
 
@@ -706,17 +915,38 @@ mcast_insects(struct monst *mtmp)
            words, no need to fuss with visibility or singularization;
            player is told what's happening even if hero is unconscious) */
     } else if (!success) {
+#ifdef ZHLANG
+        fmt = "%s对着一堆树枝施法，但什么都没发生。";
+        what = "";
+#else
         fmt = "%s casts at a clump of sticks, but nothing happens.%s";
         what = "";
+#endif
     } else if (let == S_SNAKE) {
+#ifdef ZHLANG
+        fmt = "%s把一堆树枝变成了%s！";
+#else
         fmt = "%s transforms a clump of sticks into %s!";
+#endif
     } else if (Invis && !perceives(mtmp->data)
                && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+#ifdef ZHLANG
+        fmt = "%s在你附近的位置召唤了%s！";
+#else
         fmt = "%s summons %s around a spot near you!";
+#endif
     } else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy)) {
+#ifdef ZHLANG
+        fmt = "%s在你的偏移影像周围召唤了%s！";
+#else
         fmt = "%s summons %s around your displaced image!";
+#endif
     } else {
+#ifdef ZHLANG
+        fmt = "%s召唤了%s！";
+#else
         fmt = "%s summons %s!";
+#endif
     }
     if (fmt) {
         DISABLE_WARNING_FORMAT_NONLITERAL;
@@ -732,9 +962,15 @@ mcast_blind_you(void)
     if (!Blinded) {
         int num_eyes = eyecount(gy.youmonst.data);
 
+#ifdef ZHLANG
+        pline("鳞片覆盖了你的%s！", (num_eyes == 1)
+                                       ? body_part(EYE)
+                                       : makeplural(body_part(EYE)));
+#else
         pline("Scales cover your %s!", (num_eyes == 1)
                                        ? body_part(EYE)
                                        : makeplural(body_part(EYE)));
+#endif
         make_blinded(Half_spell_damage ? 100L : 200L, FALSE);
         if (!Blind)
             Your1(vision_clears);
@@ -751,11 +987,19 @@ mcast_paralyze(struct monst *mtmp)
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_MAGR);
         if (gm.multi >= 0)
+#ifdef ZHLANG
+            You("短暂地僵硬了一下。");
+#else
             You("stiffen briefly.");
+#endif
         dmg = 1; /* to produce nomul(-1), not actual damage */
     } else {
         if (gm.multi >= 0)
+#ifdef ZHLANG
+            You("被定在了原地！");
+#else
             You("are frozen in place!");
+#endif
         dmg = 4 + (int) mtmp->m_lev;
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
@@ -773,7 +1017,11 @@ mcast_confuse_you(struct monst *mtmp)
     if (Antimagic) {
         shieldeff(u.ux, u.uy);
         monstseesu(M_SEEN_MAGR);
+#ifdef ZHLANG
+        You_feel("暂时头晕目眩。");
+#else
         You_feel("momentarily dizzy.");
+#endif
     } else {
         boolean oldprop = !!Confusion;
         int dmg = (int) mtmp->m_lev;
@@ -782,9 +1030,17 @@ mcast_confuse_you(struct monst *mtmp)
             dmg = (dmg + 1) / 2;
         make_confused(HConfusion + dmg, TRUE);
         if (Hallucination)
+#ifdef ZHLANG
+            You_feel("%s！", oldprop ? "更迷幻" : "迷幻");
+#else
             You_feel("%s!", oldprop ? "trippier" : "trippy");
+#endif
         else
+#ifdef ZHLANG
+            You_feel("%s困惑！", oldprop ? "更" : "");
+#else
             You_feel("%sconfused!", oldprop ? "more " : "");
+#endif
         monstunseesu(M_SEEN_MAGR);
     }
 }
@@ -824,12 +1080,20 @@ mcast_spell(struct monst *mtmp, int dmg, int spellnum)
         dmg = 0;
         break;
     case MCAST_AGGRAVATION:
+#ifdef ZHLANG
+        You_feel("怪物们察觉到了你的存在。");
+#else
         You_feel("that monsters are aware of your presence.");
+#endif
         aggravate();
         dmg = 0;
         break;
     case MCAST_CURSE_ITEMS:
+#ifdef ZHLANG
+        You_feel("好像你需要一些帮助。");
+#else
         You_feel("as if you need some help.");
+#endif
         rndcurse();
         dmg = 0;
         break;
@@ -1000,8 +1264,13 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s用%s电击了你！", Monnam(mtmp),
+                  flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
+#else
             pline_mon(mtmp, "%s zaps you with a %s!", Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
+#endif
         gb.buzzer = mtmp;
         buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,
              mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby));

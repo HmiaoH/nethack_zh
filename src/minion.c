@@ -67,7 +67,11 @@ msummon(struct monst *mon)
 
         if (u_wield_art(ART_DEMONBANE) && is_demon(ptr)) {
             if (canseemon(mon))
+#ifdef ZHLANG
+                pline("%s困惑了一会儿。", Monnam(mon));
+#else
                 pline("%s looks puzzled for a moment.", Monnam(mon));
+#endif
             return 0;
         }
 
@@ -171,8 +175,13 @@ msummon(struct monst *mon)
                 const char *cloud = 0,
                            *what = msummon_environ(mtmp->data, &cloud);
 
+#ifdef ZHLANG
+                pline("%s出现在一阵%s%s中！", Amonnam(mtmp),
+                      cloud, what);
+#else
                 pline("%s appears in a %s of %s!", Amonnam(mtmp),
                       cloud, what);
+#endif
             }
         }
         cnt--;
@@ -239,14 +248,31 @@ summon_minion(aligntyp alignment, boolean talk)
     if (mon) {
         if (talk) {
             if (!Deaf)
+#ifdef ZHLANG
+                pline_The("%s的声音响起：", align_gname(alignment));
+#else
                 pline_The("voice of %s booms:", align_gname(alignment));
+#endif
             else
+#ifdef ZHLANG
+                You_feel("%s洪亮的声音：",
+                         s_suffix(align_gname(alignment)));
+#else
                 You_feel("%s booming voice:",
                          s_suffix(align_gname(alignment)));
+#endif
             SetVoice(mon, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("你必须为你的轻率付出代价！");
+#else
             verbalize("Thou shalt pay for thine indiscretion!");
+#endif
             if (canspotmon(mon))
+#ifdef ZHLANG
+                pline("%s出现在你面前。", Amonnam(mon));
+#else
                 pline("%s appears before you.", Amonnam(mon));
+#endif
             mon->mstrategy &= ~STRAT_APPEARMSG;
         }
         mon->mpeaceful = FALSE;
@@ -264,9 +290,17 @@ demon_talk(struct monst *mtmp)
 
     if (u_wield_art(ART_EXCALIBUR) || u_wield_art(ART_DEMONBANE)) {
         if (canspotmon(mtmp))
+#ifdef ZHLANG
+            pline("%s看起来很愤怒。", Amonnam(mtmp));
+#else
             pline("%s looks very angry.", Amonnam(mtmp));
+#endif
         else
+#ifdef ZHLANG
+            You_feel("紧张气氛在积聚。");
+#else
             You_feel("tension building.");
+#endif
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
@@ -289,18 +323,32 @@ demon_talk(struct monst *mtmp)
 
         mtmp->minvis = mtmp->perminvis = 0;
         if (wasunseen && canspotmon(mtmp)) {
+#ifdef ZHLANG
+            pline("%s出现在你面前。", Amonnam(mtmp));
+#else
             pline("%s appears before you.", Amonnam(mtmp));
+#endif
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
         }
         newsym(mtmp->mx, mtmp->my);
     }
     if (gy.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
         if (!Deaf)
+#ifdef ZHLANG
+            pline("%s说：\"狩猎愉快，%s。\"", Amonnam(mtmp),
+                  flags.female ? "姐妹" : "兄弟");
+#else
             pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
                   flags.female ? "Sister" : "Brother");
+#endif
         else if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline("%s说了些什么。", Amonnam(mtmp),
+                  says());
+#else
             pline("%s %s something.", Amonnam(mtmp),
                   says());
+#endif
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
         return 1;
@@ -326,21 +374,44 @@ demon_talk(struct monst *mtmp)
             demand = cash + (long) rn1(1000, 125);
 
         if (!Deaf)
+#ifdef ZHLANG
+            pline("%s要求%ld%s以换取安全通行。",
+                  Amonnam(mtmp), demand, currency(demand));
+#else
             pline("%s demands %ld %s for safe passage.",
                   Amonnam(mtmp), demand, currency(demand));
+#endif
         else if (canseemon(mtmp))
+#ifdef ZHLANG
+            pline("%s似乎在要求什么东西。", Amonnam(mtmp));
+#else
             pline("%s seems to be demanding something.", Amonnam(mtmp));
+#endif
         offer = 0L;
         if (!Deaf &&
             ((offer = bribe(mtmp, "How much will you offer?")) >= demand)) {
+#ifdef ZHLANG
+            pline("%s消失了，嘲笑着懦弱的凡人。",
+                  Amonnam(mtmp));
+#else
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
+#endif
         } else if (offer > 0L
                    && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
+#ifdef ZHLANG
+            pline("%s凶狠地瞪了你一眼，然后消失了。",
+                  Amonnam(mtmp));
+#else
             pline("%s scowls at you menacingly, then vanishes.",
                   Amonnam(mtmp));
+#endif
         } else {
+#ifdef ZHLANG
+            pline("%s生气了……", Amonnam(mtmp));
+#else
             pline("%s gets angry...", Amonnam(mtmp));
+#endif
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             return 0;
@@ -370,16 +441,32 @@ bribe(struct monst *mtmp, const char *prompt)
     /*Michael Paddon -- fix for negative offer to monster*/
     /*JAR880815 - */
     if (offer < 0L) {
+#ifdef ZHLANG
+        You("想少给%s钱，但搞砸了。", mon_nam(mtmp));
+#else
         You("try to shortchange %s, but fumble.", mon_nam(mtmp));
+#endif
         return 0L;
     } else if (offer == 0L) {
+#ifdef ZHLANG
+        You("拒绝了。");
+#else
         You("refuse.");
+#endif
         return 0L;
     } else if (offer >= umoney) {
+#ifdef ZHLANG
+        You("把你所有的金币都给了%s。", mon_nam(mtmp));
+#else
         You("give %s all your gold.", mon_nam(mtmp));
+#endif
         offer = umoney;
     } else {
+#ifdef ZHLANG
+        You("给了%s %ld %s。", mon_nam(mtmp), offer, currency(offer));
+#else
         You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
+#endif
     }
     (void) money2mon(mtmp, offer);
     disp.botl = TRUE;
@@ -473,11 +560,23 @@ lose_guardian_angel(
     if (mon) {
         if (canspotmon(mon)) {
             if (!Deaf) {
+#ifdef ZHLANG
+                pline("%s斥责你，说道：", Monnam(mon));
+#else
                 pline("%s rebukes you, saying:", Monnam(mon));
+#endif
                 SetVoice(mon, 0, 80, 0);
+#ifdef ZHLANG
+                verbalize("既然你渴望冲突，那就再多来点吧！");
+#else
                 verbalize("Since you desire conflict, have some more!");
+#endif
             } else {
+#ifdef ZHLANG
+                pline("%s消失了！", Monnam(mon));
+#else
                 pline("%s vanishes!", Monnam(mon));
+#endif
             }
         }
         mongone(mon);
@@ -504,20 +603,44 @@ gain_guardian_angel(void)
                      message will be heard even if that fails) */
     if (Conflict) {
        if (!Deaf)
+#ifdef ZHLANG
+            pline("一个声音响起：");
+#else
             pline("A voice booms:");
+#endif
         else
+#ifdef ZHLANG
+            You_feel("一个洪亮的声音：");
+#else
             You_feel("a booming voice:");
+#endif
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
+#ifdef ZHLANG
+        verbalize("你对冲突的渴望将被满足！");
+#else
         verbalize("Thy desire for conflict shall be fulfilled!");
+#endif
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
         if (!Deaf)
+#ifdef ZHLANG
+            pline("一个声音低语道：");
+#else
             pline("A voice whispers:");
+#endif
         else
+#ifdef ZHLANG
+            You_feel("一个温柔的声音：");
+#else
             You_feel("a soft voice:");
+#endif
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
+#ifdef ZHLANG
+        verbalize("你一直值得我的眷顾！");
+#else
         verbalize("Thou hast been worthy of me!");
+#endif
         mm.x = u.ux;
         mm.y = u.uy;
         if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL])
@@ -539,9 +662,17 @@ gain_guardian_angel(void)
             /* for 'hilite_pet'; after making tame, before next message */
             newsym(mtmp->mx, mtmp->my);
             if (!Blind)
+#ifdef ZHLANG
+                pline("一位天使出现在你附近。");
+#else
                 pline("An angel appears near you.");
+#endif
             else
+#ifdef ZHLANG
+                You_feel("一位友善的天使在你附近出现。");
+#else
                 You_feel("the presence of a friendly angel near you.");
+#endif
             /* make him strong enough vs. endgame foes */
             mtmp->m_lev = rn1(8, 15);
             mtmp->mhp = mtmp->mhpmax =

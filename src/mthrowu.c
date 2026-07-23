@@ -106,22 +106,46 @@ thitu(
     if (u.uac + tlev <= (dieroll = rnd(20))) {
         ++gm.mesg_given;
         if (Blind || !flags.verbose) {
+#ifdef ZHLANG
+            pline("没打中。");
+#else
             pline("It misses.");
+#endif
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
                 Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
+#ifdef ZHLANG
+            pline("%s 没打中你。", upstart(onmbuf));
+#else
             pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
+#endif
         } else
+#ifdef ZHLANG
+            You("差点被%s击中。", onm);
+#else
             You("are almost hit by %s.", onm);
+#endif
         return 0;
     } else {
         if (Blind || !flags.verbose)
+#ifdef ZHLANG
+            You("被击中%s", exclam(dam));
+#else
             You("are hit%s", exclam(dam));
+#endif
         else
+#ifdef ZHLANG
+            You("被%s击中%s", onm, exclam(dam));
+#else
             You("are hit by %s%s", onm, exclam(dam));
+#endif
 
         if (is_acid && Acid_resistance) {
+#ifdef ZHLANG
+            pline("它似乎伤不到你。");
+#else
             pline("It doesn't seem to hurt you.");
+#endif
             monstseesu(M_SEEN_ACID);
         } else if (obj && stone_missile(obj)
                    && passes_rocks(gy.youmonst.data)) {
@@ -129,8 +153,13 @@ thitu(
                we avoid "passes through you" for horizontal flight path
                because missile stops and that wording would suggest that
                it should keep going */
+#ifdef ZHLANG
+            pline("它%s你。",
+                  named ? "无害地穿过了" : "没造成伤害");
+#else
             pline("It %s you.",
                   named ? "passes harmlessly through" : "doesn't harm");
+#endif
         } else if (obj && obj->oclass == POTION_CLASS) {
             /* an explosion which scatters objects might hit hero with one
                (potions deliberately thrown at hero are handled by m_throw) */
@@ -140,11 +169,19 @@ thitu(
             if (obj && objects[obj->otyp].oc_material == SILVER
                 && Hate_silver) {
                 /* extra damage already applied by dmgval() */
+#ifdef ZHLANG
+                pline_The("银器灼烧了你的血肉！");
+#else
                 pline_The("silver sears your flesh!");
+#endif
                 exercise(A_CON, FALSE);
             }
             if (is_acid) {
+#ifdef ZHLANG
+                pline("它在燃烧！");
+#else
                 pline("It burns!");
+#endif
                 monstunseesu(M_SEEN_ACID);
             }
             losehp(dam, knm, kprefix); /* acid damage */
@@ -288,9 +325,15 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         gm.m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
         Strcpy(trgbuf, mtarg ? some_mon_nam(mtarg) : "");
         set_msg_xy(mtmp->mx, mtmp->my);
+#ifdef ZHLANG
+        pline("%s%s%s%s%s！", Monnam(mtmp),
+              gm.m_shot.s ? "射出了" : "扔出了", onm,
+              mtarg ? "向" : "", trgbuf);
+#else
         pline("%s %s %s%s%s!", Monnam(mtmp),
               gm.m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);
+#endif
         gm.m_shot.o = otmp->otyp;
     } else {
         gm.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
@@ -352,7 +395,11 @@ ohitmon(
             if (vis)
                 miss(distant_name(otmp, mshot_xname), mtmp);
             else if (verbose && !gm.mtarget)
+#ifdef ZHLANG
+                pline("没打中。");
+#else
                 pline("It is missed.");
+#endif
         }
         if (!range) { /* Last position; object drops */
             (void) drop_throw(otmp, 0, mtmp->mx, mtmp->my);
@@ -381,11 +428,17 @@ ohitmon(
             seemimic(mtmp);
         mtmp->msleeping = 0;
         Soundeffect(se_splat_egg, 35);
-        if (vis) {
+            if (vis) {
             if (otmp->otyp == EGG) {
+#ifdef ZHLANG
+                pline("啪！%s被%s蛋击中了！", Monnam(mtmp),
+                      otmp->known ? an(mons[otmp->corpsenm].pmnames[NEUTRAL])
+                                  : "an");
+#else
                 pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
                       otmp->known ? an(mons[otmp->corpsenm].pmnames[NEUTRAL])
                                   : "an");
+#endif
             } else {
                 char how[BUFSZ];
 
@@ -397,20 +450,34 @@ ohitmon(
                 hit(distant_name(otmp, mshot_xname), mtmp, how);
             }
         } else if (verbose && !gm.mtarget)
+#ifdef ZHLANG
+            pline("%s%s被击中%s", (otmp->otyp == EGG) ? "啪！" : "",
+                  Monnam(mtmp), exclam(damage));
+#else
             pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat!  " : "",
                   Monnam(mtmp), exclam(damage));
+#endif
 
         if (otmp->opoisoned && is_poisonable(otmp)) {
             if (resists_poison(mtmp)) {
                 if (vis)
+#ifdef ZHLANG
+                    pline_The("毒药似乎对%s无效。",
+                              mon_nam(mtmp));
+#else
                     pline_The("poison doesn't seem to affect %s.",
                               mon_nam(mtmp));
+#endif
             } else {
                 if (rn2(30)) {
                     damage += rnd(6);
                 } else {
                     if (vis)
+#ifdef ZHLANG
+                        pline_The("毒药是致命的……");
+#else
                         pline_The("poison was deadly...");
+#endif
                     damage = mtmp->mhp;
                 }
             }
@@ -425,20 +492,40 @@ ohitmon(
 
                 if (flesh) /* s_suffix returns a modifiable buffer */
                     m_name = strcat(s_suffix(m_name), " flesh");
+#ifdef ZHLANG
+                pline_The("银器灼烧了%s！", m_name);
+#else
                 pline_The("silver sears %s!", m_name);
+#endif
             } else if (verbose && !gm.mtarget) {
+#ifdef ZHLANG
+                pline("%s被灼烧了！", flesh ? "它的肉身" : "它");
+#else
                 pline("%s is seared!", flesh ? "Its flesh" : "It");
+#endif
             }
         }
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
             if (resists_acid(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
+#ifdef ZHLANG
+                    pline("%s不受影响。", Monnam(mtmp));
+#else
                     pline("%s is unaffected.", Monnam(mtmp));
+#endif
             } else {
                 if (vis)
+#ifdef ZHLANG
+                    pline_The("%s灼烧了%s！", hliquid("acid"), mon_nam(mtmp));
+#else
                     pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
+#endif
                 else if (verbose && !gm.mtarget)
+#ifdef ZHLANG
+                    pline("它被烧了！");
+#else
                     pline("It is burned!");
+#endif
             }
         }
         if (otmp->otyp == EGG && touch_petrifies(&mons[otmp->corpsenm])) {
@@ -453,9 +540,15 @@ ohitmon(
             mtmp->mhp -= damage;
             if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
+#ifdef ZHLANG
+                    pline("%s被%s了！", Monnam(mtmp),
+                          (nonliving(mtmp->data) || is_vampshifter(mtmp)
+                           || !canspotmon(mtmp)) ? "摧毁" : "杀");
+#else
                     pline("%s is %s!", Monnam(mtmp),
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
                            || !canspotmon(mtmp)) ? "destroyed" : "killed");
+#endif
                 /* don't blame hero for unknown rolling boulder trap */
                 if (!svc.context.mon_moving
                    && (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
@@ -477,10 +570,17 @@ ohitmon(
                    two message [first via hit() above] sequence:
                    "The {splash of venom,cream pie} hits <mon>."
                    "<Mon> is blinded by the {venom,pie}." */
+#ifdef ZHLANG
+                pline("%s被%s弄瞎了。", Monnam(mtmp),
+                      the((otmp->oclass == VENOM_CLASS) ? "毒液"
+                          : (otmp->otyp == CREAM_PIE) ? "派"
+                            : xname(otmp))); /* catchall; not used */
+#else
                 pline("%s is blinded by %s.", Monnam(mtmp),
                       the((otmp->oclass == VENOM_CLASS) ? "venom"
                           : (otmp->otyp == CREAM_PIE) ? "pie"
                             : xname(otmp))); /* catchall; not used */
+#endif
             mtmp->mcansee = 0;
             tmp = (int) mtmp->mblinded + rnd(25) + 20;
             if (tmp > 127)
@@ -513,13 +613,23 @@ ucatchgem(
              *mon_s_name = s_suffix(mon_nam(mon));
 
         if (gem->otyp >= FIRST_GLASS_GEM) {
+#ifdef ZHLANG
+            You("接住了%s。", gem_xname);
+            You("对%s的破烂不感兴趣。", mon_s_name);
+#else
             You("catch the %s.", gem_xname);
             You("are not interested in %s junk.", mon_s_name);
+#endif
             makeknown(gem->otyp);
             dropy(gem);
         } else {
+#ifdef ZHLANG
+            You("怀着善意接受了%s的礼物。",
+                mon_s_name);
+#else
             You("accept %s gift in the spirit in which it was intended.",
                 mon_s_name);
+#endif
             (void) hold_another_object(gem, "You catch, but drop, %s.",
                                        gem_xname, "You catch:");
         }
@@ -622,10 +732,19 @@ m_throw(
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
         if (canseemon(mon) && flags.verbose) {
             if (is_ammo(singleobj))
+#ifdef ZHLANG
+                pline("%s射失了！", Monnam(mon));
+#else
                 pline("%s misfires!", Monnam(mon));
+#endif
             else
+#ifdef ZHLANG
+                pline("%s从%s手中滑落了！", Tobjnam(singleobj, "滑"),
+                      mon_nam(mon));
+#else
                 pline("%s as %s throws it!", Tobjnam(singleobj, "slip"),
                       mon_nam(mon));
+#endif
         }
         dx = rn2(3) - 1;
         dy = rn2(3) - 1;
@@ -760,10 +879,19 @@ m_throw(
                 blindinc = rnd(25);
                 if (singleobj->otyp == CREAM_PIE) {
                     if (!Blind)
+#ifdef ZHLANG
+                        pline("呃！你被糊了一脸奶油。");
+#else
                         pline("Yecch!  You've been creamed.");
+#endif
                     else
+#ifdef ZHLANG
+                        pline("有%s黏糊糊的东西糊在你的%s上。",
+                              something, body_part(FACE));
+#else
                         pline("There's %s sticky all over your %s.",
                               something, body_part(FACE));
+#endif
                 } else if (singleobj->otyp == BLINDING_VENOM) {
                     const char *eyes = body_part(EYE);
 
@@ -771,9 +899,17 @@ m_throw(
                         eyes = makeplural(eyes);
                     /* venom in the eyes */
                     if (!Blind)
+#ifdef ZHLANG
+                        pline_The("毒液让你失明了。");
+#else
                         pline_The("venom blinds you.");
+#endif
                     else
+#ifdef ZHLANG
+                        Your("%s在刺痛。", eyes);
+#else
                         Your("%s %s.", eyes, vtense(eyes, "sting"));
+#endif
                 }
             }
             if (hitu && singleobj->otyp == EGG) {
@@ -803,14 +939,23 @@ m_throw(
                    in order to get "Grimtooth" rather than "The Grimtooth" */
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y)
                     && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
+#ifdef ZHLANG
+                    pline("%s掉到了水槽上。", The(mshot_xname(singleobj)),
+                          otense(singleobj, "掉"));
+#else
                     pline("%s %s onto the sink.", The(mshot_xname(singleobj)),
                           otense(singleobj, Hallucination ? "plop" : "drop"));
+#endif
                 else if (gm.m_shot.n > 1
                          && (!gm.mesg_given
                              || gb.bhitpos.x != u.ux || gb.bhitpos.y != u.uy)
                          && (cansee(gb.bhitpos.x, gb.bhitpos.y)
                              || (gm.marcher && canseemon(gm.marcher))))
+#ifdef ZHLANG
+                    pline("%s没打中。", The(mshot_xname(singleobj)));
+#else
                     pline("%s misses.", The(mshot_xname(singleobj)));
+#endif
                 if (!tethered_weapon) {
                     (void) drop_throw(singleobj, 0,
                                       gb.bhitpos.x, gb.bhitpos.y);
@@ -883,8 +1028,13 @@ return_from_mtoss(
             static long do_not_annoy = 0;
 
             if (!do_not_annoy || (svm.moves - do_not_annoy) > 500L) {
+#ifdef ZHLANG
+                pline("%s回到了%s的%s中！", Tobjnam(otmp, "回"),
+                      s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
+#else
                 pline("%s to %s %s!", Tobjnam(otmp, "return"),
                       s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
+#endif
                 do_not_annoy = svm.moves;
             }
             if (otmp) {
@@ -902,22 +1052,41 @@ return_from_mtoss(
             dmg = rn2(2);
             if (!dmg) {
                 if (canseemon(magr)) {
+#ifdef ZHLANG
+                    pline("%s回到了%s身边，落在地上。",
+                          Tobjnam(otmp, "回"), mon_nam(magr));
+#else
                     pline("%s back to %s, landing %s %s %s.",
                           Tobjnam(otmp, "return"), mon_nam(magr),
                           mlevitating ? "beneath" : "at", mhis(magr),
                           makeplural(mbodypart(magr, FOOT)));
+#endif
                 } else if (!Deaf) {
+#ifdef ZHLANG
+                    You_hear("有东西落在%s附近。", mon_nam(magr));
+#else
                     You_hear("%s land near %s.", Something, mon_nam(magr));
+#endif
                 }
             } else {
                 dmg += rnd(3);
                 if (canseemon(magr)) {
+#ifdef ZHLANG
+                    pline("%s飞向%s，击中了%s的%s！",
+                          Tobjnam(otmp, "飞"), mon_nam(magr),
+                          mhis(magr), body_part(ARM));
+#else
                     pline("%s back toward %s, hitting %s %s!",
                           Tobjnam(otmp, "fly"), mon_nam(magr),
                           mhis(magr), body_part(ARM));
+#endif
                 } else if (!Deaf) {
+#ifdef ZHLANG
+                    You_hear("有东西砰地击中了%s！", mon_nam(magr));
+#else
                     You_hear("%s hit %s with a thud!", something,
                              mon_nam(magr));
+#endif
                 }
                 hits_thrower = TRUE;
             }
@@ -927,7 +1096,11 @@ return_from_mtoss(
         /* it didn't make it back to thrower's location */
         if (tethered_weapon)
             tmp_at(DISP_END, 0);
+#ifdef ZHLANG
+        You_hear("一声响亮的断裂声！");
+#else
         You_hear("a loud snap!");
+#endif
         notcaught = TRUE;
     }
     if (otmp) {
@@ -953,7 +1126,11 @@ return_from_mtoss(
                 /* Some sound effects when item lands in water or lava */
                 if (is_pool(x, y) || (is_lava(x, y) && !is_flammable(otmp))) {
                     Soundeffect(se_splash, 50);
+#ifdef ZHLANG
+                    pline((weight(otmp) > 9) ? "哗啦！" : "扑通！");
+#else
                     pline((weight(otmp) > 9) ? "Splash!" : "Plop!");
+#endif
                 }
             }
             if (obj_sheds_light(otmp))
@@ -1020,11 +1197,20 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
     if (mtmp->mcan) {
         if (!Deaf && mdistu(mtmp) < BOLT_LIM * BOLT_LIM) {
             if (canspotmon(mtmp)) {
+#ifdef ZHLANG
+                pline("%s喉咙里发出干哑的咯咯声。",
+                      s_suffix(mon_nam(mtmp)));
+#else
                 pline("A dry rattle comes from %s throat.",
                       s_suffix(mon_nam(mtmp)));
+#endif
             } else {
                 Soundeffect(se_dry_throat_rattle, 50);
+#ifdef ZHLANG
+                You_hear("附近有干哑的咯咯声。");
+#else
                 You_hear("a dry rattle nearby.");
+#endif
             }
         }
         return M_ATTK_MISS;
@@ -1049,7 +1235,11 @@ spitmm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         }
         if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,tx,ty))) {
             if (canseemon(mtmp))
+#ifdef ZHLANG
+                pline("%s喷出了毒液！", Monnam(mtmp));
+#else
                 pline("%s spits venom!", Monnam(mtmp));
+#endif
             if (!utarg)
                 gm.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby),
@@ -1099,10 +1289,18 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         if (mtmp->mcan) {
             if (!Deaf) {
                 if (canseemon(mtmp)) {
+#ifdef ZHLANG
+                    pline("%s咳嗽了一声。", Monnam(mtmp));
+#else
                     pline("%s coughs.", Monnam(mtmp));
+#endif
                 } else {
                     Soundeffect(se_cough, 100);
+#ifdef ZHLANG
+                    You_hear("一声咳嗽。");
+#else
                     You_hear("a cough.");
+#endif
                 }
             }
             return M_ATTK_MISS;
@@ -1117,8 +1315,13 @@ breamm(struct monst *mtmp, struct attack *mattk, struct monst *mtarg)
         if (!mtmp->mspec_used && rn2(3)) {
             if (BZ_VALID_ADTYP(typ)) {
                 if (canseemon(mtmp))
+#ifdef ZHLANG
+                    pline("%s喷出了%s！",
+                          Monnam(mtmp), breathwep_name(typ));
+#else
                     pline("%s breathes %s!",
                           Monnam(mtmp), breathwep_name(typ));
+#endif
                 gb.buzzer = mtmp;
                 dobuzz(BZ_M_BREATH(BZ_OFS_AD(typ)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby),
@@ -1219,10 +1422,16 @@ thrwmu(struct monst *mtmp)
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
+#ifdef ZHLANG
+            pline_mon(mtmp, "%s%s%s。", Monnam(mtmp),
+                  mswings_verb(otmp, (rang <= 2) ? TRUE : FALSE),
+                  obj_is_pname(otmp) ? the(onm) : an(onm));
+#else
             pline_mon(mtmp, "%s %s %s.", Monnam(mtmp),
                   /* "thrusts" or "swings", or "bashes with" if adjacent */
                   mswings_verb(otmp, (rang <= 2) ? TRUE : FALSE),
                   obj_is_pname(otmp) ? the(onm) : an(onm));
+#endif
         }
 
         dam = dmgval(otmp, &gy.youmonst);
@@ -1434,11 +1643,20 @@ hit_bars(
         /* breakage makes its own noises */
         if (obj_type == POT_ACID) {
             if (cansee(barsx, barsy) && !nodissolve) {
+#ifdef ZHLANG
+                pline_The("铁栏杆被溶解了！");
+#else
                 pline_The("iron bars are dissolved!");
+#endif
             } else {
                 Soundeffect(se_angry_snakes, 100);
+#ifdef ZHLANG
+                You_hear(Hallucination ? "愤怒的蛇！"
+                                       : "嘶嘶声。");
+#else
                 You_hear(Hallucination ? "angry snakes!"
                                        : "a hissing noise.");
+#endif
             }
             if (!nodissolve)
                 dissolve_bars(barsx, barsy);
@@ -1464,7 +1682,11 @@ hit_bars(
                            : SIZE(barsounds) - 1;
 
             Soundeffect(se[bsindx], 100);
+#ifdef ZHLANG
+            pline("%s！", barsounds[bsindx]);
+#else
             pline("%s!", barsounds[bsindx]);
+#endif
             nhUse(se[bsindx]);
         }
         if (!(harmless_missile(otmp) || is_flimsy(otmp)))
@@ -1483,7 +1705,11 @@ hit_bars(
             int chance = (melee_attk ? 40 : 60) - acurrstr() - spe;
 
             if (!rn2(max(2, chance))) {
+#ifdef ZHLANG
+                You("把铁栏杆掰开了！");
+#else
                 You("break the bars apart!");
+#endif
                 dissolve_bars(barsx, barsy);
                 noise = noise * 2;
             }

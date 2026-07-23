@@ -163,9 +163,15 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
         boolean name_not_title = (has_mgivenname(mtmp)
                                   || type_is_pname(mtmp->data)
                                   || mtmp->isshk);
+#ifdef ZHLANG
+        pline("%s宁愿保留%s现有的%s。", upstart(monnambuf),
+              is_rider(mtmp->data) ? "它的" : mhis(mtmp),
+              name_not_title ? "名字" : "称号");
+#else
         pline("%s would rather keep %s existing %s.", upstart(monnambuf),
               is_rider(mtmp->data) ? "its" : mhis(mtmp),
               name_not_title ? "name" : "title");
+#endif
         return TRUE;
     } else if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
                /* catch trying to name "the Oracle" as "Oracle" */
@@ -179,16 +185,29 @@ alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
                    && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
         if (is_rider(mtmp->data)) {
             /* avoid gendered pronoun for riders */
+#ifdef ZHLANG
+            pline("%s已经被叫做这个名字了。", upstart(monnambuf));
+#else
             pline("%s is already called that.", upstart(monnambuf));
+#endif
         } else {
+#ifdef ZHLANG
+            pline("%s已经被叫做%s。",
+                  upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+#else
             pline("%s is already called %s.",
                   upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+#endif
         }
         return TRUE;
     } else if (mtmp->data == &mons[PM_JUIBLEX]
                && strstri(monnambuf, "Juiblex")
                && !strcmpi(usrbuf, "Jubilex")) {
+#ifdef ZHLANG
+        pline("%s不喜欢被叫做%s。", upstart(monnambuf), usrbuf);
+#else
         pline("%s doesn't like being called %s.", upstart(monnambuf), usrbuf);
+#endif
         return TRUE;
     }
     return FALSE;
@@ -205,7 +224,11 @@ do_mgivenname(void)
     boolean do_swallow = FALSE;
 
     if (Hallucination) {
+#ifdef ZHLANG
+        You("反正你也认不出来。");
+#else
         You("would never recognize it anyway.");
+#endif
         return;
     }
     cc.x = u.ux;
@@ -219,8 +242,13 @@ do_mgivenname(void)
         if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
         } else {
+#ifdef ZHLANG
+            pline("这个%s生物名叫%s，无法重命名。",
+                  beautiful(), svp.plname);
+#else
             pline("This %s creature is called %s and cannot be renamed.",
                   beautiful(), svp.plname);
+#endif
             return;
         }
     } else
@@ -243,7 +271,11 @@ do_mgivenname(void)
                 || M_AP_TYPE(mtmp) == M_AP_OBJECT
                 || (mtmp->minvis && !See_invisible))))) {
 
+#ifdef ZHLANG
+        pline("那里没有怪物。");
+#else
         pline("I see no monster there.");
+#endif
         return;
     }
     /* special case similar to the one in lookat() */
@@ -264,18 +296,30 @@ do_mgivenname(void)
      */
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
+#ifdef ZHLANG
+            pline("%s不喜欢被起外号！", upstart(monnambuf));
+#else
             pline("%s doesn't like being called names!", upstart(monnambuf));
+#endif
     } else if (mtmp->isshk
                && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf)) {
             SetVoice(mtmp, 0, 80, 0);
+#ifdef ZHLANG
+            verbalize("我是%s，不是%s。", shkname(mtmp), buf);
+#else
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+#endif
         }
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST] || has_ebones(mtmp)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
+#ifdef ZHLANG
+            pline("%s不接受%s这个名字。", upstart(monnambuf), buf);
+#else
             pline("%s will not accept the name %s.", upstart(monnambuf), buf);
+#endif
     } else {
         (void) christen_monst(mtmp, buf);
     }
@@ -295,7 +339,11 @@ do_oname(struct obj *obj)
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
+#ifdef ZHLANG
+        pline("%s已经有出版名称了。", Ysimple_name2(obj));
+#else
         pline("%s already has a published name.", Ysimple_name2(obj));
+#endif
         return;
     }
 
@@ -319,10 +367,15 @@ do_oname(struct obj *obj)
     if (obj->oartifact) {
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
+#ifdef ZHLANG
+        pline("%s抵抗了这个尝试。",
+              has_oname(obj) ? ONAME(obj) : "神器");
+#else
         pline("%s resists the attempt.",
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
               has_oname(obj) ? ONAME(obj) : "The artifact");
+#endif
         return;
     }
 
@@ -348,9 +401,17 @@ do_oname(struct obj *obj)
         do {
             wipeout_text(bufp, rnd_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
+#ifdef ZHLANG
+        pline("雕刻时，你的%s滑了一下。", body_part(HAND));
+#else
         pline("While engraving, your %s slips.", body_part(HAND));
+#endif
         display_nhwindow(WIN_MESSAGE, FALSE);
+#ifdef ZHLANG
+        You("刻下了：\"%s\"。", buf);
+#else
         You("engrave: \"%s\".", buf);
+#endif
         /* violate illiteracy conduct since hero attempted to write
            a valid artifact name */
         u.uconduct.literate++;
@@ -577,7 +638,11 @@ docallcmd(void)
             (void) xname(obj);
 
             if (!obj->dknown) {
+#ifdef ZHLANG
+                You("永远也认不出另一个。");
+#else
                 You("would never recognize another one.");
+#endif
 #if 0
             } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
                 You("know those as well as you ever will.");
@@ -703,8 +768,13 @@ namefloorobj(void)
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
+#ifdef ZHLANG
+        There("那里似乎没有任何物体%s。",
+              u_at(cc.x, cc.y) ? "在你下方" : "在那里");
+#else
         There("doesn't seem to be any object %s.",
               u_at(cc.x, cc.y) ? "under you" : "there");
+#endif
         return;
     }
     /* note well: 'obj' might be an instance of STRANGE_OBJECT if target
@@ -738,15 +808,31 @@ namefloorobj(void)
         unames[4] = roguename();
         /* silly */
         unames[5] = "Wibbly Wobbly";
+#ifdef ZHLANG
+        pline("%s%s要把你叫做\"%s。\"",
+              The(buf), use_plural ? "决定" : "决定",
+              unames[rn2_on_display_rng(SIZE(unames))]);
+#else
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
               unames[rn2_on_display_rng(SIZE(unames))]);
+#endif
     } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
+#ifdef ZHLANG
+        pline("%s%s不能被赋予类型名称。",
+              use_plural ? "那些" : "那个", buf);
+#else
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
+#endif
     } else if (!obj->dknown) {
+#ifdef ZHLANG
+        You("对%s%s的了解还不足以命名%s。",
+            use_plural ? "那些" : "那个", buf, use_plural ? "它们" : "它");
+#else
         You("don't know %s %s well enough to name %s.",
             use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+#endif
     } else {
         docall(obj);
     }

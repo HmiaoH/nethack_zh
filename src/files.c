@@ -929,7 +929,11 @@ commit_bonesfile(d_level *lev)
     ret = rename(tempname, fq_bones);
 #endif
     if (wizard && ret != 0)
+#ifdef ZHLANG
+        pline("无法将%s重命名为%s。", tempname, fq_bones);
+#else
         pline("couldn't rename %s to %s.", tempname, fq_bones);
+#endif
 }
 
 NHFILE *
@@ -1697,7 +1701,11 @@ docompress_file(const char *filename, boolean uncomp)
         nh_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
+#ifdef ZHLANG
+        pline("派生子进程进行%s压缩%s失败。", uncomp ? "解" : "", filename);
+#else
         pline("Fork to %scompress %s failed.", uncomp ? "un" : "", filename);
+#endif
         free((genericptr_t) cfn);
         return;
     }
@@ -1854,13 +1862,21 @@ docompress_file(const char *filename, boolean uncomp)
 
         uncompressedfile = fopen(filename, RDBMODE);
         if (!uncompressedfile) {
+#ifdef ZHLANG
+            pline("zlib 压缩文件出错 %s", filename);
+#else
             pline("Error in zlib docompress_file %s", filename);
+#endif
             return;
         }
         compressedfile = gzopen(cfn, "wb");
         if (compressedfile == NULL) {
             if (errno == 0) {
+#ifdef ZHLANG
+                pline("zlib 无法分配内存");
+#else
                 pline("zlib failed to allocate memory");
+#endif
             } else {
                 panic("Error in docompress_file %d", errno);
             }
@@ -1876,8 +1892,13 @@ docompress_file(const char *filename, boolean uncomp)
         while (1) {
             len = fread(buf, 1, sizeof(buf), uncompressedfile);
             if (ferror(uncompressedfile)) {
+#ifdef ZHLANG
+                pline("读取未压缩文件失败");
+                pline("无法压缩%s。", filename);
+#else
                 pline("Failure reading uncompressed file");
                 pline("Can't compress %s.", filename);
+#endif
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(cfn);
@@ -1891,8 +1912,13 @@ docompress_file(const char *filename, boolean uncomp)
 
             len2 = gzwrite(compressedfile, buf, len);
             if (len2 == 0) {
+#ifdef ZHLANG
+                pline("写入压缩文件失败");
+                pline("无法压缩%s。", filename);
+#else
                 pline("Failure writing compressed file");
                 pline("Can't compress %s.", filename);
+#endif
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(cfn);
@@ -1919,7 +1945,11 @@ docompress_file(const char *filename, boolean uncomp)
         compressedfile = gzopen(cfn, "rb");
         if (compressedfile == NULL) {
             if (errno == 0) {
+#ifdef ZHLANG
+                pline("zlib 无法分配内存");
+#else
                 pline("zlib failed to allocate memory");
+#endif
             } else if (errno != ENOENT) {
                 panic("Error in zlib docompress_file %s, %d", filename,
                       errno);
@@ -1931,7 +1961,11 @@ docompress_file(const char *filename, boolean uncomp)
         }
         uncompressedfile = fopen(filename, WRBMODE);
         if (!uncompressedfile) {
+#ifdef ZHLANG
+            pline("zlib 解压缩文件出错 %s", filename);
+#else
             pline("Error in zlib docompress file uncompress %s", filename);
+#endif
             gzclose(compressedfile);
 #ifdef SFCTOOL
             free(cfn);
@@ -1944,8 +1978,13 @@ docompress_file(const char *filename, boolean uncomp)
         while (1) {
             len = gzread(compressedfile, buf, sizeof(buf));
             if (len == (unsigned) -1) {
+#ifdef ZHLANG
+                pline("读取压缩文件失败");
+                pline("无法解压缩%s。", filename);
+#else
                 pline("Failure reading compressed file");
                 pline("Can't uncompress %s.", filename);
+#endif
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(filename);
@@ -1959,8 +1998,13 @@ docompress_file(const char *filename, boolean uncomp)
 
             fwrite(buf, 1, len, uncompressedfile);
             if (ferror(uncompressedfile)) {
+#ifdef ZHLANG
+                pline("写入未压缩文件失败");
+                pline("无法解压缩%s。", filename);
+#else
                 pline("Failure writing uncompressed file");
                 pline("Can't uncompress %s.", filename);
+#endif
                 fclose(uncompressedfile);
                 gzclose(compressedfile);
                 (void) unlink(filename);
@@ -3476,7 +3520,11 @@ read_tribute(const char *tribsection, const char *tribtitle,
 
     int scope = 0;
     int linect = 0, passagecnt = 0, targetpassage = 0;
+#ifdef ZHLANG
+    const char *badtranslation = "一个无法理解的外文译本";
+#else
     const char *badtranslation = "an incomprehensible foreign translation";
+#endif
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
     boolean grasped = FALSE;
@@ -3488,7 +3536,11 @@ read_tribute(const char *tribsection, const char *tribtitle,
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
         if (!nowin_buf)
+#ifdef ZHLANG
+            pline("这是\"%s\"的%s！", tribtitle, badtranslation);
+#else
             pline("It's %s of \"%s\"!", badtranslation, tribtitle);
+#endif
         return grasped;
     }
 
@@ -3499,7 +3551,11 @@ read_tribute(const char *tribsection, const char *tribtitle,
     if (!fp) {
         /* this is actually an error - cannot open tribute file! */
         if (!nowin_buf)
+#ifdef ZHLANG
+            You_feel("太过震撼，无法继续！");
+#else
             You_feel("too overwhelmed to continue!");
+#endif
         return grasped;
     }
 
@@ -3635,7 +3691,11 @@ read_tribute(const char *tribsection, const char *tribtitle,
         }
         if (!grasped)
             /* multi-line window, problem */
+#ifdef ZHLANG
+            pline("这似乎是\"%s\"的%s！", tribtitle, badtranslation);
+#else
             pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
+#endif
     }
     return grasped;
 }
@@ -3671,7 +3731,11 @@ livelog_add(long ll_type, const char *str)
 
     if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
         if (!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
+#ifdef ZHLANG
+            pline("无法打开实时日志文件！");
+#else
             pline("Cannot open live log file!");
+#endif
             unlock_file(LIVELOGFILE);
             return;
         }

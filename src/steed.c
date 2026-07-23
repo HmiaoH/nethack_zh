@@ -16,7 +16,11 @@ staticfn void maybewakesteed(struct monst *);
 void
 rider_cant_reach(void)
 {
+#ifdef ZHLANG
     You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
+#else
+    You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
+#endif
 }
 
 /*** Putting the saddle on ***/
@@ -44,30 +48,50 @@ use_saddle(struct obj *otmp)
 
     /* Select an animal */
     if (u.uswallow || Underwater || !getdir((char *) 0)) {
+#ifdef ZHLANG
         pline1(Never_mind);
+#else
+        pline1(Never_mind);
+#endif
         return ECMD_CANCEL;
     }
     if (!u.dx && !u.dy) {
+#ifdef ZHLANG
         pline("Saddle yourself?  Very funny...");
+#else
+        pline("Saddle yourself?  Very funny...");
+#endif
         return ECMD_OK;
     }
     if (!isok(u.ux + u.dx, u.uy + u.dy)
         || !(mtmp = m_at(u.ux + u.dx, u.uy + u.dy)) || !canspotmon(mtmp)) {
+#ifdef ZHLANG
         pline("I see nobody there.");
+#else
+        pline("I see nobody there.");
+#endif
         return ECMD_TIME;
     }
 
     /* Is this a valid monster? */
     if ((mtmp->misc_worn_check & W_SADDLE) != 0L
         || which_armor(mtmp, W_SADDLE)) {
+#ifdef ZHLANG
         pline("%s doesn't need another one.", Monnam(mtmp));
+#else
+        pline("%s doesn't need another one.", Monnam(mtmp));
+#endif
         return ECMD_TIME;
     }
     ptr = mtmp->data;
     if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
         char kbuf[BUFSZ];
 
+#ifdef ZHLANG
         You("touch %s.", mon_nam(mtmp));
+#else
+        You("touch %s.", mon_nam(mtmp));
+#endif
         if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
                     an(pmname(mtmp->data, Mgender(mtmp))));
@@ -75,17 +99,29 @@ use_saddle(struct obj *otmp)
         }
     }
     if (ptr == &mons[PM_AMOROUS_DEMON]) {
+#ifdef ZHLANG
         pline("Shame on you!");
+#else
+        pline("Shame on you!");
+#endif
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
     if (mtmp->isminion || mtmp->isshk || mtmp->ispriest || mtmp->isgd
         || mtmp->iswiz) {
+#ifdef ZHLANG
         pline("I think %s would mind.", mon_nam(mtmp));
+#else
+        pline("I think %s would mind.", mon_nam(mtmp));
+#endif
         return ECMD_TIME;
     }
     if (!can_saddle(mtmp)) {
+#ifdef ZHLANG
         You_cant("saddle such a creature.");
+#else
+        You_cant("saddle such a creature.");
+#endif
         return ECMD_TIME;
     }
 
@@ -127,14 +163,22 @@ use_saddle(struct obj *otmp)
 
     /* Make the attempt */
     if (rn2(100) < chance) {
+#ifdef ZHLANG
         You("put the saddle on %s.", mon_nam(mtmp));
+#else
+        You("put the saddle on %s.", mon_nam(mtmp));
+#endif
         if (otmp->owornmask)
             remove_worn_item(otmp, FALSE);
         freeinv(otmp);
         /* !can_saddle(mtmp) already eliminated above */
         put_saddle_on_mon(otmp, mtmp);
     } else
+#ifdef ZHLANG
         pline("%s resists!", Monnam(mtmp));
+#else
+        pline("%s resists!", Monnam(mtmp));
+#endif
     return ECMD_TIME;
 }
 
@@ -204,13 +248,21 @@ mount_steed(
 
     /* Sanity checks */
     if (u.usteed) {
+#ifdef ZHLANG
         You("are already riding %s.", mon_nam(u.usteed));
+#else
+        You("are already riding %s.", mon_nam(u.usteed));
+#endif
         return (FALSE);
     }
 
     /* Is the player in the right form? */
     if (Hallucination && !force) {
+#ifdef ZHLANG
         pline("Maybe you should find a designated driver.");
+#else
+        pline("Maybe you should find a designated driver.");
+#endif
         return (FALSE);
     }
     /* While riding, Wounded_legs refers to the steed's
@@ -242,11 +294,19 @@ mount_steed(
                    || verysmall(gy.youmonst.data)
                    || bigmonst(gy.youmonst.data)
                    || slithy(gy.youmonst.data))) {
+#ifdef ZHLANG
         You("won't fit on a saddle.");
+#else
+        You("won't fit on a saddle.");
+#endif
         return (FALSE);
     }
     if (!force && (near_capacity() > SLT_ENCUMBER)) {
+#ifdef ZHLANG
         You_cant("do that while carrying so much stuff.");
+#else
+        You_cant("do that while carrying so much stuff.");
+#endif
         return (FALSE);
     }
 
@@ -254,7 +314,11 @@ mount_steed(
     if (!mtmp || (!force && ((Blind && !Blind_telepat) || mtmp->mundetected
                              || M_AP_TYPE(mtmp) == M_AP_FURNITURE
                              || M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
+#ifdef ZHLANG
         pline("I see nobody there.");
+#else
+        pline("I see nobody there.");
+#endif
         return (FALSE);
     }
     if (mtmp->data == &mons[PM_LONG_WORM]
@@ -264,23 +328,39 @@ mount_steed(
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()
            called from test_move(), so handle not-on-head before that */
+#ifdef ZHLANG
         You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+#else
+        You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+#endif
         return FALSE;
     }
     if (u.uswallow || u.ustuck || u.utrap || Punished
         || !test_move(u.ux, u.uy, mtmp->mx - u.ux, mtmp->my - u.uy,
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
+#ifdef ZHLANG
             You("are unable to swing your %s over.", body_part(LEG));
+#else
+            You("are unable to swing your %s over.", body_part(LEG));
+#endif
         else
+#ifdef ZHLANG
             You("are stuck here for now.");
+#else
+            You("are stuck here for now.");
+#endif
         return (FALSE);
     }
 
     /* Is this a valid monster? */
     otmp = which_armor(mtmp, W_SADDLE);
     if (!otmp) {
+#ifdef ZHLANG
         pline("%s is not saddled.", Monnam(mtmp));
+#else
+        pline("%s is not saddled.", Monnam(mtmp));
+#endif
         return (FALSE);
     }
 
@@ -288,51 +368,87 @@ mount_steed(
     if (touch_petrifies(ptr) && !Stone_resistance) {
         char kbuf[BUFSZ];
 
+#ifdef ZHLANG
         You("touch %s.", mon_nam(mtmp));
+#else
+        You("touch %s.", mon_nam(mtmp));
+#endif
         Sprintf(kbuf, "attempting to ride %s",
                 an(pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {
+#ifdef ZHLANG
         pline("I think %s would mind.", mon_nam(mtmp));
+#else
+        pline("I think %s would mind.", mon_nam(mtmp));
+#endif
         return (FALSE);
     }
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
+#ifdef ZHLANG
         You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
                  mhe(mtmp), an(trapname(t->ttyp, FALSE)));
+#else
+        You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
+                 mhe(mtmp), an(trapname(t->ttyp, FALSE)));
+#endif
         return (FALSE);
     }
 
     if (!force && !Role_if(PM_KNIGHT) && !(--mtmp->mtame)) {
         /* no longer tame */
         newsym(mtmp->mx, mtmp->my);
+#ifdef ZHLANG
         pline("%s resists%s!", Monnam(mtmp),
               mtmp->mleashed ? " and its leash comes off" : "");
+#else
+        pline("%s resists%s!", Monnam(mtmp),
+              mtmp->mleashed ? " and its leash comes off" : "");
+#endif
         if (mtmp->mleashed)
             m_unleash(mtmp, FALSE);
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
+#ifdef ZHLANG
         You_cant("ride that creature while under %s.",
                  hliquid("water"));
+#else
+        You_cant("ride that creature while under %s.",
+                 hliquid("water"));
+#endif
         return (FALSE);
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
+#ifdef ZHLANG
         You_cant("ride such a creature.");
+#else
+        You_cant("ride such a creature.");
+#endif
         return FALSE;
     }
 
     /* Is the player impaired? */
     if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation
         && !Lev_at_will) {
+#ifdef ZHLANG
         You("cannot reach %s.", mon_nam(mtmp));
+#else
+        You("cannot reach %s.", mon_nam(mtmp));
+#endif
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
+#ifdef ZHLANG
         Your("%s armor is too stiff to be able to mount %s.",
              uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
+#else
+        Your("%s armor is too stiff to be able to mount %s.",
+             uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
+#endif
         return (FALSE);
     }
     if (!force
@@ -340,10 +456,18 @@ mount_steed(
             || otmp->greased
             || (u.ulevel + mtmp->mtame < rnd(MAXULEV / 2 + 5)))) {
         if (Levitation) {
+#ifdef ZHLANG
             pline("%s slips away from you.", Monnam(mtmp));
+#else
+            pline("%s slips away from you.", Monnam(mtmp));
+#endif
             return FALSE;
         }
+#ifdef ZHLANG
         You("slip while trying to get on %s.", mon_nam(mtmp));
+#else
+        You("slip while trying to get on %s.", mon_nam(mtmp));
+#endif
 
         Sprintf(buf, "slipped while mounting %s",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
@@ -360,10 +484,22 @@ mount_steed(
     if (!force) {
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
+#ifdef ZHLANG
             pline("%s magically floats up!", Monnam(mtmp));
+#else
+            pline("%s magically floats up!", Monnam(mtmp));
+#endif
+#ifdef ZHLANG
         You("mount %s.", mon_nam(mtmp));
+#else
+        You("mount %s.", mon_nam(mtmp));
+#endif
         if (Flying)
+#ifdef ZHLANG
             You("and %s take flight together.", mon_nam(mtmp));
+#else
+            You("and %s take flight together.", mon_nam(mtmp));
+#endif
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
@@ -374,7 +510,11 @@ mount_steed(
 
         steed_vs_stealth();
         if (was_stealthy && !Stealth)
+#ifdef ZHLANG
             You("aren't stealthy anymore.");
+#else
+            You("aren't stealthy anymore.");
+#endif
     }
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
@@ -422,13 +562,25 @@ kick_steed(void)
                 u.usteed->mcanmove = 1;
             }
             if (helpless(u.usteed))
+#ifdef ZHLANG
                 pline("%s stirs.", He);
+#else
+                pline("%s stirs.", He);
+#endif
             else
                 /* if hallucinating, might yield "He rouses herself" or
                    "She rouses himself" */
+#ifdef ZHLANG
                 pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
+#else
+                pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
+#endif
         } else
+#ifdef ZHLANG
             pline("%s does not respond.", He);
+#else
+            pline("%s does not respond.", He);
+#endif
         return;
     }
 
@@ -444,7 +596,11 @@ kick_steed(void)
         return;
     }
 
+#ifdef ZHLANG
     pline("%s gallops!", Monnam(u.usteed));
+#else
+    pline("%s gallops!", Monnam(u.usteed));
+#endif
     u.ugallop += rn1(20, 30);
     return;
 }
@@ -605,7 +761,11 @@ dismount_steed(
         /*FALLTHRU*/
     case DISMOUNT_KNOCKED:
     case DISMOUNT_FELL:
+#ifdef ZHLANG
         You("%s off of %s!", verb, mon_nam(mtmp));
+#else
+        You("%s off of %s!", verb, mon_nam(mtmp));
+#endif
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         if (!ulev && !ufly) {
@@ -616,7 +776,11 @@ dismount_steed(
         }
         break;
     case DISMOUNT_POLY:
+#ifdef ZHLANG
         You("can no longer ride %s.", mon_nam(u.usteed));
+#else
+        You("can no longer ride %s.", mon_nam(u.usteed));
+#endif
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
         break;
@@ -632,22 +796,44 @@ dismount_steed(
     case DISMOUNT_BYCHOICE:
     default:
         if (otmp && otmp->cursed) {
+#ifdef ZHLANG
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
+#else
+            You("can't.  The saddle %s cursed.",
+                otmp->bknown ? "is" : "seems to be");
+#endif
             otmp->bknown = 1; /* ok to skip set_bknown() here */
             return;
         }
         if (!have_spot) {
+#ifdef ZHLANG
             You("can't.  There isn't anywhere for you to stand.");
+#else
+            You("can't.  There isn't anywhere for you to stand.");
+#endif
             return;
         }
         if (!has_mgivenname(mtmp)) {
+#ifdef ZHLANG
             pline("You've been through the dungeon on %s with no name.",
                   an(pmname(mtmp->data, Mgender(mtmp))));
+#else
+            pline("You've been through the dungeon on %s with no name.",
+                  an(pmname(mtmp->data, Mgender(mtmp))));
+#endif
             if (Hallucination)
+#ifdef ZHLANG
                 pline("It felt good to get out of the rain.");
+#else
+                pline("It felt good to get out of the rain.");
+#endif
         } else
+#ifdef ZHLANG
             You("dismount %s.", mon_nam(mtmp));
+#else
+            You("dismount %s.", mon_nam(mtmp));
+#endif
     }
     /* While riding, Wounded_legs refers to the steed's legs;
        after dismounting, it reverts to the hero's legs. */
@@ -662,7 +848,11 @@ dismount_steed(
 
         steed_vs_stealth();
         if (Stealth && !was_stealthy)
+#ifdef ZHLANG
             You("seem less noisy now.");
+#else
+            You("seem less noisy now.");
+#endif
     }
 
     if (u.utraptype == TT_BEARTRAP
@@ -724,15 +914,25 @@ dismount_steed(
             if (grounded(mdat)) {
                 if (is_pool(u.ux, u.uy)) {
                     if (!Underwater)
+#ifdef ZHLANG
                         pline("%s falls into the %s!", Monnam(mtmp),
                               surface(u.ux, u.uy));
+#else
+                        pline("%s falls into the %s!", Monnam(mtmp),
+                              surface(u.ux, u.uy));
+#endif
                     if (!cant_drown(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
+#ifdef ZHLANG
                     pline("%s is pulled into the %s!", Monnam(mtmp),
                           hliquid("lava"));
+#else
+                    pline("%s is pulled into the %s!", Monnam(mtmp),
+                          hliquid("lava"));
+#endif
                     if (!likes_lava(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
@@ -842,7 +1042,11 @@ maybewakesteed(struct monst *steed)
         }
     }
     if (wasimmobile && !helpless(steed))
+#ifdef ZHLANG
         pline("%s wakes up.", Monnam(steed));
+#else
+        pline("%s wakes up.", Monnam(steed));
+#endif
     /* regardless of waking, terminate any meal in progress */
     finish_meating(steed);
 }
@@ -865,7 +1069,11 @@ poly_steed(
                              SUPPRESS_SADDLE, FALSE));
         if (oldshape != steed->data)
             (void) strsubst(buf, "your ", "your new ");
+#ifdef ZHLANG
         You("adjust yourself in the saddle on %s.", buf);
+#else
+        You("adjust yourself in the saddle on %s.", buf);
+#endif
 
         /* riding blocks stealth unless hero+steed fly */
         steed_vs_stealth();
@@ -882,12 +1090,20 @@ stucksteed(boolean checkfeeding)
     if (steed) {
         /* check whether steed can move */
         if (helpless(steed)) {
+#ifdef ZHLANG
             pline("%s won't move!", YMonnam(steed));
+#else
+            pline("%s won't move!", YMonnam(steed));
+#endif
             return TRUE;
         }
         /* optionally check whether steed is in the midst of a meal */
         if (checkfeeding && steed->meating) {
+#ifdef ZHLANG
             pline("%s is still eating.", YMonnam(steed));
+#else
+            pline("%s is still eating.", YMonnam(steed));
+#endif
             return TRUE;
         }
     }

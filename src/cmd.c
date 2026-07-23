@@ -477,10 +477,18 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
     }
 
     if (!wizard && (ecflags & WIZMODECMD)) {
+        #ifdef ZHLANG
         pline(unavailcmd, extcmd->ef_txt);
+        #else
+        pline(unavailcmd, extcmd->ef_txt);
+        #endif
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
+        #ifdef ZHLANG
         You_cant("do that while you are buried!");
+        #else
+        You_cant("do that while you are buried!");
+        #endif
         return FALSE;
     } else if (iflags.debug_fuzzer && (ecflags & NOFUZZERCMD)) {
         return FALSE;
@@ -505,9 +513,15 @@ doextcmd(void)
         if (!can_do_extcmd(&extcmdlist[idx]))
             return ECMD_OK;
         if (iflags.menu_requested && !accept_menu_prefix(&extcmdlist[idx])) {
+            #ifdef ZHLANG
             pline("'%s' prefix has no effect for the %s command.",
                   visctrl(cmd_from_func(do_reqmenu)),
                   extcmdlist[idx].ef_txt);
+            #else
+            pline("'%s' prefix has no effect for the %s command.",
+                  visctrl(cmd_from_func(do_reqmenu)),
+                  extcmdlist[idx].ef_txt);
+            #endif
             iflags.menu_requested = FALSE;
         }
         /* tell rhack() what command is actually executing */
@@ -930,9 +944,17 @@ domonability(void)
         use_unicorn_horn((struct obj **) 0);
         return ECMD_TIME;
     } else if (uptr->msound == MS_SHRIEK) {
+        #ifdef ZHLANG
         You("shriek.");
+        #else
+        You("shriek.");
+        #endif
         if (u.uburied)
+            #ifdef ZHLANG
             pline("Unfortunately sound does not carry well through rock.");
+            #else
+            pline("Unfortunately sound does not carry well through rock.");
+            #endif
         else
             aggravate();
     } else if (is_vampire(uptr) || is_vampshifter(&gy.youmonst)) {
@@ -941,9 +963,17 @@ domonability(void)
         (void) pet_ranged_attk(u.usteed, TRUE);
         return ECMD_TIME;
     } else if (Upolyd) {
+        #ifdef ZHLANG
         pline("Any special ability you may have is purely reflexive.");
+        #else
+        pline("Any special ability you may have is purely reflexive.");
+        #endif
     } else {
+        #ifdef ZHLANG
         You("don't have a special ability in your normal form!");
+        #else
+        You("don't have a special ability in your normal form!");
+        #endif
     }
     return ECMD_OK;
 }
@@ -952,31 +982,57 @@ int
 enter_explore_mode(void)
 {
     if (discover) {
+        #ifdef ZHLANG
         You("are already in explore mode.");
+        #else
+        You("are already in explore mode.");
+        #endif
     } else {
         const char *oldmode = !wizard ? "normal game" : "debug mode";
 
         if (!authorize_explore_mode()) {
             if (!wizard) {
+                #ifdef ZHLANG
                 You("cannot access explore mode.");
+                #else
+                You("cannot access explore mode.");
+                #endif
                 return ECMD_OK;
             } else {
+                #ifdef ZHLANG
                 pline(
                  "Note: normally you wouldn't be allowed into explore mode.");
+                #else
+                pline(
+                 "Note: normally you wouldn't be allowed into explore mode.");
+                #endif
                 /* keep going */
             }
         }
+        #ifdef ZHLANG
         pline("Beware!  From explore mode there will be no return to %s,",
               oldmode);
+        #else
+        pline("Beware!  From explore mode there will be no return to %s,",
+              oldmode);
+        #endif
         if (paranoid_query(ParanoidQuit,
                            "Do you want to enter explore mode?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
+            #ifdef ZHLANG
             You("are now in non-scoring explore mode.");
+            #else
+            You("are now in non-scoring explore mode.");
+            #endif
         } else {
             clear_nhwindow(WIN_MESSAGE);
+            #ifdef ZHLANG
             pline("Continuing with %s.", oldmode);
+            #else
+            pline("Continuing with %s.", oldmode);
+            #endif
         }
     }
     return ECMD_OK;
@@ -999,11 +1055,19 @@ makemap_prepost(boolean pre, boolean wiztower)
                reset for the new instance of that prize */
             if (Is_mineend_level(&u.uz)) {
                 if (remove_achievement(ACH_MINE_PRIZE))
+                    #ifdef ZHLANG
                     pline(Unachieve, "Mine's-end");
+                    #else
+                    pline(Unachieve, "Mine's-end");
+                    #endif
                 svc.context.achieveo.mines_prize_oid = 0;
             } else if (Is_sokoend_level(&u.uz)) {
                 if (remove_achievement(ACH_SOKO_PRIZE))
+                    #ifdef ZHLANG
                     pline(Unachieve, "Soko-prize");
+                    #else
+                    pline(Unachieve, "Soko-prize");
+                    #endif
                 svc.context.achieveo.soko_prize_oid = 0;
             }
         }
@@ -1288,19 +1352,39 @@ lookaround_known_room(coordxy x, coordxy y)
     if (u_have_seen_whole_selection(sel)) {
         boolean u_in = (boolean) selection_getpoint(x, y, sel);
 
+        #ifdef ZHLANG
         You("%s %s %s.",
             u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
             : (u_at(x, y)) ? "remember this as" : "remember that as",
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "room" : "area");
+        #else
+        You("%s %s %s.",
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
+            : (u_at(x, y)) ? "remember this as" : "remember that as",
+            an(selection_size_description(sel, qbuf)),
+            rmno >= 0 ? "room" : "area");
+        #endif
     } else if (u_have_seen_bounds_selection(sel)) {
+        #ifdef ZHLANG
         You("guess %s to be %s %s.",
             u_at(x, y) ? "this" : "that",
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "room" : "area");
+        #else
+        You("guess %s to be %s %s.",
+            u_at(x, y) ? "this" : "that",
+            an(selection_size_description(sel, qbuf)),
+            rmno >= 0 ? "room" : "area");
+        #endif
     } else {
+        #ifdef ZHLANG
         You("can't guess the size of %s area.",
             u_at(x, y) ? "this" : "that");
+        #else
+        You("can't guess the size of %s area.",
+            u_at(x, y) ? "this" : "that");
+        #endif
     }
     selection_free(sel, TRUE);
 }
@@ -1378,7 +1462,11 @@ dotoggleoption(void)
     if (gc.cmd_bind && gc.cmd_bind->param) {
         return toggle_bool_option(gc.cmd_bind->param);
     } else {
+        #ifdef ZHLANG
         pline("Use #optionsfull to set any option instead.");
+        #else
+        pline("Use #optionsfull to set any option instead.");
+        #endif
         return ECMD_OK;
     }
 }
@@ -1575,8 +1663,13 @@ int
 do_reqmenu(void)
 {
     if (iflags.menu_requested) {
+        #ifdef ZHLANG
         Norep("Double %s prefix, canceled.",
               visctrl(cmd_from_func(do_reqmenu)));
+        #else
+        Norep("Double %s prefix, canceled.",
+              visctrl(cmd_from_func(do_reqmenu)));
+        #endif
         iflags.menu_requested = FALSE;
         return ECMD_CANCEL;
     }
@@ -1590,7 +1683,11 @@ int
 do_rush(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
+        #ifdef ZHLANG
         Norep("Double rush prefix, canceled.");
+        #else
+        Norep("Double rush prefix, canceled.");
+        #endif
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1606,7 +1703,11 @@ int
 do_run(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
+        #ifdef ZHLANG
         Norep("Double run prefix, canceled.");
+        #else
+        Norep("Double run prefix, canceled.");
+        #endif
         svc.context.run = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1622,7 +1723,11 @@ int
 do_fight(void)
 {
     if (svc.context.forcefight) {
+        #ifdef ZHLANG
         Norep("Double fight prefix, canceled.");
+        #else
+        Norep("Double fight prefix, canceled.");
+        #endif
         svc.context.forcefight = 0;
         gd.domove_attempting = 0;
         return ECMD_CANCEL;
@@ -1643,7 +1748,11 @@ do_repeat(void)
         struct _cmd_queue *repeat_copy;
 
         if (!cmdq_peek(CQ_REPEAT)) {
+            #ifdef ZHLANG
             Norep("There is no command available to repeat.");
+            #else
+            Norep("There is no command available to repeat.");
+            #endif
             return ECMD_FAIL;
         }
         repeat_copy = cmdq_copy(CQ_REPEAT);
@@ -2301,7 +2410,11 @@ handler_rebind_keys_add(boolean keyfirst)
     int clr = NO_COLOR;
 
     if (keyfirst) {
+        #ifdef ZHLANG
         pline("Bind which key? ");
+        #else
+        pline("Bind which key? ");
+        #endif
         key = pgetchar();
 
         if (!key || key == '\033')
@@ -2381,7 +2494,11 @@ handler_rebind_keys_add(boolean keyfirst)
         }
  bindit:
         if (!key) {
+            #ifdef ZHLANG
             pline("Bind which key? ");
+            #else
+            pline("Bind which key? ");
+            #endif
             key = pgetchar();
 
             if (!key || key == '\033')
@@ -2392,14 +2509,28 @@ handler_rebind_keys_add(boolean keyfirst)
 
         if (bind_key(key, cmdstr, TRUE)) {
             if (prevcmd && prevcmd->cmd != ec) {
+                #ifdef ZHLANG
                 pline("Changed key '%s' from \"%s\" to \"%s\".",
                       key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
+                #else
+                pline("Changed key '%s' from \"%s\" to \"%s\".",
+                      key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
+                #endif
             } else if (!prevcmd) {
+                #ifdef ZHLANG
                 pline("Bound key '%s' to \"%s\".",
                       key2txt(key, buf2), cmdstr);
+                #else
+                pline("Bound key '%s' to \"%s\".",
+                      key2txt(key, buf2), cmdstr);
+                #endif
             }
         } else {
+            #ifdef ZHLANG
             pline("Key binding failed?!");
+            #else
+            pline("Key binding failed?!");
+            #endif
         }
     }
 }
@@ -3707,18 +3838,31 @@ rhack(int key)
                  * the former call to help_dir() (for 'bad_command' below).
                  */
                 if (was_m_prefix) {
+                    #ifdef ZHLANG
                     custompline(SUPPRESS_HISTORY,
                           "The %s command does not accept '%s' prefix.",
                           tlist->ef_txt, which);
+                    #else
+                    custompline(SUPPRESS_HISTORY,
+                          "The %s command does not accept '%s' prefix.",
+                          tlist->ef_txt, which);
+                    #endif
                 } else {
                     uchar ch = tlist->key;
                     boolean up = (ch == '<' || tlist->ef_funct == doup),
                             down = (ch == '>' || tlist->ef_funct == dodown);
 
+                    #ifdef ZHLANG
                     pline(
                 "The '%s' prefix should be followed by a movement command%s.",
                           which,
                           (up || down) ? " other than up or down" : "");
+                    #else
+                    pline(
+                "The '%s' prefix should be followed by a movement command%s.",
+                          which,
+                          (up || down) ? " other than up or down" : "");
+                    #endif
                 }
                 res = ECMD_FAIL;
                 prefix_seen = 0;
@@ -3780,7 +3924,11 @@ rhack(int key)
                              & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                            && !svc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
+                    #ifdef ZHLANG
                     You_cant("get there from here...");
+                    #else
+                    You_cant("get there from here...");
+                    #endif
                     reset_cmd_vars(TRUE);
                     return;
                 } else if ((gd.domove_attempting & DOMOVE_WALK) != 0L) {
@@ -3832,7 +3980,11 @@ rhack(int key)
     }
 
     if (bad_command) {
+        #ifdef ZHLANG
         custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
+        #else
+        custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
+        #endif
         cmdq_clear(CQ_CANNED);
         cmdq_clear(CQ_REPEAT);
         iflags.sanity_no_check = iflags.sanity_check; /* skip sanity check */
@@ -3937,7 +4089,11 @@ get_adjacent_loc(
 {
     coordxy new_x, new_y;
     if (!getdir(prompt)) {
+        #ifdef ZHLANG
         pline1(Never_mind);
+        #else
+        pline1(Never_mind);
+        #endif
         return 0;
     }
     new_x = x + u.dx;
@@ -3947,7 +4103,11 @@ get_adjacent_loc(
         cc->y = new_y;
     } else {
         if (emsg)
+            #ifdef ZHLANG
             pline1(emsg);
+            #else
+            pline1(emsg);
+            #endif
         return 0;
     }
     return 1;
@@ -4107,11 +4267,19 @@ getdir(const char *s)
                     goto retry;
             }
             if (!did_help)
+                #ifdef ZHLANG
                 pline("What a strange direction!");
+                #else
+                pline("What a strange direction!");
+                #endif
         }
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
+        #ifdef ZHLANG
         You_cant("orient yourself that direction.");
+        #else
+        You_cant("orient yourself that direction.");
+        #endif
         return 0;
     }
     if (!u.dz)
@@ -4217,7 +4385,11 @@ help_dir(
             if (!*buf)
                 Sprintf(buf, "Invalid direction for '%s' prefix.",
                         visctrl(spkey));
+            #ifdef ZHLANG
             pline("%s", buf);
+            #else
+            pline("%s", buf);
+            #endif
             return TRUE;
         }
         /* when 'cmdassist' is off and caller doesn't insist, do nothing */
@@ -5103,7 +5275,11 @@ get_count(
                 Sprintf(qbuf, "Count: %ld", cnt);
                 backspaced = FALSE;
             }
+            #ifdef ZHLANG
             custompline(SUPPRESS_HISTORY, "%s", qbuf);
+            #else
+            custompline(SUPPRESS_HISTORY, "%s", qbuf);
+            #endif
             mark_synch();
         }
     }
@@ -5358,7 +5534,11 @@ dotravel(void)
         }
         iflags.getloc_filter = gfilt;
     } else {
+        #ifdef ZHLANG
         pline("Where do you want to travel to?");
+        #else
+        pline("Where do you want to travel to?");
+        #endif
         if (getpos(&cc, TRUE, "the desired destination") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
@@ -5377,12 +5557,20 @@ dotravel_target(void)
 {
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
         /* assume <0,0>, the value assigned when travel reaches destination */
+        #ifdef ZHLANG
         pline("No travel destination set.");
+        #else
+        pline("No travel destination set.");
+        #endif
         return ECMD_OK;
     } else if (u_at(iflags.travelcc.x, iflags.travelcc.y)) {
         /* maybe interrupted while traveling then just walked rest of way
            so destination hasn't been reset yet */
+        #ifdef ZHLANG
         You("are already here.");
+        #else
+        You("are already here.");
+        #endif
         iflags.travelcc.x = iflags.travelcc.y = 0;
         return ECMD_OK;
     }
@@ -5483,7 +5671,11 @@ yn_function_menu(
         } else {
             *res = def;
         }
+        #ifdef ZHLANG
         pline("%s %s", query, key2txt(*res, keybuf));
+        #else
+        pline("%s %s", query, key2txt(*res, keybuf));
+        #endif
         clear_nhwindow(WIN_MESSAGE);
         return TRUE;
     }
@@ -5701,7 +5893,11 @@ dosuspend_core(void)
         urealtime.start_timing = getnow(); /* resume keeping track of time */
     } else
 #endif
+        #ifdef ZHLANG
         Norep(cmdnotavail, "#suspend");
+        #else
+        Norep(cmdnotavail, "#suspend");
+        #endif
     return ECMD_OK;
 }
 
@@ -5718,7 +5914,11 @@ dosh_core(void)
     dosh();
     urealtime.start_timing = getnow();
 #else
+    #ifdef ZHLANG
     Norep(cmdnotavail, "#shell");
+    #else
+    Norep(cmdnotavail, "#shell");
+    #endif
 #endif
     return ECMD_OK;
 }

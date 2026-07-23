@@ -247,19 +247,32 @@ wiz_kill(void)
     coord cc;
     int ans;
     char c, qbuf[QBUFSZ];
+#ifdef ZHLANG
+    const char *prompt = "选择第一个要杀的怪物";
+#else
     const char *prompt = "Pick first monster to slay";
+#endif
     boolean save_verbose = flags.verbose,
             save_autodescribe = iflags.autodescribe;
     d_level uarehere = u.uz;
 
     cc.x = u.ux, cc.y = u.uy;
     for (;;) {
+#ifdef ZHLANG
+        pline("%s：", prompt);
+        prompt = "下一个怪物";
+#else
         pline("%s:", prompt);
         prompt = "Next monster";
+#endif
 
         flags.verbose = FALSE;
         iflags.autodescribe = TRUE;
+#ifdef ZHLANG
+        ans = getpos(&cc, TRUE, "一个怪物");
+#else
         ans = getpos(&cc, TRUE, "a monster");
+#endif
         flags.verbose = save_verbose;
         iflags.autodescribe = save_autodescribe;
         if (ans < 0 || cc.x < 1)
@@ -268,15 +281,24 @@ wiz_kill(void)
         mtmp = 0;
         if (u_at(cc.x, cc.y)) {
             if (u.usteed) {
+#ifdef ZHLANG
+                Sprintf(qbuf, "杀死%.110s？", mon_nam(u.usteed));
+#else
                 Sprintf(qbuf, "Kill %.110s?", mon_nam(u.usteed));
+#endif
                 if ((c = ynq(qbuf)) == 'q')
                     break;
                 if (c == 'y')
                     mtmp = u.usteed;
             }
             if (!mtmp) {
+#ifdef ZHLANG
+                Sprintf(qbuf, "%s？", Role_if(PM_SAMURAI) ? "切腹"
+                                                          : "自杀");
+#else
                 Sprintf(qbuf, "%s?", Role_if(PM_SAMURAI) ? "Perform seppuku"
                                                          : "Commit suicide");
+#endif
                 if (paranoid_query(TRUE, qbuf)) {
                     Sprintf(svk.killer.name, "%s own player", uhis());
                     svk.killer.format = KILLED_BY;
@@ -312,7 +334,11 @@ wiz_kill(void)
 
             if (!iflags.menu_requested) {
                 /* normal case: hero is credited/blamed */
+#ifdef ZHLANG
+                You("%s了%s！", nonliving(mtmp->data) ? "摧毁" : "杀死", Mn);
+#else
                 You("%s %s!", nonliving(mtmp->data) ? "destroy" : "kill", Mn);
+#endif
                 xkilled(mtmp, XKILL_NOMSG);
             } else { /* 'm'-prefix */
                 /* we know that monsters aren't moving because player has
@@ -321,8 +347,13 @@ wiz_kill(void)
                    need to have the mon_moving flag be True in order to
                    avoid blaming or crediting hero for their deaths */
                 svc.context.mon_moving = TRUE;
+#ifdef ZHLANG
+                pline("%s被%s了。", upstart(Mn),
+                      nonliving(mtmp->data) ? "摧毁" : "杀死");
+#else
                 pline("%s is %s.", upstart(Mn),
                       nonliving(mtmp->data) ? "destroyed" : "killed");
+#endif
                 /* Null second arg suppresses the usual message */
                 monkilled(mtmp, (char *) 0, AD_PHYS);
                 svc.context.mon_moving = FALSE;
@@ -332,7 +363,11 @@ wiz_kill(void)
             if (u.utotype || !on_level(&u.uz, &uarehere))
                 break;
         } else {
+#ifdef ZHLANG
+            There("那里没有怪物。");
+#else
             There("is no monster there.");
+#endif
             break;
         }
     }
@@ -361,7 +396,11 @@ wiz_load_lua(void)
                 16*1024*1024, 0, 16*1024*1024};
 
         buf[0] = '\0';
+#ifdef ZHLANG
+        getlin("加载哪个 Lua 文件？", buf);
+#else
         getlin("Load which lua file?", buf);
+#endif
         if (buf[0] == '\033' || buf[0] == '\0')
             return ECMD_CANCEL;
         if (!strchr(buf, '.'))
@@ -380,7 +419,11 @@ wiz_load_splua(void)
         char buf[BUFSZ];
 
         buf[0] = '\0';
+#ifdef ZHLANG
+        getlin("加载哪个 des Lua 文件？", buf);
+#else
         getlin("Load which des lua file?", buf);
+#endif
         if (buf[0] == '\033' || buf[0] == '\0')
             return ECMD_CANCEL;
         if (!strchr(buf, '.'))
@@ -412,8 +455,12 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 int
 wiz_flip_level(void)
 {
-    static const char choices[] = "0123",
-        prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizontally, 3=both:";
+    static const char choices[] = "0123";
+#ifdef ZHLANG
+    static const char prmpt[] = "翻转：0=随机，1=垂直，2=水平，3=两者：";
+#else
+    static const char prmpt[] = "Flip 0=randomly, 1=vertically, 2=horizontally, 3=both:";
+#endif
 
     /*
      * Does not handle
@@ -436,7 +483,11 @@ wiz_flip_level(void)
 
             docrt();
         } else {
+#ifdef ZHLANG
+            pline("%s", "算了。");
+#else
             pline("%s", Never_mind);
+#endif
         }
     }
     return ECMD_OK;
@@ -451,7 +502,11 @@ wiz_level_change(void)
     int ret;
 
     buf[0] = '\0'; /* in case EDIT_GETLIN is enabled */
+#ifdef ZHLANG
+    getlin("你想设置到什么经验等级？", buf);
+#else
     getlin("To what experience level do you want to be set?", buf);
+#endif
     (void) mungspaces(buf);
     if (buf[0] == '\033' || buf[0] == '\0')
         ret = 0;
@@ -459,14 +514,26 @@ wiz_level_change(void)
         ret = sscanf(buf, "%d%c", &newlevel, &dummy);
 
     if (ret != 1) {
+#ifdef ZHLANG
+        pline1("算了。");
+#else
         pline1(Never_mind);
+#endif
         return ECMD_OK;
     }
     if (newlevel == u.ulevel) {
+#ifdef ZHLANG
+        You("已经达到那个经验等级了。");
+#else
         You("are already that experienced.");
+#endif
     } else if (newlevel < u.ulevel) {
         if (u.ulevel == 1) {
+#ifdef ZHLANG
+            You("已经是最低的经验等级了。");
+#else
             You("are already as inexperienced as you can get.");
+#endif
             return ECMD_OK;
         }
         if (newlevel < 1)
@@ -475,7 +542,11 @@ wiz_level_change(void)
             losexp("#levelchange");
     } else {
         if (u.ulevel >= MAXULEV) {
+#ifdef ZHLANG
+            You("已经达到最高的经验等级了。");
+#else
             You("are already as experienced as you can get.");
+#endif
             return ECMD_OK;
         }
         if (newlevel > MAXULEV)
@@ -501,7 +572,11 @@ wiz_telekinesis(void)
     cc.x = u.ux;
     cc.y = u.uy;
 
+#ifdef ZHLANG
+    pline("选择一个怪物来扔出去。");
+#else
     pline("Pick a monster to hurtle.");
+#endif
     do {
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 1)
@@ -509,7 +584,12 @@ wiz_telekinesis(void)
 
         if ((((mtmp = m_at(cc.x, cc.y)) != 0) && canspotmon(mtmp))
             || u_at(cc.x, cc.y)) {
-            if (!getdir("which direction?"))
+            if (!getdir(
+#ifdef ZHLANG
+                    "哪个方向？"))
+#else
+                    "which direction?"))
+#endif
                 return ECMD_CANCEL;
 
             if (mtmp) {
@@ -540,7 +620,11 @@ wiz_panic(void)
         return ECMD_OK;
     }
     if (paranoid_query(TRUE,
+#ifdef ZHLANG
+                       "你想调用 panic() 并结束游戏吗？"))
+#else
                        "Do you want to call panic() and end your game?"))
+#endif
         panic("Crash test (#panic).");
     return ECMD_OK;
 }
@@ -550,12 +634,22 @@ int
 wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
+#ifdef ZHLANG
+        pline("模糊测试器将让 NetHack 执行随机按键。");
+        There("没有常规方式退出此模式。");
+#else
         pline("The fuzz tester will make NetHack execute random keypresses.");
         There("is no conventional way out of this mode.");
+#endif
     }
-    if (paranoid_query(TRUE, "Do you want to start fuzz testing?")) {
-        /* Thoth, take the reins */
+    if (paranoid_query(TRUE,
+#ifdef ZHLANG
+                       "你想开始模糊测试吗？")) {
+        if (y_n("你想在 impossible() 之后调用 panic() 吗？") == 'n') {
+#else
+                       "Do you want to start fuzz testing?")) {
         if (y_n("Do you want to call panic() after impossible()?") == 'n') {
+#endif
             iflags.debug_fuzzer = fuzzer_impossible_continue;
         } else {
             iflags.debug_fuzzer = fuzzer_impossible_panic;
@@ -894,13 +988,25 @@ wiz_smell(void)
     cc.x = u.ux;
     cc.y = u.uy;
     if (!olfaction(gy.youmonst.data)) {
+#ifdef ZHLANG
+        You("以你当前的形态无法探测气味。");
+#else
         You("are incapable of detecting odors in your present form.");
+#endif
         return ECMD_OK;
     }
 
+#ifdef ZHLANG
+    You("可以移动光标到你想要闻的怪物上。");
+#else
     You("can move the cursor to a monster that you want to smell.");
+#endif
     do {
+#ifdef ZHLANG
+        pline("选择一个怪物来闻。");
+#else
         pline("Pick a monster to smell.");
+#endif
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 0) {
             return ECMD_CANCEL; /* done */
@@ -924,14 +1030,27 @@ wiz_smell(void)
         /* Is it a monster? */
         if (mptr) {
             if (is_you)
+#ifdef ZHLANG
+                You("偷偷闻了闻你的%s下面。", body_part(ARM));
+#else
                 You("surreptitiously sniff under your %s.", body_part(ARM));
+#endif
             if (!usmellmon(mptr))
+#ifdef ZHLANG
+                pline("%s没有散发出任何气味。",
+                      is_you ? "你似乎" : "那怪物似乎");
+#else
                 pline("%s to not give off any smell.",
                       is_you ? "You seem" : "That monster seems");
+#endif
             if (!glyph_is_monster(glyph))
                 map_invisible(cc.x, cc.y);
         } else {
+#ifdef ZHLANG
+            You("没有闻到任何怪物。");
+#else
             You("don't smell any monster there.");
+#endif
             if (glyph_is_invisible(glyph))
                 unmap_invisible(cc.x, cc.y);
         }
@@ -1038,20 +1157,32 @@ wiz_intrinsic(void)
                 make_sick(newtimeout, wizintrinsic, TRUE, typ);
                 break;
             case SLIMED:
+#ifdef ZHLANG
+                Sprintf(buf, "你%s在变成粘液。", !Slimed ? "" : "仍然");
+#else
                 Sprintf(buf, fmt,
                         !Slimed ? "" : " still", "turning into slime");
+#endif
                 make_slimed(newtimeout, buf);
                 break;
             case STONED:
+#ifdef ZHLANG
+                Sprintf(buf, "你%s在变成石头。", !Stoned ? "" : "仍然");
+#else
                 Sprintf(buf, fmt,
                         !Stoned ? "" : " still", "turning into stone");
+#endif
                 make_stoned(newtimeout, buf, KILLED_BY, wizintrinsic);
                 break;
             case STUNNED:
                 make_stunned(newtimeout, TRUE);
                 break;
             case VOMITING:
+#ifdef ZHLANG
+                Sprintf(buf, "你%s在呕吐。", !Vomiting ? "" : "仍然");
+#else
                 Sprintf(buf, fmt, !Vomiting ? "" : " still", "vomiting");
+#endif
                 make_vomiting(newtimeout, FALSE);
                 pline1(buf);
                 break;
@@ -1074,8 +1205,13 @@ wiz_intrinsic(void)
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
                 disp.botl = TRUE; /* have pline() do a status update */
+#ifdef ZHLANG
+                pline("%s的时限%s%d。", propname,
+                      oldtimeout ? "增加了" : "设为", amt);
+#else
                 pline("Timeout for %s %s %d.", propname,
                       oldtimeout ? "increased by" : "set to", amt);
+#endif
                 break;
             }
             /* this has to be after incr_itimeout() */
@@ -1525,11 +1661,21 @@ list_migrating_mons(
             ++other;
     }
     if (here + nxtlv + other == 0) {
+#ifdef ZHLANG
+        pline("当前没有怪物在迁移中。");
+#else
         pline("No monsters currently migrating.");
+#endif
     } else {
+#ifdef ZHLANG
+        pline(
+      "%d个怪物%s等待在当前层，%d个在下一层，%d个在其他层。",
+              here, plur(here), nxtlv, other);
+#else
         pline(
       "%d mon%s pending for current level, %d for next level, %d for others.",
               here, plur(here), nxtlv, other);
+#endif
         prmpt[0] = xtra[0] = '\0';
         (void) strkitten(here ? prmpt : xtra, 'c');
         (void) strkitten(nxtlv ? prmpt : xtra, 'n');
@@ -1537,7 +1683,13 @@ list_migrating_mons(
         Strcat(prmpt, "a q");
         if (*xtra)
             Sprintf(eos(prmpt), "%c%s", '\033', xtra);
-        c = yn_function("List which?", prmpt, 'q', TRUE);
+        c = yn_function(
+#ifdef ZHLANG
+                "列出哪些？",
+#else
+                "List which?",
+#endif
+                prmpt, 'q', TRUE);
         n = (c == 'c') ? here
             : (c == 'n') ? nxtlv
               : (c == 'o') ? other
@@ -1549,13 +1701,24 @@ list_migrating_mons(
             case 'c':
             case 'n':
             case 'o':
+#ifdef ZHLANG
+                Sprintf(buf, "正在迁移到%s的怪物%s：", plur(n),
+                        (c == 'c') ? "当前层"
+                        : (c == 'n') ? "下一层"
+                          : "其他层");
+#else
                 Sprintf(buf, "Monster%s migrating to %s:", plur(n),
                         (c == 'c') ? "current level"
                         : (c == 'n') ? "next level"
                           : "'other' levels");
+#endif
                 break;
             default:
+#ifdef ZHLANG
+                Strcpy(buf, "所有正在迁移的怪物：");
+#else
                 Strcpy(buf, "All migrating monsters:");
+#endif
                 break;
             }
             putstr(win, 0, buf);
@@ -1604,7 +1767,11 @@ list_migrating_mons(
             display_nhwindow(win, FALSE);
             destroy_nhwindow(win);
         } else if (c != 'q') {
+#ifdef ZHLANG
+            pline("无。");
+#else
             pline("None.");
+#endif
         }
 
     }
@@ -1782,7 +1949,11 @@ wiz_display_macros(void)
 int
 wiz_show_nhuuid(void)
 {
+#ifdef ZHLANG
+    pline("本游戏的 NHUUID 是 { %s }。", svn.nhuuid);
+#else
     pline("The NHUUID for this game is { %s }.", svn.nhuuid);
+#endif
     return ECMD_OK;
 }
 
@@ -1895,10 +2066,19 @@ wiz_migrate_mons(void)
 #ifdef DEBUG_MIGRATING_MONS
     inbuf[0] = inbuf[1] = '\0';
     if (tolevel.dnum || tolevel.dlevel)
+#ifdef ZHLANG
+        getlin("要迁移多少个随机怪物到下一层？[0]",
+               inbuf);
+#else
         getlin("How many random monsters to migrate to next level? [0]",
                inbuf);
+#endif
     else
+#ifdef ZHLANG
+        pline("无法从当前位置到达那里。");
+#else
         pline("Can't get there from here.");
+#endif
     if (*inbuf == '\033' || *inbuf == '\0')
         return ECMD_OK;
 

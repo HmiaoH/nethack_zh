@@ -948,7 +948,11 @@ touch_artifact(struct obj *obj, struct monst *mon)
 
         if (!yours)
             return 0;
+#ifdef ZHLANG
         You("are blasted by %s power!", s_suffix(the(xname(obj))));
+#else
+        You("are blasted by %s power!", s_suffix(the(xname(obj))));
+#endif
         touch_blasted = TRUE;
         dmg = d((Antimagic ? 2 : 4), (self_willed ? 10 : 4));
         /* add half (maybe quarter) of the usual silver damage bonus */
@@ -963,9 +967,17 @@ touch_artifact(struct obj *obj, struct monst *mon)
     if (badclass && badalign && self_willed) {
         if (yours) {
             if (!carried(obj))
+#ifdef ZHLANG
                 pline("%s your grasp!", Tobjnam(obj, "evade"));
+#else
+                pline("%s your grasp!", Tobjnam(obj, "evade"));
+#endif
             else
+#ifdef ZHLANG
                 pline("%s beyond your control!", Tobjnam(obj, "are"));
+#else
+                pline("%s beyond your control!", Tobjnam(obj, "are"));
+#endif
         }
         return 0;
     }
@@ -1302,8 +1314,13 @@ Mb_hit(struct monst *magr, /* attacker */
     verb = mb_verb[!!Hallucination][attack_indx];
     if (youattack || youdefend || vis) {
         result = TRUE;
+#ifdef ZHLANG
         pline_The("magic-absorbing blade %s %s!",
                   vtense((const char *) 0, verb), hittee);
+#else
+        pline_The("magic-absorbing blade %s %s!",
+                  vtense((const char *) 0, verb), hittee);
+#endif
         /* assume probing has some sort of noticeable feedback
            even if it is being done by one monster to another */
         if (attack_indx == MB_INDEX_PROBE && !canspotmon(mdef))
@@ -1330,7 +1347,11 @@ Mb_hit(struct monst *magr, /* attacker */
                     if (u.uen > 0)
                         u.uen--;
                     disp.botl = TRUE;
+#ifdef ZHLANG
                     You("lose magical energy!");
+#else
+                    You("lose magical energy!");
+#endif
                 }
             } else {
                 /* canceled shapeshifter/vamp may have changed forms, so
@@ -1345,7 +1366,11 @@ Mb_hit(struct monst *magr, /* attacker */
                         u.uenpeak = u.uenmax;
                     u.uen++;
                     disp.botl = TRUE;
+#ifdef ZHLANG
                     You("absorb magical energy!");
+#else
+                    You("absorb magical energy!");
+#endif
                 }
             }
         }
@@ -1361,7 +1386,11 @@ Mb_hit(struct monst *magr, /* attacker */
                 gn.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(gy.youmonst.data)) {
                     set_ustuck((struct monst *) 0);
+#ifdef ZHLANG
                     You("release %s!", mon_nam(magr));
+#else
+                    You("release %s!", mon_nam(magr));
+#endif
                 }
             }
         } else {
@@ -1380,7 +1409,11 @@ Mb_hit(struct monst *magr, /* attacker */
 
     case MB_INDEX_PROBE:
         if (youattack && (mb->spe == 0 || !rn2(3 * abs(mb->spe)))) {
+#ifdef ZHLANG
             pline_The("%s is insightful.", verb);
+#else
+            pline_The("%s is insightful.", verb);
+#endif
             /* pre-damage status */
             probe_monster(mdef);
         }
@@ -1411,7 +1444,11 @@ Mb_hit(struct monst *magr, /* attacker */
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
+#ifdef ZHLANG
             pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
+#else
+            pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
+#endif
             shieldeff(youdefend ? u.ux : mdef->mx,
                       youdefend ? u.uy : mdef->my);
         }
@@ -1425,8 +1462,13 @@ Mb_hit(struct monst *magr, /* attacker */
                 Strcat(buf, " and ");
             if (do_confuse)
                 Strcat(buf, "confused");
+#ifdef ZHLANG
             pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
                   (do_stun && do_confuse) ? '!' : '.');
+#else
+            pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
+                  (do_stun && do_confuse) ? '!' : '.');
+#endif
         }
     }
 
@@ -1481,6 +1523,7 @@ artifact_hit(
     /* the four basic attacks: fire, cold, shock and missiles */
     if (attacks(AD_FIRE, otmp)) {
         if (realizes_damage)
+#ifdef ZHLANG
             pline_The("fiery blade %s %s%c",
                       !gs.spec_dbon_applies
                           ? "hits"
@@ -1488,6 +1531,15 @@ artifact_hit(
                                 ? "vaporizes part of"
                                 : "burns",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
+#else
+            pline_The("fiery blade %s %s%c",
+                      !gs.spec_dbon_applies
+                          ? "hits"
+                          : (mdef->data == &mons[PM_WATER_ELEMENTAL])
+                                ? "vaporizes part of"
+                                : "burns",
+                      hittee, !gs.spec_dbon_applies ? '.' : '!');
+#endif
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_FIRE, *dmgptr);
             if (!youdefend)
@@ -1500,9 +1552,15 @@ artifact_hit(
     }
     if (attacks(AD_COLD, otmp)) {
         if (realizes_damage)
+#ifdef ZHLANG
             pline_The("ice-cold blade %s %s%c",
                       !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
                       !gs.spec_dbon_applies ? '.' : '!');
+#else
+            pline_The("ice-cold blade %s %s%c",
+                      !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
+                      !gs.spec_dbon_applies ? '.' : '!');
+#endif
         if (!rn2(4)) {
             int itemdmg = destroy_items(mdef, AD_COLD, *dmgptr);
             if (!youdefend)
@@ -1512,9 +1570,15 @@ artifact_hit(
     }
     if (attacks(AD_ELEC, otmp)) {
         if (realizes_damage)
+#ifdef ZHLANG
             pline_The("massive hammer hits%s %s%c",
                       !gs.spec_dbon_applies ? "" : "!  Lightning strikes",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
+#else
+            pline_The("massive hammer hits%s %s%c",
+                      !gs.spec_dbon_applies ? "" : "!  Lightning strikes",
+                      hittee, !gs.spec_dbon_applies ? '.' : '!');
+#endif
         if (gs.spec_dbon_applies)
             wake_nearto(mdef->mx, mdef->my, 4 * 4);
         if (!rn2(5)) {
@@ -1526,11 +1590,19 @@ artifact_hit(
     }
     if (attacks(AD_MAGM, otmp)) {
         if (realizes_damage)
+#ifdef ZHLANG
             pline_The("imaginary widget hits%s %s%c",
                       !gs.spec_dbon_applies
                           ? ""
                           : "!  A hail of magic missiles strikes",
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
+#else
+            pline_The("imaginary widget hits%s %s%c",
+                      !gs.spec_dbon_applies
+                          ? ""
+                          : "!  A hail of magic missiles strikes",
+                      hittee, !gs.spec_dbon_applies ? '.' : '!');
+#endif
         return realizes_damage;
     }
 
@@ -1552,7 +1624,11 @@ artifact_hit(
             wepdesc = "The razor-sharp blade";
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
+#ifdef ZHLANG
                 You("slice %s wide open!", mon_nam(mdef));
+#else
+                You("slice %s wide open!", mon_nam(mdef));
+#endif
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 return TRUE;
             }
@@ -1563,21 +1639,39 @@ artifact_hit(
 
                 if (bigmonst(mdef->data)) {
                     if (youattack)
+#ifdef ZHLANG
                         You("slice deeply into %s!", mon_nam(mdef));
+#else
+                        You("slice deeply into %s!", mon_nam(mdef));
+#endif
                     else if (vis)
+#ifdef ZHLANG
                         pline("%s cuts deeply into %s!", Monnam(magr),
                               hittee);
+#else
+                        pline("%s cuts deeply into %s!", Monnam(magr),
+                              hittee);
+#endif
                     *dmgptr *= 2;
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
+#ifdef ZHLANG
                 pline("%s cuts %s in half!", wepdesc, mon_nam(mdef));
+#else
+                pline("%s cuts %s in half!", wepdesc, mon_nam(mdef));
+#endif
                 observe_object(otmp);
                 return TRUE;
             } else {
                 if (bigmonst(gy.youmonst.data)) {
+#ifdef ZHLANG
                     pline("%s cuts deeply into you!",
                           magr ? Monnam(magr) : wepdesc);
+#else
+                    pline("%s cuts deeply into you!",
+                          magr ? Monnam(magr) : wepdesc);
+#endif
                     *dmgptr *= 2;
                     return TRUE;
                 }
@@ -1588,7 +1682,11 @@ artifact_hit(
                  * damage does not prevent death.
                  */
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
+#ifdef ZHLANG
                 pline("%s cuts you in half!", wepdesc);
+#else
+                pline("%s cuts you in half!", wepdesc);
+#endif
                 observe_object(otmp);
                 return TRUE;
             }
@@ -1603,39 +1701,75 @@ artifact_hit(
             if (!youdefend) {
                 if (!has_head(mdef->data) || gn.notonhead || u.uswallow) {
                     if (youattack)
+#ifdef ZHLANG
                         pline("Somehow, you miss %s wildly.", mon_nam(mdef));
+#else
+                        pline("Somehow, you miss %s wildly.", mon_nam(mdef));
+#endif
                     else if (vis)
+#ifdef ZHLANG
                         pline("Somehow, %s misses wildly.", mon_nam(magr));
+#else
+                        pline("Somehow, %s misses wildly.", mon_nam(magr));
+#endif
                     *dmgptr = 0;
                     return (boolean) (youattack || vis);
                 }
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
+#ifdef ZHLANG
                     pline("%s slices through %s %s.", wepdesc,
                           s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
+#else
+                    pline("%s slices through %s %s.", wepdesc,
+                          s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
+#endif
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
+#ifdef ZHLANG
                 pline(ROLL_FROM(behead_msg), wepdesc,
                       mon_nam(mdef));
+#else
+                pline(ROLL_FROM(behead_msg), wepdesc,
+                      mon_nam(mdef));
+#endif
                 if (Hallucination && !flags.female)
+#ifdef ZHLANG
                     pline("Good job Henry, but that wasn't Anne.");
+#else
+                    pline("Good job Henry, but that wasn't Anne.");
+#endif
                 observe_object(otmp);
                 return TRUE;
             } else {
                 if (!has_head(gy.youmonst.data)) {
+#ifdef ZHLANG
                     pline("Somehow, %s misses you wildly.",
                           magr ? mon_nam(magr) : wepdesc);
+#else
+                    pline("Somehow, %s misses you wildly.",
+                          magr ? mon_nam(magr) : wepdesc);
+#endif
                     *dmgptr = 0;
                     return TRUE;
                 }
                 if (noncorporeal(gy.youmonst.data)
                     || amorphous(gy.youmonst.data)) {
+#ifdef ZHLANG
                     pline("%s slices through your %s.", wepdesc,
                           body_part(NECK));
+#else
+                    pline("%s slices through your %s.", wepdesc,
+                          body_part(NECK));
+#endif
                     return TRUE;
                 }
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
+#ifdef ZHLANG
                 pline(ROLL_FROM(behead_msg), wepdesc, "you");
+#else
+                pline(ROLL_FROM(behead_msg), wepdesc, "you");
+#endif
                 observe_object(otmp);
                 /* Should amulets fall off? */
                 return TRUE;
@@ -1664,11 +1798,21 @@ artifact_hit(
                 char *otmpname = distant_name(otmp, xname);
 
                 if (is_art(otmp, ART_STORMBRINGER))
+#ifdef ZHLANG
                     pline_The("%s blade draws the %s from %s!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
+#else
+                    pline_The("%s blade draws the %s from %s!",
+                              hcolor(NH_BLACK), life, mon_nam(mdef));
+#endif
                 else
+#ifdef ZHLANG
                     pline("%s draws the %s from %s!",
                           The(otmpname), life, mon_nam(mdef));
+#else
+                    pline("%s draws the %s from %s!",
+                          The(otmpname), life, mon_nam(mdef));
+#endif
             }
             if (mdef->m_lev == 0) {
                 /* losing a level when at 0 is fatal */
@@ -1694,21 +1838,38 @@ artifact_hit(
             int oldhpmax = u.uhpmax;
 
             if (Blind) {
+#ifdef ZHLANG
                 You_feel("an %s drain your %s!",
                          is_art(otmp, ART_STORMBRINGER)
                             ? "unholy blade"
                             : "object",
                          life);
+#else
+                You_feel("an %s drain your %s!",
+                         is_art(otmp, ART_STORMBRINGER)
+                            ? "unholy blade"
+                            : "object",
+                         life);
+#endif
             } else {
                 /* call distant_name() for possible side-effects even if
                    the result won't be printed */
                 char *otmpname = distant_name(otmp, xname);
 
                 if (is_art(otmp, ART_STORMBRINGER))
+#ifdef ZHLANG
                     pline_The("%s blade drains your %s!",
                               hcolor(NH_BLACK), life);
+#else
+                    pline_The("%s blade drains your %s!",
+                              hcolor(NH_BLACK), life);
+#endif
                 else
+#ifdef ZHLANG
                     pline("%s drains your %s!", The(otmpname), life);
+#else
+                    pline("%s drains your %s!", The(otmpname), life);
+#endif
             }
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
@@ -1762,7 +1923,11 @@ staticfn void
 nothing_special(struct obj *obj)
 {
     if (carried(obj))
+#ifdef ZHLANG
         You_feel("a surge of power, but nothing seems to happen.");
+#else
+        You_feel("a surge of power, but nothing seems to happen.");
+#endif
 }
 
 staticfn int
@@ -1785,8 +1950,13 @@ invoke_healing(struct obj *obj)
     if (Upolyd)
         healamt = (u.mhmax + 1 - u.mh) / 2;
     if (healamt || Sick || Slimed || Blinded > creamed)
+#ifdef ZHLANG
         You_feel("better.");
+#else
+        You_feel("better.");
+#endif
     if (healamt || Sick || Slimed || BlindedTimeout > creamed)
+#ifdef ZHLANG
         You_feel("%sbetter.",
                  (!healamt && !Sick && !Slimed
                   /* when healing temporary blindness (aside from
@@ -1794,6 +1964,15 @@ invoke_healing(struct obj *obj)
                      due to PermaBlind or eyeless polymorph;
                      vary the message in that situation */
                   && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
+#else
+        You_feel("%sbetter.",
+                 (!healamt && !Sick && !Slimed
+                  /* when healing temporary blindness (aside from
+                     goop covering face), might still be blind
+                     due to PermaBlind or eyeless polymorph;
+                     vary the message in that situation */
+                  && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
+#endif
     else {
         nothing_special(obj);
         return ECMD_TIME;
@@ -1826,7 +2005,11 @@ invoke_energy_boost(struct obj *obj)
     if (epboost) {
         u.uen += epboost;
         disp.botl = TRUE;
+#ifdef ZHLANG
         You_feel("re-energized.");
+#else
+        You_feel("re-energized.");
+#endif
     } else {
         nothing_special(obj);
         return ECMD_TIME;
@@ -1919,12 +2102,24 @@ invoke_create_portal(struct obj *obj)
 
     if (u.uhave.amulet || In_endgame(&u.uz) || In_endgame(&newlev)
         || newlev.dnum == u.uz.dnum || !next_to_u()) {
+#ifdef ZHLANG
         You_feel("very disoriented for a moment.");
+#else
+        You_feel("very disoriented for a moment.");
+#endif
     } else {
         if (!Blind)
+#ifdef ZHLANG
             You("are surrounded by a shimmering sphere!");
+#else
+            You("are surrounded by a shimmering sphere!");
+#endif
         else
+#ifdef ZHLANG
             You_feel("weightless for a moment.");
+#else
+            You_feel("weightless for a moment.");
+#endif
         goto_level(&newlev, FALSE, FALSE, FALSE);
     }
     return ECMD_TIME;
@@ -2008,12 +2203,21 @@ invoke_banish(struct obj *obj UNUSED)
 
         if (nvanished == 1)
             *(eos(subject) - 1) = '\0'; /* remove 's' */
+#ifdef ZHLANG
         pline("%s %s %s in a cloud of brimstone!",
               nstayed ? ((nvanished > nstayed)
                          ? "Most of the"
                          : "Some of the")
               : "The",
               subject, vtense(subject, "disappear"));
+#else
+        pline("%s %s %s in a cloud of brimstone!",
+              nstayed ? ((nvanished > nstayed)
+                         ? "Most of the"
+                         : "Some of the")
+              : "The",
+              subject, vtense(subject, "disappear"));
+#endif
     }
     return ECMD_TIME;
 }
@@ -2029,7 +2233,11 @@ invoke_fling_poison(struct obj *obj)
         throwit(otmp, 0L, FALSE, (struct obj *) 0);
     } else {
         /* no direction picked */
+#ifdef ZHLANG
         pline("%s", Never_mind);
+#else
+        pline("%s", Never_mind);
+#endif
         obj->age = svm.moves;
         return ECMD_CANCEL;
     }
@@ -2061,10 +2269,17 @@ invoke_blinding_ray(struct obj *obj)
                radius 0 for Sunsword, except on Rogue level where
                whole room gets lit and corridor spots remain unlit */
             litroom(TRUE, obj);
+#ifdef ZHLANG
             pline("%s", ((!Blind && levl[u.ux][u.uy].lit
                           && !levl[u.ux][u.uy].waslit)
                          ? "It is lit here now."
                          : nothing_seems_to_happen));
+#else
+            pline("%s", ((!Blind && levl[u.ux][u.uy].lit
+                          && !levl[u.ux][u.uy].waslit)
+                         ? "It is lit here now."
+                         : nothing_seems_to_happen));
+#endif
         } else { /* zapyourself() */
             boolean vulnerable = (u.umonnum == PM_GREMLIN);
             int damg = obj->blessed ? 15 : !obj->cursed ? 10 : 5;
@@ -2074,11 +2289,19 @@ invoke_blinding_ray(struct obj *obj)
 
             if (!flashburn((long) (damg + rnd(damg)), FALSE)
                 && !vulnerable)
+#ifdef ZHLANG
                 pline("%s", nothing_seems_to_happen);
+#else
+                pline("%s", nothing_seems_to_happen);
+#endif
         }
     } else {
         /* no direction picked */
+#ifdef ZHLANG
         pline("%s", Never_mind);
+#else
+        pline("%s", Never_mind);
+#endif
         obj->age = svm.moves;
         return ECMD_CANCEL;
     }
@@ -2110,14 +2333,23 @@ arti_invoke_cost(struct obj *obj)
 
         if (pw_cost < 0 || u.uen < pw_cost) {
             /* the artifact is tired :-) */
+#ifdef ZHLANG
             You_feel("that %s %s ignoring you.", the(xname(obj)),
                      otense(obj, "are"));
+#else
+            You_feel("that %s %s ignoring you.", the(xname(obj)),
+                     otense(obj, "are"));
+#endif
             /* and just got more so; patience is essential... */
             obj->age += (long) d(3, 10);
             return FALSE;
         } else {
             /* you pay invoke cost with your own magic */
+#ifdef ZHLANG
             You_feel("drained...");
+#else
+            You_feel("drained...");
+#endif
             u.uen -= pw_cost;
             disp.botl = TRUE;
         }
@@ -2142,7 +2374,11 @@ arti_invoke(struct obj *obj)
         if (obj->otyp == CRYSTAL_BALL)
             use_crystal_ball(&obj);
         else
+#ifdef ZHLANG
             pline1(nothing_happens);
+#else
+            pline1(nothing_happens);
+#endif
         return ECMD_TIME;
     }
 
@@ -2183,8 +2419,13 @@ arti_invoke(struct obj *obj)
         if (on && obj->age > svm.moves) {
             /* the artifact is tired :-) */
             u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
+#ifdef ZHLANG
             You_feel("that %s %s ignoring you.", the(xname(obj)),
                      otense(obj, "are"));
+#else
+            You_feel("that %s %s ignoring you.", the(xname(obj)),
+                     otense(obj, "are"));
+#endif
             /* can't just keep repeatedly trying */
             obj->age += (long) d(3, 10);
             return ECMD_TIME;
@@ -2202,9 +2443,17 @@ arti_invoke(struct obj *obj)
         switch (oart->inv_prop) {
         case CONFLICT:
             if (on)
+#ifdef ZHLANG
                 You_feel("like a rabble-rouser.");
+#else
+                You_feel("like a rabble-rouser.");
+#endif
             else
+#ifdef ZHLANG
                 You_feel("the tension decrease around you.");
+#else
+                You_feel("the tension decrease around you.");
+#endif
             break;
         case LEVITATION:
             if (on) {
@@ -2220,10 +2469,19 @@ arti_invoke(struct obj *obj)
             }
             newsym(u.ux, u.uy);
             if (on)
+#ifdef ZHLANG
                 Your("body takes on a %s transparency...",
                      Hallucination ? "normal" : "strange");
+#else
+                Your("body takes on a %s transparency...",
+                     Hallucination ? "normal" : "strange");
+#endif
             else
+#ifdef ZHLANG
                 Your("body seems to unfade...");
+#else
+                Your("body seems to unfade...");
+#endif
             break;
         }
     }
@@ -2289,9 +2547,17 @@ arti_speak(struct obj *obj)
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
         line = "NetHack rumors file closed for renovation.";
+#ifdef ZHLANG
     pline("%s:", Tobjnam(obj, "whisper"));
+#else
+    pline("%s:", Tobjnam(obj, "whisper"));
+#endif
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
+#ifdef ZHLANG
     verbalize1(line);
+#else
+    verbalize1(line);
+#endif
     return ECMD_TIME;
 }
 
@@ -2476,8 +2742,13 @@ Sting_effects(
         if (orc_count == -1 && gw.warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
+#ifdef ZHLANG
             pline("%s is %s.", bare_artifactname(uwep),
                   glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
+#else
+            pline("%s is %s.", bare_artifactname(uwep),
+                  glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
+#endif
         } else if (newstr > 0 && newstr != oldstr) {
             /* goto_level() -> docrt() -> see_monsters() -> Sting_effects();
                if "you materialize on a different level" is pending, give
@@ -2486,17 +2757,34 @@ Sting_effects(
 
             /* 'start' message */
             if (!Blind)
+#ifdef ZHLANG
                 pline("%s %s %s%c", bare_artifactname(uwep),
                       otense(uwep, glow_verb(orc_count, FALSE)),
                       glow_color(uwep->oartifact),
                       (newstr > oldstr) ? '!' : '.');
+#else
+                pline("%s %s %s%c", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(orc_count, FALSE)),
+                      glow_color(uwep->oartifact),
+                      (newstr > oldstr) ? '!' : '.');
+#endif
             else if (oldstr == 0) /* quivers */
+#ifdef ZHLANG
                 pline("%s %s slightly.", bare_artifactname(uwep),
                       otense(uwep, glow_verb(0, FALSE)));
+#else
+                pline("%s %s slightly.", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(0, FALSE)));
+#endif
         } else if (orc_count == 0 && gw.warn_obj_cnt > 0) {
             /* 'stop' message */
+#ifdef ZHLANG
             pline("%s stops %s.", bare_artifactname(uwep),
                   glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
+#else
+            pline("%s stops %s.", bare_artifactname(uwep),
+                  glow_verb(Blind ? 0 : gw.warn_obj_cnt, TRUE));
+#endif
         }
     }
 }
@@ -2529,8 +2817,13 @@ retouch_object(
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
            "<obj> evades your grasp|control" message; give an alternate one */
+#ifdef ZHLANG
         You_cant("handle %s%s!", yname(obj),
                  obj->owornmask ? " anymore" : "");
+#else
+        You_cant("handle %s%s!", yname(obj),
+                 obj->owornmask ? " anymore" : "");
+#endif
         /* also inflict damage unless touch_artifact() already did so */
         if (!touch_blasted) {
             const char *what = killer_xname(obj);
@@ -2581,8 +2874,13 @@ retouch_object(
             /* dropx gives a message if a dropped item lands on an altar;
                we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
+#ifdef ZHLANG
                 pline("%s to the %s.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));
+#else
+                pline("%s to the %s.", Tobjnam(obj, "fall"),
+                      surface(u.ux, u.uy));
+#endif
             dropx(obj);
         }
         *objp = obj = 0; /* no longer in inventory */
@@ -2762,7 +3060,11 @@ mkot_trap_warn(void)
 
         if (ntraps != gm.mkot_trap_warn_count) {
             idx = min(ntraps, SIZE(heat) - 1);
+#ifdef ZHLANG
             pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+#else
+            pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+#endif
         }
         gm.mkot_trap_warn_count = ntraps;
     } else
