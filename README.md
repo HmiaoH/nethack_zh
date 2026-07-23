@@ -29,7 +29,7 @@
 ```bash
 tar xzf nethack-zh-*.tar.gz
 cd nethack-zh-*
-./nethack.sh          # 开始游戏
+./nethack.sh          # 首次运行会提示输入密码完成配置
 ./nethack.sh -D       # 开发者模式（调试/作弊）
 ```
 

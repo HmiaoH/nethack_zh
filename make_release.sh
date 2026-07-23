@@ -42,25 +42,6 @@ exec "$HACKDIR/nethack" "$@"
 SCRIPT
 chmod +x "$PKG/nethack.sh"
 
-# 创建首次运行安装脚本
-cat > "$PKG/install.sh" << 'SETUP'
-#!/bin/bash
-# 首次运行：创建 nethackdir 软链接（如果二进制硬编码了此路径）
-DIR="$(cd "$(dirname "$0")" && pwd)"
-TARGET=/Users/chenjiahao/nethackdir
-if [ ! -d "$TARGET" ]; then
-    sudo mkdir -p "$(dirname "$TARGET")" 2>/dev/null || true
-    sudo ln -sf "$DIR" "$TARGET" 2>/dev/null || {
-        echo "无法创建系统路径，请手动运行："
-        echo "  cd '$DIR' && ./nethack.sh"
-        exit 1
-    }
-    echo "安装完成！"
-fi
-echo "运行：cd '$DIR' ; ./nethack.sh"
-SETUP
-chmod +x "$PKG/install.sh"
-
 # 说明文件
 cat > "$PKG/README_汉化版.txt" << 'INSTALL'
 NetHack 5.0 汉化版
