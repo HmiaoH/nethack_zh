@@ -783,6 +783,34 @@ staticfn void status_hilites_viewall(void);
  */
 static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
+#ifdef ZHLANG
+    INIT_BLSTAT("strength", " 力:%s", ANY_INT, 10, BL_STR),
+    INIT_BLSTAT("dexterity", " 敏:%s", ANY_INT,  10, BL_DX),
+    INIT_BLSTAT("constitution", " 体:%s", ANY_INT, 10, BL_CO),
+    INIT_BLSTAT("intelligence", " 智:%s", ANY_INT, 10, BL_IN),
+    INIT_BLSTAT("wisdom", " 慧:%s", ANY_INT, 10, BL_WI),
+    INIT_BLSTAT("charisma", " 魅:%s", ANY_INT, 10, BL_CH),
+    INIT_BLSTAT("alignment", " %s", ANY_STR, 20, BL_ALIGN),
+    INIT_BLSTAT("score", " S:%s", ANY_LONG, 30, BL_SCORE),
+    INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
+    INIT_BLSTAT("gold", " %s", ANY_LONG, 40, BL_GOLD),
+    INIT_BLSTATP("power", " 魔力:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
+    INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
+    INIT_BLSTATP("experience-level", " 经验:%s", ANY_INT, 10, BL_XP, BL_XP),
+    INIT_BLSTAT("armor-class", " 防御:%s", ANY_INT, 10, BL_AC),
+    INIT_BLSTAT("HD", " 级:%s", ANY_INT, 10, BL_HD),
+    INIT_BLSTAT("time", " 时:%s", ANY_LONG, 30, BL_TIME),
+    INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
+    INIT_BLSTATP("hitpoints", " 生命:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
+    INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
+    INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
+    INIT_BLSTATP("experience", "/%s", ANY_LONG, 30, BL_EXP, BL_EXP),
+    INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
+    INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
+    INIT_BLSTAT("weapon", " %s", ANY_STR, 20, BL_WEAPON),
+    INIT_BLSTAT("armor", " %s", ANY_STR, 20, BL_ARMOR),
+    INIT_BLSTAT("terrain", " %s", ANY_STR, 20, BL_TERRAIN),
+#else
     INIT_BLSTAT("strength", " St:%s", ANY_INT, 10, BL_STR),
     INIT_BLSTAT("dexterity", " Dx:%s", ANY_INT,  10, BL_DX),
     INIT_BLSTAT("constitution", " Co:%s", ANY_INT, 10, BL_CO),
@@ -799,26 +827,17 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 30, BL_TIME),
-    /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 20, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
     INIT_BLSTATP("experience", "/%s", ANY_LONG, 30, BL_EXP, BL_EXP),
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
-    /* optional; once set it doesn't change unless 'showvers' option is
-       toggled or player modifies the 'versinfo' option;
-       available mostly for screenshots or someone looking over shoulder;
-       blstat[][BL_VERS] is actually an int copy of flags.versinfo (0...7) */
     INIT_BLSTAT("version", " %s", ANY_STR, MAXVALWIDTH, BL_VERS),
-    /* weapon and armor are constructed strings with no particular numeric
-       equivalent */
     INIT_BLSTAT("weapon", " %s", ANY_STR, 20, BL_WEAPON),
     INIT_BLSTAT("armor", " %s", ANY_STR, 20, BL_ARMOR),
-    /* terrain is tracked by a number but designating it as type 'int'
-       isn't useful; using type 'string' allows highlighting based on text
-       matching which is potentially useful */
     INIT_BLSTAT("terrain", " %s", ANY_STR, 20, BL_TERRAIN),
+#endif
 };
 
 #undef INIT_BLSTATP
