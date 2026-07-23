@@ -1868,7 +1868,11 @@ dopay(void)
     }
 
     if ((!sk && (!Blind || Blind_telepat)) || (!Blind && !seensk)) {
+#ifdef ZHLANG
+        There("这里似乎没有店主来接收你的付款。");
+#else
         There("appears to be no shopkeeper here to receive your payment.");
+#endif
         return ECMD_OK;
     }
 
@@ -1922,7 +1926,11 @@ dopay(void)
             return ECMD_OK;
         }
         if (!mtmp) {
+#ifdef ZHLANG
+            There("那里没人接收你的付款。");
+#else
             There("is no one there to receive your payment.");
+#endif
             return ECMD_OK;
         }
         if (!mtmp->isshk) {
@@ -1930,7 +1938,11 @@ dopay(void)
             return ECMD_OK;
         }
         if (mtmp != resident && !m_next2u(mtmp)) {
+#ifdef ZHLANG
+            pline("%s离你太远，无法接收付款。", Shknam(mtmp));
+#else
             pline("%s is too far to receive your payment.", Shknam(mtmp));
+#endif
             return ECMD_OK;
         }
         shkp = mtmp;

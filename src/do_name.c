@@ -279,7 +279,11 @@ do_mgivenname(void)
         return;
     }
     /* special case similar to the one in lookat() */
+#ifdef ZHLANG
+    Sprintf(qbuf, "你想怎么称呼%s？",
+#else
     Sprintf(qbuf, "What do you want to call %s?",
+#endif
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf,
@@ -347,7 +351,11 @@ do_oname(struct obj *obj)
         return;
     }
 
+#ifdef ZHLANG
+    Sprintf(qbuf, "你想命名%s ",
+#else
     Sprintf(qbuf, "What do you want to name %s ",
+#endif
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
     /* use getlin() to get a name string from the player */
@@ -608,7 +616,11 @@ docallcmd(void)
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
              ATR_NONE, clr, "record an annotation for the current level",
              MENU_ITEMFLAGS_NONE);
+#ifdef ZHLANG
+    end_menu(win, "你想命名什么？");
+#else
     end_menu(win, "What do you want to name?");
+#endif
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
@@ -1127,8 +1139,13 @@ l_monnam(struct monst *mtmp)
 char *
 mon_nam(struct monst *mtmp)
 {
+#ifdef ZHLANG
+    return x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+#else
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                     (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+#endif
 }
 
 /* print the name as if mon_nam() (y_monnam() if tame) was called, but

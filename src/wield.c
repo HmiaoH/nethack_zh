@@ -170,7 +170,11 @@ empty_handed(void)
     return uarmg ? "empty handed" /* gloves imply hands */
            : humanoid(gy.youmonst.data)
              /* hands but no weapon and no gloves */
+#ifdef ZHLANG
+             ? "徒手"
+#else
              ? "bare handed"
+#endif
                /* alternate phrasing for paws or lack of hands */
                : "not wielding anything";
 }

@@ -1916,7 +1916,11 @@ getobj(
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
+#ifdef ZHLANG
+        Sprintf(qbuf, "你想%s什么？", word);
+#else
         Sprintf(qbuf, "What do you want to %s?", word);
+#endif
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {

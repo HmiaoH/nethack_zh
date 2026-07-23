@@ -697,7 +697,11 @@ nhl_get_config(lua_State *L)
 }
 
 /*
+#ifdef ZHLANG
+  str = getlin("你想怎么给这个地牢楼层命名？");
+#else
   str = getlin("What do you want to call this dungeon level?");
+#endif
  */
 staticfn int
 nhl_getlin(lua_State *L)

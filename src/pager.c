@@ -1800,7 +1800,11 @@ do_look(int mode, coord *click_cc)
                          clr, "all seen or remembered engravings",
                          MENU_ITEMFLAGS_NONE);
             }
+#ifdef ZHLANG
+            end_menu(win, "你想查看什么：");
+#else
             end_menu(win, "What do you want to look at:");
+#endif
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
                 free((genericptr_t) pick_list);

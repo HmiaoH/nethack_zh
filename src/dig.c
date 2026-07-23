@@ -1368,7 +1368,11 @@ use_pick_axe(struct obj *obj)
         *dsp++ = dirch;
     }
     *dsp = 0;
+#ifdef ZHLANG
+    Sprintf(qbuf, "你向哪个方向%s？[%s]", verb, dirsyms);
+#else
     Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);
+#endif
     if (!getdir(qbuf))
         return (res|ECMD_CANCEL);
 

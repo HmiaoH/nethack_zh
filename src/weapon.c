@@ -57,7 +57,11 @@ static NEARDATA const char *const odd_skill_names[] = {
 };
 /* indexed via is_martial() */
 static NEARDATA const char *const barehands_or_martial[] = {
+#ifdef ZHLANG
+    "徒手战斗", "武术"
+#else
     "bare handed combat", "martial arts"
+#endif
 };
 
 #define P_NAME(type)                                    \

@@ -5080,7 +5080,11 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         act_on_act(act, dx, dy);
         return '\0';
     } else {
+#ifdef ZHLANG
+        end_menu(win, "你想做什么？");
+#else
         end_menu(win, "What do you want to do?");
+#endif
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
     }

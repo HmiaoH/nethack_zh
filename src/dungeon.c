@@ -2555,7 +2555,11 @@ query_annotation(d_level *lev)
                values will end up with one anyway; remove it */
             (void) trimspaces(lbuf);
         }
+#ifdef ZHLANG
+        Snprintf(qbuf, sizeof qbuf, "你想怎么称呼%s？", lbuf);
+#else
         Snprintf(qbuf, sizeof qbuf, "What do you want to call %s?", lbuf);
+#endif
         getlin(qbuf, nbuf);
     }
 
