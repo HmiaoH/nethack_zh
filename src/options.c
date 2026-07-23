@@ -312,6 +312,30 @@ typedef struct {
 } menu_cmd_t;
 
 static const menu_cmd_t default_menu_cmd_info[] = {
+#ifdef ZHLANG
+    { "menu_next_page",     MENU_NEXT_PAGE,     "前往下一页" },
+    { "menu_previous_page", MENU_PREVIOUS_PAGE, "前往上一页" },
+    { "menu_first_page",    MENU_FIRST_PAGE,    "前往第一页" },
+    { "menu_last_page",     MENU_LAST_PAGE,     "前往最后一页" },
+    { "menu_select_all",    MENU_SELECT_ALL,
+                            "全选整个菜单的所有条目" },
+    { "menu_invert_all",    MENU_INVERT_ALL,
+                            "反转所有条目的选择状态" },
+    { "menu_deselect_all",  MENU_UNSELECT_ALL,
+                            "取消全选整个菜单的所有条目" },
+    { "menu_select_page",   MENU_SELECT_PAGE,
+                            "选择当前页的所有条目" },
+    { "menu_invert_page",   MENU_INVERT_PAGE,
+                            "反转当前页的选择状态" },
+    { "menu_deselect_page", MENU_UNSELECT_PAGE,
+                            "取消选择当前页的所有条目" },
+    { "menu_search",        MENU_SEARCH,
+                            "搜索并反转匹配条目" },
+    { "menu_shift_right",   MENU_SHIFT_RIGHT,
+                            "向右平移当前页（仅限永久物品栏）" },
+    { "menu_shift_left",    MENU_SHIFT_LEFT,
+                            "向左平移当前页（仅限永久物品栏）" },
+#else
     { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
     { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
     { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
@@ -334,6 +358,7 @@ static const menu_cmd_t default_menu_cmd_info[] = {
                             "Pan current page to right (perm_invent only)" },
     { "menu_shift_left",    MENU_SHIFT_LEFT,
                             "Pan current page to left (perm_invent only)" },
+#endif
     { (char *) 0, '\0', (char *) 0 }
 };
 
@@ -9188,11 +9213,19 @@ show_menu_controls(winid win, boolean dolist)
         const char *key, *desc;
     };
     static const struct xtra_cntrls hardcoded[] = {
+#ifdef ZHLANG
+        { "回车", "确认当前选择并退出菜单" },
+        { "Enter", "同回车键" },
+        { "空格", "若非最后一页，则翻至下一页；" },
+        { "     ", "若是最后一页，则等同于回车键" },
+        { "Esc",   "不做任何选择直接取消菜单" },
+#else
         { "Return", "Accept current choice(s) and dismiss menu" },
         { "Enter",  "Same as Return" },
         { "Space",  "If not on last page, advance one page;" },
         { "     ",  "when on last page, treat like Return" },
         { "Escape", "Cancel menu without making any choice(s)" },
+#endif
         { (char *) 0, (char *) 0}
     };
     static const char mc_fmt[] = "%8s     %-6s %s",

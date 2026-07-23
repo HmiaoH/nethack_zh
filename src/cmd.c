@@ -584,8 +584,13 @@ doextlist(void)
     int n, pass;
     int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
+#ifdef ZHLANG
+    static const char *const headings[] = { "扩展命令",
+                                      "调试扩展命令" };
+#else
     static const char *const headings[] = { "Extended commands",
                                       "Debugging Extended Commands" };
+#endif
     int clr = NO_COLOR;
 
     searchbuf[0] = '\0';
@@ -595,11 +600,20 @@ doextlist(void)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
+#ifdef ZHLANG
+        add_menu_str(menuwin, "扩展命令列表");
+#else
         add_menu_str(menuwin, "Extended Commands List");
+#endif
         add_menu_str(menuwin, "");
 
+#ifdef ZHLANG
+        Sprintf(buf, "%s不自动补全的命令",
+                menumode ? "显示" : "隐藏");
+#else
         Sprintf(buf, "Switch to %s commands that don't autocomplete",
                 menumode ? "including" : "excluding");
+#endif
         any.a_int = 1;
         add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
@@ -611,11 +625,21 @@ doextlist(void)
                actual list of extended commands shown via separator lines;
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
+#ifdef ZHLANG
+            add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
+                     clr, "搜索扩展命令",
+                     MENU_ITEMFLAGS_NONE);
+#else
             add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
                      clr, "Search extended commands",
                      MENU_ITEMFLAGS_NONE);
+#endif
         } else {
+#ifdef ZHLANG
+            Strcpy(buf, "退出搜索");
+#else
             Strcpy(buf, "Switch back from search");
+#endif
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
@@ -629,10 +653,17 @@ doextlist(void)
         }
         if (wizard) {
             any.a_int = 4;
+#ifdef ZHLANG
+            add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE, clr,
+          onelist ? "切换到将调试命令分节显示"
+       : "切换到按字母全部排序显示（包括调试命令）",
+                     MENU_ITEMFLAGS_NONE);
+#else
             add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE, clr,
           onelist ? "Switch to showing debugging commands in separate section"
        : "Switch to showing all alphabetically, including debugging commands",
                      MENU_ITEMFLAGS_NONE);
+#endif
         }
         add_menu_str(menuwin, "");
         menushown[0] = menushown[1] = 0;
@@ -699,7 +730,11 @@ doextlist(void)
                 add_menu_str(menuwin, "");
         }
         if (*searchbuf && !n)
+#ifdef ZHLANG
+            add_menu_str(menuwin, "无匹配");
+#else
             add_menu_str(menuwin, "no matches");
+#endif
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
@@ -732,7 +767,11 @@ doextlist(void)
             searchbuf[0] = '\0';
         }
         if (search) {
+#ifdef ZHLANG
+            Strcpy(promptbuf, "扩展命令列表搜索词");
+#else
             Strcpy(promptbuf, "Extended command list search phrase");
+#endif
             Strcat(promptbuf, "?");
             getlin(promptbuf, searchbuf);
             (void) mungspaces(searchbuf);
@@ -867,7 +906,11 @@ extcmd_via_menu(void)
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         }
+#ifdef ZHLANG
+        Snprintf(prompt, sizeof(prompt), "扩展命令：%s", cbuf);
+#else
         Snprintf(prompt, sizeof(prompt), "Extended Command: %s", cbuf);
+#endif
         end_menu(win, prompt);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
@@ -1133,6 +1176,23 @@ makemap_prepost(boolean pre, boolean wiztower)
 /* temporary? hack, since level type codes aren't the same as screen
    symbols and only the latter have easily accessible descriptions.
    Also used by wizcmds.c */
+#ifdef ZHLANG
+const char *levltyp[MAX_TYPE + 2] = {
+    "石头", "垂直墙", "水平墙", "左上角墙",
+    "右上角墙", "左下角墙",
+    "右下角墙", "十字墙", "T形上墙", "T形下墙",
+    "T形左墙", "T形右墙", "吊桥墙", "树",
+    "暗门", "密道", "水池", "护城河", "水",
+    "升起的吊桥", "岩浆池", "岩浆墙", "铁栏杆", "门",
+    "走廊", "房间", "楼梯", "梯子", "喷泉", "王座", "水槽",
+    "坟墓", "祭坛", "冰", "降下的吊桥", "空气", "云",
+    /* not a real terrain type, but used for undiggable stone
+       by wiz_map_levltyp() */
+    "不可到达/不可挖掘",
+    /* padding in case the number of entries above is odd */
+    ""
+};
+#else
 const char *levltyp[MAX_TYPE + 2] = {
     "stone", "vertical wall", "horizontal wall", "top-left corner wall",
     "top-right corner wall", "bottom-left corner wall",
@@ -1148,6 +1208,7 @@ const char *levltyp[MAX_TYPE + 2] = {
     /* padding in case the number of entries above is odd */
     ""
 };
+#endif
 
 const char *
 levltyp_to_name(int typ)
@@ -1186,6 +1247,36 @@ doterrain(void)
     start_menu(men, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = 1;
+#ifdef ZHLANG
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+             "已知地图（不含怪物、物品、陷阱）",
+             MENU_ITEMFLAGS_SELECTED);
+    any.a_int = 2;
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             clr, "已知地图（不含怪物和物品）",
+             MENU_ITEMFLAGS_NONE);
+    any.a_int = 3;
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             clr, "已知地图（不含怪物）",
+             MENU_ITEMFLAGS_NONE);
+    if (discover || wizard) {
+        any.a_int = 4;
+        add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 clr, "全图（不含怪物、物品、陷阱）",
+                 MENU_ITEMFLAGS_NONE);
+        if (wizard) {
+            any.a_int = 5;
+            add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                     clr, "内部levl[][].typ代码（base-36）",
+                     MENU_ITEMFLAGS_NONE);
+            any.a_int = 6;
+            add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                     clr, "base-36 levl[][].typ代码图例",
+                     MENU_ITEMFLAGS_NONE);
+        }
+    }
+    end_menu(men, "查看哪种？");
+#else
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              "known map without monsters, objects, and traps",
              MENU_ITEMFLAGS_SELECTED);
@@ -1214,6 +1305,7 @@ doterrain(void)
         }
     }
     end_menu(men, "View which?");
+#endif
 
     n = select_menu(men, PICK_ONE, &sel);
     destroy_nhwindow(men);
@@ -1774,395 +1866,1208 @@ do_repeat(void)
    or control keystroke generally should not be; there are a few exceptions
    such as ^O/#overview and C/N/#name */
 struct ext_func_tab extcmdlist[] = {
-    { '#',    "#", "enter and perform an extended command",
+    { '#',    "#",
+    #ifdef ZHLANG
+              "输入并执行扩展命令",
+    #else
+              "enter and perform an extended command",
+    #endif
               doextcmd, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { M('?'), "?", "list all extended commands",
+    { M('?'), "?",
+    #ifdef ZHLANG
+              "列出所有扩展命令",
+    #else
+              "list all extended commands",
+    #endif
               doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX,
               NULL },
-    { M('a'), "adjust", "adjust inventory letters",
+    { M('a'), "adjust",
+    #ifdef ZHLANG
+              "调整物品栏字母",
+    #else
+              "adjust inventory letters",
+    #endif
               doorganize, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { M('A'), "annotate", "name current level",
+    { M('A'), "annotate",
+    #ifdef ZHLANG
+              "命名当前关卡",
+    #else
+              "name current level",
+    #endif
               donamelevel, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
-    { 'a',    "apply", "apply (use) a tool (pick-axe, key, lamp...)",
+    { 'a',    "apply",
+    #ifdef ZHLANG
+              "使用工具（镐、钥匙、灯等）",
+    #else
+              "apply (use) a tool (pick-axe, key, lamp...)",
+    #endif
               doapply, CMD_M_PREFIX, NULL },
-    { C('x'), "attributes", "show your attributes",
+    { C('x'), "attributes",
+    #ifdef ZHLANG
+              "显示你的属性",
+    #else
+              "show your attributes",
+    #endif
               doattributes, IFBURIED | GENERALCMD, NULL },
-    { '@',    "autopickup", "toggle the 'autopickup' option on/off",
+    { '@',    "autopickup",
+    #ifdef ZHLANG
+              "切换自动拾取选项",
+    #else
+              "toggle the 'autopickup' option on/off",
+    #endif
               dotogglepickup, IFBURIED | GENERALCMD, NULL },
 #ifdef CRASHREPORT
-    { '\0',   "bugreport", "file a bug report",
+    { '\0',   "bugreport",
+    #ifdef ZHLANG
+              "提交错误报告",
+    #else
+              "file a bug report",
+    #endif
               dobugreport, GENERALCMD | NOFUZZERCMD, NULL },
 #endif
-    { 'C',    "call", "name a monster, specific object, or type of object",
+    { 'C',    "call",
+    #ifdef ZHLANG
+              "命名怪物、特定物品或物品类型",
+    #else
+              "name a monster, specific object, or type of object",
+    #endif
               docallcmd, IFBURIED | GENERALCMD, NULL },
-    { 'Z',    "cast", "zap (cast) a spell",
+    { 'Z',    "cast",
+    #ifdef ZHLANG
+              "施展（施放）咒语",
+    #else
+              "zap (cast) a spell",
+    #endif
               docast, IFBURIED, NULL },
-    { M('c'), "chat", "talk to someone",
+    { M('c'), "chat",
+    #ifdef ZHLANG
+              "与某人交谈",
+    #else
+              "talk to someone",
+    #endif
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
-    { 'v',    "chronicle", "show journal of major events",
+    { 'v',    "chronicle",
+    #ifdef ZHLANG
+              "显示重大事件日志",
+    #else
+              "show journal of major events",
+    #endif
               do_gamelog, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'c',    "close", "close a door",
+    { 'c',    "close",
+    #ifdef ZHLANG
+              "关上一扇门",
+    #else
+              "close a door",
+    #endif
               doclose, 0, NULL },
-    { M('C'), "conduct", "list voluntary challenges you have maintained",
+    { M('C'), "conduct",
+    #ifdef ZHLANG
+              "列出你保持的自愿挑战",
+    #else
+              "list voluntary challenges you have maintained",
+    #endif
               doconduct, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { '\0',   "debugfuzzer", "start the fuzz tester",
+    { '\0',   "debugfuzzer",
+    #ifdef ZHLANG
+              "启动模糊测试器",
+    #else
+              "start the fuzz tester",
+    #endif
               wiz_fuzzer, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { M('d'), "dip", "dip an object into something",
+    { M('d'), "dip",
+    #ifdef ZHLANG
+              "将物品浸入某物中",
+    #else
+              "dip an object into something",
+    #endif
               dodip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { '>',    "down", "go down a staircase",
+    { '>',    "down",
+    #ifdef ZHLANG
+              "走下楼梯",
+    #else
+              "go down a staircase",
+    #endif
               /* allows 'm' prefix (for move without autopickup) but not the
                  g/G/F movement modifiers; not flagged as MOVEMENTCMD because
                  that would suppress it from dokeylist output */
               dodown, CMD_M_PREFIX, NULL },
-    { 'd',    "drop", "drop an item",
+    { 'd',    "drop",
+    #ifdef ZHLANG
+              "丢弃物品",
+    #else
+              "drop an item",
+    #endif
               dodrop, 0, NULL },
-    { 'D',    "droptype", "drop specific item types",
+    { 'D',    "droptype",
+    #ifdef ZHLANG
+              "丢弃特定类型的物品",
+    #else
+              "drop specific item types",
+    #endif
               doddrop, 0, NULL },
-    { 'e',    "eat", "eat something",
+    { 'e',    "eat",
+    #ifdef ZHLANG
+              "吃一些东西",
+    #else
+              "eat something",
+    #endif
               doeat, CMD_M_PREFIX, NULL },
-    { 'E',    "engrave", "engrave writing on the floor",
+    { 'E',    "engrave",
+    #ifdef ZHLANG
+              "在地板上刻下文字",
+    #else
+              "engrave writing on the floor",
+    #endif
               doengrave, 0, NULL },
-    { M('e'), "enhance", "advance or check weapon and spell skills",
+    { M('e'), "enhance",
+    #ifdef ZHLANG
+              "提升或查看武器与咒语技能",
+    #else
+              "advance or check weapon and spell skills",
+    #endif
               enhance_weapon_skill, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     /* #exploremode should be flagged AUTOCOMPETE but that would negatively
        impact frequently used #enhance by making #e become ambiguous */
-    { M('X'), "exploremode", "enter explore (discovery) mode",
+    { M('X'), "exploremode",
+    #ifdef ZHLANG
+              "进入探索模式",
+    #else
+              "enter explore (discovery) mode",
+    #endif
               enter_explore_mode, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { 'F',    "fight", "prefix: force fight even if you don't see a monster",
+    { 'F',    "fight",
+    #ifdef ZHLANG
+              "前缀：强制战斗，即使看不到怪物",
+    #else
+              "prefix: force fight even if you don't see a monster",
+    #endif
               do_fight, PREFIXCMD, NULL },
-    { 'f',    "fire", "fire ammunition from quiver",
+    { 'f',    "fire",
+    #ifdef ZHLANG
+              "从箭袋发射弹药",
+    #else
+              "fire ammunition from quiver",
+    #endif
               dofire, 0, NULL },
-    { M('f'), "force", "force a lock",
+    { M('f'), "force",
+    #ifdef ZHLANG
+              "撬开一把锁",
+    #else
+              "force a lock",
+    #endif
               doforce, AUTOCOMPLETE, NULL },
     { M('g'), "genocided",
+              #ifdef ZHLANG
+              "列出已被灭绝或已灭绝的怪物",
+              #else
               "list monsters that have been genocided or become extinct",
+              #endif
               dogenocided,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
-    { ';',    "glance", "show what type of thing a map symbol corresponds to",
+    { ';',    "glance",
+    #ifdef ZHLANG
+              "显示地图符号对应的东西",
+    #else
+              "show what type of thing a map symbol corresponds to",
+    #endif
               doquickwhatis, IFBURIED | GENERALCMD, NULL },
-    { '?',    "help", "give a help message",
+    { '?',    "help",
+    #ifdef ZHLANG
+              "显示帮助信息",
+    #else
+              "give a help message",
+    #endif
               dohelp, IFBURIED | GENERALCMD, NULL },
-    { '\0',   "herecmdmenu", "show menu of commands you can do here",
+    { '\0',   "herecmdmenu",
+    #ifdef ZHLANG
+              "显示此处可执行的命令菜单",
+    #else
+              "show menu of commands you can do here",
+    #endif
               doherecmdmenu, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { '\0',    "history", "show a summary of the game's development",
+    { '\0',    "history",
+    #ifdef ZHLANG
+              "显示游戏开发历程概要",
+    #else
+              "show a summary of the game's development",
+    #endif
               dohistory, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'i',    "inventory", "show your inventory",
+    { 'i',    "inventory",
+    #ifdef ZHLANG
+              "显示你的物品栏",
+    #else
+              "show your inventory",
+    #endif
               ddoinv, IFBURIED | GENERALCMD, NULL },
-    { 'I',    "inventtype", "show inventory of one specific item class",
+    { 'I',    "inventtype",
+    #ifdef ZHLANG
+              "显示特定类型的物品栏",
+    #else
+              "show inventory of one specific item class",
+    #endif
               dotypeinv, IFBURIED | GENERALCMD, NULL },
-    { M('i'), "invoke", "invoke an object's special powers",
+    { M('i'), "invoke",
+    #ifdef ZHLANG
+              "唤起物品的特殊力量",
+    #else
+              "invoke an object's special powers",
+    #endif
               doinvoke, IFBURIED | AUTOCOMPLETE, NULL },
-    { M('j'), "jump", "jump to another location",
+    { M('j'), "jump",
+    #ifdef ZHLANG
+              "跳到另一个位置",
+    #else
+              "jump to another location",
+    #endif
               dojump, AUTOCOMPLETE, NULL },
-    { C('d'), "kick", "kick something",
+    { C('d'), "kick",
+    #ifdef ZHLANG
+              "踢某物",
+    #else
+              "kick something",
+    #endif
               dokick, 0, NULL },
-    { '\\',   "known", "show what object types have been discovered",
+    { '\\',   "known",
+    #ifdef ZHLANG
+              "显示已发现的物品类型",
+    #else
+              "show what object types have been discovered",
+    #endif
               dodiscovered, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '`',    "knownclass", "show discovered types for one class of objects",
+    { '`',    "knownclass",
+    #ifdef ZHLANG
+              "显示某一类已发现的物品类型",
+    #else
+              "show discovered types for one class of objects",
+    #endif
               doclassdisco, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "levelchange", "change experience level",
+    { '\0',   "levelchange",
+    #ifdef ZHLANG
+              "改变经验等级",
+    #else
+              "change experience level",
+    #endif
               wiz_level_change, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "lightsources", "show mobile light sources",
+    { '\0',   "lightsources",
+    #ifdef ZHLANG
+              "显示移动光源",
+    #else
+              "show mobile light sources",
+    #endif
               wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { ':',    "look", "look at what is here",
+    { ':',    "look",
+    #ifdef ZHLANG
+              "查看这里有什么",
+    #else
+              "look at what is here",
+    #endif
               dolook, IFBURIED, NULL },
-    { '\0',   "lookaround", "describe what you can see",
+    { '\0',   "lookaround",
+    #ifdef ZHLANG
+              "描述你所能看到的",
+    #else
+              "describe what you can see",
+    #endif
               dolookaround, IFBURIED | GENERALCMD, NULL },
-    { M('l'), "loot", "loot a box on the floor",
+    { M('l'), "loot",
+    #ifdef ZHLANG
+              "搜刮地上的箱子",
+    #else
+              "loot a box on the floor",
+    #endif
               doloot, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '\0',   "migratemons",
 #ifdef DEBUG_MIGRATING_MONS
+              #ifdef ZHLANG
+              "显示正在迁移的怪物并随机迁移N只",
+              #else
               "show migrating monsters and migrate N random ones",
+              #endif
 #else
+              #ifdef ZHLANG
+              "显示正在迁移的怪物",
+              #else
               "show migrating monsters",
+              #endif
 #endif
               wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('m'), "monster", "use monster's special ability",
+    { M('m'), "monster",
+    #ifdef ZHLANG
+              "使用怪物的特殊能力",
+    #else
+              "use monster's special ability",
+    #endif
               domonability, IFBURIED | AUTOCOMPLETE, NULL },
-    { M('n'), "name", "same as call; name a monster or object or object type",
+    { M('n'), "name",
+    #ifdef ZHLANG
+              "同call；命名怪物、物品或物品类型",
+    #else
+              "same as call; name a monster or object or object type",
+    #endif
               docallcmd, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { M('o'), "offer", "offer a sacrifice to the gods",
+    { M('o'), "offer",
+    #ifdef ZHLANG
+              "向神献祭",
+    #else
+              "offer a sacrifice to the gods",
+    #endif
               dosacrifice, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { 'o',    "open", "open a door",
+    { 'o',    "open",
+    #ifdef ZHLANG
+              "打开一扇门",
+    #else
+              "open a door",
+    #endif
               doopen, 0, NULL },
     /* 'm #options' runs doset() */
-    { 'O',    "options", "show option settings",
+    { 'O',    "options",
+    #ifdef ZHLANG
+              "显示选项设置",
+    #else
+              "show option settings",
+    #endif
               doset_simple, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* 'm #optionsfull' runs doset_simple() */
-    { '\0',   "optionsfull", "show all option settings, possibly change them",
+    { '\0',   "optionsfull",
+    #ifdef ZHLANG
+              "显示所有选项设置，并可修改",
+    #else
+              "show all option settings, possibly change them",
+    #endif
               doset, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* #overview used to need autocomplete and has retained that even
        after being assigned to ^O [old wizard mode ^O is now #wizwhere];
        'm' prefix displays overview as a menu where player can choose a
        level to supply with an annotation */
-    { C('o'), "overview", "show a summary of the explored dungeon",
+    { C('o'), "overview",
+    #ifdef ZHLANG
+              "显示已探索地牢的概要",
+    #else
+              "show a summary of the explored dungeon",
+    #endif
               dooverview,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     /* [should #panic actually autocomplete?] */
-    { '\0',   "panic", "test panic routine (fatal to game)",
+    { '\0',   "panic",
+    #ifdef ZHLANG
+              "测试恐慌程序（会导致游戏终止）",
+    #else
+              "test panic routine (fatal to game)",
+    #endif
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { 'p',    "pay", "pay your shopping bill",
+    { 'p',    "pay",
+    #ifdef ZHLANG
+              "支付购物账单",
+    #else
+              "pay your shopping bill",
+    #endif
               dopay, CMD_M_PREFIX, NULL },
-    { '|',    "perminv", "scroll persistent inventory display",
+    { '|',    "perminv",
+    #ifdef ZHLANG
+              "滚动常驻物品栏显示",
+    #else
+              "scroll persistent inventory display",
+    #endif
               doperminv, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { ',',    "pickup", "pick up things at the current location",
               dopickup, CMD_M_PREFIX, NULL },
-    { '\0',   "polyself", "polymorph self",
+    { '\0',   "polyself",
+    #ifdef ZHLANG
+              "变形自我",
+    #else
+              "polymorph self",
+    #endif
               wiz_polyself, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('p'), "pray", "pray to the gods for help",
+    { M('p'), "pray",
+    #ifdef ZHLANG
+              "向神祈求帮助",
+    #else
+              "pray to the gods for help",
+    #endif
               dopray, IFBURIED | AUTOCOMPLETE, NULL },
-    { C('p'), "prevmsg", "view recent game messages",
+    { C('p'), "prevmsg",
+    #ifdef ZHLANG
+              "查看最近的游戏消息",
+    #else
+              "view recent game messages",
+    #endif
               doprev_message, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
-    { 'P',    "puton", "put on an accessory (ring, amulet, etc)",
+    { 'P',    "puton",
+    #ifdef ZHLANG
+              "佩戴饰品（戒指、护身符等）",
+    #else
+              "put on an accessory (ring, amulet, etc)",
+    #endif
               doputon, 0, NULL },
-    { 'q',    "quaff", "quaff (drink) something",
+    { 'q',    "quaff",
+    #ifdef ZHLANG
+              "喝下某物",
+    #else
+              "quaff (drink) something",
+    #endif
               dodrink, CMD_M_PREFIX, NULL },
-    { '\0',   "quit", "exit without saving current game",
+    { '\0',   "quit",
+    #ifdef ZHLANG
+              "不保存退出当前游戏",
+    #else
+              "exit without saving current game",
+    #endif
               done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD,
               NULL },
-    { 'Q',    "quiver", "select ammunition for quiver",
+    { 'Q',    "quiver",
+    #ifdef ZHLANG
+              "选择箭袋的弹药",
+    #else
+              "select ammunition for quiver",
+    #endif
               dowieldquiver, 0, NULL },
-    { 'r',    "read", "read a scroll or spellbook",
+    { 'r',    "read",
+    #ifdef ZHLANG
+              "阅读卷轴或咒语书",
+    #else
+              "read a scroll or spellbook",
+    #endif
               doread, 0, NULL },
-    { C('r'), "redraw", "redraw screen",
+    { C('r'), "redraw",
+    #ifdef ZHLANG
+              "重绘屏幕",
+    #else
+              "redraw screen",
+    #endif
               doredraw, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
-    { 'R',    "remove", "remove an accessory (ring, amulet, etc)",
+    { 'R',    "remove",
+    #ifdef ZHLANG
+              "脱下饰品（戒指、护身符等）",
+    #else
+              "remove an accessory (ring, amulet, etc)",
+    #endif
               doremring, 0, NULL },
-    { C('a'), "repeat", "repeat a previous command",
+    { C('a'), "repeat",
+    #ifdef ZHLANG
+              "重复上一条命令",
+    #else
+              "repeat a previous command",
+    #endif
               do_repeat, IFBURIED | GENERALCMD, NULL },
     /* "modify command" is a vague description for use as no-autopickup,
        no-attack movement as well as miscellaneous non-movement things;
        key2extcmddesc() constructs a more explicit two line description
        for display by the '&' command and expects to find "prefix:" as
        the start of the text here */
-    { 'm',    "reqmenu", "prefix: request menu or modify command",
+    { 'm',    "reqmenu",
+    #ifdef ZHLANG
+              "前缀：请求菜单或修改命令",
+    #else
+              "prefix: request menu or modify command",
+    #endif
               do_reqmenu, PREFIXCMD, NULL },
-    { C('_'), "retravel", "travel to previously selected travel location",
+    { C('_'), "retravel",
+    #ifdef ZHLANG
+              "旅行到之前选择的旅行位置",
+    #else
+              "travel to previously selected travel location",
+    #endif
               dotravel_target, 0, NULL },
-    { M('R'), "ride", "mount or dismount a saddled steed",
+    { M('R'), "ride",
+    #ifdef ZHLANG
+              "骑上或下鞍坐骑",
+    #else
+              "mount or dismount a saddled steed",
+    #endif
               doride, AUTOCOMPLETE, NULL },
-    { M('r'), "rub", "rub a lamp or a stone",
+    { M('r'), "rub",
+    #ifdef ZHLANG
+              "擦拭神灯或宝石",
+    #else
+              "rub a lamp or a stone",
+    #endif
               dorub, AUTOCOMPLETE, NULL },
-    { 'G',    "run", "prefix: run until something interesting is seen",
+    { 'G',    "run",
+    #ifdef ZHLANG
+              "前缀：奔跑直到看到有趣的东西",
+    #else
+              "prefix: run until something interesting is seen",
+    #endif
               do_run, PREFIXCMD, NULL },
-    { 'g',    "rush", "prefix: rush until something interesting is seen",
+    { 'g',    "rush",
+    #ifdef ZHLANG
+              "前缀：冲刺直到看到有趣的东西",
+    #else
+              "prefix: rush until something interesting is seen",
+    #endif
               do_rush, PREFIXCMD, NULL },
-    { 'S',    "save", "save the game and exit",
+    { 'S',    "save",
+    #ifdef ZHLANG
+              "保存游戏并退出",
+    #else
+              "save the game and exit",
+    #endif
               dosave, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { '\0',   "saveoptions", "save the game configuration",
+    { '\0',   "saveoptions",
+    #ifdef ZHLANG
+              "保存游戏配置",
+    #else
+              "save the game configuration",
+    #endif
               do_write_config_file,
               IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
-    { 's',    "search", "search for traps and secret doors",
+    { 's',    "search",
+    #ifdef ZHLANG
+              "搜索陷阱和暗门",
+    #else
+              "search for traps and secret doors",
+    #endif
               dosearch, IFBURIED | CMD_M_PREFIX, "searching" },
-    { '*',    "seeall", "show all equipment in use",
+    { '*',    "seeall",
+    #ifdef ZHLANG
+              "显示所有正在使用的装备",
+    #else
+              "show all equipment in use",
+    #endif
               doprinuse, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { AMULET_SYM, "seeamulet", "show the amulet currently worn",
+    { AMULET_SYM, "seeamulet",
+    #ifdef ZHLANG
+              "显示当前佩戴的护身符",
+    #else
+              "show the amulet currently worn",
+    #endif
               dopramulet, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { ARMOR_SYM, "seearmor", "show the armor currently worn",
+    { ARMOR_SYM, "seearmor",
+    #ifdef ZHLANG
+              "显示当前穿戴的盔甲",
+    #else
+              "show the armor currently worn",
+    #endif
               doprarm, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { RING_SYM, "seerings", "show the ring(s) currently worn",
+    { RING_SYM, "seerings",
+    #ifdef ZHLANG
+              "显示当前佩戴的戒指",
+    #else
+              "show the ring(s) currently worn",
+    #endif
               doprring, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { TOOL_SYM, "seetools", "show the tools currently in use",
+    { TOOL_SYM, "seetools",
+    #ifdef ZHLANG
+              "显示当前使用的工具",
+    #else
+              "show the tools currently in use",
+    #endif
               doprtool, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
+    { WEAPON_SYM, "seeweapon",
+    #ifdef ZHLANG
+              "显示当前挥舞的武器",
+    #else
+              "show the weapon currently wielded",
+    #endif
               doprwep, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { '!',    "shell",
+              #ifdef ZHLANG
+              "离开游戏进入子shell（输入'exit'返回）",
+              #else
               "leave game to enter a sub-shell ('exit' to come back)",
+              #endif
               dosh_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SHELL
                         | CMD_NOT_AVAILABLE
 #endif /* SHELL */
                         ), NULL },
     /* $ is like ),=,&c but is not included with *, so not called "seegold" */
-    { GOLD_SYM, "showgold", "show gold, possibly shop credit or debt",
+    { GOLD_SYM, "showgold",
+    #ifdef ZHLANG
+              "显示金币、商店余额或欠款",
+    #else
+              "show gold, possibly shop credit or debt",
+    #endif
               doprgold, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { SPBOOK_SYM, "showspells", "list and reorder known spells",
+    { SPBOOK_SYM, "showspells",
+    #ifdef ZHLANG
+              "列出并排列已学会的咒语",
+    #else
+              "list and reorder known spells",
+    #endif
               dovspell, IFBURIED | GENERALCMD, NULL },
-    { '^',    "showtrap", "describe an adjacent, discovered trap",
+    { '^',    "showtrap",
+    #ifdef ZHLANG
+              "描述相邻的已发现陷阱",
+    #else
+              "describe an adjacent, discovered trap",
+    #endif
               doidtrap, IFBURIED | GENERALCMD, NULL },
-    { M('s'), "sit", "sit down",
+    { M('s'), "sit",
+    #ifdef ZHLANG
+              "坐下",
+    #else
+              "sit down",
+    #endif
               dosit, AUTOCOMPLETE, NULL },
-    { '\0',   "stats", "show memory statistics",
+    { '\0',   "stats",
+    #ifdef ZHLANG
+              "显示内存统计",
+    #else
+              "show memory statistics",
+    #endif
               wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { C('z'), "suspend", "push game to background ('fg' to come back)",
+    { C('z'), "suspend",
+    #ifdef ZHLANG
+              "将游戏放入后台（输入'fg'返回）",
+    #else
+              "push game to background ('fg' to come back)",
+    #endif
               dosuspend_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SUSPEND
                                | CMD_NOT_AVAILABLE
 #endif /* SUSPEND */
                                ), NULL },
-    { 'x',    "swap", "swap wielded and secondary weapons",
+    { 'x',    "swap",
+    #ifdef ZHLANG
+              "交换主武器和副武器",
+    #else
+              "swap wielded and secondary weapons",
+    #endif
               doswapweapon, 0, NULL },
-    { 'T',    "takeoff", "take off one piece of armor",
+    { 'T',    "takeoff",
+    #ifdef ZHLANG
+              "脱下一件盔甲",
+    #else
+              "take off one piece of armor",
+    #endif
               dotakeoff, 0, NULL },
-    { 'A',    "takeoffall", "remove all armor",
+    { 'A',    "takeoffall",
+    #ifdef ZHLANG
+              "脱下所有盔甲",
+    #else
+              "remove all armor",
+    #endif
               doddoremarm, 0, NULL },
-    { C('t'), "teleport", "teleport around the level",
+    { C('t'), "teleport",
+    #ifdef ZHLANG
+              "在当前关卡传送",
+    #else
+              "teleport around the level",
+    #endif
               dotelecmd, IFBURIED | CMD_M_PREFIX, NULL },
     /* \177 == <del> aka <delete> aka <rubout>; some terminals have an
        option to swap it with <backspace> so if there's a key labeled
        <delete> it may or may not actually invoke the #terrain command */
     { '\177', "terrain",
+              #ifdef ZHLANG
+              "查看地图（不显示怪物和物品遮挡）",
+              #else
               "view map without monsters or objects obstructing it",
+              #endif
               doterrain, IFBURIED | GENERALCMD | AUTOCOMPLETE, NULL },
     { '\0',   "therecmdmenu",
+              #ifdef ZHLANG
+              "显示从当前位置到相邻位置的命令菜单",
+              #else
               "menu of commands you can do from here to adjacent spot",
+              #endif
               dotherecmdmenu, AUTOCOMPLETE | GENERALCMD | MOUSECMD, NULL },
-    { 't',    "throw", "throw something",
+    { 't',    "throw",
+    #ifdef ZHLANG
+              "投掷某物",
+    #else
+              "throw something",
+    #endif
               dothrow, 0, NULL },
-    { '\0',   "timeout", "look at timeout queue and hero's timed intrinsics",
+    { '\0',   "timeout",
+    #ifdef ZHLANG
+              "查看超时队列和英雄的定时内在属性",
+    #else
+              "look at timeout queue and hero's timed intrinsics",
+    #endif
               wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { M('T'), "tip", "empty a container",
+    { M('T'), "tip",
+    #ifdef ZHLANG
+              "清空容器",
+    #else
+              "empty a container",
+    #endif
               dotip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-    { '\0',   "toggle", "toggle boolean option",
+    { '\0',   "toggle",
+    #ifdef ZHLANG
+              "切换布尔选项",
+    #else
+              "toggle boolean option",
+    #endif
               dotoggleoption, IFBURIED | GENERALCMD | CMD_PARAM, NULL },
-    { '_',    "travel", "travel to a specific location on the map",
+    { '_',    "travel",
+    #ifdef ZHLANG
+              "旅行到地图上的特定位置",
+    #else
+              "travel to a specific location on the map",
+    #endif
               dotravel, CMD_M_PREFIX, NULL },
-    { M('t'), "turn", "turn undead away",
+    { M('t'), "turn",
+    #ifdef ZHLANG
+              "驱散亡灵",
+    #else
+              "turn undead away",
+    #endif
               doturn, IFBURIED | AUTOCOMPLETE, NULL },
-    { 'X',    "twoweapon", "toggle two-weapon combat",
+    { 'X',    "twoweapon",
+    #ifdef ZHLANG
+              "切换双武器战斗",
+    #else
+              "toggle two-weapon combat",
+    #endif
               dotwoweapon, 0, NULL },
-    { M('u'), "untrap", "untrap something",
+    { M('u'), "untrap",
+    #ifdef ZHLANG
+              "解除陷阱",
+    #else
+              "untrap something",
+    #endif
               dountrap, AUTOCOMPLETE, NULL },
-    { '<',    "up", "go up a staircase",
+    { '<',    "up",
+    #ifdef ZHLANG
+              "走上楼梯",
+    #else
+              "go up a staircase",
+    #endif
               /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
-    { M('V'), "vanquished", "list vanquished monsters",
+    { M('V'), "vanquished",
+    #ifdef ZHLANG
+              "列出已击败的怪物",
+    #else
+              "list vanquished monsters",
+    #endif
               dovanquished,
               IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('v'), "version",
+              #ifdef ZHLANG
+              "列出此版本的编译选项",
+              #else
               "list compile time options for this version of NetHack",
+              #endif
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
-    { 'V',    "versionshort", "show version and date+time program was built",
+    { 'V',    "versionshort",
+    #ifdef ZHLANG
+              "显示版本及程序构建日期时间",
+    #else
+              "show version and date+time program was built",
+    #endif
               doversion, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "vision", "show vision array",
+    { '\0',   "vision",
+    #ifdef ZHLANG
+              "显示视野数组",
+    #else
+              "show vision array",
+    #endif
               wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '.',    "wait", "rest one move while doing nothing",
+    { '.',    "wait",
+    #ifdef ZHLANG
+              "休息一回合",
+    #else
+              "rest one move while doing nothing",
+    #endif
               donull, IFBURIED | CMD_M_PREFIX, "waiting" },
-    { 'W',    "wear", "wear a piece of armor",
+    { 'W',    "wear",
+    #ifdef ZHLANG
+              "穿上一件盔甲",
+    #else
+              "wear a piece of armor",
+    #endif
               dowear, 0, NULL },
-    { '&',    "whatdoes", "tell what a command does",
+    { '&',    "whatdoes",
+    #ifdef ZHLANG
+              "说明某个命令的功能",
+    #else
+              "tell what a command does",
+    #endif
               dowhatdoes, IFBURIED | GENERALCMD, NULL },
-    { '/',    "whatis", "show what type of thing a symbol corresponds to",
+    { '/',    "whatis",
+    #ifdef ZHLANG
+              "显示某个符号对应的东西",
+    #else
+              "show what type of thing a symbol corresponds to",
+    #endif
               dowhatis, IFBURIED | GENERALCMD, NULL },
-    { 'w',    "wield", "wield (put in use) a weapon",
+    { 'w',    "wield",
+    #ifdef ZHLANG
+              "挥舞武器",
+    #else
+              "wield (put in use) a weapon",
+    #endif
               dowield, 0, NULL },
-    { M('w'), "wipe", "wipe off your face",
+    { M('w'), "wipe",
+    #ifdef ZHLANG
+              "擦脸",
+    #else
+              "wipe off your face",
+    #endif
               dowipe, AUTOCOMPLETE, NULL },
-    { '\0',   "wizborn", "show stats of monsters created",
+    { '\0',   "wizborn",
+    #ifdef ZHLANG
+              "显示已创建怪物的统计数据",
+    #else
+              "show stats of monsters created",
+    #endif
               doborn, IFBURIED | WIZMODECMD, NULL },
 #ifdef DEBUG
-    { '\0',   "wizbury", "bury objs under and around you",
+    { '\0',   "wizbury",
+    #ifdef ZHLANG
+              "在你周围及身下埋藏物品",
+    #else
+              "bury objs under and around you",
+    #endif
               wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD,
               NULL },
 #endif
-    { '\0',   "wizcast", "cast any spell",
+    { '\0',   "wizcast",
+    #ifdef ZHLANG
+              "施展任意咒语",
+    #else
+              "cast any spell",
+    #endif
               dowizcast, IFBURIED | WIZMODECMD, NULL },
-    { '\0',   "wizcustom", "show customized glyphs",
+    { '\0',   "wizcustom",
+    #ifdef ZHLANG
+              "显示自定义符号",
+    #else
+              "show customized glyphs",
+    #endif
               wiz_custom, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { C('e'), "wizdetect", "reveal hidden things within a small radius",
+    { C('e'), "wizdetect",
+    #ifdef ZHLANG
+              "在小范围内揭示隐藏的事物",
+    #else
+              "reveal hidden things within a small radius",
+    #endif
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizdispmacros", "validate the display macro ranges",
+    { '\0',   "wizdispmacros",
+    #ifdef ZHLANG
+              "验证显示宏范围",
+    #else
+              "validate the display macro ranges",
+    #endif
               wiz_display_macros, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizfliplevel", "flip the level",
+    { '\0',   "wizfliplevel",
+    #ifdef ZHLANG
+              "翻转关卡",
+    #else
+              "flip the level",
+    #endif
               wiz_flip_level, IFBURIED | WIZMODECMD, NULL },
-    { C('g'), "wizgenesis", "create a monster",
+    { C('g'), "wizgenesis",
+    #ifdef ZHLANG
+              "生成一只怪物",
+    #else
+              "create a monster",
+    #endif
               wiz_genesis, IFBURIED | WIZMODECMD, NULL },
-    { C('i'), "wizidentify", "identify all items in inventory",
+    { C('i'), "wizidentify",
+    #ifdef ZHLANG
+              "鉴定物品栏中的所有物品",
+    #else
+              "identify all items in inventory",
+    #endif
               wiz_identify, IFBURIED | WIZMODECMD, NULL },
-    { '\0',   "wizintrinsic", "set an intrinsic",
+    { '\0',   "wizintrinsic",
+    #ifdef ZHLANG
+              "设置内在属性",
+    #else
+              "set an intrinsic",
+    #endif
               wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizkill", "slay a monster",
+    { '\0',   "wizkill",
+    #ifdef ZHLANG
+              "杀死一只怪物",
+    #else
+              "slay a monster",
+    #endif
               wiz_kill, (IFBURIED | AUTOCOMPLETE | WIZMODECMD
                          | CMD_M_PREFIX | NOFUZZERCMD), NULL },
-    { C('v'), "wizlevelport", "teleport to another level",
+    { C('v'), "wizlevelport",
+    #ifdef ZHLANG
+              "传送到另一关卡",
+    #else
+              "teleport to another level",
+    #endif
               wiz_level_tele, IFBURIED | WIZMODECMD | CMD_M_PREFIX, NULL },
-    { '\0',   "wizloaddes", "load and execute a des-file lua script",
+    { '\0',   "wizloaddes",
+    #ifdef ZHLANG
+              "加载并执行des文件lua脚本",
+    #else
+              "load and execute a des-file lua script",
+    #endif
               wiz_load_splua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
-    { '\0',   "wizloadlua", "load and execute a lua script",
+    { '\0',   "wizloadlua",
+    #ifdef ZHLANG
+              "加载并执行lua脚本",
+    #else
+              "load and execute a lua script",
+    #endif
               wiz_load_lua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizobjprobs", "list object generation probabilities",
+    { '\0',   "wizobjprobs",
+    #ifdef ZHLANG
+              "列出物品生成概率",
+    #else
+              "list object generation probabilities",
+    #endif
               wiz_objprobs, IFBURIED | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizmakemap", "recreate the current level",
+    { '\0',   "wizmakemap",
+    #ifdef ZHLANG
+              "重建当前关卡",
+    #else
+              "recreate the current level",
+    #endif
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
-    { C('f'), "wizmap", "map the level",
+    { C('f'), "wizmap",
+    #ifdef ZHLANG
+              "绘制关卡地图",
+    #else
+              "map the level",
+    #endif
               wiz_map, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizmondiff", "validate the difficulty ratings of monsters",
+    { '\0',   "wizmondiff",
+    #ifdef ZHLANG
+              "验证怪物的难度评级",
+    #else
+              "validate the difficulty ratings of monsters",
+    #endif
               wiz_mon_diff, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
-    { '\0',   "wizrumorcheck", "verify rumor boundaries",
+    { '\0',   "wizrumorcheck",
+    #ifdef ZHLANG
+              "验证传闻边界",
+    #else
+              "verify rumor boundaries",
+    #endif
               wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizseenv", "show map locations' seen vectors",
+    { '\0',   "wizseenv",
+    #ifdef ZHLANG
+              "显示地图位置的已见向量",
+    #else
+              "show map locations' seen vectors",
+    #endif
               wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0', "wizshownhuuid", "show NHUUID for this game",
+    { '\0', "wizshownhuuid",
+    #ifdef ZHLANG
+              "显示此游戏的NHUUID",
+    #else
+              "show NHUUID for this game",
+    #endif
               wiz_show_nhuuid, AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizsmell", "smell monster",
+    { '\0',   "wizsmell",
+    #ifdef ZHLANG
+              "嗅探怪物",
+    #else
+              "smell monster",
+    #endif
               wiz_smell, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wiztelekinesis", "telekinesis",
+    { '\0',   "wiztelekinesis",
+    #ifdef ZHLANG
+              "心灵遥控",
+    #else
+              "telekinesis",
+    #endif
               wiz_telekinesis, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizwhere", "show locations of special levels",
+    { '\0',   "wizwhere",
+    #ifdef ZHLANG
+              "显示特殊关卡的位置",
+    #else
+              "show locations of special levels",
+    #endif
               wiz_where, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { C('w'), "wizwish", "wish for something",
+    { C('w'), "wizwish",
+    #ifdef ZHLANG
+              "许愿某物",
+    #else
+              "wish for something",
+    #endif
               wiz_wish, IFBURIED | CMD_M_PREFIX | WIZMODECMD, NULL },
-    { '\0',   "wmode", "show wall modes",
+    { '\0',   "wmode",
+    #ifdef ZHLANG
+              "显示墙壁模式",
+    #else
+              "show wall modes",
+    #endif
               wiz_show_wmodes, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { 'z',    "zap", "zap a wand",
+    { 'z',    "zap",
+    #ifdef ZHLANG
+              "使用魔杖",
+    #else
+              "zap a wand",
+    #endif
               dozap, 0, NULL },
     /* movement commands will be bound by reset_commands() */
     /* move or attack; accept m/g/G/F prefixes */
-    { '\0',   "movewest", "move west (screen left)",
+    { '\0',   "movewest",
+    #ifdef ZHLANG
+              "向西移动（屏幕左侧）",
+    #else
+              "move west (screen left)",
+    #endif
               do_move_west, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenorthwest", "move northwest (screen upper left)",
+    { '\0',   "movenorthwest",
+    #ifdef ZHLANG
+              "向西北移动（屏幕左上）",
+    #else
+              "move northwest (screen upper left)",
+    #endif
               do_move_northwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenorth", "move north (screen up)",
+    { '\0',   "movenorth",
+    #ifdef ZHLANG
+              "向北移动（屏幕上方）",
+    #else
+              "move north (screen up)",
+    #endif
               do_move_north, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movenortheast", "move northeast (screen upper right)",
+    { '\0',   "movenortheast",
+    #ifdef ZHLANG
+              "向东北移动（屏幕右上）",
+    #else
+              "move northeast (screen upper right)",
+    #endif
               do_move_northeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "moveeast", "move east (screen right)",
+    { '\0',   "moveeast",
+    #ifdef ZHLANG
+              "向东移动（屏幕右侧）",
+    #else
+              "move east (screen right)",
+    #endif
               do_move_east, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesoutheast", "move southeast (screen lower right)",
+    { '\0',   "movesoutheast",
+    #ifdef ZHLANG
+              "向东南移动（屏幕右下）",
+    #else
+              "move southeast (screen lower right)",
+    #endif
               do_move_southeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesouth", "move south (screen down)",
+    { '\0',   "movesouth",
+    #ifdef ZHLANG
+              "向南移动（屏幕下方）",
+    #else
+              "move south (screen down)",
+    #endif
               do_move_south, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
-    { '\0',   "movesouthwest", "move southwest (screen lower left)",
+    { '\0',   "movesouthwest",
+    #ifdef ZHLANG
+              "向西南移动（屏幕左下）",
+    #else
+              "move southwest (screen lower left)",
+    #endif
               do_move_southwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     /* rush; accept m prefix but not g/G/F */
-    { '\0',   "rushwest", "rush west (screen left)",
+    { '\0',   "rushwest",
+    #ifdef ZHLANG
+              "向西冲刺（屏幕左侧）",
+    #else
+              "rush west (screen left)",
+    #endif
               do_rush_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnorthwest", "rush northwest (screen upper left)",
+    { '\0',   "rushnorthwest",
+    #ifdef ZHLANG
+              "向西北冲刺（屏幕左上）",
+    #else
+              "rush northwest (screen upper left)",
+    #endif
               do_rush_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnorth", "rush north (screen up)",
+    { '\0',   "rushnorth",
+    #ifdef ZHLANG
+              "向北冲刺（屏幕上方）",
+    #else
+              "rush north (screen up)",
+    #endif
               do_rush_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushnortheast", "rush northeast (screen upper right)",
+    { '\0',   "rushnortheast",
+    #ifdef ZHLANG
+              "向东北冲刺（屏幕右上）",
+    #else
+              "rush northeast (screen upper right)",
+    #endif
               do_rush_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rusheast", "rush east (screen right)",
+    { '\0',   "rusheast",
+    #ifdef ZHLANG
+              "向东冲刺（屏幕右侧）",
+    #else
+              "rush east (screen right)",
+    #endif
               do_rush_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsoutheast", "rush southeast (screen lower right)",
+    { '\0',   "rushsoutheast",
+    #ifdef ZHLANG
+              "向东南冲刺（屏幕右下）",
+    #else
+              "rush southeast (screen lower right)",
+    #endif
               do_rush_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsouth", "rush south (screen down)",
+    { '\0',   "rushsouth",
+    #ifdef ZHLANG
+              "向南冲刺（屏幕下方）",
+    #else
+              "rush south (screen down)",
+    #endif
               do_rush_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "rushsouthwest", "rush southwest (screen lower left)",
+    { '\0',   "rushsouthwest",
+    #ifdef ZHLANG
+              "向西南冲刺（屏幕左下）",
+    #else
+              "rush southwest (screen lower left)",
+    #endif
               do_rush_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     /* run; accept m prefix but not g/G/F */
-    { '\0',   "runwest", "run west (screen left)",
+    { '\0',   "runwest",
+    #ifdef ZHLANG
+              "向西奔跑（屏幕左侧）",
+    #else
+              "run west (screen left)",
+    #endif
               do_run_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnorthwest", "run northwest (screen upper left)",
+    { '\0',   "runnorthwest",
+    #ifdef ZHLANG
+              "向西北奔跑（屏幕左上）",
+    #else
+              "run northwest (screen upper left)",
+    #endif
               do_run_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnorth", "run north (screen up)",
+    { '\0',   "runnorth",
+    #ifdef ZHLANG
+              "向北奔跑（屏幕上方）",
+    #else
+              "run north (screen up)",
+    #endif
               do_run_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runnortheast", "run northeast (screen upper right)",
+    { '\0',   "runnortheast",
+    #ifdef ZHLANG
+              "向东北奔跑（屏幕右上）",
+    #else
+              "run northeast (screen upper right)",
+    #endif
               do_run_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runeast", "run east (screen right)",
+    { '\0',   "runeast",
+    #ifdef ZHLANG
+              "向东奔跑（屏幕右侧）",
+    #else
+              "run east (screen right)",
+    #endif
               do_run_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsoutheast", "run southeast (screen lower right)",
+    { '\0',   "runsoutheast",
+    #ifdef ZHLANG
+              "向东南奔跑（屏幕右下）",
+    #else
+              "run southeast (screen lower right)",
+    #endif
               do_run_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsouth", "run south (screen down)",
+    { '\0',   "runsouth",
+    #ifdef ZHLANG
+              "向南奔跑（屏幕下方）",
+    #else
+              "run south (screen down)",
+    #endif
               do_run_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
-    { '\0',   "runsouthwest", "run southwest (screen lower left)",
+    { '\0',   "runsouthwest",
+    #ifdef ZHLANG
+              "向西南奔跑（屏幕左下）",
+    #else
+              "run southwest (screen lower left)",
+    #endif
               do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
 
     /* internal commands: only used by game core, not available for user */
