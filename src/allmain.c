@@ -974,13 +974,38 @@ welcome(boolean new_game) /* false => restoring an old game */
                                              : gu.urole.name.m);
 
 #ifdef ZHLANG
-    pline(new_game ? "%s%s，欢迎来到NetHack！你是%s。"
-                   : "%s%s，%s，欢迎回到NetHack！",
+    {
+        const char *gendercn = !strcmp(genders[currentgend].adj, "male")
+                               ? "男" : "女";
+        const char *racecn = !strcmp(gu.urace.noun, "human") ? "人"
+                           : !strcmp(gu.urace.noun, "elf") ? "精灵"
+                           : !strcmp(gu.urace.noun, "dwarf") ? "矮人"
+                           : !strcmp(gu.urace.noun, "gnome") ? "侏儒"
+                           : !strcmp(gu.urace.noun, "orc") ? "兽人"
+                           : gu.urace.noun;
+        Sprintf(buf, "%s%s",
+                (currentgend && gu.urole.name.f) ? "女" : gendercn,
+                racecn);
+        Sprintf(eos(buf), "%s",
+                (currentgend && gu.urole.name.f) ? gu.urole.name.f
+                                                 : gu.urole.name.m);
+    }
+    pline(new_game ? "%s，%s，欢迎来到NetHack！你是%s。"
+                   : "%s，%s，欢迎回到NetHack！",
+          Hello((struct monst *) 0), svp.plname, buf);
 #else
+    if (!gu.urole.name.f
+        && (new_game
+            ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
+            : currentgend != flags.initgend))
+        Sprintf(eos(buf), " %s", genders[currentgend].adj);
+    Sprintf(eos(buf), " %s %s", gu.urace.adj,
+            (currentgend && gu.urole.name.f) ? gu.urole.name.f
+                                             : gu.urole.name.m);
     pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
                    : "%s %s, the%s, welcome back to NetHack!",
-#endif
           Hello((struct monst *) 0), svp.plname, buf);
+#endif
 
     if (new_game) {
         /* guarantee that 'major' event category is never empty */

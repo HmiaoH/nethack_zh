@@ -452,18 +452,32 @@ ask_do_tutorial(void)
             any.a_char = 'y';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, NO_COLOR,
+#ifdef ZHLANG
+                     "是，进入教程", MENU_ITEMFLAGS_NONE);
+            any.a_char = 'n';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, NO_COLOR,
+                     "否，直接开始游戏", MENU_ITEMFLAGS_NONE);
+#else
                      "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
             any.a_char = 'n';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, NO_COLOR,
                      "No, just start play", MENU_ITEMFLAGS_NONE);
+#endif
 
             add_menu_str(win, "");
             add_menu_str(win, buf);
             if (pass++) /* we'll get here after <space> or <return> */
+#ifdef ZHLANG
+                add_menu_str(win, "（请选择'是'或'否'。）");
+
+            end_menu(win, "是否进行教程？");
+#else
                 add_menu_str(win, "(Please choose 'y' or 'n'.)");
 
             end_menu(win, "Do you want a tutorial?");
+#endif
 
             n = select_menu(win, PICK_ONE, &sel);
             destroy_nhwindow(win);
