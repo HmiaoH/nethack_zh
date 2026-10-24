@@ -76,9 +76,9 @@ get_mplname(struct monst *mtmp, char *nam)
 
     devnam = dev_name();
     if (!devnam)
-        Strcpy(nam, fmlkind ? "Eve" : "Adam");
+        Strcpy(nam, fmlkind ? TR("Eve", "伊芙") : "Adam");
     else if (fmlkind && !!strcmp(devnam, "Janet"))
-        Strcpy(nam, rn2(2) ? "Maud" : "Eve");
+        Strcpy(nam, rn2(2) ? TR("Maud", "莫德") : "Eve");
     else
         Strcpy(nam, devnam);
 
@@ -86,7 +86,7 @@ get_mplname(struct monst *mtmp, char *nam)
         mtmp->female = 1;
     else
         mtmp->female = 0;
-    Strcat(nam, " the ");
+    Strcat(nam, TR(" the ", "，"));
     Strcat(nam, rank_of((int) mtmp->m_lev, monsndx(mtmp->data),
                         (boolean) mtmp->female));
 }

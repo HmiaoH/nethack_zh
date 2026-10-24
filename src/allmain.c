@@ -260,7 +260,7 @@ moveloop_core(void)
                  */
                 if (svm.moves >= 1000000000L) {
                     display_nhwindow(WIN_MESSAGE, TRUE);
-                    urgent_pline("The dungeon capitulates.");
+                    urgent_pline(TR("The dungeon capitulates.", "地牢投降了。"));
                     done(ESCAPED);
                 }
                 /* 'moves' is misnamed; it represents turns; hero_seq is
@@ -454,7 +454,7 @@ moveloop_core(void)
     if (u.uhave.amulet && !u.uevent.amulet_wish) {
         u.uevent.amulet_wish = 1;
         display_nhwindow(WIN_MESSAGE, TRUE);
-        urgent_pline("The Amulet is bestowing a wish upon you!");
+        urgent_pline(TR("The Amulet is bestowing a wish upon you!", "护身符正赐予你一个愿望！"));
         makewish();
     }
 
@@ -883,7 +883,7 @@ newgame(void)
     }
 
     if (flags.legacy) {
-        com_pager(u.uroleplay.pauper ? "pauper_legacy" : "legacy");
+        com_pager(u.uroleplay.pauper ? "pauper_legacy" : "legacy"); /* NOTRANS */
     }
 
     urealtime.realtime = 0L;
@@ -964,28 +964,38 @@ welcome(boolean new_game) /* false => restoring an old game */
                 adrift ? align_str(u.ualign.type)
                        : align_str(u.ualignbase[A_CURRENT]));
 #endif
-    if (!gu.urole.name.f
-        && (new_game
-            ? (gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
-            : currentgend != flags.initgend))
-        Sprintf(eos(buf), " %s", genders[currentgend].adj);
-    Sprintf(eos(buf), " %s %s", gu.urace.adj,
-            (currentgend && gu.urole.name.f) ? gu.urole.name.f
-                                             : gu.urole.name.m);
 
 #ifdef ZHLANG
     {
+        /* Chinese word order is <race> <gender> <role>; the gender word is
+           omitted when the role name itself distinguishes gender (穴居女,
+           女祭司, ...) or when the English version would omit it. */
         const char *gendercn = !strcmp(genders[currentgend].adj, "male")
-                               ? "男" : "女";
-        const char *racecn = !strcmp(gu.urace.noun, "human") ? "人"
+                               ? "男性"
+                               : !strcmp(genders[currentgend].adj, "female")
+                                 ? "女性" : "中性";
+        const char *racecn = !strcmp(gu.urace.noun, "human") ? "人类"
                            : !strcmp(gu.urace.noun, "elf") ? "精灵"
                            : !strcmp(gu.urace.noun, "dwarf") ? "矮人"
                            : !strcmp(gu.urace.noun, "gnome") ? "侏儒"
                            : !strcmp(gu.urace.noun, "orc") ? "兽人"
                            : gu.urace.noun;
-        Sprintf(buf, "%s%s",
-                (currentgend && gu.urole.name.f) ? "女" : gendercn,
-                racecn);
+        aligntyp showalign = adrift ? u.ualign.type
+                                    : u.ualignbase[A_CURRENT];
+        const char *aligncn = (showalign == A_LAWFUL) ? "守序"
+                            : (showalign == A_NEUTRAL) ? "中立"
+                            : (showalign == A_CHAOTIC) ? "混沌" : "无阵营";
+
+        Sprintf(buf, "%s", racecn);
+        if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT]
+            || adrift)
+            Sprintf(buf, "%s%s", aligncn, racecn);
+        if (!gu.urole.name.f
+            && (new_game
+                ? (gu.urole.allow & ROLE_GENDMASK)
+                      == (ROLE_MALE | ROLE_FEMALE)
+                : currentgend != flags.initgend))
+            Sprintf(eos(buf), "%s", gendercn);
         Sprintf(eos(buf), "%s",
                 (currentgend && gu.urole.name.f) ? gu.urole.name.f
                                                  : gu.urole.name.m);
@@ -1009,7 +1019,7 @@ welcome(boolean new_game) /* false => restoring an old game */
 
     if (new_game) {
         /* guarantee that 'major' event category is never empty */
-        livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
+        livelog_printf(LL_ACHIEVE, TR("%s the%s entered the dungeon", "%s，%s进入了地牢"),
                        svp.plname, buf);
     } else {
         /* if restoring in Gehennom, give same hot/smoky message as when

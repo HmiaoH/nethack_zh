@@ -897,9 +897,9 @@ scrolltele(struct obj *scroll)
         } else {
             char whobuf[BUFSZ];
 
-            Strcpy(whobuf, "you");
+            Strcpy(whobuf, TR("you", "你"));
             if (u.usteed)
-                Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
+                Sprintf(eos(whobuf), TR(" and %s", "和%s"), mon_nam(u.usteed));
             #ifdef ZHLANG
             pline("%s想要传送到哪里？", whobuf);
             #else
@@ -1006,7 +1006,7 @@ dotelecmd(void)
                      (tports[i].menulet == 'w') ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
         }
-        end_menu(win, "Which way do you want to teleport?");
+        end_menu(win, TR("Which way do you want to teleport?", "你想往哪个方向传送？"));
         i = select_menu(win, PICK_ONE, &picks);
         destroy_nhwindow(win);
         if (i > 0) {
@@ -1260,7 +1260,7 @@ level_tele(void)
         char qbuf[BUFSZ];
         int trycnt = 0;
 
-        Strcpy(qbuf, "To what level do you want to teleport?");
+        Strcpy(qbuf, TR("To what level do you want to teleport?", "你想传送到哪一层？"));
         do {
             if (iflags.menu_requested) {
                 /* wizard mode 'm ^V' skips prompting on first pass
@@ -1271,9 +1271,9 @@ level_tele(void)
             }
             if (++trycnt == 2) {
                 if (wizard)
-                    Strcat(qbuf, " [type a number, name, or ? for a menu]");
+                    Strcat(qbuf, TR(" [type a number, name, or ? for a menu]", " ［输入数字、名称，或 ? 打开菜单］"));
                 else
-                    Strcat(qbuf, " [type a number or name]");
+                    Strcat(qbuf, TR(" [type a number or name]", " ［输入数字或名称］"));
             }
             *buf = '\0'; /* EDIT_GETLIN: if we're on second or later pass,
                             the previous input was invalid so don't use it
@@ -1327,7 +1327,7 @@ level_tele(void)
         if (newlev == 0) {
             if (trycnt >= 10)
                 goto random_levtport;
-            if (ynq("Go to Nowhere.  Are you sure?") != 'y')
+            if (ynq(TR("Go to Nowhere.  Are you sure?", "前往虚无之地。你确定吗？")) != 'y')
                 return;
             #ifdef ZHLANG
             You("%s痛苦地扭动，你的身体开始扭曲...",
@@ -1351,7 +1351,7 @@ level_tele(void)
                      surface(u.ux, u.uy));
                 #endif
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "committed suicide");
+            Strcpy(svk.killer.name, TR("committed suicide", "自杀"));
             done(DIED);
             #ifdef ZHLANG
             pline("一团充满能量的尘埃开始凝聚。");
@@ -1405,7 +1405,7 @@ level_tele(void)
         int llimit = dunlevs_in_dungeon(&u.uz);
 
         if (newlev >= 0 || newlev <= -llimit) {
-            You_cant(get_there_from, "here");
+            You_cant(get_there_from, TR("here", "这里"));
             return;
         }
         newlevel.dnum = u.uz.dnum;
@@ -1440,7 +1440,7 @@ level_tele(void)
             verbalize("Thou art early, but we'll admit thee.");
             #endif
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "went to heaven prematurely");
+            Strcpy(svk.killer.name, TR("went to heaven prematurely", "过早升天"));
         } else if (newlev == -9) {
             #ifdef ZHLANG
             You_feel("欣喜若狂。");
@@ -1681,10 +1681,10 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
     boolean intentional = FALSE;
 
     if ((trflags & (VIASITTING | FORCETRAP)) != 0) {
-        Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+        Strcpy(verbbuf, TR("trigger", "触发")); /* follows "You sit down." */
         intentional = TRUE;
     } else
-        Sprintf(verbbuf, "%s onto", u_locomotion("step"));
+        Sprintf(verbbuf, TR("%s onto", "%s上"), u_locomotion("step"));
     #ifdef ZHLANG
     You("%s了一个楼层传送陷阱！", verbbuf);
     #else
@@ -2095,14 +2095,14 @@ control_mon_tele(
           noit_mon_nam(mon), mon->mx, mon->my);
     #endif
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
-    Sprintf(tcbuf, "where to teleport %s", noit_mon_nam(mon));
+    Sprintf(tcbuf, TR("where to teleport %s", "把%s传送到哪里"), noit_mon_nam(mon));
     if (getpos(cc_p, FALSE, tcbuf) >= 0 && !u_at(cc_p->x, cc_p->y)) {
         if (via_rloc
               ? rloc_pos_ok(cc_p->x, cc_p->y, mon)
               : goodpos(cc_p->x, cc_p->y, mon, rlocflags))
             return TRUE;
         if (!iflags.debug_fuzzer) {
-            Sprintf(tcbuf, "<%d,%d> is not considered viable; force anyway?",
+            Sprintf(tcbuf, TR("<%d,%d> is not considered viable; force anyway?", "＜%d,%d＞不是可行位置，仍要强制传送吗？"),
                     mon->mx, mon->my);
             if (y_n(tcbuf) == 'y')
                 return TRUE;

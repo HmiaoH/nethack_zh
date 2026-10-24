@@ -77,9 +77,11 @@ staticfn void finish_splitting(struct obj *);
      ? !(is_launcher(obj) || is_ammo(obj) || is_missile(obj))   \
      : is_weptool(obj))
 
+#ifndef ZHLANG
 static const char
     are_no_longer_twoweap[] = "are no longer using two weapons at once",
     can_no_longer_twoweap[] = "can no longer wield two weapons at once";
+#endif
 
 /*** Functions that place a given item in a slot ***/
 /* Proper usage includes:
@@ -157,7 +159,7 @@ cant_wield_corpse(struct obj *obj)
         corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
         makeplural(body_part(HAND)));
 #endif
-    Sprintf(kbuf, "wielding %s bare-handed", killer_xname(obj));
+    Sprintf(kbuf, TR("wielding %s bare-handed", "徒手挥舞%s"), killer_xname(obj));
     instapetrify(kbuf);
     return TRUE;
 }
@@ -303,7 +305,7 @@ ready_weapon(struct obj *wep)
         if (Race_if(PM_ELF) && !wep->oartifact
             && objects[wep->otyp].oc_material == IRON) {
             /* Elves are averse to wielding cold iron */
-            You("have an uneasy feeling about wielding cold iron.");
+            You(TR("have an uneasy feeling about wielding cold iron.", "对挥舞冷铁感到不安。"));
             change_luck(-1);
         }
 #endif
@@ -1062,7 +1064,7 @@ drop_uswapwep(void)
        dual-wielded, or to get this far attempting to achieve that,
        uswapwep must be one-handed; since it's secondary, the hand must
        be the left one */
-    Sprintf(left_hand, "left %s", body_part(HAND));
+    Sprintf(left_hand, TR("left %s", "左%s"), body_part(HAND));
     if (!obj->cursed)
         /* attempting to two-weapon while Glib */
 #ifdef ZHLANG
@@ -1304,9 +1306,8 @@ chwepon(struct obj *otmp, int amount)
         && rn2(3)) {
         if (!Blind)
 #ifdef ZHLANG
-            pline("%s剧烈地发光了一会儿然后%s了。",
-                  Yobjnam2(uwep, ""), color,
-                  otense(uwep, "蒸发"));
+            pline("%s剧烈地发出%s光，然后%s了。",
+                  Yobjnam2(uwep, ""), color, "蒸发");
 #else
             pline("%s %s for a while and then %s.",
                   Yobjnam2(uwep, "violently glow"), color,

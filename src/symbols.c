@@ -768,7 +768,7 @@ savedsym_strbuf(strbuf_t *sbuf)
     char buf[BUFSZ];
 
     while (tmp) {
-        Sprintf(buf, "%sSYMBOLS=%s:%s\n",
+        Sprintf(buf, "%sSYMBOLS=%s:%s\n", /* NOTRANS */
                 (tmp->which_set == ROGUESET) ? "ROGUE" : "",
                 tmp->name, tmp->val);
         strbuf_append(sbuf, buf);
@@ -1036,7 +1036,7 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            There("are no appropriate %s symbol sets available.",
+            There(TR("are no appropriate %s symbol sets available.", "没有可用的合适%s符号集。"),
                   rogueflag ? "rogue level" : "primary");
             return TRUE;
         }
@@ -1079,7 +1079,7 @@ do_symset(boolean rogueflag)
                                                 : MENU_ITEMFLAGS_NONE);
             }
         }
-        Sprintf(buf, "Select %ssymbol set:",
+        Sprintf(buf, TR("Select %ssymbol set:", "选择%s符号集："),
                 rogueflag ? "rogue level " : "");
         end_menu(tmpwin, buf);
         n = select_menu(tmpwin, PICK_ONE, &symset_pick);
@@ -1126,7 +1126,7 @@ do_symset(boolean rogueflag)
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        There("were no symbol sets found in \"%s\".", SYMBOLS);
+        There(TR("were no symbol sets found in \"%s\".", "在「%s」中没有找到任何符号集。"), SYMBOLS);
         return TRUE;
     }
 

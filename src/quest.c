@@ -176,7 +176,7 @@ is_pure(boolean talk)
             You("are currently %d and require %d.", u.ualign.record,
 #endif
                 MIN_QUEST_ALIGN);
-            if (yn_function("adjust?", (char *) 0, 'y', TRUE) == 'y')
+            if (yn_function(TR("adjust?", "要调整吗？"), (char *) 0, 'y', TRUE) == 'y')
                 u.ualign.record = MIN_QUEST_ALIGN;
         }
     }
@@ -286,7 +286,7 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
         /* should have obtained bell during quest;
            if not, suggest returning for it now */
         if ((otmp = carrying(BELL_OF_OPENING)) == 0)
-            com_pager("quest_complete_no_bell");
+            com_pager("quest_complete_no_bell"); /* NOTRANS */
     }
     Qstat(got_thanks) = TRUE;
 
@@ -357,7 +357,7 @@ chat_with_leader(struct monst *mtmp)
             expulsion(FALSE);
         } else if ((purity = is_pure(TRUE)) < 0) {
             if (!Qstat(pissed_off)) {
-                com_pager("banished");
+                com_pager("banished"); /* NOTRANS */
                 Qstat(pissed_off) = TRUE;
                 expulsion(FALSE);
 

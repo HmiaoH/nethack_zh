@@ -697,9 +697,9 @@ object_detect(struct obj *detector, /* object doing the detecting */
     if (Hallucination || (Confusion && class == SCROLL_CLASS))
         Strcpy(stuff, something);
     else
-        Strcpy(stuff, class ? def_oc_syms[class].name : "objects");
+        Strcpy(stuff, class ? def_oc_syms[class].name : TR("objects", "物品"));
     if (boulder && class != ROCK_CLASS)
-        Strcat(stuff, " and/or large stones");
+        Strcat(stuff, TR(" and/or large stones", "或大石头"));
 
     if (do_dknown)
         for (obj = gi.invent; obj; obj = obj->nobj)
@@ -1167,12 +1167,12 @@ trap_detect(
     if (!found) {
         char buf[BUFSZ];
 
-        Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
+        Sprintf(buf, TR("Your %s stop itching.", "你的%s不再发痒了。"), makeplural(body_part(TOE)));
         strange_feeling(sobj, buf);
         return 1;
     }
     /* traps exist, but only under me - no separate display required */
-    Your("%s itch.", makeplural(body_part(TOE)));
+    Your(TR("%s itch.", "你的%s发痒。"), makeplural(body_part(TOE)));
     return 0;
 }
 
@@ -1205,11 +1205,11 @@ furniture_detect(void)
         }
 
     if (!found)
-        There("seems to be nothing of interest on this level.");
+        There(TR("seems to be nothing of interest on this level.", "这一层似乎没有任何值得注意的东西。"));
     else if (!revealed)
         /* [what about clipped map with points of interest outside of the
             currently shown area?] */
-        Your("map already shows all relevant locations.");
+        Your(TR("map already shows all relevant locations.", "你的地图已经标出了所有相关地点。"));
 
     if (!revealed)
         display_nhwindow(WIN_MAP, TRUE);
@@ -1452,7 +1452,7 @@ use_crystal_ball(struct obj **optr)
 #else
         You("may look for an object, monster, or special map symbol.");
 #endif
-    ch = yn_function("What do you look for?", (char *) 0, '\0', TRUE);
+    ch = yn_function(TR("What do you look for?", "你要寻找什么？"), (char *) 0, '\0', TRUE);
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && strchr(quitchars, ch)) {
         if (flags.verbose)
@@ -2009,30 +2009,30 @@ findit(void)
     buf[0] = '\0';
     if (found.num_sdoors) {
         if (found.num_sdoors > 1)
-            Sprintf(eos(buf), "%d secret doors", found.num_sdoors);
+            Sprintf(eos(buf), TR("%d secret doors", "%d扇暗门"), found.num_sdoors);
         else
-            Strcat(buf, "a secret door");
+            Strcat(buf, TR("a secret door", "一扇暗门"));
         num += found.num_sdoors;
     }
     /* note: non-\0 *buf implies that at least one previous type is present */
     if (found.num_scorrs) {
         if (*buf) /* "doors and corrs" or "doors, corrs ..." */
-            Strcat(buf, (k == 2) ? " and " : ", ");
+            Strcat(buf, (k == 2) ? TR(" and ", "且") : ", ");
         if (found.num_scorrs > 1)
-            Sprintf(eos(buf), "%d secret corridors", found.num_scorrs);
+            Sprintf(eos(buf), TR("%d secret corridors", "%d条密道"), found.num_scorrs);
         else
-            Strcat(buf, "a secret corridor");
+            Strcat(buf, TR("a secret corridor", "一条密道"));
         num += found.num_scorrs;
     }
     if (found.num_traps) {
         if (*buf) /* "doors, corrs, and traps" or "{doors|corrs} and traps"
                    * or "..., traps ..." */
-            Strcat(buf, (k == 3 && !found.num_mons) ? ", and "
+            Strcat(buf, (k == 3 && !found.num_mons) ? TR(", and ", "，以及")
                         : (k == 2) ? " and " : ", ");
         if (found.num_traps > 1)
-            Sprintf(eos(buf), "%d traps", found.num_traps);
+            Sprintf(eos(buf), TR("%d traps", "%d个陷阱"), found.num_traps);
         else
-            Strcat(buf, "a trap");
+            Strcat(buf, TR("a trap", "一个陷阱"));
         num += found.num_traps;
     }
 
@@ -2043,11 +2043,11 @@ findit(void)
 
     if (found.num_mons) {
         if (*buf)
-            Strcat(buf, (k > 2) ? ", and " : " and ");
+            Strcat(buf, (k > 2) ? TR(", and ", "，以及") : " and ");
         if (found.num_mons > 1)
-            Sprintf(eos(buf), "%d hidden monsters", found.num_mons);
+            Sprintf(eos(buf), TR("%d hidden monsters", "%d只隐藏的怪物"), found.num_mons);
         else
-            Strcat(buf, "a hidden monster");
+            Strcat(buf, TR("a hidden monster", "一只隐藏的怪物"));
         num += found.num_mons;
     }
     if (*buf)
@@ -2059,10 +2059,10 @@ findit(void)
 
     if (found.num_invis) {
         if (found.num_invis > 1)
-            Sprintf(buf, "%d%s unseen monsters", found.num_invis,
+            Sprintf(buf, TR("%d%s unseen monsters", "%d只%s看不见的怪物"), found.num_invis,
                     found.num_kept_invis ? " other" : "");
         else
-            Sprintf(buf, "%s unseen monster",
+            Sprintf(buf, TR("%s unseen monster", "%s看不见的怪物"),
                     found.num_kept_invis ? "another" : "an");
 #ifdef ZHLANG
         You("探测到%s！", buf);
@@ -2075,7 +2075,7 @@ findit(void)
     if (found.num_cleared_invis) {
         /* at least 1 "remembered, unseen monster" marker has been removed */
         if (!num)
-            You_feel("%sless paranoid.",
+            You_feel(TR("%sless paranoid.", "你感到%s没那么疑神疑鬼了。"),
                      found.num_kept_invis ? "somewhat " : "");
         num += found.num_cleared_invis;
     }
@@ -2122,7 +2122,7 @@ openit(void)
 #if 0   /* expels() will take care of this */
         } else if (enfolds(u.ustuck->data)) {
             /* trapper or lurker above */
-            pline("%s unfolds!", Monnam(u.ustuck));
+            pline(TR("%s unfolds!", "%s展开身子！"), Monnam(u.ustuck));
 #endif
         }
         expels(u.ustuck, u.ustuck->data, TRUE);
@@ -2195,7 +2195,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
                                   || mtmp->data->mlet == S_EEL)) {
             if (via_warning && found_something) {
                 set_msg_xy(x, y);
-                Your("danger sense causes you to take a second %s.",
+                Your(TR("danger sense causes you to take a second %s.", "你的危险直觉让你再%s一遍。"),
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
@@ -2624,18 +2624,18 @@ reveal_terrain(
            cursor there, and after moving it anywhere '@' moves it back */
         flush_screen(1);
         if (full) {
-            Strcpy(buf, "underlying terrain");
+            Strcpy(buf, TR("underlying terrain", "底层地形"));
         } else {
-            Strcpy(buf, "known terrain");
+            Strcpy(buf, TR("known terrain", "已知地形"));
             if (keep_traps)
-                Sprintf(eos(buf), "%s traps",
+                Sprintf(eos(buf), TR("%s traps", "%s陷阱"),
                         (keep_objs || keep_mons) ? "," : " and");
             if (keep_objs)
-                Sprintf(eos(buf), "%s%s objects",
+                Sprintf(eos(buf), TR("%s%s objects", "%s%s物品"),
                         (keep_traps || keep_mons) ? "," : "",
                         keep_mons ? "" : " and");
             if (keep_mons)
-                Sprintf(eos(buf), "%s and monsters",
+                Sprintf(eos(buf), TR("%s and monsters", "%s及怪物"),
                         (keep_traps || keep_objs) ? "," : "");
         }
 #ifdef ZHLANG

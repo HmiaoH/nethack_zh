@@ -897,7 +897,7 @@ dorecover(NHFILE *nhfp)
     dotcnt = 0;
     dotrow = 2;
     if (!WINDOWPORT(X11))
-        putstr(WIN_MAP, 0, "Restoring:");
+        putstr(WIN_MAP, 0, TR("Restoring:", "正在恢复："));
 #endif
     restoreinfo.mread_flags = 1; /* return despite error */
     while (1) {
@@ -1144,10 +1144,10 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         char trickbuf[BUFSZ];
 
         if (pid && pid != hpid)
-            Sprintf(trickbuf, "PID (%d) doesn't match saved PID (%d)!", hpid,
+            Sprintf(trickbuf, TR("PID (%d) doesn't match saved PID (%d)!", "PID（%d）与保存的 PID（%d）不符！"), hpid,
                     pid);
         else
-            Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
+            Sprintf(trickbuf, TR("This is level %d, not %d!", "这是第 %d 层，不是第 %d 层！"), dlvl, lev);
         if (wizard)
             pline1(trickbuf);
         trickery(trickbuf);
@@ -1625,7 +1625,7 @@ restore_menu(
                 add_menu_str(tmpwin, copyright_banner_line(k));
             add_menu_str(tmpwin, "");
         }
-        add_menu_str(tmpwin, "Select one of your saved games");
+        add_menu_str(tmpwin, TR("Select one of your saved games", "选择一份存档"));
         /* if all the save files have a playmode of '-' then we'll just list
            their character name-role-race-gend-algn values, but if any are
            'X' or 'D', we'll list playmode along with name-role-&c values

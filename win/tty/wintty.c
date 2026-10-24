@@ -32,6 +32,7 @@ extern void msmsg(const char *, ...);
 #endif
 
 #include "wintty.h"
+#include "utf8map.h"
 
 #if defined(CLIPPING) && !defined(NO_SIGNAL)
 #include <signal.h>
@@ -219,7 +220,7 @@ static void invert_all_on_page(winid, tty_menu_item *, tty_menu_item *,
 static void invert_all(winid, tty_menu_item *, tty_menu_item *, char, long);
 static void toggle_menu_attr(boolean, int, int);
 static void process_menu_window(winid, struct WinDesc *);
-static void process_text_window(winid, struct WinDesc *);
+/* (the text window routine is defined below, ahead of its only caller) */
 static tty_menu_item *reverse(tty_menu_item *);
 static const char *compress_str(const char *);
 #ifndef STATUS_HILITES
@@ -1166,7 +1167,7 @@ dmore(
     if (flags.standout)
         standoutbeg();
     xputs(prompt);
-    ttyDisplay->curx += strlen(prompt);
+    ttyDisplay->curx += u8_width(prompt);
     if (flags.standout)
         standoutend();
 
@@ -1455,6 +1456,55 @@ process_menu_window(winid window, struct WinDesc *cw)
                      * actually output the character.  We're faster doing
                      * this.
                      */
+#ifdef ZHLANG
+                    /* Menu text can contain multi-byte UTF-8 characters
+                       (translated item names); emit each sequence as a
+                       unit and count display columns so that entries line
+                       up and no character is cut in half at the edge. */
+                    for (n = 0, cp = curr->str; *cp; ) {
+                        int u8len = u8_seqlen(cp), u8w, k;
+                        char u8tmp[5];
+
+                        if (u8len > 1) {
+                            (void) memcpy(u8tmp, cp, (size_t) u8len);
+                            u8tmp[u8len] = '\0';
+                            u8w = u8_width(u8tmp);
+                        } else {
+                            u8w = 1;
+                        }
+                        if ((int) ttyDisplay->curx + u8w
+                            >= (int) ttyDisplay->cols)
+                            break;
+                        if (n == attr_n && (color != NO_COLOR
+                                            || attr != ATR_NONE))
+                            toggle_menu_attr(TRUE, color, attr);
+                        if (n == 2 && curr->identifier.a_void != 0
+                            && curr->selected) {
+                            char c = (curr->count == -1L) ? '*' : '#';
+
+                            /* all selected: '*' vs count selected: '#' */
+                            (void) putchar(c);
+                        } else if (n == 2 && curr->identifier.a_void != 0
+                                   && show_obj_syms
+                                   && curr->glyphinfo.glyph != NO_GLYPH) {
+                            int gcolor = curr->glyphinfo.gm.sym.color;
+
+                            /* tty_print_glyph could be used, but is overkill
+                               and requires referencing the cursor location */
+                            toggle_menu_attr(TRUE, gcolor, ATR_NONE);
+                            (void) putchar(curr->glyphinfo.ttychar);
+                            toggle_menu_attr(FALSE, gcolor, ATR_NONE);
+                        } else if (u8len > 1) {
+                            for (k = 0; k < u8len; ++k)
+                                (void) putchar(cp[k]);
+                        } else {
+                            (void) putchar(*cp);
+                        }
+                        ttyDisplay->curx += u8w;
+                        cp += u8len;
+                        n++;
+                    } /* for *cp */
+#else
                     for (n = 0, cp = curr->str;
                          *cp &&
 #ifndef WIN32CON
@@ -1487,6 +1537,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                             (void) putchar(*cp);
                         }
                     } /* for *cp */
+#endif
                     if (n > attr_n && (color != NO_COLOR || attr != ATR_NONE))
                         toggle_menu_attr(FALSE, color, attr);
                 } /* if npages > 0 */
@@ -1807,6 +1858,50 @@ process_text_window(winid window, struct WinDesc *cw)
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
+#ifdef ZHLANG
+            /* The contents of a text/menu window can be raw UTF-8 (Chinese
+               text) or English text which may embed glyph codes.  Walk the
+               data one UTF-8 sequence at a time so that a multi-byte
+               character is neither split nor counted as several columns;
+               English text and symbol sets such as DECgraphics/IBM still
+               take the upstream glyph path. */
+            for (cp = &cw->data[i][1], linestart = TRUE; *cp; ) {
+                int u8len = u8_seqlen(cp), u8w, k;
+                char u8tmp[5];
+
+                if (u8len > 1) {
+                    (void) memcpy(u8tmp, cp, (size_t) u8len);
+                    u8tmp[u8len] = '\0';
+                    u8w = u8_width(u8tmp);
+                } else {
+                    u8w = 1;
+                }
+                if ((int) ttyDisplay->curx + u8w >= (int) ttyDisplay->cols)
+                    break;
+                /* message recall for msg_window:full/combination/reverse
+                   might have output from '/' in it (see redotoplin()) */
+                if (u8len > 1) {
+                    /* raw UTF-8: emit the whole sequence */
+                    for (k = 0; k < u8len; ++k)
+                        (void) putchar(cp[k]);
+                } else if (linestart) {
+                    if (SYMHANDLING(H_UTF8)) {
+                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
+                        g_putch(*cp);
+                    } else if ((*cp & 0x80) != 0) {
+                        g_putch(*cp);
+                        end_glyphout();
+                    } else {
+                        (void) putchar(*cp);
+                    }
+                } else {
+                    (void) putchar(*cp);
+                }
+                linestart = FALSE;
+                ttyDisplay->curx += u8w;
+                cp += u8len;
+            }
+#else
             for (cp = &cw->data[i][1], linestart = TRUE;
 #ifndef WIN32CON
                  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
@@ -1819,12 +1914,21 @@ process_text_window(winid window, struct WinDesc *cw)
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
                 if (linestart) {
+                    if (SYMHANDLING(H_UTF8)) {
+                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
+                        g_putch(*cp);
+                    } else if ((*cp & 0x80) != 0) {
+                        g_putch(*cp);
+                        end_glyphout();
+                    } else {
+                        (void) putchar(*cp);
+                    }
                     linestart = FALSE;
-                    (void) putchar(*cp);
                 } else {
                     (void) putchar(*cp);
                 }
             }
+#endif
             term_end_attr(attr);
         }
     }
@@ -2402,6 +2506,44 @@ tty_putstr(winid window, int attr, const char *str)
         if (++cw->cury > cw->maxrow)
             cw->maxrow = cw->cury;
         if (n0 > CO) {
+#ifdef ZHLANG
+            /* Break the line at a display-column boundary.  Chinese text
+               usually has no spaces, so when no space fits in the line,
+               hard-break after the last complete UTF-8 character which
+               does fit; the remainder is put on the next line. */
+            const char *bp2 = str;
+            int wcol = 0, blen = 0, splen = -1;
+
+            while (*bp2) {
+                int slen = u8_seqlen(bp2), cw2;
+                char tmp[5];
+
+                if (slen > 1) {
+                    (void) memcpy(tmp, bp2, (size_t) slen);
+                    tmp[slen] = '\0';
+                    cw2 = u8_width(tmp);
+                } else {
+                    cw2 = 1;
+                }
+                if (wcol + cw2 > CO - 1)
+                    break;
+                if (slen == 1 && *bp2 == ' ') {
+                    splen = blen;
+                }
+                wcol += cw2;
+                blen += slen;
+                bp2 += slen;
+            }
+            if (*bp2) { /* a remainder has to be moved to the next line */
+                if (splen > 0) { /* break at the last space */
+                    cw->data[cw->cury - 1][splen + 1] = '\0';
+                    tty_putstr(window, attr, &str[splen + 1]);
+                } else if (blen > 0) {
+                    cw->data[cw->cury - 1][blen + 1] = '\0';
+                    tty_putstr(window, attr, &str[blen]);
+                }
+            }
+#else
             /* attempt to break the line */
             for (i = CO - 1; i && str[i] != ' ' && str[i] != '\n';)
                 i--;
@@ -2409,6 +2551,7 @@ tty_putstr(winid window, int attr, const char *str)
                 cw->data[cw->cury - 1][++i] = '\0';
                 tty_putstr(window, attr, &str[i]);
             }
+#endif
         }
         break;
     }
@@ -4314,6 +4457,11 @@ static boolean truncation_expected = FALSE;
 static int do_field_opt =
 #if defined(DISABLE_TTY_FIELD_OPT)
     0;
+#elif defined(ZHLANG)
+    /* the shadow copy of the status row is compared byte-by-byte with the
+       field values; that doesn't work for multi-byte UTF-8 text, so always
+       redraw the fields in the translated game */
+    0;
 #else
     1;
 #endif
@@ -4507,7 +4655,12 @@ tty_status_update(
         tty_status[NOW][fldidx].idx = fldidx;
         tty_status[NOW][fldidx].color = (color & 0x00FF);
         tty_status[NOW][fldidx].attr = term_attr_fixup(attrmask);
+#ifdef ZHLANG
+        /* field positions are display columns, not bytes */
+        tty_status[NOW][fldidx].lth = u8_width(status_vals[fldidx]);
+#else
         tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
+#endif
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
         tty_status[NOW][fldidx].sanitycheck = TRUE;
@@ -4789,13 +4942,76 @@ status_sanity_check(void)
 }
 #endif /* NHDEVEL_STATUS */
 
+#ifdef ZHLANG
+/* Display width of the UTF-8 character at the start of 'str'. */
+static int
+u8_chrwidth(const char *str)
+{
+    char tmp[5];
+    int len = u8_seqlen(str);
+
+    if (len <= 1 || len > 4)
+        return 1;
+    (void) memcpy(tmp, str, (size_t) len);
+    tmp[len] = '\0';
+    return u8_width(tmp);
+}
+
+/* Pad/truncate 'text' into 'out' so that the result is exactly 'want'
+   display columns wide; never splits a UTF-8 character. */
+static void
+u8_fitcols(char *out, const char *text, int want)
+{
+    char *q = out;
+    const char *p = text;
+    int col = 0;
+
+    while (*p) {
+        int len = u8_seqlen(p), w = u8_chrwidth(p), k;
+
+        if (col + w > want)
+            break;
+        for (k = 0; k < len; ++k)
+            *q++ = *p++;
+        col += w;
+    }
+    while (col < want) {
+        *q++ = ' ';
+        ++col;
+    }
+    *q = '\0';
+}
+
+/* Byte offset within 'str' of display column 'want' (clamped to a
+   character boundary). */
+static int
+u8_coloffset(const char *str, int want)
+{
+    const char *p = str;
+    int col = 0;
+
+    while (*p) {
+        int w = u8_chrwidth(p);
+
+        if (col + w > want)
+            break;
+        col += w;
+        p += u8_seqlen(p);
+    }
+    return (int) (p - str);
+}
+#endif /* ZHLANG */
+
 /*
  * This is what places a field on the tty display.
  */
 static void
 tty_putstatusfield(const char *text, int x, int y)
 {
-    int i, n, ncols, nrows, lth = 0;
+#ifndef ZHLANG
+    int i, n, lth = 0;
+#endif
+    int ncols, nrows;
     struct WinDesc *cw = 0;
 
     if (WIN_STATUS == WIN_ERR
@@ -4804,10 +5020,50 @@ tty_putstatusfield(const char *text, int x, int y)
 
     ncols = cw->cols;
     nrows = cw->maxrow;
+#ifndef ZHLANG
     lth = (int) strlen(text);
+#endif
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
+#ifdef ZHLANG
+    /* Status text can contain multi-byte UTF-8 characters (translated
+       title/alignment/condition words).  Write each sequence as a unit
+       and stop at a character boundary so a field never gets cut in the
+       middle of a character.  'x' and the column budget are display
+       columns (see tty_status_update() and check_fields()). */
+    if (x < ncols && y < nrows) {
+        const char *p = text;
+        int col = x, dat = x;
+
+        if (x != cw->curx || y != cw->cury)
+            tty_curs(NHW_STATUS, x, y);
+        while (*p) {
+            int slen = u8_seqlen(p), cw2, k;
+            char tmp[5];
+
+            if (slen > 1) {
+                (void) memcpy(tmp, p, (size_t) slen);
+                tmp[slen] = '\0';
+                cw2 = u8_width(tmp);
+            } else {
+                cw2 = 1;
+            }
+            if (col + cw2 > ncols)
+                break;
+            for (k = 0; k < slen; ++k) {
+                (void) putchar(*p);
+                ttyDisplay->curx++;
+                cw->curx++;
+                if (dat >= 1 && dat <= cw->cols)
+                    cw->data[y][dat - 1] = *p;
+                ++p;
+                ++dat;
+            }
+            col += cw2;
+        }
+    }
+#else
     if (x < ncols && y < nrows) {
         if (x != cw->curx || y != cw->cury)
             tty_curs(NHW_STATUS, x, y);
@@ -4822,6 +5078,7 @@ tty_putstatusfield(const char *text, int x, int y)
             }
         }
     }
+#endif
 #if 0
     else {
         if (truncation_expected) {
@@ -5086,7 +5343,11 @@ render_status(void)
                                 bits = 0L; /* skip any remaining conditions */
                             }
                             tty_putstatusfield(condtext, x, y);
+#ifdef ZHLANG
+                            x += u8_width(condtext);
+#else
                             x += (int) strlen(condtext);
+#endif
                             if (iflags.hilite_delta) {
                                 if (coloridx != NO_COLOR)
                                     term_end_color();
@@ -5115,20 +5376,35 @@ render_status(void)
                      */
                     /* hitpointbar using hp percent calculation */
                     int bar_len, bar_pos = 0;
+#ifdef ZHLANG
+                    char bar[30 * 4 + 1], *bar2 = (char *) 0, savedch = '\0';
+#else
                     char bar[30 + 1], *bar2 = (char *) 0, savedch = '\0';
+#endif
                     boolean twoparts = (hpbar_percent < 100);
 
                     /* force exactly 30 characters, padded with spaces
                        if shorter or truncated if longer */
+#ifdef ZHLANG
+                    /* multi-byte title: measure and pad by display
+                       columns, never cutting a character in half */
+                    u8_fitcols(bar, text, 30);
+                    Strcpy(status_vals[BL_TITLE], bar);
+#else
                     if (strlen(text) != 30) {
                         Sprintf(bar, "%-30.30s", text);
                         Strcpy(status_vals[BL_TITLE], bar);
                     } else {
                         Strcpy(bar, text);
                     }
+#endif
                     if (hpbar_crit_hp)
                         repad_with_dashes(bar);
+#ifdef ZHLANG
+                    bar_len = u8_width(bar); /* always 30 columns */
+#else
                     bar_len = (int) strlen(bar); /* always 30 */
+#endif
                     /*tlth = bar_len + 2; // not needed within this 'if'*/
                     attrmask = 0; /* for the second part only case: dead */
                     /* when at full HP, the whole title will be highlighted;
@@ -5141,7 +5417,11 @@ render_status(void)
                             bar_pos = 1;
                         if (bar_pos >= bar_len && hpbar_percent < 100)
                             bar_pos = bar_len - 1;
+#ifdef ZHLANG
+                        bar2 = &bar[u8_coloffset(bar, bar_pos)];
+#else
                         bar2 = &bar[bar_pos];
+#endif
                         savedch = *bar2;
                         *bar2 = '\0';
                     }
@@ -5153,7 +5433,11 @@ render_status(void)
                         if (iflags.hilite_delta && coloridx != NO_COLOR)
                             term_start_color(coloridx);
                         tty_putstatusfield(bar, x, y);
+#ifdef ZHLANG
+                        x += u8_width(bar);
+#else
                         x += (int) strlen(bar);
+#endif
                         if (iflags.hilite_delta && coloridx != NO_COLOR)
                             term_end_color();
                         End_Attr(attrmask);
@@ -5163,7 +5447,11 @@ render_status(void)
                             term_start_attr(ATR_BLINK);
                         *bar2 = savedch;
                         tty_putstatusfield(bar2, x, y);
+#ifdef ZHLANG
+                        x += u8_width(bar2);
+#else
                         x += (int) strlen(bar2);
+#endif
                         if ((attrmask & HL_BLINK) != 0)
                             term_end_attr(ATR_BLINK);
                     }

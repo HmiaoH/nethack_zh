@@ -1525,7 +1525,24 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #ifndef min
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #endif
+#ifdef ZHLANG
+/* Chinese doesn't inflect nouns or verbs for number, so the English plural
+   suffix which plur() is normally used for has to vanish; the count itself
+   is still carried by the %ld/%d conversion next to it.  The argument gets
+   evaluated exactly as in the English version. */
+#define plur(x) (((x) == 1) ? "" : "")
+/* nonzero if 'str' contains a byte outside 7-bit ASCII, which in this build
+   means Chinese text that the English grammar helpers must not touch (B1) */
+extern boolean zh_nonascii(const char *);
+/* C3: longest Chinese monster name at the start of 'zh'; NON_PM if none.
+   Sets *bytelenp to the matched name's size in bytes and *mgenderp to the
+   matching gender variant (MALE/FEMALE/NEUTRAL).  Implemented in objnam.c;
+   name_to_monplus() uses it so #genocide and polymorph accept Chinese names
+   as well as wishes do. */
+extern int zh_mon_name(const char *, unsigned *, int *);
+#else
 #define plur(x) (((x) == 1) ? "" : "s")
+#endif
 
 /* Cast to int, but limit value to range. */
 #define LIMIT_TO_RANGE_INT(lo, hi, var) \

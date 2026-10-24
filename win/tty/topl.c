@@ -9,12 +9,18 @@
 
 #include "tcap.h"
 #include "wintty.h"
+#include "utf8map.h"
 
 static void redotoplin(const char *);
 static void topl_putsym(char);
 static void removetopl(int);
 static void msghistory_snapshot(boolean);
 static void free_msghistory_snapshot(boolean);
+#ifdef ZHLANG
+static int topl_chrwidth(const char *, int);
+static void topl_putu8(const char *, int, int);
+static void wrap_topl_zh(void);
+#endif
 
 int
 tty_doprev_message(void)
@@ -125,7 +131,14 @@ redotoplin(const char *str)
 
     home();
     if (!ttyDisplay->topl_utf8) {
+#ifdef ZHLANG
+        /* Don't treat the lead byte of a valid UTF-8 (Chinese) character
+           as a lone graphics character; only genuinely single-byte high
+           bits are the '/' command's glyph kludge. */
+        if (ttyDisplay->mixed && (*str & 0x80) && u8_seqlen(str) == 1) {
+#else
         if (ttyDisplay->mixed && (*str & 0x80)) {
+#endif
             /* kludge for the / command, the only time we ever want a */
             /* graphics character on the top line */
             g_putch((int) *str++);
@@ -247,10 +260,96 @@ more(void)
     ttyDisplay->inmore = 0;
 }
 
+#ifdef ZHLANG
+/* Display width of the single UTF-8 character of 'len' bytes at 'str'. */
+static int
+topl_chrwidth(const char *str, int len)
+{
+    char tmp[5];
+
+    if (len <= 0 || len > 4)
+        return 1;
+    (void) memcpy(tmp, str, (size_t) len);
+    tmp[len] = '\0';
+    return u8_width(tmp);
+}
+
+/* Output one UTF-8 character, advancing the cursor by its display width.
+   topl_putsym() handles a single byte at a time; doing that with multi-byte
+   characters would count them as several columns and could break a line in
+   the middle of a character. */
+static void
+topl_putu8(const char *str, int len, int width)
+{
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+    int i;
+
+    if (ttyDisplay->curx + width > CO - 1)
+        topl_putsym('\n'); /* 1 <= curx < CO; avoid CO */
+#ifdef WIN32CON
+    for (i = 0; i < len; ++i)
+        (void) putchar(str[i]);
+#endif
+    ttyDisplay->curx += width;
+    cw->curx = ttyDisplay->curx;
+    if (cw->curx == 0)
+        cl_end();
+#ifndef WIN32CON
+    for (i = 0; i < len; ++i)
+        (void) putchar(str[i]);
+#endif
+    return;
+}
+
+/* Split gt.toplines into lines that fit the screen width.  Chinese text
+   usually has no spaces, so when no space is available within the limit,
+   break at the last complete UTF-8 character that still fits instead of
+   cutting a multi-byte sequence in half.  (The byte-counting loop in
+   update_topl() is fine for English but not for CJK.) */
+static void
+wrap_topl_zh(void)
+{
+    char *line = gt.toplines;
+
+    while (*line && u8_width(line) >= CO) {
+        char *p = line, *lastspace = NULL, *brk;
+        int col = 0, limit = CO - 1;
+
+        while (*p) {
+            int len = u8_seqlen(p);
+            int cw = (len > 1) ? topl_chrwidth(p, len) : 1;
+
+            if (col + cw > limit)
+                break;
+            if (len == 1 && *p == ' ')
+                lastspace = p;
+            col += cw;
+            p += len;
+        }
+        if (!*p || p == line)
+            break; /* remainder fits, or nothing fits (can't happen) */
+        if (lastspace && lastspace > line) {
+            /* replace the space with the line break, like the English code */
+            *lastspace = '\n';
+            line = lastspace + 1;
+        } else {
+            brk = p;
+            if ((int) strlen(gt.toplines) + 1 >= TBUFSZ)
+                break; /* no room left for the inserted newline */
+            (void) memmove(brk + 1, brk, strlen(brk) + 1);
+            *brk = '\n';
+            line = brk + 1;
+        }
+    }
+}
+#endif /* ZHLANG */
+
 void
 update_topl(const char *bp)
 {
+#ifndef ZHLANG
     char *tl, *otl;
+#endif
     int n0;
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
@@ -258,12 +357,26 @@ update_topl(const char *bp)
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
+#ifdef ZHLANG
+    /* A death message is flagged by the end-of-game code (end.c);
+       comparing the message text can't work once it is translated.
+       The flag is one-shot: consume it here. */
+    notdied = !gd.done_dying;
+    gd.done_dying = FALSE;
+#else
+    notdied = (strncmp(bp, "You die", 7) == 0) ? 0 : 1;
+#endif
     n0 = strlen(bp);
     if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || skip)
         && cw->cury == 0
         /* room for --More-- */
+#ifdef ZHLANG
+        && u8_width(bp) + u8_width(gt.toplines) + 3 < min(CO - 8, TBUFSZ)
+        && n0 + (int) strlen(gt.toplines) + 3 < TBUFSZ
+#else
         && n0 + (int) strlen(gt.toplines) + 3 < min(CO - 8, TBUFSZ)
-        && (notdied = strncmp(bp, "You die", 7)) != 0) {
+#endif
+        && notdied) {
         Strcat(gt.toplines, "  ");
         Strcat(gt.toplines, bp);
         cw->curx += 2;
@@ -282,6 +395,9 @@ update_topl(const char *bp)
     (void) strncpy(gt.toplines, bp, TBUFSZ);
     gt.toplines[TBUFSZ - 1] = 0;
 
+#ifdef ZHLANG
+    wrap_topl_zh();
+#else
     for (tl = gt.toplines; n0 >= CO; ) {
         otl = tl;
         for (tl += CO - 1; tl != otl; --tl)
@@ -296,6 +412,7 @@ update_topl(const char *bp)
         *tl++ = '\n';
         n0 = strlen(tl);
     }
+#endif
     if (!notdied) /* double negative => "You die"; avoid suppressing mesg */
         cw->flags &= ~WIN_STOP, skip = FALSE;
     if (!skip)
@@ -347,8 +464,23 @@ topl_putsym(char c)
 void
 putsyms(const char *str)
 {
+#ifdef ZHLANG
+    /* multi-byte characters are emitted as a unit so that the cursor
+       advances by display columns instead of bytes */
+    while (*str) {
+        int len = u8_seqlen(str);
+
+        if (len > 1) {
+            topl_putu8(str, len, topl_chrwidth(str, len));
+            str += len;
+        } else {
+            topl_putsym(*str++);
+        }
+    }
+#else
     while (*str)
         topl_putsym(*str++);
+#endif
 }
 
 static void

@@ -119,11 +119,11 @@ morgue_mon_sound(struct monst *mtmp)
             #endif
             break;
         case 1:
-            pline_The("%s on the back of your %s %s up.", hair,
+            pline_The(TR("%s on the back of your %s %s up.", "%s在你%s后面%s起来。"), hair,
                       body_part(NECK), vtense(hair, "stand"));
             break;
         case 2:
-            pline_The("%s on your %s %s to stand up.", hair,
+            pline_The(TR("%s on your %s %s to stand up.", "%s在你%s上%s竖起。"), hair,
                       body_part(HEAD), vtense(hair, "seem"));
             break;
         }
@@ -799,7 +799,7 @@ domonnoise(struct monst *mtmp)
         } else {
             /* approximation of GEICO's advertising slogan (it actually
                concludes with "save you 15% or more on car insurance.") */
-            Sprintf(verbuf, "15 minutes could save you 15 %s.",
+            Sprintf(verbuf, TR("15 minutes could save you 15 %s.", "15 分钟能为你省下 15 %s。"),
                     currency(15L)); /* "zorkmids" */
             verbl_msg = verbuf;
         }
@@ -821,7 +821,7 @@ domonnoise(struct monst *mtmp)
 
         if (mtmp->mtame) {
             if (kindred) {
-                Sprintf(verbuf, "Good %s to you Master%s",
+                Sprintf(verbuf, TR("Good %s to you Master%s", "祝%s好，主人%s"),
                         isnight ? "evening" : "day",
                         isnight ? "!" : ".  Why do we not rest?");
                 verbl_msg = verbuf;
@@ -837,11 +837,11 @@ domonnoise(struct monst *mtmp)
             }
         } else if (mtmp->mpeaceful) {
             if (kindred && isnight) {
-                Sprintf(verbuf, "Good feeding %s!",
+                Sprintf(verbuf, TR("Good feeding %s!", "用餐愉快，%s！"),
                         flags.female ? "sister" : "brother");
                 verbl_msg = verbuf;
             } else if (nightchild && isnight) {
-                Sprintf(verbuf, "How nice to hear you, child of the night!");
+                Sprintf(verbuf, TR("How nice to hear you, child of the night!", "很高兴听到你的声音，暗夜之子！"));
                 verbl_msg = verbuf;
             } else
                 verbl_msg = "I only drink... potions.";
@@ -1287,11 +1287,11 @@ domonnoise(struct monst *mtmp)
         if (ms_Death && !svc.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
-                Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
+                Sprintf(verbuf, TR("Ah, so you have a copy of /%s/.", "啊，原来你有《%s》这本书。"), tribtitle);
                 /* no Death featured in these two, so exclude them */
                 if (strcmpi(tribtitle, "Snuff")
                     && strcmpi(tribtitle, "The Wee Free Men"))
-                    Strcat(verbuf, "  I may have been misquoted there.");
+                    Strcat(verbuf, TR("  I may have been misquoted there.", "  那句话也许被误引了。"));
                 verbl_msg = verbuf;
             }
             svc.context.tribute.Deathnotice = 1;
@@ -1383,7 +1383,7 @@ dochat(void)
         return ECMD_OK;
     }
     if (Underwater) {
-        Your("speech is unintelligible underwater.");
+        Your(TR("speech is unintelligible underwater.", "言语在水下含混不清。"));
         return ECMD_OK;
     }
     if (!Deaf && !Blind && (otmp = shop_object(u.ux, u.uy)) != 0) {
@@ -1455,7 +1455,7 @@ dochat(void)
         if ((otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
             /* Talking to a statue */
             if (!Blind)
-                pline_The("%s seems not to notice you.",
+                pline_The(TR("%s seems not to notice you.", "%s似乎没有注意到你。"),
                           /* if hallucinating, you can't tell it's a statue */
                           Hallucination ? rndmonnam((char *) 0) : "statue");
             return ECMD_OK;
@@ -1490,7 +1490,7 @@ dochat(void)
 
                 if (idx >= SIZE(walltalk))
                     idx = SIZE(walltalk) - 1;
-                pline_The("wall %s", walltalk[idx]);
+                pline_The(TR("wall %s", "墙壁%s"), walltalk[idx]);
             }
             return ECMD_OK;
         }
@@ -1609,7 +1609,7 @@ tiphat(void)
             pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
             #endif
         } else {
-            pline_The("lout here doesn't acknowledge you...");
+            pline_The(TR("lout here doesn't acknowledge you...", "这里的粗人没搭理你……"));
         }
         return res;
     }
@@ -1800,7 +1800,7 @@ add_sound_mapping(const char *mapping)
                 soundmap = new_map;
             }
         } else {
-            Sprintf(text, "cannot read %.243s", filespec);
+            Sprintf(text, TR("cannot read %.243s", "无法读取 %.243s"), filespec);
             raw_print(text);
             return 0;
         }

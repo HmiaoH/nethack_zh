@@ -250,7 +250,7 @@ polyman(const char *fmt, const char *arg)
             Strcpy(svk.killer.name, kptr->name);
         } else {
             svk.killer.format = KILLED_BY;
-            Strcpy(svk.killer.name, "self-genocide");
+            Strcpy(svk.killer.name, TR("self-genocide", "自我灭绝"));
         }
         dealloc_killer(kptr);
         done(GENOCIDED);
@@ -333,7 +333,7 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
             oldrank = rank_of(u.ulevel, Role_switch, oldgend);
             newrank = rank_of(u.ulevel, Role_switch, newgend);
             Sprintf(buf, "%.10s %.30s", genders[flags.female].adj, newrank);
-            livelog_printf(LL_MINORAC, "%s into %s",
+            livelog_printf(LL_MINORAC, TR("%s into %s", "%s，变成了%s"),
                            viapoly ? "polymorphed" : "transformed",
                            an(strcmp(newrole, oldrole) ? newrole
                               : strcmp(newrank, oldrank) ? newrank
@@ -435,7 +435,7 @@ newman(void)
             urgent_pline(
                      "Your new form doesn't seem healthy enough to survive.");
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "unsuccessful polymorph");
+            Strcpy(svk.killer.name, TR("unsuccessful polymorph", "失败的变形"));
             done(DIED);
             /* must have been life-saved to get here */
             newuhs(FALSE);
@@ -456,7 +456,7 @@ newman(void)
     /* note: newman() bypasses achievements for new ranks attained and
        doesn't log "new <form>" when that isn't accompanied by level change */
     if (newlvl != oldlvl)
-        livelog_printf(LL_MINORAC, "became experience level %d as a new %s",
+        livelog_printf(LL_MINORAC, TR("became experience level %d as a new %s", "达到了经验等级 %d，成为新的%s"),
                        newlvl, newform);
     else
         livelog_newform(TRUE, oldgend, newgend);
@@ -534,7 +534,7 @@ polyself(int psflags)
 
         do {
             mntmp = NON_PM;
-            getlin("Become what kind of monster? [type the name]", buf);
+            getlin(TR("Become what kind of monster? [type the name]", "要变成哪种怪物？[输入名称]"), buf);
             (void) mungspaces(buf);
             if (*buf == '\033') {
                 /* user is cancelling controlled poly */
@@ -717,7 +717,7 @@ polyself(int psflags)
                     mntmp = gy.youmonst.cham;
             }
             if (controllable_poly) {
-                Sprintf(buf, "Become %s?",
+                Sprintf(buf, TR("Become %s?", "要变成%s吗？"),
                         an(pmname(&mons[mntmp], gvariant)));
                 if (y_n(buf) != 'y')
                     return;
@@ -1020,7 +1020,7 @@ polymon(int mntmp)
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
 #endif
-            Sprintf(buf, "riding %s",
+            Sprintf(buf, TR("riding %s", "正骑着%s"),
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
@@ -1422,7 +1422,7 @@ break_armor(void)
                 char hornbuf[BUFSZ];
 
                 /* Future possibilities: This could damage/destroy helmet */
-                Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
+                Sprintf(hornbuf, TR("horn%s", "角%s"), plur(num_horns(uptr)));
 #ifdef ZHLANG
                 Your("%s%s%s。", hornbuf, "刺穿了",
                      yname(otmp));
@@ -1603,7 +1603,7 @@ rehumanize(void)
     if (Unchanging) {
         if (u.mh < 1) {
             svk.killer.format = NO_KILLER_PREFIX;
-            Strcpy(svk.killer.name, "killed while stuck in creature form");
+            Strcpy(svk.killer.name, TR("killed while stuck in creature form", "困在生物形态时被杀"));
             done(DIED);
             /* can get to here if declining to die in explore or wizard
                mode; since we're wearing an amulet of unchanging we can't
@@ -1637,7 +1637,7 @@ rehumanize(void)
 #else
     Your("old form was not healthy enough to survive.");
 #endif
-        Sprintf(svk.killer.name, "reverting to unhealthy %s form",
+        Sprintf(svk.killer.name, TR("reverting to unhealthy %s form", "变回不健康的%s形态"),
                 gu.urace.adj);
         svk.killer.format = KILLED_BY;
         done(DIED);
@@ -1799,13 +1799,13 @@ dospinweb(void)
                 sweep[0] = '\0';
                 switch (u.ustuck->data->mattk[i].adtyp) {
                 case AD_FIRE:
-                    Strcpy(sweep, "ignites and ");
+                    Strcpy(sweep, TR("ignites and ", "被点燃并"));
                     break;
                 case AD_ELEC:
-                    Strcpy(sweep, "fries and ");
+                    Strcpy(sweep, TR("fries and ", "被电焦并"));
                     break;
                 case AD_COLD:
-                    Strcpy(sweep, "freezes, shatters and ");
+                    Strcpy(sweep, TR("freezes, shatters and ", "被冻僵、碎裂并"));
                     break;
                 }
 #ifdef ZHLANG
@@ -2045,7 +2045,7 @@ dogaze(void)
 #endif
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
-                    Sprintf(qbuf, "Really %s %s?",
+                    Sprintf(qbuf, TR("Really %s %s?", "真的要%s%s吗？"),
                             (adtyp == AD_CONF) ? "confuse" : "attack",
                             mon_nam(mtmp));
                     if (y_n(qbuf) != 'y')
@@ -2250,14 +2250,10 @@ dohide(void)
                 corpse_name = an(corpse_name);
             /* no need to check poly_when_stoned(); no hide-underers can
                turn into stone golems instead of becoming petrified */
-#ifdef ZHLANG
-            pline("躲在%s% s下是致命的错误...",
+            pline(TR("Hiding under %s%s is a fatal mistake...",
+                     "躲在%s%s下是致命的错误……"),
                   corpse_name, plur(ct));
-#else
-            pline("Hiding under %s%s is a fatal mistake...",
-                  corpse_name, plur(ct));
-#endif
-            Sprintf(kbuf, "hiding under %s%s", corpse_name, plur(ct));
+            Sprintf(kbuf, TR("hiding under %s%s", "躲在%s%s下"), corpse_name, plur(ct));
             instapetrify(kbuf);
             /* only reach here if life-saved */
             u.uundetected = 0;

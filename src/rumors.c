@@ -139,7 +139,7 @@ getrumor(
             if (gt.true_rumor_size == 0L) { /* if this is 1st outrumor() */
                 init_rumors(rumors);
                 if (gt.true_rumor_size < 0L) { /* init failed */
-                    Sprintf(rumor_buf, "Error reading \"%.80s\".", RUMORFILE);
+                    Sprintf(rumor_buf, TR("Error reading \"%.80s\".", "读取「%.80s」时出错。"), RUMORFILE);
                     return rumor_buf;
                 }
             }
@@ -335,7 +335,7 @@ others_check(
         /* "don't edit" comment */
         *line = '\0';
         if (!dlb_fgets(line, sizeof line, fh)) {
-            Sprintf(xbuf, errfmt, fname, "error; can't read comment line");
+            Sprintf(xbuf, errfmt, fname, TR("error; can't read comment line", "错误：无法读取注释行"));
             putstr(tmpwin, 0, xbuf);
             goto closeit;
         }
@@ -347,9 +347,9 @@ others_check(
                encrypted via xcrypt() so show it both ways */
             if ((endp = strchr(line, '\n')) != 0)
                 *endp = 0;
-            putstr(tmpwin, 0, "- first line, as is");
+            putstr(tmpwin, 0, TR("- first line, as is", "— 第一行原文"));
             putstr(tmpwin, 0, line);
-            putstr(tmpwin, 0, "- xcrypt of first line");
+            putstr(tmpwin, 0, TR("- xcrypt of first line", "— 第一行加密后"));
             putstr(tmpwin, 0, xcrypt(line, xbuf));
             goto closeit;
         }
@@ -369,7 +369,7 @@ others_check(
             *endp = 0;
         putstr(tmpwin, 0, xcrypt(line, xbuf));
         if (!dlb_fgets(line, sizeof line, fh)) {
-            putstr(tmpwin, 0, "(no second entry)");
+            putstr(tmpwin, 0, TR("(no second entry)", "（没有第二项）"));
         } else {
             ++entrycount;
             if ((endp = strchr(line, '\n')) != 0)
@@ -385,7 +385,7 @@ others_check(
                entry are the only ones present (if either of those were
                missing, we wouldn't have gotten here...) */
             if (entrycount == 2) {
-                putstr(tmpwin, 0, "(only two entries)");
+                putstr(tmpwin, 0, TR("(only two entries)", "（只有两项）"));
             } else {
                 /* showing an ellipsis avoids ambiguity about whether
                    there are other lines; doing so three times (once for
@@ -695,7 +695,7 @@ outoracle(boolean special, boolean delphi)
                      ? "The Oracle scornfully takes all your gold and says:"
                      : "The Oracle meditates for a moment and then intones:");
         else
-            putstr(tmpwin, 0, "The message reads:");
+            putstr(tmpwin, 0, TR("The message reads:", "这段信息写道："));
         putstr(tmpwin, 0, "");
 
         while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
@@ -747,7 +747,7 @@ doconsult(struct monst *oracl)
         return ECMD_OK;
     }
 
-    Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
+    Sprintf(qbuf, TR("\"Wilt thou settle for a minor consultation?\" (%d %s)", "「你愿意接受一次小咨询吗？」（%d %s）"),
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -768,7 +768,7 @@ doconsult(struct monst *oracl)
         if (umoney <= (long) minor_cost /* don't even ask */
             || (svo.oracle_cnt == 1 || go.oracle_flg < 0))
             return ECMD_OK;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+        Sprintf(qbuf, TR("\"Then dost thou desire a major one?\" (%d %s)", "「那么你还要一次大咨询吗？」（%d %s）"),
                 major_cost, currency((long) major_cost));
         if (y_n(qbuf) != 'y')
             return ECMD_OK;

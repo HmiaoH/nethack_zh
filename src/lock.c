@@ -600,7 +600,7 @@ pick_lock(
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
                     && (c = otmp->tknown ? (otmp->otrapped ? 'y' : 'n')
-                            : ynq(safe_qbuf(qbuf, "Check ", " for a trap?",
+                            : ynq(safe_qbuf(qbuf, TR("Check ", "要检查"), " for a trap?",
                                           otmp, yname, ysimple_name, "this")))
                        != 'n') {
                     if (c == 'q')
@@ -612,14 +612,14 @@ pick_lock(
                           && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
                     c = 'q';
                     if (pick != &dummypick) {
-                        Sprintf(qbuf, "Unlock it with %s?", yname(pick));
+                        Sprintf(qbuf, TR("Unlock it with %s?", "用%s把它解锁吗？"), yname(pick));
                         c = ynq(qbuf);
                     }
                     if (c != 'y')
                         return PICKLOCK_DID_NOTHING;
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
-                    Sprintf(qsfx, " here; %s %s?",
+                    Sprintf(qsfx, TR(" here; %s %s?", "；要%s%s吗？"),
                             verb, it ? "it" : "its lock");
                     (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
                                      ansimpleoname, "a box");
@@ -780,7 +780,7 @@ pick_lock(
         default:
             if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                 && could_untrap(FALSE, FALSE)
-                && (c = ynq("Check this door for a trap?")) != 'n') {
+                && (c = ynq(TR("Check this door for a trap?", "要检查这扇门有没有陷阱吗？"))) != 'n') {
                 if (c == 'q')
                     return PICKLOCK_DID_NOTHING;
                 /* c == 'y' */
@@ -873,7 +873,9 @@ doforce(void)
         return ECMD_OK;
     }
     if (!u_have_forceable_weapon()) {
+#ifndef ZHLANG
         boolean use_plural = uwep && uwep->quan > 1;
+#endif
 
 #ifdef ZHLANG
         You_cant("无法用%s武器强行开锁。",
@@ -1146,7 +1148,7 @@ doopen_indir(coordxy x, coordxy y)
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
             } else if ((flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && !u.usteed /* kicking is different when mounted */
-                       && ynq("Kick it?") == 'y') {
+                       && ynq(TR("Kick it?", "要踢它吗？")) == 'y') {
                 cmdq_add_ec(CQ_CANNED, dokick);
                 cmdq_add_dir(CQ_CANNED,
                              sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);

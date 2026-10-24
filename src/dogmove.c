@@ -384,7 +384,7 @@ dog_starve(struct monst *mtmp)
 #endif
     else
 #ifdef ZHLANG
-        You_feel("难过了一瞬间。",
+        You_feel("%s了一瞬间。",
                     Hallucination ? "郁闷" : "伤心");
 #else
         You_feel("%s for a moment.",
@@ -1105,7 +1105,7 @@ dog_move(
     if (!Conflict && !mtmp->mconf
         && mtmp == u.ustuck && !sticks(gy.youmonst.data)) {
         unstuck(mtmp); /* swallowed case handled above */
-        You("get released!");
+        You(TR("get released!", "挣脱了！"));
     }
 #endif
     allowflags = mon_allowflags(mtmp);
@@ -1359,7 +1359,7 @@ dog_move(
             const char *what = o ? distant_name(o, doname) : something;
 
 #ifdef ZHLANG
-            pline_mon(mtmp, "%s不情愿地%s了%s。", noit_Monnam(mtmp),
+            pline_mon(mtmp, "%s不情愿地%s%s了%s。", noit_Monnam(mtmp),
                   vtense((char *) 0, locomotion(mtmp->data, "走")),
                   (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "过" : "上",
                   what);

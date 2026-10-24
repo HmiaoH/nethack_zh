@@ -1753,8 +1753,8 @@ maybe_adjust_light(struct obj *obj, int old_range)
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
 #ifdef ZHLANG
-                pline("%s%s%s。", buf,
-                      (abs(delta) > 1) ? "亮了很多" :
+                pline("%s%s%s%s。", buf, "的光",
+                      (abs(delta) > 1) ? "一下子" : "",
                       (delta > 0) ? "更亮了" : "没那么亮了");
 #else
                 pline("%s %s %s%s.", buf, otense(obj, "shine"),
@@ -3023,7 +3023,7 @@ obj_sanity_check(void)
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj->where != OBJ_FLOOR || x == 0
                     || obj->ox != x || obj->oy != y) {
-                    Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
+                    Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>", /* NOTRANS */
                             x, y, obj->ox, obj->oy);
                     insane_object(obj, at_fmt, "location sanity",
                                   (struct monst *) 0);
@@ -3097,7 +3097,7 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
             char lostbuf[40];
 
             /* %d: bitfield is unsigned but narrow, so promotes to int */
-            Sprintf(lostbuf, "how_lost=%d obj in inventory!", obj->how_lost);
+            Sprintf(lostbuf, "how_lost=%d obj in inventory!", obj->how_lost); /* NOTRANS */
             insane_object(obj, ofmt0, lostbuf, (struct monst *) 0);
         }
         if (Has_contents(obj)) {
@@ -3133,7 +3133,7 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                 if ((obj != uchain && obj != uball) || !bc_ok) {
                     /* discovered an object not in inventory which
                        erroneously has worn mask set */
-                    Sprintf(maskbuf, "worn mask 0x%08lx", obj->owornmask);
+                    Sprintf(maskbuf, "worn mask 0x%08lx", obj->owornmask); /* NOTRANS */
                     insane_object(obj, ofmt0, maskbuf, (struct monst *) 0);
                 }
                 break;
@@ -3145,12 +3145,12 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
 
             if (obj->where == OBJ_INVENT) {
                 if (!mtmp) { /* found leash with phantom mon */
-                    Sprintf(buf, "leashmon=%u no monst,",
+                    Sprintf(buf, "leashmon=%u no monst,", /* NOTRANS */
                             (unsigned) obj->leashmon);
                     insane_object(obj, ofmt0, buf, (struct monst *) 0);
                 } else if (!mtmp->mleashed) { /* found leashed mon
                                                * not flagged as leashed */
-                    Sprintf(buf, "leashmon=%u %s not leashed,",
+                    Sprintf(buf, "leashmon=%u %s not leashed,", /* NOTRANS */
                             (unsigned) obj->leashmon, mon_pmname(mtmp));
                     insane_object(obj, ofmt0, buf, (struct monst *) 0);
                 }
@@ -3164,12 +3164,12 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                                       ? obj->ocarry : (struct monst *) 0;
 
                 if (mtmp) { /* found monst leashed by non-invent leash */
-                    Sprintf(buf, "leashmon:%u %s leashed by %s leash,",
+                    Sprintf(buf, "leashmon:%u %s leashed by %s leash,", /* NOTRANS */
                             (unsigned) obj->leashmon,
                             mon_pmname(mtmp), where_name(obj));
                     insane_object(obj, ofmt0, buf, mtmp2);
                 } else { /* found non-invent leash with m_id of phantom mon */
-                    Sprintf(buf, "leashmon:%u no monst for %s leash,",
+                    Sprintf(buf, "leashmon:%u no monst for %s leash,", /* NOTRANS */
                             (unsigned) obj->leashmon, where_name(obj));
                     insane_object(obj, ofmt0, buf, mtmp2);
                 }
@@ -3321,7 +3321,7 @@ insane_obj_bits(struct obj *obj, struct monst *mon)
     if (o_in_use || o_bypass || o_nomerge || o_boulder) {
         char infobuf[QBUFSZ];
 
-        Sprintf(infobuf, "flagged%s%s%s%s",
+        Sprintf(infobuf, "flagged%s%s%s%s", /* NOTRANS */
                 o_in_use ? " in_use" : "",
                 o_bypass ? " bypass" : "",
                 o_nomerge ? " nomerge" : "",
@@ -3359,7 +3359,7 @@ where_name(struct obj *obj)
         return "nowhere";
     where = obj->where;
     if (where < 0 || where >= NOBJ_STATES || !obj_state_names[where]) {
-        Sprintf(unknown, "unknown[%d]", where);
+        Sprintf(unknown, "unknown[%d]", where); /* NOTRANS */
         return unknown;
     }
     return obj_state_names[where];
@@ -3384,7 +3384,7 @@ insane_object(
         iflags.override_ID--;
     }
     if (mon || (strstri(mesg, "minvent") && !strstri(mesg, "contained"))) {
-        Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
+        Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)"); /* NOTRANS */
         if (mon)
             monnm = x_monnam(mon, ARTICLE_A, (char *) 0, EXACT_NAME, TRUE);
         impossible(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
@@ -3463,7 +3463,7 @@ check_contained(struct obj *container, const char *mesg)
                 panic("failed sanity check: container holds its parent");
             /* change "contained... sanity" to "nested contained... sanity"
                and "nested contained..." to "nested nested contained..." */
-            Strcpy(nestedmesg, "nested ");
+            Strcpy(nestedmesg, "nested "); /* NOTRANS */
             copynchars(eos(nestedmesg), mesg, (int) sizeof nestedmesg
                                               - (int) strlen(nestedmesg) - 1);
             /* recursively check contents */
@@ -3491,7 +3491,7 @@ check_glob(struct obj *obj, const char *mesg)
         ) {
         char mesgbuf[BUFSZ], globbuf[QBUFSZ];
 
-        Sprintf(globbuf, " glob %d,quan=%ld,owt=%u ",
+        Sprintf(globbuf, " glob %d,quan=%ld,owt=%u ", /* NOTRANS */
                 obj->otyp, obj->quan, obj->owt);
         mesg = strsubst(strcpy(mesgbuf, mesg), " obj ", globbuf);
         insane_object(obj, ofmt0, mesg,
@@ -3546,13 +3546,13 @@ sanity_check_worn(struct obj *obj)
     }
     if (n > 1) {
         /* multiple bits set */
-        Sprintf(maskbuf, "worn mask (multiple) 0x%08lx", obj->owornmask);
+        Sprintf(maskbuf, "worn mask (multiple) 0x%08lx", obj->owornmask); /* NOTRANS */
         insane_object(obj, ofmt0, maskbuf, (struct monst *) 0);
     }
     if ((owornmask & ~allmask) != 0L
         || (carried(obj) && (owornmask & W_SADDLE) != 0L)) {
         /* non-wearable bit(s) set */
-        Sprintf(maskbuf, "worn mask (bogus)) 0x%08lx", obj->owornmask);
+        Sprintf(maskbuf, "worn mask (bogus)) 0x%08lx", obj->owornmask); /* NOTRANS */
         insane_object(obj, ofmt0, maskbuf, (struct monst *) 0);
     }
     if (n == 1 && (carried(obj) || (owornmask & (W_BALL | W_CHAIN)) != 0L)) {
@@ -3629,7 +3629,7 @@ sanity_check_worn(struct obj *obj)
             break;
         }
         if (what) {
-            Sprintf(maskbuf, "worn mask 0x%08lx != %s", obj->owornmask, what);
+            Sprintf(maskbuf, "worn mask 0x%08lx != %s", obj->owornmask, what); /* NOTRANS */
             insane_object(obj, ofmt0, maskbuf, (struct monst *) 0);
         }
     }
@@ -3682,7 +3682,7 @@ sanity_check_worn(struct obj *obj)
             /* if we've found a potion worn in the amulet slot,
                this yields "worn (potion amulet)" */
             Strcpy(oclassname, def_oc_syms[(uchar) obj->oclass].name);
-            Sprintf(maskbuf, "worn (%s %s)", makesingular(oclassname), what);
+            Sprintf(maskbuf, "worn (%s %s)", makesingular(oclassname), what); /* NOTRANS */
             insane_object(obj, ofmt0, maskbuf, mon);
         }
     }

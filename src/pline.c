@@ -213,6 +213,40 @@ vpline(const char *line, va_list the_args)
         /* too long but modestly so; allow but truncate, preserving final
            3 chars: "___ extremely long text" -> "___ extremely l...ext"
            (this may be suboptimal if overflow is less than 3) */
+#ifdef ZHLANG
+        /*
+         * Chinese messages are multi-byte UTF-8, so the cut points must
+         * fall on character boundaries or the tty would receive a broken
+         * sequence (D1).  Keep the same shape as the English version:
+         * head, "...", then the last three *characters*.
+         */
+        {
+            int avail = BUFSZ - 1; /* room for text, not counting NUL */
+            int headlen, taillen = 0, cnt = 0;
+            const char *tail = line + ln;
+
+            while (tail > line && cnt < 3) {
+                --tail;
+                /* step back over continuation bytes to the char start */
+                while (tail > line
+                       && ((unsigned char) *tail & 0xC0) == 0x80)
+                    --tail;
+                ++cnt;
+            }
+            taillen = (int) (line + ln - tail);
+            headlen = avail - 3 - taillen;
+            if (headlen < 0)
+                headlen = 0;
+            /* don't cut in the middle of a character in the head either */
+            while (headlen > 0
+                   && ((unsigned char) line[headlen] & 0xC0) == 0x80)
+                --headlen;
+            (void) memmove(pbuf, line, headlen); /* may be the same buffer */
+            pbuf[headlen] = pbuf[headlen + 1] = pbuf[headlen + 2] = '.';
+            (void) memmove(pbuf + headlen + 3, tail, taillen);
+            pbuf[headlen + 3 + taillen] = '\0';
+        }
+#else
         if (line != pbuf) /* no '%' was present or format was just "%s" */
             (void) strncpy(pbuf, line, BUFSZ - 1); /* caveat: unterminated */
         pbuf[BUFSZ - 1 - 6] = pbuf[BUFSZ - 1 - 5] = pbuf[BUFSZ - 1 - 4] = '.';
@@ -221,6 +255,7 @@ vpline(const char *line, va_list the_args)
         pbuf[BUFSZ - 1 - 2] = line[ln - 2];
         pbuf[BUFSZ - 1 - 1] = line[ln - 1];
         pbuf[BUFSZ - 1] = '\0';
+#endif
         line = pbuf;
     }
     msgtyp = MSGTYP_NORMAL;
@@ -355,12 +390,38 @@ free_youbuf(void)
     gy.you_buf_siz = 0;
 }
 
-/* `prefix' must be a string literal, not a pointer */
+/* `prefix' may be a string literal or a computed pointer; size the buffer
+   for the actual prefix length (C strings never need more room). */
 #define YouPrefix(pointer, prefix, text) \
-    Strcpy((pointer = You_buf((int) (strlen(text) + sizeof prefix))), prefix)
+    Strcpy((pointer = You_buf((int) (strlen(text) + strlen(prefix) + 1))), \
+           prefix)
 
 #define YouMessage(pointer, prefix, text) \
     strcat((YouPrefix(pointer, prefix, text), pointer), text)
+
+#ifdef ZHLANG
+/*
+ * Chinese messages put the subject in front of the translated text
+ * ("你挥舞着…"), so the You() family supplies a Chinese prefix instead of
+ * the former empty string.  Translations which already spell out the
+ * subject must not get a second one, hence the "already starts with 你"
+ * test.  Untranslated (ASCII) text keeps the old behaviour of getting no
+ * prefix, so an English fallback sentence is not mangled.
+ */
+staticfn const char *
+zh_you_prefix(const char *text, const char *prefix)
+{
+    if (!text || !*text)
+        return "";
+    if (!strncmp(text, "你", sizeof "你" - 1))
+        return "";
+    if (!((unsigned char) *text & 0x80) && *text != '%')
+        return ""; /* plain untranslated English: keep the old output */
+    return prefix;
+}
+#else
+#define zh_you_prefix(text, prefix) (prefix)
+#endif
 
 void
 You(const char *line, ...)
@@ -370,7 +431,7 @@ You(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, "", line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你"), line), the_args);
 #else
     vpline(YouMessage(tmp, "You ", line), the_args);
 #endif
@@ -385,7 +446,7 @@ Your(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, "", line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你的"), line), the_args);
 #else
     vpline(YouMessage(tmp, "Your ", line), the_args);
 #endif
@@ -401,9 +462,9 @@ You_feel(const char *line, ...)
     va_start(the_args, line);
 #ifdef ZHLANG
     if (Unaware)
-        YouPrefix(tmp, "", line);
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己感到"), line);
     else
-        YouPrefix(tmp, "", line);
+        YouPrefix(tmp, zh_you_prefix(line, "你感到"), line);
 #else
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
@@ -422,7 +483,7 @@ You_cant(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, "", line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你不能"), line), the_args);
 #else
     vpline(YouMessage(tmp, "You can't ", line), the_args);
 #endif
@@ -469,7 +530,12 @@ You_hear(const char *line, ...)
         return;
     va_start(the_args, line);
 #ifdef ZHLANG
-    YouPrefix(tmp, "", line);
+    if (Underwater)
+        YouPrefix(tmp, zh_you_prefix(line, "你勉强听到"), line);
+    else if (Unaware)
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己听到"), line);
+    else
+        YouPrefix(tmp, zh_you_prefix(line, "你听到"), line);
 #else
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
@@ -490,7 +556,12 @@ You_see(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    YouPrefix(tmp, "", line);
+    if (Unaware)
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己看见"), line);
+    else if (Blind) /* caller should have caught this... */
+        YouPrefix(tmp, zh_you_prefix(line, "你感觉到"), line);
+    else
+        YouPrefix(tmp, zh_you_prefix(line, "你看见"), line);
 #else
     if (Unaware)
         YouPrefix(tmp, "You dream that you see ", line);

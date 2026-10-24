@@ -105,7 +105,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
         egrd->fcbeg++;
     }
     if (sawcorridor && !silently)
-        pline_The("corridor disappears.");
+        pline_The(TR("corridor disappears.", "走廊消失了。"));
     /* only give encased message if hero is still alive (might get here
        via paygd() -> mongone() -> grddead() when game is over;
        died: no message, quit: message) */
@@ -484,7 +484,7 @@ invault(void)
                 #endif
             }
             if (!spotted)
-                pline_The("other presence vanishes.");
+                pline_The(TR("other presence vanishes.", "另一股存在感消失了。"));
             mongone(guard);
             return;
         }
@@ -540,7 +540,7 @@ invault(void)
         buf[0] = '\0';
         trycount = 5;
         do {
-            getlin(Deaf ? "You are required to supply your name. -"
+            getlin(Deaf ? TR("You are required to supply your name. -", "你必须提供你的名字。 -")
                         : "\"Hello stranger, who are you?\" -", buf);
             (void) mungspaces(buf);
         } while (!buf[0] && --trycount > 0);
@@ -841,7 +841,7 @@ wallify_vault(struct monst *grd)
             pline("A mysterious force moves the gold into the vault.");
             #endif
         if (fixed)
-            pline_The("damaged vault's walls are magically restored!");
+            pline_The(TR("damaged vault's walls are magically restored!", "被破坏的金库墙壁在魔法的力量下恢复了！"));
     }
 }
 
@@ -1098,7 +1098,7 @@ gd_move(struct monst *grd)
             if (egrd->warncnt == 3 && !Deaf) {
                 char buf[BUFSZ];
 
-                Sprintf(buf, "%sfollow me!",
+                Sprintf(buf, TR("%sfollow me!", "%s跟我来！"),
                         u_carry_gold ? (!umoney ? "drop that hidden gold and "
                                                 : "drop that gold and ")
                                      : "");
@@ -1415,7 +1415,7 @@ paygd(boolean silently)
 
     if (u.uinvault) {
         if (!silently)
-            Your("%ld %s goes into the Magic Memory Vault.",
+            Your(TR("%ld %s goes into the Magic Memory Vault.", "%ld %s进了魔法记忆金库。"),
                  umoney, currency(umoney));
         gdx = u.ux;
         gdy = u.uy;
@@ -1432,7 +1432,7 @@ paygd(boolean silently)
             #endif
         gdx = svr.rooms[EGD(grd)->vroom].lx + rn2(2);
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
-        Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
+        Sprintf(buf, TR("To Croesus: here's the gold recovered from %s the %s.", "致克罗伊斯：这是从%s这位%s处追回的金币。"),
                 svp.plname,
                 pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
         make_grave(gdx, gdy, buf);

@@ -274,7 +274,7 @@ mplayhorn(
         objnamp = xname(otmp);
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
-        Sprintf(objbuf, "a %s directed at", objnamp);
+        Sprintf(objbuf, TR("a %s directed at", "一件对准自己的%s"), objnamp);
         /* "<mon> plays a <horn> directed at himself!" */
         #ifdef ZHLANG
         pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
@@ -347,7 +347,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             map_invisible(mtmp->mx, mtmp->my);
         }
 
-        Snprintf(blindbuf, sizeof blindbuf, "reading %s", onambuf);
+        Snprintf(blindbuf, sizeof blindbuf, TR("reading %s", "正在读%s"), onambuf);
         strsubst(blindbuf, "reading a scroll labeled",
                  mtmp->mconf ? "attempting to incant" : "incant");
         #ifdef ZHLANG
@@ -910,7 +910,7 @@ use_defensive(struct monst *mtmp)
             if (otmp)
                 pline_mon(mtmp, "%s uses a unicorn horn!", Monnam(mtmp));
             else
-                pline_The("tip of %s's horn glows!", mon_nam(mtmp));
+                pline_The(TR("tip of %s's horn glows!", "%s的角尖发光了！"), mon_nam(mtmp));
         }
         if (!mtmp->mcansee) {
             mcureblindness(mtmp, vismon);
@@ -1016,7 +1016,7 @@ use_defensive(struct monst *mtmp)
             || IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ)
             || (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0)
             || stairway_at(mtmp->mx, mtmp->my)) {
-            pline_The("digging ray is ineffective.");
+            pline_The(TR("digging ray is ineffective.", "挖掘射线毫无效果。"));
             return 2;
         }
         if (!Can_dig_down(&u.uz) && !levl[mtmp->mx][mtmp->my].candig) {
@@ -1025,7 +1025,7 @@ use_defensive(struct monst *mtmp)
             if (t_at(mtmp->mx, mtmp->my)
                 || !(t = maketrap(mtmp->mx, mtmp->my, PIT))) {
                 if (vismon) {
-                    pline_The("%s here is too hard to dig in.",
+                    pline_The(TR("%s here is too hard to dig in.", "这里的%s太硬，挖不动。"),
                               surface(mtmp->mx, mtmp->my));
                 }
                 return 2;
@@ -1724,14 +1724,14 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             } else if (rnd(20) < 10 + u.uac &&
                        !(gb.buzzer && !gb.buzzer->mwandexp)) {
                 monstunseesu(M_SEEN_MAGR); /* mons see hero not resisting */
-                pline_The("wand hits you!");
+                pline_The(TR("wand hits you!", "魔杖击中了你！"));
                 tmp = d(2, 12);
                 if (Half_spell_damage)
                     tmp = (tmp + 1) / 2;
                 losehp(tmp, "wand", KILLED_BY_AN);
                 learnit = TRUE;
             } else {
-                pline_The("wand misses you.");
+                pline_The(TR("wand misses you.", "魔杖没有击中你。"));
             }
             stop_occupation();
             nomul(0);
@@ -2009,12 +2009,12 @@ use_offensive(struct monst *mtmp)
         mreadmsg(mtmp, otmp);
         /* Identify the scroll */
         if (canspotmon(mtmp)) {
-            pline_The("%s rumbles %s %s!", ceiling(mtmp->mx, mtmp->my),
+            pline_The(TR("%s rumbles %s %s!", "%s在%s%s隆隆作响！"), ceiling(mtmp->mx, mtmp->my),
                       otmp->blessed ? "around" : "above", mon_nam(mtmp));
             if (oseen)
                 makeknown(otmp->otyp);
         } else if (cansee(mtmp->mx, mtmp->my)) {
-            pline_The("%s rumbles in the middle of nowhere!",
+            pline_The(TR("%s rumbles in the middle of nowhere!", "%s在虚无之中隆隆作响！"),
                       ceiling(mtmp->mx, mtmp->my));
             if (mtmp->minvis)
                 map_invisible(mtmp->mx, mtmp->my);
@@ -2093,7 +2093,7 @@ use_offensive(struct monst *mtmp)
             int num;
 
             if (vis)
-                pline_The("scroll erupts in a tower of flame!");
+                pline_The(TR("scroll erupts in a tower of flame!", "卷轴喷发出一道火柱！"));
             shieldeff(mtmp->mx, mtmp->my);
             pline_mon(mtmp, "%s is uninjured.", Monnam(mtmp));
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
@@ -2758,7 +2758,7 @@ use_misc(struct monst *mtmp)
                 where_to = 0;
             }
             if (!where_to) {
-                pline_The("whip slips free."); /* not `The_whip' */
+                pline_The(TR("whip slips free.", "鞭子滑脱了。")); /* not `The_whip' */
                 return 1;
             } else if (where_to == 3 && mon_hates_silver(mtmp)
                        && objects[obj->otyp].oc_material == SILVER) {

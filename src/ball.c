@@ -212,7 +212,7 @@ placebc(void)
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
         char panicbuf[BUFSZ];
 
-        Sprintf(panicbuf, "placebc denied, restriction in effect");
+        Sprintf(panicbuf, TR("placebc denied, restriction in effect", "placebc 被拒绝：限制仍在生效"));
         paniclog("placebc", panicbuf);
 #endif
         return;
@@ -255,7 +255,7 @@ lift_covet_and_placebc(int pin)
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
         char panicbuf[BUFSZ];
 
-        Sprintf(panicbuf, "lift_covet_and_placebc denied, %s",
+        Sprintf(panicbuf, TR("lift_covet_and_placebc denied, %s", "lift_covet_and_placebc 被拒绝：%s"),
                 (pin != bcrestriction) ? "pin mismatch"
                                        : "restriction in effect");
         paniclog("placebc", panicbuf);
@@ -278,7 +278,7 @@ Placebc(const char *funcnm, int linenum)
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
         char panicbuf[BUFSZ];
 
-        Sprintf(panicbuf, "Placebc denied to %s:%d, restricted by %s:%d",
+        Sprintf(panicbuf, TR("Placebc denied to %s:%d, restricted by %s:%d", "Placebc 对 %s:%d 被拒绝，受到 %s:%d 的限制"),
                 funcnm, linenum,
                 bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
         paniclog("Placebc", panicbuf);
@@ -306,7 +306,7 @@ Unplacebc(const char *funcnm, int linenum)
     if (bcrestriction) {
         char panicbuf[BUFSZ];
 
-        Sprintf(panicbuf, "Unplacebc from %s:%d, when restricted to %s:%d",
+        Sprintf(panicbuf, TR("Unplacebc from %s:%d, when restricted to %s:%d", "从 %s:%d 调用 Unplacebc，但限制在 %s:%d"),
                 funcnm, linenum,
                 bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
         paniclog("Unplacebc", panicbuf);
@@ -922,7 +922,9 @@ drop_ball(coordxy x, coordxy y)
     }
 
     if (x != u.ux || y != u.uy) {
+#ifndef ZHLANG
         static const char pullmsg[] = "The ball pulls you out of the ";
+#endif
         struct trap *t;
         long side;
 

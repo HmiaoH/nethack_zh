@@ -147,6 +147,32 @@ restore_artifacts(NHFILE *nhfp)
 
 #ifndef SFCTOOL
 
+#ifdef ZHLANG
+/* Chinese display names, indexed the same way as artilist[]; see
+   include/artilist_zh.h (display only, never used for lookups) */
+static const char *const artifact_names_zh[] = {
+#define ARTI_ZH_NAMES
+#include "artilist_zh.h"
+#undef ARTI_ZH_NAMES
+};
+
+/* the two tables are line-aligned; a mismatch is a build error */
+typedef char artifact_names_zh_count_check[
+    (SIZE(artifact_names_zh) == AFTER_LAST_ARTIFACT + 1) ? 1 : -1];
+
+/* Chinese name of an artifact, for display; falls back to the English
+   name when no translation is available */
+const char *
+artiname_zh(int artinum)
+{
+    if (artinum <= 0 || artinum > NROFARTIFACTS)
+        return "";
+    if (artifact_names_zh[artinum] && *artifact_names_zh[artinum])
+        return artifact_names_zh[artinum];
+    return artilist[artinum].name;
+}
+#endif /* ZHLANG */
+
 const char *
 artiname(int artinum)
 {
@@ -352,6 +378,46 @@ artifact_name(
     return (char *) 0;
 }
 
+#ifdef ZHLANG
+/*
+ * Translate a Chinese artifact name typed by the player (for a wish, for
+ * naming an item, ...) back to the canonical English name.  The English
+ * name is what every internal lookup uses, so a caller can hand the result
+ * straight to artifact_name().  Returns NULL when "name" is not a known
+ * Chinese artifact name; the object type is returned in otyp if non-NULL.
+ */
+const char *
+artifact_name_zh(
+    const char *name, /* string from player that might be a Chinese name */
+    short *otyp_p,    /* secondary output */
+    boolean fuzzy)    /* whether to allow surrounding or repeated spaces */
+{
+    const struct artifact *a;
+    const char *aname;
+    int i;
+
+    if (!*name)
+        return (char *) 0;
+    /* ignore a leading "the " for symmetry with artifact_name() */
+    if (!strncmpi(name, "the ", 4))
+        name += 4;
+
+    for (a = artilist + 1, i = 1; a->otyp; a++, i++) {
+        aname = artifact_names_zh[i];
+        if (!aname || !*aname)
+            continue;
+        if (!fuzzy ? !strcmp(name, aname)
+                   : fuzzymatch(name, aname, " ", TRUE)) {
+            if (otyp_p)
+                *otyp_p = a->otyp;
+            return a->name;
+        }
+    }
+
+    return (char *) 0;
+}
+#endif /* ZHLANG */
+
 boolean
 exist_artifact(int otyp, const char *name)
 {
@@ -453,7 +519,7 @@ find_artifact(struct obj *otmp)
                         blind but now seen; there's no previous_where to
                         figure out how it got here */
                      : "");
-        livelog_printf(LL_ARTIFACT, "found %s%s",
+        livelog_printf(LL_ARTIFACT, TR("found %s%s", "发现了%s%s"),
                        bare_artifactname(otmp), where);
     }
 }
@@ -592,13 +658,13 @@ restrict_name(struct obj *otmp, const char *name)
     (void) memset((genericptr_t) sametype, 0, sizeof sametype); /* FALSE */
     sametype[otyp] = TRUE;
     if (!objects[otyp].oc_name_known
-        && (odesc = OBJ_DESCR(objects[otyp])) != 0) {
+        && (odesc = OBJ_DESCR_EN(objects[otyp])) != 0) {
         obj_shuffle_range(otyp, &lo, &hi);
         for (i = svb.bases[ocls]; i < NUM_OBJECTS; i++) {
             if (objects[i].oc_class != ocls)
                 break;
             if (!objects[i].oc_name_known
-                && (other = OBJ_DESCR(objects[i])) != 0
+                && (other = OBJ_DESCR_EN(objects[i])) != 0
                 && (!strcmp(odesc, other) || (i >= lo && i <= hi)))
                 sametype[i] = TRUE;
         }
@@ -958,7 +1024,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
         /* add half (maybe quarter) of the usual silver damage bonus */
         if (objects[obj->otyp].oc_material == SILVER && Hate_silver)
             tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
-        Sprintf(buf, "touching %s", oart->name);
+        Sprintf(buf, TR("touching %s", "触碰%s"), oart->name);
         losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
         exercise(A_WIS, FALSE);
     }
@@ -1170,7 +1236,7 @@ disp_artifact_discoveries(
             continue; /* for WIN_ERR, we just count */
 
         if (i == 0)
-            putstr(tmpwin, iflags.menu_headings.attr, "Artifacts");
+            putstr(tmpwin, iflags.menu_headings.attr, TR("Artifacts", "神器"));
         m = artidisco[i];
         otyp = artilist[m].otyp;
         algnstr = align_str(artilist[m].alignment);
@@ -1192,7 +1258,7 @@ dump_artifact_info(winid tmpwin)
     char buf[BUFSZ], buf2[BUFSZ];
 
     /* not a menu, but header uses same bold or whatever attribute as such */
-    putstr(tmpwin, iflags.menu_headings.attr, "Artifacts");
+    putstr(tmpwin, iflags.menu_headings.attr, TR("Artifacts", "神器"));
     for (m = 1; m <= NROFARTIFACTS; ++m) {
         Snprintf(buf2, sizeof buf2,
                 "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
@@ -1457,11 +1523,11 @@ Mb_hit(struct monst *magr, /* attacker */
 
             buf[0] = '\0';
             if (do_stun)
-                Strcat(buf, "stunned");
+                Strcat(buf, TR("stunned", "眩晕"));
             if (do_stun && do_confuse)
-                Strcat(buf, " and ");
+                Strcat(buf, TR(" and ", "且"));
             if (do_confuse)
-                Strcat(buf, "confused");
+                Strcat(buf, TR("confused", "混乱"));
 #ifdef ZHLANG
             pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
                   (do_stun && do_confuse) ? '!' : '.');
@@ -2066,11 +2132,11 @@ invoke_create_portal(struct obj *obj)
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                  ATR_NONE, clr,
-                 svd.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
+                 dname_zh(svd.dungeons[i].dname), MENU_ITEMFLAGS_NONE);
         num_ok_dungeons++;
         last_ok_dungeon = i;
     }
-    end_menu(tmpwin, "Open a portal to which dungeon?");
+    end_menu(tmpwin, TR("Open a portal to which dungeon?", "要打开通往哪个地牢的传送门？"));
     if (num_ok_dungeons > 1) {
         /* more than one entry; display menu for choices */
         menu_item *selected;
@@ -2723,7 +2789,7 @@ glow_verb(int count, /* 0 means blind rather than no applicable creatures */
     /* ing_suffix() will double the last consonant for all the words
        we're using and none of them should have that, so bypass it */
     if (ingsfx)
-        Strcat(resbuf, "ing");
+        Strcat(resbuf, "ing"); /* NOTRANS */
     return resbuf;
 }
 
@@ -2845,7 +2911,7 @@ retouch_object(
                 tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
             if (bane)
                 dmg += rnd(10);
-            Sprintf(buf, "handling %s", what);
+            Sprintf(buf, TR("handling %s", "接触%s"), what);
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }

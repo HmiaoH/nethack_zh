@@ -279,11 +279,8 @@ do_mgivenname(void)
         return;
     }
     /* special case similar to the one in lookat() */
-#ifdef ZHLANG
-    Sprintf(qbuf, "你想怎么称呼%s？",
-#else
-    Sprintf(qbuf, "What do you want to call %s?",
-#endif
+    Sprintf(qbuf, TR("What do you want to call %s?",
+                     "你想怎么称呼%s？"),
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf,
@@ -351,13 +348,11 @@ do_oname(struct obj *obj)
         return;
     }
 
-#ifdef ZHLANG
-    Sprintf(qbuf, "你想命名%s ",
-#else
-    Sprintf(qbuf, "What do you want to name %s ",
-#endif
-            is_plural(obj) ? "these" : "this");
-    (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
+    Sprintf(qbuf, TR("What do you want to name %s ",
+                     "你想命名%s"),
+            is_plural(obj) ? TR("these", "这些") : TR("this", "这个"));
+    (void) safe_qbuf(qbuf, qbuf, TR("?", "？"), obj, xname, simpleonames,
+                     TR("item", "物品"));
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf, safe_oname(obj)))
         return;
@@ -388,6 +383,17 @@ do_oname(struct obj *obj)
     }
 
     /* relax restrictions over proper capitalization for artifacts */
+#ifdef ZHLANG
+    /* C3/F5: a Chinese artifact name used when naming an item is converted
+       to the canonical English name first; everything below, and every
+       internal lookup, keeps working with English */
+    {
+        const char *en = artifact_name_zh(buf, &objtyp, TRUE);
+
+        if (en)
+            copynchars(buf, en, BUFSZ - 1);
+    }
+#endif
     if ((aname = artifact_name(buf, &objtyp, TRUE)) != 0
         && (restrict_name(obj, aname) || exist_artifact(obj->otyp, aname))) {
         /* substitute canonical spelling before slippage */
@@ -657,7 +663,7 @@ docallcmd(void)
 #endif
 #if 0
             } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
-                You("know those as well as you ever will.");
+                You(TR("know those as well as you ever will.", "已经把它们了解得不能再透彻了。"));
 #endif
             } else {
                 docall(obj);
@@ -722,7 +728,7 @@ docall(struct obj *obj)
 
     if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* fromsink: kludge, meaning it's sink water */
-        Sprintf(qbuf, "Call a stream of %s fluid:",
+        Sprintf(qbuf, TR("Call a stream of %s fluid:", "把这股%s流体称作："),
                 OBJ_DESCR(objects[obj->otyp]));
     else
         (void) safe_qbuf(qbuf, "Call ", ":", obj,
@@ -765,7 +771,7 @@ namefloorobj(void)
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-    Sprintf(buf, "object on map (or '.' for one %s you)",
+    Sprintf(buf, TR("object on map (or '.' for one %s you)", "地图上的物体（或用「.」表示你%s的那个）"),
             (u.uundetected && hides_under(gy.youmonst.data))
               ? "over" : "under");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
@@ -1018,15 +1024,15 @@ x_monnam(
         if (adjective && article == ARTICLE_THE) {
             /* pathological case: "the angry Asidonhopo the blue dragon"
                sounds silly */
-            Strcpy(buf, "the ");
+            Strcpy(buf, TR("the ", "这个 "));
             Strcat(strcat(buf, adjective), " ");
             Strcat(buf, shkname(mtmp));
         } else {
             Strcat(buf, shkname(mtmp));
             if (mdat != &mons[PM_SHOPKEEPER] || do_invis){
-                Strcat(buf, " the ");
+                Strcat(buf, TR(" the ", "，"));
                 if (do_invis)
-                    Strcat(buf, "invisible ");
+                    Strcat(buf, TR("invisible ", "隐形的"));
                 Strcat(buf, pm_name);
             }
         }
@@ -1037,10 +1043,10 @@ x_monnam(
     if (adjective)
         Strcat(strcat(buf, adjective), " ");
     if (do_invis)
-        Strcat(buf, "invisible ");
+        Strcat(buf, TR("invisible ", "隐形的"));
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
-        Strcat(buf, "saddled ");
+        Strcat(buf, TR("saddled ", "备鞍的"));
     has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now.
@@ -1059,10 +1065,10 @@ x_monnam(
       if (has_ebones(mtmp)) {
 #endif
         if (mdat == &mons[PM_GHOST]) {
-            Sprintf(eos(buf), "%s ghost", s_suffix(name));
+            Sprintf(eos(buf), TR("%s ghost", "%s的幽灵"), s_suffix(name));
             name_at_start = TRUE;
         } else if (called) {
-            Sprintf(eos(buf), "%s called %s", pm_name, name);
+            Sprintf(eos(buf), TR("%s called %s", "%s（名叫%s）"), pm_name, name);
             name_at_start = (boolean) type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
@@ -1288,8 +1294,8 @@ distant_monnam(
        its own obfuscation) */
     if (mon->data == &mons[PM_HIGH_CLERIC] && !Hallucination
         && Is_astralevel(&u.uz) && !m_next2u(mon)) {
-        Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
-        Strcat(outbuf, mon->female ? "high priestess" : "high priest");
+        Strcpy(outbuf, article == ARTICLE_THE ? TR("the ", "这个 ") : "");
+        Strcat(outbuf, mon->female ? TR("high priestess", "女大祭司") : "high priest");
     } else {
         Strcpy(outbuf, x_monnam(mon, article, (char *) 0, 0, TRUE));
     }
@@ -1309,17 +1315,17 @@ mon_nam_too(struct monst *mon, struct monst *other_mon)
         outbuf = nextmbuf();
         switch (pronoun_gender(mon, PRONOUN_HALLU)) {
         case 0:
-            Strcpy(outbuf, "himself");
+            Strcpy(outbuf, TR("himself", "他自己"));
             break;
         case 1:
-            Strcpy(outbuf, "herself");
+            Strcpy(outbuf, TR("herself", "她自己"));
             break;
         default:
         case 2:
-            Strcpy(outbuf, "itself");
+            Strcpy(outbuf, TR("itself", "它自己"));
             break;
         case 3: /* could happen when hallucinating */
-            Strcpy(outbuf, "themselves");
+            Strcpy(outbuf, TR("themselves", "他们自己"));
             break;
         }
     }
@@ -1368,15 +1374,15 @@ minimal_monnam(struct monst *mon, boolean ckloc)
     char *outbuf = nextmbuf();
 
     if (!mon) {
-        Strcpy(outbuf, "[Null monster]");
+        Strcpy(outbuf, TR("[Null monster]", "［空怪物］"));
     } else if ((ptr = mon->data) == 0) {
-        Strcpy(outbuf, "[Null mon->data]");
+        Strcpy(outbuf, TR("[Null mon->data]", "［空 mon->data］"));
     } else if (ptr < &mons[0]) {
-        Sprintf(outbuf, "[Invalid mon->data %s < %s]",
+        Sprintf(outbuf, TR("[Invalid mon->data %s < %s]", "［无效的 mon->data %s < %s］"),
                 fmt_ptr((genericptr_t) mon->data),
                 fmt_ptr((genericptr_t) &mons[0]));
     } else if (ptr >= &mons[NUMMONS]) {
-        Sprintf(outbuf, "[Invalid mon->data %s >= %s]",
+        Sprintf(outbuf, TR("[Invalid mon->data %s >= %s]", "［无效的 mon->data %s >= %s］"),
                 fmt_ptr((genericptr_t) mon->data),
                 fmt_ptr((genericptr_t) &mons[NUMMONS]));
     } else if (ckloc && ptr == &mons[PM_LONG_WORM] && mon->mx
@@ -1494,7 +1500,7 @@ bogusmon(char *buf, char *code)
     /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng, MD_PAD_BOGONS);
     if (!*mnam) {
-        Strcpy(buf, "bogon");
+        Strcpy(buf, TR("bogon", "博贡"));
     } else if (strchr(bogon_codes, *mnam)) { /* strip prefix if present */
         if (code)
             *code = *mnam;
@@ -1753,13 +1759,13 @@ lookup_novel(const char *lookname, int *idx)
      * editions keep that, but we also recognize American spelling;
      * _Sourcery_ is a joke rather than British spelling of "sorcery".
      */
-    if (!strcmpi(The(lookname), "The Color of Magic"))
+    if (!strcmpi(The(lookname), "The Color of Magic")) /* NOTRANS */
         lookname = sir_Terry_novels[NVL_COLOUR_OF_MAGIC];
     else if (!strcmpi(lookname, "Sorcery"))
         lookname = sir_Terry_novels[NVL_SOURCERY];
     else if (!strcmpi(lookname, "Masquerade"))
         lookname = sir_Terry_novels[NVL_MASKERADE];
-    else if (!strcmpi(The(lookname), "The Amazing Maurice"))
+    else if (!strcmpi(The(lookname), "The Amazing Maurice")) /* NOTRANS */
         lookname = sir_Terry_novels[NVL_AMAZING_MAURICE];
     else if (!strcmpi(lookname, "Thud"))
         lookname = sir_Terry_novels[NVL_THUD];

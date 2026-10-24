@@ -684,15 +684,15 @@ failed_grab(
                mon_nam(x_monnam) calls s_suffix() for named ghosts and
                s_suffix() uses a single static buffer; make copies of both
                names to overcome that [note: comment predates 'tailmiss'] */
-            Strcpy(magrnam, (magr == &gy.youmonst) ? "Your"
+            Strcpy(magrnam, (magr == &gy.youmonst) ? TR("Your", "你")
                                                    : s_suffix(Monnam(magr)));
             if (!tailmiss) {
-                Strcpy(mdefnam, (mdef == &gy.youmonst) ? "you"
+                Strcpy(mdefnam, (mdef == &gy.youmonst) ? TR("you", "你")
                                                        : mon_nam(mdef));
             } else {
                 /* hero poly'd into long worm can't grow tail
                    so no 'youmonst' handling is needed here */
-                Sprintf(mdefnam, "%s tail", s_suffix(some_mon_nam(mdef)));
+                Sprintf(mdefnam, TR("%s tail", "%s尾巴"), s_suffix(some_mon_nam(mdef)));
             }
             /* unsolid grab misses are actually somewhat iffy--how come
                ordinary attacks don't also pass right through? */
@@ -750,31 +750,31 @@ hitmm(
             buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
-                Snprintf(buf, sizeof buf, "%s bites", magr_name);
+                Snprintf(buf, sizeof buf, TR("%s bites", "%s咬"), magr_name);
                 break;
             case AT_STNG:
-                Snprintf(buf, sizeof buf, "%s stings", magr_name);
+                Snprintf(buf, sizeof buf, TR("%s stings", "%s蜇"), magr_name);
                 break;
             case AT_BUTT:
-                Snprintf(buf, sizeof buf, "%s butts", magr_name);
+                Snprintf(buf, sizeof buf, TR("%s butts", "%s顶撞"), magr_name);
                 break;
             case AT_TUCH:
-                Snprintf(buf, sizeof buf, "%s touches", magr_name);
+                Snprintf(buf, sizeof buf, TR("%s touches", "%s触碰"), magr_name);
                 break;
             case AT_TENT:
-                Snprintf(buf, sizeof buf, "%s tentacles suck",
+                Snprintf(buf, sizeof buf, TR("%s tentacles suck", "%s的触手吮吸"),
                          s_suffix(magr_name));
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Snprintf(buf, sizeof buf, "%s squeezes", magr_name);
+                    Snprintf(buf, sizeof buf, TR("%s squeezes", "%s挤压"), magr_name);
                     break;
                 }
                 FALLTHROUGH;
                 /*FALLTHRU*/
             default:
                 if (!weaponhit || !mwep || !mwep->oartifact)
-                    Snprintf(buf, sizeof buf, "%s hits", magr_name);
+                    Snprintf(buf, sizeof buf, TR("%s hits", "%s击中"), magr_name);
                 break;
             }
             if (*buf)
@@ -799,7 +799,7 @@ hitmm(
                         (void) strsubst(mdef_name, "herself", "her own");
                         (void) strsubst(mdef_name, "itself", "its own");
                     }
-                    Strcat(mdef_name, " flesh");
+                    Strcat(mdef_name, TR(" flesh", "的皮肉"));
                 }
 
 #ifdef ZHLANG
@@ -1282,7 +1282,9 @@ mdamagem(
 int
 mon_poly(struct monst *magr, struct monst *mdef, int dmg)
 {
+#ifndef ZHLANG
     static const char freaky[] = " undergoes a freakish metamorphosis";
+#endif
     struct permonst *oldform = mdef->data;
 
     if (mdef == &gy.youmonst) {
@@ -1484,9 +1486,11 @@ mswingsm(
     struct obj *otemp)  /* attacker's weapon */
 {
     if (flags.verbose && !Blind && mon_visible(magr)) {
+#ifndef ZHLANG
         boolean bash = (is_pole(otemp) && !is_art(otemp, ART_SNICKERSNEE)
                         && (dist2(magr->mx, magr->my, mdef->mx, mdef->my)
                             <= 2));
+#endif
 
 #ifdef ZHLANG
         pline("%s用%s%s%s向%s挥去。", Monnam(magr),
@@ -1586,7 +1590,7 @@ passivemm(
                     /* construct format string; guard against '%' in Monnam */
                     Strcpy(buf, s_suffix(Monnam(mdef)));
                     (void) strNsubst(buf, "%", "%%", 0);
-                    Strcat(buf, " gaze is reflected by %s %s.");
+                    Strcat(buf, TR(" gaze is reflected by %s %s.", "凝视被%s的%s反射开了。"));
                     if (mon_reflects(magr,
                                      canseemon(magr) ? buf : (char *) 0))
                         return (mdead | mhit);

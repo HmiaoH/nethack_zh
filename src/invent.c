@@ -938,7 +938,7 @@ merged(struct obj **potmp, struct obj **pobj)
         if (discovered && otmp->where == OBJ_INVENT
             && obj->how_lost != LOST_THROWN
             && otmp->how_lost != LOST_THROWN) {
-            pline("You learn more about your items by comparing them.");
+            pline(TR("You learn more about your items by comparing them.", "通过比较物品，你能了解更多信息。"));
         }
 
         obfree(obj, otmp); /* free(obj), bill->otmp */
@@ -1037,7 +1037,7 @@ addinv_core2(struct obj *obj)
         obj->otyp != SCR_BLANK_PAPER && !Blind &&
         !objects[obj->otyp].oc_name_known) {
         observe_object(obj);
-        pline("You decipher the label on %s.", yname(obj));
+        pline(TR("You decipher the label on %s.", "你辨认出了%s上的标签。"), yname(obj));
         makeknown(obj->otyp);
 
         /* conduct: this is avoidable via not picking up / wishing for
@@ -1547,6 +1547,12 @@ currency(long amount)
 {
     const char *res;
 
+#ifdef ZHLANG
+    /* "N 金币" reads naturally in Chinese and matches the currency
+       unit used by the existing translations. */
+    if (!Hallucination)
+        return "金币";
+#endif
     res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
     if (amount != 1L)
         res = makeplural(res);
@@ -1701,7 +1707,7 @@ mime_action(const char *word)
     } else
         bp = buf;
 
-    You("mime %s%s%s something%s%s.", ing_suffix(bp),
+    You(TR("mime %s%s%s something%s%s.", "模仿%s%s%s某物%s%s。"), ing_suffix(bp),
         pfx ? " " : "", pfx ? pfx : "", sfx ? " " : "", sfx ? sfx : "");
 }
 
@@ -1719,18 +1725,18 @@ staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
     if (!strcmp(action, "grease")) {
-        Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
+        Sprintf(qbuf, TR("your %s", "你的%s"), fingers_or_gloves(FALSE));
     } else if (!strcmp(action, "write with")) {
-        Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+        Sprintf(qbuf, TR("your %s", "你的%s"), body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")) {
-        Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
+        Sprintf(qbuf, TR("your %s %s%s", "你的%s%s%s"), uarmg ? "gloved" : "bare",
                 makeplural(body_part(HAND)),
                 !uwep ? " (wielded)" : "");
     } else if (!strcmp(action, "ready")) {
-        Sprintf(qbuf, "empty quiver%s",
+        Sprintf(qbuf, TR("empty quiver%s", "空箭袋%s"),
                 !uquiver ? " (nothing readied)" : "");
     } else {
-        Sprintf(qbuf, "your %s", makeplural(body_part(HAND)));
+        Sprintf(qbuf, TR("your %s", "你的%s"), makeplural(body_part(HAND)));
     }
     return qbuf;
 }
@@ -1931,7 +1937,7 @@ getobj(
 
     if (suggested == 0 && !forceprompt && !allownone) {
 #ifdef ZHLANG
-        You("没有任何东西可以%s。", word);
+        You("没有%s东西可以%s。", inaccess ? "其它" : "", word);
 #else
         You("don't have anything %sto %s.", inaccess ? "else " : "", word);
 #endif
@@ -1940,13 +1946,11 @@ getobj(
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        Sprintf(qbuf,
 #ifdef ZHLANG
-                "你想%s什么？",
+        Sprintf(qbuf, "你想%s什么？", word);
 #else
-                "What do you want to %s?",
+        Sprintf(qbuf, "What do you want to %s?", word);
 #endif
-                word);
         if (gi.in_doagain) {
             ilet = readchar();
         } else if (iflags.force_invmenu) {
@@ -1968,7 +1972,7 @@ getobj(
             long tmpcnt = 0L;
 
             if (!allowcnt) {
-                pline("No count allowed with this command.");
+                pline(TR("No count allowed with this command.", "此命令不允许指定数量。"));
                 continue;
             }
             ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, GC_SAVEHIST);
@@ -2039,7 +2043,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("cannot %s gold.", word);
+                You(TR("cannot %s gold.", "不能%s金币。"), word);
                 return (struct obj *) 0;
             }
             /*
@@ -2050,7 +2054,7 @@ getobj(
              */
             if (cntgiven && cnt <= 0L) {
                 if (cnt < 0L)
-                    pline_The("LRS would be very interested to know"
+                    pline_The(TR("LRS would be very interested to know", "LRS会非常有兴趣知道")
                               " you have that much.");
                 return (struct obj *) 0;
             }
@@ -2068,7 +2072,7 @@ getobj(
             coins = (otmp->oclass == COIN_CLASS);
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
-                    You("only have %ld%s%s.", otmp->quan,
+                    You(TR("only have %ld%s%s.", "只有%ld%s%s。"), otmp->quan,
                         (!coins && otmp->quan > 1L) ? " and " : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
@@ -2086,12 +2090,12 @@ getobj(
            that's been moved above so that otmp can be checked earlier] */
         /* verify the chosen object */
         if (!otmp) {
-            You("don't have that object.");
+            You(TR("don't have that object.", "没有那个物品。"));
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
         } else if (cnt < 0L || otmp->quan < cnt) {
-            You("don't have that many!  You have only %ld.", otmp->quan);
+            You(TR("don't have that many!  You have only %ld.", "没有那么多！你只有%ld个。"), otmp->quan);
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
@@ -2146,7 +2150,7 @@ silly_thing(const char *word,
             s1 = "R", s2 = "remove", s3 = "";
     }
     if (s1)
-        pline("Use the '%s' command to %s %s%s.", s1, s2,
+        pline(TR("Use the '%s' command to %s %s%s.", "使用「%s」命令来%s%s%s。"), s1, s2,
               !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
     else
 #endif
@@ -2155,7 +2159,7 @@ silly_thing(const char *word,
     if (!strcmp(word, "call")
         && (otmp->otyp == AMULET_OF_YENDOR
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
-        pline_The("Amulet doesn't like being called names.");
+        pline_The(TR("Amulet doesn't like being called names.", "护身符不喜欢被乱起名字。"));
     else
         pline(silly_thing_to, word);
 }
@@ -2243,7 +2247,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
-        You("have nothing to %s.", word);
+        You(TR("have nothing to %s.", "没有什么可以%s。"), word);
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2288,7 +2292,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     ilets[iletct] = '\0';
 
     for (;;) {
-        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]",
+        Sprintf(qbuf, TR("What kinds of thing do you want to %s? [%s]", "你想%s哪类物品？[%s]"),
                 word, ilets);
         getlin(qbuf, buf);
         if (buf[0] == '\033')
@@ -2334,23 +2338,23 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             if (strchr(extra_removeables, oc_of_sym)) {
                 ; /* skip rest of takeoff checks */
             } else if (!strchr(removeables, oc_of_sym)) {
-                pline("Not applicable.");
+                pline(TR("Not applicable.", "不适用。"));
                 return 0;
             } else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
                 noarmor(FALSE);
                 return 0;
             } else if (oc_of_sym == WEAPON_CLASS && !uwep && !uswapwep
                        && !uquiver) {
-                You("are not wielding anything.");
+                You(TR("are not wielding anything.", "没有挥舞任何武器。"));
                 return 0;
             } else if (oc_of_sym == RING_CLASS && !uright && !uleft) {
-                You("are not wearing rings.");
+                You(TR("are not wearing rings.", "没有戴戒指。"));
                 return 0;
             } else if (oc_of_sym == AMULET_CLASS && !uamul) {
-                You("are not wearing an amulet.");
+                You(TR("are not wearing an amulet.", "没有戴护身符。"));
                 return 0;
             } else if (oc_of_sym == TOOL_CLASS && !ublindf) {
-                You("are not wearing a blindfold.");
+                You(TR("are not wearing a blindfold.", "没有戴眼罩。"));
                 return 0;
             }
         }
@@ -2368,7 +2372,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (sym == 'm') {
             m_seen = TRUE;
         } else if (oc_of_sym == MAXOCLASSES) {
-            You("don't have any %c's.", sym);
+            You(TR("don't have any %c's.", "没有任何%c类物品。"), sym);
         } else {
             if (!strchr(olets, oc_of_sym)) {
                 add_valid_menu_class(oc_of_sym);
@@ -2558,9 +2562,9 @@ askchain(
         goto nextclass;
 
     if (!takeoff && (dud || cnt))
-        pline("That was all.");
+        pline(TR("That was all.", "就这些。"));
     else if (!dud && !cnt)
-        pline("No applicable objects.");
+        pline(TR("No applicable objects.", "没有适用的物品。"));
  ret:
     unsortloot(&sortedchn);
     /* can't just clear bypass bit of items in objchn because the action
@@ -2598,7 +2602,7 @@ reroll_menu(void)
              ATR_NONE, NO_COLOR, "start the game with this character",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'y';
-    Strcpy(buf, "reroll another character");
+    Strcpy(buf, TR("reroll another character", "重新随机另一个角色"));
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'r', 0,
              ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);
     any.a_char = 0;
@@ -2620,16 +2624,19 @@ reroll_menu(void)
              MENU_ITEMFLAGS_NONE);
 #ifdef ZHLANG
     Sprintf(buf, "力:%s 敏:%-1d 体:%-1d 智:%-1d 慧:%-1d 魅:%-1d",
-#else
-    Sprintf(buf, "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
-#endif
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
+#else
+    Sprintf(buf, "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+            get_strength_str(),
+            ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
+            ACURR(A_CHA));
+#endif
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
              buf, MENU_ITEMFLAGS_NONE);
 
-    end_menu(win, "Reroll this character?");
+    end_menu(win, TR("Reroll this character?", "重新随机这个角色？"));
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         option = pick_list[0].item.a_char;
         free((genericptr_t) pick_list);
@@ -2694,7 +2701,7 @@ menu_identify(int id_limit)
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
     while (id_limit) {
-        Sprintf(buf, "What would you like to identify %s?",
+        Sprintf(buf, TR("What would you like to identify %s?", "你想%s鉴定什么？"),
                 first ? "first" : "next");
         n = query_objlist(buf, &gi.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
                                            | USE_INVLET | INVORDER_SORT),
@@ -2712,13 +2719,13 @@ menu_identify(int id_limit)
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
         } else if (n == -1) { /* no eligible items found */
-            pline("That was all.");
+            pline(TR("That was all.", "就这些。"));
             break;
         } else if (!--tryct) { /* stop re-prompting */
             pline1(thats_enough_tries);
             break;
         } else { /* try again */
-            pline("Choose an item; use ESC to decline.");
+            pline(TR("Choose an item; use ESC to decline.", "选择一件物品；按ESC取消。"));
         }
     }
 }
@@ -2791,7 +2798,7 @@ identify_pack(
     int n, unid_cnt = count_unidentified(gi.invent);
 
     if (!unid_cnt) {
-        You("have already identified %s of your possessions.",
+        You(TR("have already identified %s of your possessions.", "已经鉴定了你物品中的%s。"),
             !learning_id ? "all" : "the rest");
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
@@ -2908,7 +2915,7 @@ doperminv(void)
     if ((windowprocs.wincap & WC_PERM_INVENT) == 0) {
         /* [TODO? perhaps omit "by <interface>" if all the window ports
            compiled into this binary lack support for perm_invent...] */
-        pline("Persistent inventory display is not supported by '%s'.",
+        pline(TR("Persistent inventory display is not supported by '%s'.", "「%s」不支持持久化物品栏显示。"),
               windowprocs.name);
 
     } else if (!iflags.perm_invent) {
@@ -2917,7 +2924,7 @@ doperminv(void)
 
     } else if (!gi.invent) {
         /* [should this be left for the interface to decide?] */
-        pline("Persistent inventory display is empty.");
+        pline(TR("Persistent inventory display is empty.", "持久化物品栏显示为空。"));
 
     } else {
         /* note: we used to request a scrolling key here and pass that to
@@ -3302,7 +3309,7 @@ display_pickinv(
         char prompt[QBUFSZ];
 
         unid_cnt = count_unidentified(gi.invent);
-        Sprintf(prompt, "Debug Identify"); /* 'title' rather than 'prompt' */
+        Sprintf(prompt, TR("Debug Identify", "调试鉴定")); /* 'title' rather than 'prompt' */
         if (unid_cnt)
             Sprintf(eos(prompt),
                     " -- unidentified or partially identified item%s",
@@ -3314,7 +3321,7 @@ display_pickinv(
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
-            Sprintf(prompt, "select %s to permanently identify",
+            Sprintf(prompt, TR("select %s to permanently identify", "选择%s以永久鉴定"),
                     (unid_cnt == 1) ? "it": "any or all of them");
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
@@ -3322,7 +3329,7 @@ display_pickinv(
                the #wizidentify command, so include it as a group accelerator
                but use '_' as the primary selector */
             if (unid_cnt > 1)
-                Sprintf(eos(prompt), " (%s for all)",
+                Sprintf(eos(prompt), TR(" (%s for all)", "（按%s全部鉴定）"),
                         visctrl(iflags.override_ID));
             add_menu(win, &nul_glyphinfo, &any, '_', iflags.override_ID,
                      ATR_NONE, clr, prompt, MENU_ITEMFLAGS_SKIPINVERT);
@@ -3389,7 +3396,7 @@ display_pickinv(
 
                 /* like doname() below, makeplural() returns an obuf[] */
                 formattedobj = makeplural(body_part(HAND));
-                Sprintf(barehands, "%s %s (no weapon)",
+                Sprintf(barehands, TR("%s %s (no weapon)", "%s%s（无武器）"),
                         uarmg ? "gloved" : "bare", formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
@@ -3585,7 +3592,7 @@ display_used_invlets(char avoidlet)
                 continue;
             invdone = 1;
         }
-        end_menu(win, "Inventory letters used:");
+        end_menu(win, TR("Inventory letters used:", "已使用的物品栏字母："));
 
         n = select_menu(win, PICK_ONE, &selected);
         if (n > 0) {
@@ -3818,7 +3825,7 @@ dounpaid(
                     char contbuf[BUFSZ];
 
                     /* Shopkeeper knows what to charge for contents */
-                    Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+                    Sprintf(contbuf, TR("%s contents", "%s内容"), s_suffix(xname(otmp)));
                     putstr(win, 0,
                            xprname((struct obj *) 0, contbuf, CONTAINED_SYM,
                                    TRUE, contcost, 0L));
@@ -3852,11 +3859,11 @@ dounpaid(
                        : "on or under the floor";
 
         if (!count) {
-            You("aren't carrying any unpaid items but there %s %d %s.",
+            You(TR("aren't carrying any unpaid items but there %s %d %s.", "没有携带任何未付款物品，但%s有%d%s。"),
                 floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
-            Sprintf(buf, "(There %s %d more unpaid object%s %s.)",
+            Sprintf(buf, TR("(There %s %d more unpaid object%s %s.)", "（%s有%d件未付款物品%s%s。）"),
                     floorverb, xtracount, plur(xtracount), where);
             putstr(win, 0, buf);
         }
@@ -3922,7 +3929,7 @@ dotypeinv(void)
     gt.this_type = 0;
     gt.this_title = NULL;
     if (!gi.invent && !billx) {
-        You("aren't carrying anything.");
+        You(TR("aren't carrying anything.", "没有携带任何东西。"));
         goto doI_done;
     }
     title[0] = '\0';
@@ -4024,7 +4031,7 @@ dotypeinv(void)
         if (billx)
             (void) doinvbill(1);
         else
-            pline("No used-up objects%s.",
+            pline(TR("No used-up objects%s.", "没有已用掉的物品%s。"),
                   any_unpaid ? " on your shopping bill" : "");
         goto doI_done;
     }
@@ -4032,7 +4039,7 @@ dotypeinv(void)
         if (any_unpaid)
             dounpaid(u_carried, u_floor, u_buried);
         else
-            You("are not carrying any unpaid objects.");
+            You(TR("are not carrying any unpaid objects.", "没有携带任何未付款物品。"));
         goto doI_done;
     }
 
@@ -4079,7 +4086,7 @@ dotypeinv(void)
 
     if (traditional) {
         if (strchr(types, c) > strchr(types, '\033')) {
-            You("have no %sobjects%s.", before, after);
+            You(TR("have no %sobjects%s.", "没有%s物品%s。"), before, after);
             goto doI_done;
         }
         gt.this_type = oclass; /* extra input for this_type_only() */
@@ -4087,7 +4094,7 @@ dotypeinv(void)
     if (strchr("BUCXP", c)) {
         /* the before and after phrases for "you have no..." can both be
            treated as mutually-exclusive suffices when creating a title */
-        Sprintf(title, "Items %s", (before && *before) ? before : after);
+        Sprintf(title, TR("Items %s", "物品%s"), (before && *before) ? before : after);
         /* get rid of trailing space from 'before' and double-space from
            'after's leading space */
         (void) mungspaces(title);
@@ -4153,7 +4160,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
-        Sprintf(altbuf, "%saltar to %s (%s)",
+        Sprintf(altbuf, TR("%saltar to %s (%s)", "%s祭坛，供奉%s（%s）"),
                 (lev->altarmask & AM_SANCTUM) ? "high " : "",
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
@@ -4218,10 +4225,10 @@ look_here(
          *  something along the lines of "because it's worn on the outside
          *  so is unreachable from in here...").
          */
-        Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
+        Sprintf(fbuf, TR("Contents of %s %s", "%s%s里的物品"), s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
-        You("%s to %s what is lying in %s.", Blind ? "try" : "look around",
+        You(TR("%s to %s what is lying in %s.", "%s%s%s里有什么。"), Blind ? "try" : "look around",
             verb, &fbuf[12]);
         otmp = mtmp->minvent;
         if (otmp) {
@@ -4232,7 +4239,7 @@ look_here(
                     feel_cockatrice(otmp, FALSE);
             }
             if (Blind)
-                Strcpy(fbuf, "You feel");
+                Strcpy(fbuf, TR("You feel", "你感觉到"));
             Strcat(fbuf, ":");
             (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
@@ -4250,13 +4257,13 @@ look_here(
 
         regbuf[0] = '\0';
         if ((reg = visible_region_at(u.ux, u.uy)) != 0)
-            Sprintf(regbuf, "a %s cloud",
+            Sprintf(regbuf, TR("a %s cloud", "一团%s云"),
                     reg_damg(reg) ? "poison gas" : "vapor");
         if ((trap = t_at(u.ux, u.uy)) != 0 && !trap->tseen)
             trap = (struct trap *) NULL;
 
         if (reg || trap)
-            There("is %s%s%s here.",
+            There(TR("is %s%s%s here.", "这里有%s%s%s。"),
                   reg ? regbuf : "",
                   (reg && trap) ? " and " : "",
                   trap ? an(trapname(trap->ttyp, FALSE)) : "");
@@ -4293,13 +4300,15 @@ look_here(
             skip_dfeature = TRUE; /* ice already described */
         } else {
             boolean cant_reach = !can_reach_floor(TRUE);
-            const char *surf = surface(u.ux, u.uy),
-                       *where = cant_reach ? "lying beneath you"
+            const char *surf = surface(u.ux, u.uy);
+#ifndef ZHLANG
+            const char *where = cant_reach ? "lying beneath you"
                                            : "lying here on the ",
                        *onwhat = cant_reach ? "" : surf;
+#endif
 
 #ifdef ZHLANG
-            You("摸索周围，却没有发现什么。");
+            You("试着摸索%s，却没有发现什么。", cant_reach ? "脚下" : "周围");
 #else
             You("try to feel what is %s%s.", drift ? "floating here" : where,
                 drift ? "" : onwhat);
@@ -4310,7 +4319,7 @@ look_here(
         }
         trap = t_at(u.ux, u.uy);
         if (!can_reach_floor(trap && is_pit(trap->ttyp))) {
-            pline("But you can't reach it!");
+            pline(TR("But you can't reach it!", "但你够不到它！"));
             return ECMD_OK;
         }
     }
@@ -4362,9 +4371,9 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There("is %s object here.", picked_some ? "another" : "an");
+            There(TR("is %s object here.", "这里有一个%s物品。"), picked_some ? "another" : "an");
         else
-            There("are %s%s objects here.",
+            There(TR("are %s%s objects here.", "这里有%s%s物品。"),
                   (obj_cnt == 2) ? "two"
                   : (obj_cnt < 5) ? "a few"
                     : (obj_cnt < 10) ? "several"
@@ -4470,12 +4479,12 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
         Strcpy(kbuf, corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
 
         if (poly_when_stoned(gy.youmonst.data))
-            You("touched %s with your bare %s.", kbuf,
+            You(TR("touched %s with your bare %s.", "碰了%s，用的是你裸露的%s。"), kbuf,
                 makeplural(body_part(HAND)));
         else
-            pline("Touching %s is a fatal mistake...", kbuf);
+            pline(TR("Touching %s is a fatal mistake...", "碰触%s是致命的错误……"), kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
-        Sprintf(kbuf, "touching %s bare-handed", killer_xname(otmp));
+        Sprintf(kbuf, TR("touching %s bare-handed", "徒手碰触%s"), killer_xname(otmp));
         /* will call polymon() for the poly_when_stoned() case */
         instapetrify(kbuf);
     }
@@ -4635,9 +4644,9 @@ doprgold(void)
         char buf[BUFSZ];
 
         if (!umoney) {
-            Strcpy(buf, "Your wallet is empty");
+            Strcpy(buf, TR("Your wallet is empty", "你的钱包是空的"));
         } else {
-            Sprintf(buf, "Your wallet contains %ld %s",
+            Sprintf(buf, TR("Your wallet contains %ld %s", "你的钱包里有%ld%s"),
                     umoney, currency(umoney));
         }
         if (hmoney) {
@@ -4650,9 +4659,9 @@ doprgold(void)
     } else {
         long total = umoney + hmoney;
         if (total)
-            You("are carrying a total of %ld %s.", total, currency(total));
+            You(TR("are carrying a total of %ld %s.", "一共携带了%ld%s。"), total, currency(total));
         else
-            You("have no money.");
+            You(TR("have no money.", "没有钱。"));
     }
     shopper_financial_report();
 
@@ -4671,7 +4680,7 @@ int
 doprwep(void)
 {
     if (!uwep) {
-        You("are %s.", empty_handed());
+        You(TR("are %s.", "你现在是%s。"), empty_handed());
     } else if (!iflags.menu_requested) {
         prinv((char *) 0, uwep, 0L);
         if (u.twoweap)
@@ -4699,7 +4708,7 @@ staticfn void
 noarmor(boolean report_uskin)
 {
     if (!uskin || !report_uskin) {
-        You("are not wearing any armor.");
+        You(TR("are not wearing any armor.", "没有穿任何护甲。"));
     } else {
         char *p, *uskinname, buf[BUFSZ];
 
@@ -4712,7 +4721,7 @@ noarmor(boolean report_uskin)
             while ((p[1] = p[8]) != '\0')
                 ++p;
 
-        You("are not wearing armor but have %s embedded in your skin.",
+        You(TR("are not wearing armor but have %s embedded in your skin.", "没有穿护甲，但皮肤里嵌着%s。"),
             uskinname);
     }
 }
@@ -4763,7 +4772,7 @@ int
 doprring(void)
 {
     if (!uleft && !uright) {
-        You("are not wearing any rings.");
+        You(TR("are not wearing any rings.", "没有戴任何戒指。"));
     } else {
         char lets[3]; /* 3: uright, uleft, terminator */
         boolean use_inuse_mode = FALSE;
@@ -4800,7 +4809,7 @@ int
 dopramulet(void)
 {
     if (!uamul) {
-        You("are not wearing an amulet.");
+        You(TR("are not wearing an amulet.", "没有戴护身符。"));
     } else {
         char lets[2];
 
@@ -4849,7 +4858,7 @@ doprtool(void)
         }
     lets[ct] = '\0';
     if (!ct)
-        You("are not using any tools.");
+        You(TR("are not using any tools.", "没有使用任何工具。"));
     else
         (void) dispinv_with_action(lets, TRUE, NULL);
     return ECMD_OK;
@@ -4871,7 +4880,7 @@ doprinuse(void)
             break;
         }
     if (!ct)
-        You("are not wearing or wielding anything.");
+        You(TR("are not wearing or wielding anything.", "没有穿戴或挥舞任何东西。"));
     else
         (void) dispinv_with_action((char *) 0, TRUE, NULL);
     return ECMD_OK;
@@ -4950,7 +4959,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
         gi.invbuf = (char *) alloc(gi.invbufsiz);
     }
     if (unpaid)
-        Strcat(strcpy(gi.invbuf, "Unpaid "), class_name);
+        Strcat(strcpy(gi.invbuf, TR("Unpaid ", "未付款的")), class_name);
     else
         Strcpy(gi.invbuf, class_name);
     if ((oclass != 0) && showsym) {
@@ -5114,7 +5123,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!gi.invent || (gi.invent->oclass == COIN_CLASS
                       && gi.invent->invlet == GOLD_SYM && !gi.invent->nobj)) {
-        You("aren't carrying anything %s.",
+        You(TR("aren't carrying anything %s.", "没有携带任何%s东西。"),
             !gi.invent ? "to adjust" : "adjustable");
         return ECMD_OK;
     }
@@ -5148,7 +5157,7 @@ adjust_split(void)
         splitamount = 1L;
     } else {
         /* get first digit; doesn't wait for <return> */
-        dig = yn_function("Split off how many?", (char *) 0, '\0', TRUE);
+        dig = yn_function(TR("Split off how many?", "要分出多少个？"), (char *) 0, '\0', TRUE);
         if (!digit(dig)) {
             pline1(Never_mind);
             return ECMD_CANCEL;
@@ -5178,9 +5187,9 @@ adjust_split(void)
             Amount[] = "Amount to split from current stack must be";
 
         if (splitamount < 1L)
-            pline("%s at least 1.", Amount);
+            pline(TR("%s at least 1.", "%s至少为1。"), Amount);
         else
-            pline("%s less than %ld.", Amount, obj->quan);
+            pline(TR("%s less than %ld.", "%s小于%ld。"), Amount, obj->quan);
         return ECMD_CANCEL;
     }
 
@@ -5263,10 +5272,10 @@ doorganize_core(struct obj *obj)
 
     /* get 'to' slot to use as destination */
     if (!splitting)
-        Strcpy(qbuf, "Adjust letter");
+        Strcpy(qbuf, TR("Adjust letter", "调整字母"));
     else /* note: splitting->quan is the amount being left in original slot */
-        Sprintf(qbuf, "Split %ld", obj->quan);
-    Sprintf(eos(qbuf), " to what [%s]%s?", lets,
+        Sprintf(qbuf, TR("Split %ld", "拆分%ld"), obj->quan);
+    Sprintf(eos(qbuf), TR(" to what [%s]%s?", "到哪个[%s]%s？"), lets,
             gi.invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
         let = !isgold ? yn_function(qbuf, (char *) 0, '\0', TRUE) : GOLD_SYM;
@@ -5289,7 +5298,7 @@ doorganize_core(struct obj *obj)
                 pline1(Never_mind);
             return ECMD_OK;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
-            pline("Only gold coins may be moved into the '%c' slot.",
+            pline(TR("Only gold coins may be moved into the '%c' slot.", "只有金币可以移到「%c」格。"),
                   GOLD_SYM);
             ever_mind = TRUE;
             goto noadjust;
@@ -5301,7 +5310,7 @@ doorganize_core(struct obj *obj)
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
-        pline("Select an inventory slot letter."); /* else try again */
+        pline(TR("Select an inventory slot letter.", "请选择一个物品栏字母。")); /* else try again */
     }
 
     collect = (let == obj->invlet);
@@ -5374,7 +5383,7 @@ doorganize_core(struct obj *obj)
                 } else if (inv_cnt(FALSE) >= invlet_basic) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
-                    Your("pack is too full.");
+                    Your(TR("pack is too full.", "背包太满了。"));
                     return ECMD_OK;
                 } else {
                     bumped = otmp;
@@ -5634,7 +5643,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There("%s %s under the %s here.", more_than_1 ? "are" : "is",
+            There(TR("%s %s under the %s here.", "%s %s在%s下面。"), more_than_1 ? "are" : "is",
                   doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
@@ -5642,7 +5651,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
                 more_than_1 = TRUE;
             underwhat = more_than_1 ? "under them" : "beneath it";
         } else {
-            Sprintf(qbuf, "Things that are under the %s here:", seen_liquid);
+            Sprintf(qbuf, TR("Things that are under the %s here:", "这里%s下面的东西："), seen_liquid);
             if (query_objlist(qbuf, &svl.level.objects[x][y], BY_NEXTHERE,
                               &selected, PICK_NONE, allow_all) > 0)
                 free((genericptr_t) selected), selected = 0;
@@ -5664,7 +5673,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         go.only.x = x;
         go.only.y = y;
         /* "buried here", but vary if we've already shown underwater items */
-        Sprintf(qbuf, "Things that are buried %s:", underwhat);
+        Sprintf(qbuf, TR("Things that are buried %s:", "埋在%s的东西："), underwhat);
         if (query_objlist(qbuf, &svl.level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
@@ -5756,8 +5765,8 @@ sync_perminvent(void)
                         destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
                     wport_id = WINDOWPORT(tty) ? "tty perm_invent"
                                                : "perm_invent";
-                    pline("%s could not be enabled.", wport_id);
-                    pline("%s needs a terminal that is at least %dx%d, yours "
+                    pline(TR("%s could not be enabled.", "%s无法启用。"), wport_id);
+                    pline(TR("%s needs a terminal that is at least %dx%d, yours ", "%s需要至少%dx%d的终端，而你的终端")
                           "is %dx%d.",
                           wport_id, wri->tocore.needrows,
                           wri->tocore.needcols, wri->tocore.haverows,

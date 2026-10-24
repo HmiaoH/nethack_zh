@@ -416,7 +416,7 @@ validate_prefix_locations(char *reasonbuf)
                 Strcat(reasonbuf, fqn_prefix_names[prefcnt]);
             }
             /* the paniclog entry gets the value of errno as well */
-            Sprintf(panicbuf1, "Invalid %s", fqn_prefix_names[prefcnt]);
+            Sprintf(panicbuf1, TR("Invalid %s", "无效的 %s"), fqn_prefix_names[prefcnt]);
 #if defined(NHSTDC) && !defined(NOTSTDC)
             if (!(details = strerror(errno)))
 #endif
@@ -780,7 +780,7 @@ set_bonesfile_name(char *file, d_level *lev)
      * to manually move a bones file from one pool to another by
      * renaming it.
      */
-    Strcpy(file, "bon");
+    Strcpy(file, "bon"); /* NOTRANS */
 #ifdef SYSCF
     if (sysopt.bones_pools > 1) {
         unsigned poolnum = min((unsigned) sysopt.bones_pools, 10);
@@ -887,7 +887,7 @@ create_bonesfile(d_level *lev, char **bonesid, char errbuf[])
 #endif
         }
         if (failed && errbuf)  /* failure explanation */
-            Sprintf(errbuf, "Cannot create bones \"%s\", id %s (errno %d).",
+            Sprintf(errbuf, TR("Cannot create bones \"%s\", id %s (errno %d).", "无法创建骸骨文件「%s」，id %s（errno %d）。"),
                     gl.lock, *bonesid, errno);
     }
 #if defined(VMS) && !defined(SECURE)
@@ -1028,7 +1028,7 @@ set_savefile_name(boolean regularize_it)
 #endif
 
 #ifdef VMS
-    Sprintf(gs.SAVEF, "[.save]%d%s", getuid(), svp.plname);
+    Sprintf(gs.SAVEF, "[.save]%d%s", getuid(), svp.plname); /* NOTRANS */
     regoffset = 7;
     indicator_spot = 1;
     postappend = ";1";
@@ -1052,7 +1052,7 @@ set_savefile_name(boolean regularize_it)
     regularize_it = FALSE;
 #endif
 #ifdef UNIX
-    Sprintf(gs.SAVEF, "save/%d%s", (int) getuid(), svp.plname);
+    Sprintf(gs.SAVEF, "save/%d%s", (int) getuid(), svp.plname); /* NOTRANS */
     regoffset = 5;
     indicator_spot = 2;
 #endif
@@ -1506,7 +1506,7 @@ get_saved_games(void)
                         char filename[BUFSZ];
                         char *r;
 
-                        Sprintf(filename, "save/%d%s", uid, name);
+                        Sprintf(filename, "save/%d%s", uid, name); /* NOTRANS */
                         r = plname_from_file(filename,
                                              ALLOW_WAITSYNCH_PERFILE, 0);
                         if (r)
@@ -2278,9 +2278,9 @@ make_lockname(const char *filename UNUSED_conditional, char *lockname)
         if (semi_colon)
             *semi_colon = '\0';
     }
-    Strcat(lockname, ".lock;1");
+    Strcat(lockname, ".lock;1"); /* NOTRANS */
 #else
-    Strcat(lockname, "_lock");
+    Strcat(lockname, "_lock"); /* NOTRANS */
 #endif
     return lockname;
 #else /* !(UNIX || VMS || AMIGA || WIN32 || MSDOS) */
@@ -2785,13 +2785,13 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
                 (void) nhclose(fd);
             } else {
                 /* explanation for failure other than missing file */
-                Sprintf(buf, "error   \"%s\", (errno %d).",
+                Sprintf(buf, TR("error   \"%s\", (errno %d).", "错误：「%s」（errno %d）。"),
                         fq_record, errno);
                 paniclog("scorefile", buf);
             }
             return;
         }
-        Sprintf(buf, "missing \"%s\", creating new scorefile.",
+        Sprintf(buf, TR("missing \"%s\", creating new scorefile.", "缺少「%s」，正在新建成绩文件。"),
                 fq_record);
         paniclog("scorefile", buf);
     }
@@ -2884,7 +2884,7 @@ testinglog(const char *filenm,   /* ad hoc file name */
         return;
     Strcpy(fnbuf, filenm);
     if (strchr(fnbuf, '.') == 0)
-        Strcat(fnbuf, ".log");
+        Strcat(fnbuf, ".log"); /* NOTRANS */
     lfile = fopen_datafile(fnbuf, "a", TROUBLEPREFIX);
     if (lfile) {
         (void) fprintf(lfile, "%s\n%s\n", type, reason);
@@ -3681,9 +3681,9 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 if (strchr(lastline, '['))
                     mungspaces(lastline); /* to remove leading spaces */
                 else /* construct one if necessary */
-                    Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
+                    Sprintf(lastline, TR("[%s, by Terry Pratchett]", "[%s，特里·普拉切特著]"), tribtitle);
                 if ((p = strrchr(lastline, ']')) != 0)
-                    Sprintf(p, "; passage #%d]", targetpassage);
+                    Sprintf(p, TR("; passage #%d]", "；第%d段]"), targetpassage);
                 putmsghistory(lastline, FALSE);
                 grasped = TRUE;
             }

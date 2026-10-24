@@ -140,7 +140,8 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 #endif
     else
 #ifdef ZHLANG
-        pline_mon(mtmp, "%s打空了！", Monnam(mtmp));
+        pline_mon(mtmp, "%s%s！", Monnam(mtmp),
+                  (nearmiss && flags.verbose) ? "差一点就打中你" : "打空了");
 #else
         pline_mon(mtmp, "%s %smisses!", Monnam(mtmp),
                   (nearmiss && flags.verbose) ? "just " : "");
@@ -402,14 +403,14 @@ expels(
                 if (is_whirly(mdat)) {
                     switch (attk->adtyp) {
                     case AD_ELEC:
-                        Strcpy(blast, " in a shower of sparks");
+                        Strcpy(blast, TR(" in a shower of sparks", "，伴随着一片火花"));
                         break;
                     case AD_COLD:
-                        Strcpy(blast, " in a blast of frost");
+                        Strcpy(blast, TR(" in a blast of frost", "，伴随着一阵寒霜爆裂"));
                         break;
                     }
                 } else {
-                    Strcpy(blast, " with a squelch");
+                    Strcpy(blast, TR(" with a squelch", "，伴随着咕叽一声"));
                 }
 #ifdef ZHLANG
                 You("get expelled from %s%s!", mon_nam(mtmp), blast);
@@ -889,7 +890,7 @@ mattacku(struct monst *mtmp)
         if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
-            Sprintf(buf, "You appear to be %s again.",
+            Sprintf(buf, TR("You appear to be %s again.", "你看起来又变回%s了。"),
                     Upolyd ? (const char *) an(pmname(gy.youmonst.data,
                                                       flags.female))
                            : (const char *) "yourself");
@@ -1215,7 +1216,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
             int numseen, numhelp;
             char buf[BUFSZ], genericwere[BUFSZ];
 
-            Strcpy(genericwere, "creature");
+            Strcpy(genericwere, TR("creature", "生物"));
             if (youseeit)
 #ifdef ZHLANG
                 pline_mon(mtmp, "%s summons help!", Monnam(mtmp));
@@ -1262,9 +1263,9 @@ summonmu(struct monst *mtmp, boolean youseeit)
 #endif
                     } else {
                         if (numseen == 1)
-                            Sprintf(buf, "%s appears", an(genericwere));
+                            Sprintf(buf, TR("%s appears", "%s出现了"), an(genericwere));
                         else
-                            Sprintf(buf, "%s appear",
+                            Sprintf(buf, TR("%s appear", "%s出现了"),
                                     makeplural(genericwere));
 #ifdef ZHLANG
                         pline("%s%s!", upstart(buf), from_nowhere);
@@ -2519,7 +2520,7 @@ doseduce(struct monst *mon)
         You_feel("very attracted to %s.", mon_nam(mon));
 #endif
     /* cache the seducer's name in a local buffer */
-    Strcpy(Who, (!seewho ? (fem ? "She" : "He") : Monnam(mon)));
+    Strcpy(Who, (!seewho ? (fem ? TR("She", "她") : "He") : Monnam(mon)));
 
     /* if in the process of putting armor on or taking armor off,
        interrupt that activity now */
@@ -2981,14 +2982,14 @@ mayberem(struct monst *mon,
 #endif
     } else if (rn2(20) < ACURR(A_CHA)) {
         SetVoice(mon, 0, 80, 0); /* y_n aka yn_function is set up for this */
-        Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,
+        Sprintf(qbuf, TR("\"Shall I remove your %s, %s?\"", "「要我把你的%s脱掉吗，%s？」"), str,
                 (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
         if (y_n(qbuf) == 'n')
             return;
     } else {
         char hairbuf[BUFSZ];
 
-        Sprintf(hairbuf, "let me run my fingers through your %s",
+        Sprintf(hairbuf, TR("let me run my fingers through your %s", "让我用手指梳过你的%s"),
                 body_part(HAIR));
         SetVoice(mon, 0, 80, 0);
 #ifdef ZHLANG

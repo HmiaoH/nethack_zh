@@ -3,6 +3,152 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "utf8map.h"
+
+/*
+ * UTF-8 helpers, used by the tty port (and the Lua interface) to work
+ * with display columns instead of bytes.  Kept outside of the
+ * ENHANCED_SYMBOLS conditional because localized text needs them even
+ * when the enhanced (UTF-8) symbols are not in use.
+ */
+
+/* Is 'cp' a wide (two terminal columns) character?
+   Covers CJK ideographs, Hangul, kana and full-width forms. */
+static boolean
+u8_wide(uint32 cp)
+{
+    if (cp < 0x1100) /* fast path for Latin-1 and the like */
+        return FALSE;
+    if (cp <= 0x115F)                       /* Hangul Jamo */
+        return TRUE;
+    if (cp >= 0x2E80 && cp <= 0x303E)       /* CJK radicals, punctuation */
+        return TRUE;
+    if (cp >= 0x3041 && cp <= 0x33FF)       /* kana, CJK symbols */
+        return TRUE;
+    if (cp >= 0x3400 && cp <= 0x4DBF)       /* CJK ext A */
+        return TRUE;
+    if (cp >= 0x4E00 && cp <= 0x9FFF)       /* CJK unified ideographs */
+        return TRUE;
+    if (cp >= 0xA000 && cp <= 0xA4CF)       /* Yi */
+        return TRUE;
+    if (cp >= 0xA960 && cp <= 0xA97F)       /* Hangul Jamo ext A */
+        return TRUE;
+    if (cp >= 0xAC00 && cp <= 0xD7A3)       /* Hangul syllables */
+        return TRUE;
+    if (cp >= 0xF900 && cp <= 0xFAFF)       /* CJK compat ideographs */
+        return TRUE;
+    if (cp >= 0xFE10 && cp <= 0xFE19)       /* vertical forms */
+        return TRUE;
+    if (cp >= 0xFE30 && cp <= 0xFE6F)       /* CJK compat forms */
+        return TRUE;
+    if (cp >= 0xFF00 && cp <= 0xFF60)       /* full-width forms */
+        return TRUE;
+    if (cp >= 0xFFE0 && cp <= 0xFFE6)       /* full-width signs */
+        return TRUE;
+    if (cp >= 0x1B000 && cp <= 0x1B001)     /* kana supplement */
+        return TRUE;
+    if (cp >= 0x1F200 && cp <= 0x1F251)     /* enclosed ideographs */
+        return TRUE;
+    if (cp >= 0x20000 && cp <= 0x3FFFD)     /* CJK ext B and beyond */
+        return TRUE;
+    return FALSE;
+}
+
+/* Zero-width code points: combining marks, zero-width space/joiners
+   and the byte order mark. */
+static boolean
+u8_zero_width(uint32 cp)
+{
+    if (cp >= 0x0300 && cp <= 0x036F)       /* combining diacritics */
+        return TRUE;
+    if (cp >= 0x1AB0 && cp <= 0x1AFF)       /* combining ext */
+        return TRUE;
+    if (cp >= 0x1DC0 && cp <= 0x1DFF)       /* combining supplement */
+        return TRUE;
+    if (cp >= 0x20D0 && cp <= 0x20FF)       /* combining for symbols */
+        return TRUE;
+    if (cp >= 0xFE00 && cp <= 0xFE0F)       /* variation selectors */
+        return TRUE;
+    if (cp >= 0xFE20 && cp <= 0xFE2F)       /* combining half marks */
+        return TRUE;
+    return (boolean) (cp == 0x200B || cp == 0x200C || cp == 0x200D
+                      || cp == 0xFEFF);
+}
+
+/* Decode the UTF-8 sequence at 'str'.  Returns its length in bytes;
+   *cp is set to the code point (or to the raw byte for invalid input). */
+static int
+u8_decode(const char *str, uint32 *cp)
+{
+    const unsigned char *p = (const unsigned char *) str;
+    int len = u8_seqlen(str), i;
+    uint32 val;
+
+    if (len <= 1) {
+        *cp = (uint32) *p;
+        return len;
+    }
+    val = (uint32) (p[0] & ((len == 2) ? 0x1F
+                            : (len == 3) ? 0x0F : 0x07));
+    for (i = 1; i < len; ++i)
+        val = (val << 6) | (uint32) (p[i] & 0x3F);
+    *cp = val;
+    return len;
+}
+
+/* Number of bytes in the UTF-8 sequence at the start of 'str'.
+   Never returns more than 4 and always returns at least 1 for a
+   non-empty string, so that a malformed byte cannot cause a caller
+   to loop forever.  Returns 0 at the terminating NUL. */
+int
+u8_seqlen(const char *str)
+{
+    const unsigned char *p = (const unsigned char *) str;
+    int len, i;
+
+    if (!p || !*p)
+        return 0;
+    if (*p < 0x80)
+        return 1;
+    if ((*p & 0xE0) == 0xC0)
+        len = 2;
+    else if ((*p & 0xF0) == 0xE0)
+        len = 3;
+    else if ((*p & 0xF8) == 0xF0)
+        len = 4;
+    else
+        return 1; /* stray continuation byte or invalid lead byte */
+    for (i = 1; i < len; ++i)
+        if (p[i] == '\0' || (p[i] & 0xC0) != 0x80)
+            return 1; /* truncated or malformed sequence */
+    return len;
+}
+
+/* Display width of a UTF-8 string, in terminal columns. */
+int
+u8_width(const char *str)
+{
+    const unsigned char *p = (const unsigned char *) str;
+    int width = 0;
+
+    if (!p)
+        return 0;
+    while (*p) {
+        int len;
+        uint32 cp;
+
+        if (*p < 0x80) {
+            len = 1;
+            cp = (uint32) *p;
+        } else {
+            len = u8_decode((const char *) p, &cp);
+        }
+        if (!u8_zero_width(cp))
+            width += u8_wide(cp) ? 2 : 1;
+        p += len;
+    }
+    return width;
+}
 
 #ifdef ENHANCED_SYMBOLS
 

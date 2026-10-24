@@ -81,7 +81,7 @@ initedog(struct monst *mtmp, boolean everything)
          * from a figurine or some other method in which it was created tame
          * using an() is safe unless it somehow becomes possible to tame a
          * unique monster */
-        livelog_printf(LL_CONDUCT, "obtained %s first pet (%s)",
+        livelog_printf(LL_CONDUCT, TR("obtained %s first pet (%s)", "获得了%s的第一只宠物（%s）"),
                        uhis(), an(mon_pmname(mtmp)));
     }
     u.uconduct.pets++;

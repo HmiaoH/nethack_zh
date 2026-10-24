@@ -128,7 +128,7 @@ adjattrib(
 
     if ((ndx == A_INT || ndx == A_WIS) && uarmh && uarmh->otyp == DUNCE_CAP) {
         if (msgflg == 0)
-            Your("cap constricts briefly, then relaxes again.");
+            Your(TR("cap constricts briefly, then relaxes again.", "帽子短暂收紧，然后又松开了。"));
         return FALSE;
     }
 
@@ -354,7 +354,7 @@ poisoned(
     if (Poison_resistance) {
         if (blast)
             shieldeff(u.ux, u.uy);
-        pline_The("poison doesn't seem to affect you.");
+        pline_The(TR("poison doesn't seem to affect you.", "毒素似乎对你没有影响。"));
         return;
     }
 
@@ -382,7 +382,7 @@ poisoned(
         if (u.uhp <= loss) {
             u.uhp = -1;
             disp.botl = TRUE;
-            pline_The("poison was deadly...");
+            pline_The(TR("poison was deadly...", "这毒是致命的……"));
         } else {
             /* survived, but with severe reaction */
             int olduhp = u.uhp,
@@ -951,17 +951,17 @@ from_what(
              */
             if ((propidx == BLINDED && u.uroleplay.blind)
                 || (propidx == DEAF && u.uroleplay.deaf))
-                Sprintf(buf, " from birth");
+                Sprintf(buf, TR(" from birth", "（天生）"));
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
-                Strcpy(buf, " innately");
+                Strcpy(buf, TR(" innately", "（先天具备）"));
             else if (innateness == FROM_INTR) /* [].intrinsic & FROMOUTSIDE */
-                Strcpy(buf, " intrinsically");
+                Strcpy(buf, TR(" intrinsically", "（本身固有）"));
             else if (innateness == FROM_EXP)
-                Strcpy(buf, " because of your experience");
+                Strcpy(buf, TR(" because of your experience", "（因你的经历）"));
             else if (innateness == FROM_LYCN)
-                Strcpy(buf, " due to your lycanthropy");
+                Strcpy(buf, TR(" due to your lycanthropy", "（因你的狼化症）"));
             else if (innateness == FROM_FORM)
-                Strcpy(buf, " from your creature form");
+                Strcpy(buf, TR(" from your creature form", "（因你的怪物形态）"));
             else if (propidx == FAST && Very_fast)
                 Sprintf(buf, because_of,
                         ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
@@ -980,7 +980,7 @@ from_what(
             else if (propidx == BLINDED && u.ucreamed
                      && BlindedTimeout == (long) u.ucreamed
                      && !EBlinded && !(HBlinded & ~TIMEOUT))
-                Sprintf(buf, "due to goop covering your %s",
+                Sprintf(buf, TR("due to goop covering your %s", "（因你的%s上糊着黏胶）"),
                         body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
@@ -1357,7 +1357,7 @@ uchangealign(
     disp.botl = TRUE; /* status line needs updating */
     if (reason == A_CG_CONVERT) {
         /* conversion via altar */
-        livelog_printf(LL_ALIGNMENT, "permanently converted to %s",
+        livelog_printf(LL_ALIGNMENT, TR("permanently converted to %s", "永久转变为%s"),
                        aligns[1 - newalign].adj);
         u.ualignbase[A_CURRENT] = (aligntyp) newalign;
         /* worn helm of opposite alignment might block change */
@@ -1383,10 +1383,10 @@ uchangealign(
             if (Is_astralevel(&u.uz) || ((unsigned) rn2(50) < u.ualign.abuse))
                 summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
-            livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
+            livelog_printf(LL_ALIGNMENT, TR("used a helm to turn %s", "用头盔使阵营转变为%s"),
                            aligns[1 - newalign].adj);
         } else if (reason == A_CG_HELM_OFF) {
-            Your("mind is %s.", Hallucination
+            Your(TR("mind is %s.", "心智%s。"), Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");
         }

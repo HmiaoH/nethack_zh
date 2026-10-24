@@ -145,7 +145,7 @@ dowrite(struct obj *pen)
     makeknown(SCR_BLANK_PAPER);
 
     /* what to write */
-    Sprintf(qbuf, "What type of %s do you want to write?", typeword);
+    Sprintf(qbuf, TR("What type of %s do you want to write?", "你想写哪一种%s？"), typeword);
     getlin(qbuf, namebuf);
     (void) mungspaces(namebuf); /* remove any excess whitespace */
     if (namebuf[0] == '\033' || !namebuf[0])
@@ -167,13 +167,15 @@ dowrite(struct obj *pen)
     deferralchance = 0;  /* incremented for each oc_uname match */
     first = svb.bases[(int) paper->oclass];
     last = svb.bases[(int) paper->oclass + 1] - 1;
-    /* first loop: look for match with name/description */
+    /* first loop: look for match with name/description; player input is
+       parsed against the untranslated tables so that the chosen object
+       type is unambiguous (A2) */
     for (i = first; i <= last; i++) {
         /* extra shufflable descr not representing a real object */
-        if (!OBJ_NAME(objects[i]))
+        if (!OBJ_NAME_EN(objects[i]))
             continue;
 
-        if (!strcmpi(OBJ_NAME(objects[i]), nm)) {
+        if (!strcmpi(OBJ_NAME_EN(objects[i]), nm)) {
             if (objects[i].oc_name_known
                 /* spellbooks can only be written by_name, so no need to
                    hold out for a 'better' by_descr match */
@@ -186,7 +188,7 @@ dowrite(struct obj *pen)
             }
         }
 
-        if (!strcmpi(OBJ_DESCR(objects[i]), nm)) {
+        if (!strcmpi(OBJ_DESCR_EN(objects[i]), nm)) {
             by_descr = TRUE;
             goto found;
         }
@@ -226,7 +228,7 @@ dowrite(struct obj *pen)
         goto found;
     }
 
-    There("is no such %s!", typeword);
+    There(TR("is no such %s!", "没有这样的%s！"), typeword);
     return ECMD_TIME;
  found:
 
@@ -409,7 +411,7 @@ dowrite(struct obj *pen)
                 Strcpy(namebuf, OBJ_DESCR(objects[new_obj->otyp]));
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
-                Sprintf(namebuf, "%s was here!", svp.plname);
+                Sprintf(namebuf, TR("%s was here!", "%s到此一游！"), svp.plname);
 #ifdef ZHLANG
             You("写下\"%s\"，卷轴消失了。", namebuf);
 #else
@@ -470,7 +472,7 @@ dowrite(struct obj *pen)
         observe_object(new_obj);
 
     new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
-                                  The(aobjnam(new_obj, "slip")),
+                                  The(aobjnam(new_obj, TR("slip", "滑落"))),
                                   (const char *) 0);
     nhUse(new_obj); /* try to avoid complaint about dead assignment */
     return ECMD_TIME;

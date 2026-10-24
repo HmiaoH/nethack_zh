@@ -1104,10 +1104,10 @@ wet_a_towel(
                                      : (!obj->spe ? "wet" : "wetter");
 
             if (carried(obj))
-                pline("%s gets %s.", Yobjnam2(obj, (const char *) 0),
+                pline(TR("%s gets %s.", "%s沾上了%s。"), Yobjnam2(obj, (const char *) 0),
                       wetness);
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%s %s gets %s.", s_suffix(Monnam(obj->ocarry)),
+                pline(TR("%s %s gets %s.", "%s的%s沾上了%s。"), s_suffix(Monnam(obj->ocarry)),
                       xname(obj), wetness);
         }
     }
@@ -1129,10 +1129,10 @@ dry_a_towel(
     if (newspe < obj->spe) {
         if (verbose) {
             if (carried(obj))
-                pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
+                pline(TR("%s dries%s.", "%s变干了%s。"), Yobjnam2(obj, (const char *) 0),
                       !newspe ? " out" : "");
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%s %s dries%s.", s_suffix(Monnam(obj->ocarry)),
+                pline(TR("%s %s dries%s.", "%s的%s变干了%s。"), s_suffix(Monnam(obj->ocarry)),
                       xname(obj), !newspe ? " out" : "");
         }
     }
@@ -1425,7 +1425,7 @@ enhance_weapon_skill(void)
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
-                Sprintf(buf, "(Skill%s flagged by \"*\" may be enhanced %s.)",
+                Sprintf(buf, TR("(Skill%s flagged by \"*\" may be enhanced %s.)", "（标有「*」的技能%s可以%s提升。）"),
                         plur(eventually_advance),
                         (u.ulevel < MAXULEV)
                             ? "when you're more experienced"
@@ -1444,10 +1444,10 @@ enhance_weapon_skill(void)
         add_skills_to_menu(
             win, to_advance + eventually_advance + maxxed_cnt > 0, speedy);
 
-        Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:"
+        Strcpy(buf, (to_advance > 0) ? TR("Pick a skill to advance:", "选择要提升的技能：")
                                      : "Current skills:");
         if (wizard && !speedy)
-            Sprintf(eos(buf), "  (%d slot%s available)", u.weapon_slots,
+            Sprintf(eos(buf), TR("  (%d slot%s available)", "  （可用技能点 %d%s）"), u.weapon_slots,
                     plur(u.weapon_slots));
         end_menu(win, buf);
         n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);

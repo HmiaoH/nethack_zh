@@ -848,7 +848,7 @@ readmail(struct obj *otmp)
     if (!cmd || !*cmd)
         cmd = "SPAWN";
 
-    Sprintf(qbuf, "System command (%s)", cmd);
+    Sprintf(qbuf, TR("System command (%s)", "系统命令（%s）"), cmd);
     getlin(qbuf, buf);
     if (*buf != '\033') {
         for (p = eos(buf); p > buf; *p = '\0')

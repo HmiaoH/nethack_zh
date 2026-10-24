@@ -358,7 +358,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
             cmap = (j % 4) + S_vbeam;
             Snprintf(tmpbuf[2], sizeof tmpbuf[2], "%s",
                      loadsyms[cmap + cmap_offset].name + 2);
-            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "%s zap %s",
+            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "%s zap %s", /* NOTRANS */
                      zap_texts[j / 4], fix_glyphname(tmpbuf[2]));
             buf3 = tmpbuf[3];
             buf2 = "";
@@ -377,7 +377,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
             if (!attacktype(&mons[mnum], AT_ENGL))
                 return 0;
             cmap = glyph_to_swallow(glyph);
-            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "swallow %s %s",
+            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "swallow %s %s", /* NOTRANS */
                      monsdump[mnum].nm, swallow_texts[cmap]);
             buf3 = tmpbuf[3];
             skip_base = TRUE;
@@ -410,11 +410,11 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
         }
         Snprintf(buf, bufsz, "G_%s%s%s", buf2, buf3, buf4);
     } else if (glyph_is_invisible(glyph)) {
-        Snprintf(buf, bufsz, "G_invisible");
+        Snprintf(buf, bufsz, "G_invisible"); /* NOTRANS */
     } else if (glyph_is_nothing(glyph)) {
-        Snprintf(buf, bufsz, "G_nothing");
+        Snprintf(buf, bufsz, "G_nothing"); /* NOTRANS */
     } else if (glyph_is_unexplored(glyph)) {
-        Snprintf(buf, bufsz, "G_unexplored");
+        Snprintf(buf, bufsz, "G_unexplored"); /* NOTRANS */
     } else if (glyph_is_warning(glyph)) {
         j = glyph - GLYPH_WARNING_OFF;
         Snprintf(buf, bufsz, "G_%s%d", "warning", j);

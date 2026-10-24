@@ -206,7 +206,7 @@ stairs_description(
                                     || single_level_branch(&tolev)); /* knox */
             int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
 
-            Sprintf(eos(outbuf), " to level %d", to_dlev);
+            Sprintf(eos(outbuf), TR(" to level %d", " 到第 %d 层"), to_dlev);
         }
     } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up) {
         /* stairs up from level one are a special case; they are marked
@@ -226,7 +226,7 @@ stairs_description(
                   : "to the end game");
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
-        Sprintf(outbuf, "branch %s %s to %s",
+        Sprintf(outbuf, TR("branch %s %s to %s", "%s%s通往%s"),
                 stairs, updown, svd.dungeons[tolev.dnum].dname);
         /* dungeons[].dname is capitalized; undo that for "The <Branch>" */
         (void) strsubst(outbuf, "The ", "the ");

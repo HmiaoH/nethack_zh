@@ -55,8 +55,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
       "Arc",
+#ifdef ZHLANG
+      "考古学院",
+      "托尔特克诸王陵墓",
+#else
       "the College of Archeology",
       "the Tomb of the Toltec Kings",
+#endif
       PM_ARCHEOLOGIST,
       NON_PM,
       PM_LORD_CARNARVON,
@@ -112,8 +117,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Mitra", "Crom", "Set", /* Hyborian */
       "Bar",
+#ifdef ZHLANG
+      "杜阿利部落营地",
+      "杜阿利绿洲",
+#else
       "the Camp of the Duali Tribe",
       "the Duali Oasis",
+#endif
       PM_BARBARIAN,
       NON_PM,
       PM_PELIAS,
@@ -169,8 +179,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Anu", "_Ishtar", "Anshar", /* Babylonian */
       "Cav",
+#ifdef ZHLANG
+      "祖先洞穴",
+      "龙巢",
+#else
       "the Caves of the Ancestors",
       "the Dragon's Lair",
+#endif
       PM_CAVE_DWELLER,
       PM_LITTLE_DOG,
       PM_SHAMAN_KARNOV,
@@ -226,8 +241,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "_Athena", "Hermes", "Poseidon", /* Greek */
       "Hea",
+#ifdef ZHLANG
+      "埃皮达鲁斯神殿",
+      "科俄斯神殿",
+#else
       "the Temple of Epidaurus",
       "the Temple of Coeus",
+#endif
       PM_HEALER,
       NON_PM,
       PM_HIPPOCRATES,
@@ -282,8 +302,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
       "Kni",
+#ifdef ZHLANG
+      "卡米洛特城堡",
+      "玻璃岛",
+#else
       "Camelot Castle",
       "the Isle of Glass",
+#endif
       PM_KNIGHT,
       PM_PONY,
       PM_KING_ARTHUR,
@@ -338,8 +363,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
       "Mon",
+#ifdef ZHLANG
+      "禅宗寺院",
+      "大地之主寺院",
+#else
       "the Monastery of Chan-Sune",
       "the Monastery of the Earth-Lord",
+#endif
       PM_MONK,
       NON_PM,
       PM_GRAND_MASTER,
@@ -395,8 +425,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       0, 0, 0, /* deities from a randomly chosen other role will be used */
       "Pri",
+#ifdef ZHLANG
+      "大神殿",
+      "纳尔佐克神殿",
+#else
       "the Great Temple",
       "the Temple of Nalzok",
+#endif
       PM_CLERIC,
       NON_PM,
       PM_ARCH_PRIEST,
@@ -454,8 +489,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Issek", "Mog", "Kos", /* Nehwon */
       "Rog",
+#ifdef ZHLANG
+      "盗贼公会大厅",
+      "刺客公会大厅",
+#else
       "the Thieves' Guild Hall",
       "the Assassins' Guild Hall",
+#endif
       PM_ROGUE,
       NON_PM,
       PM_MASTER_OF_THIEVES,
@@ -538,8 +578,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Mercury", "_Venus", "Mars", /* Roman/planets */
       "Ran",
+#ifdef ZHLANG
+      "猎户座营地",
+      "沃普斯洞穴",
+#else
       "Orion's camp",
       "the cave of the wumpus",
+#endif
       PM_RANGER,
       PM_LITTLE_DOG /* Orion & canis major */,
       PM_ORION,
@@ -595,8 +640,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
       "Sam",
+#ifdef ZHLANG
+      "太郎氏族城堡",
+      "幕府将军城堡",
+#else
       "the Castle of the Taro Clan",
       "the Shogun's Castle",
+#endif
       PM_SAMURAI,
       PM_LITTLE_DOG,
       PM_LORD_SATO,
@@ -651,8 +701,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Blind Io", "_The Lady", "Offler", /* Discworld */
       "Tou",
+#ifdef ZHLANG
+      "安科-莫波克",
+      "盗贼公会大厅",
+#else
       "Ankh-Morpork",
       "the Thieves' Guild Hall",
+#endif
       PM_TOURIST,
       NON_PM,
       PM_TWOFLOWER,
@@ -707,8 +762,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Tyr", "Odin", "Loki", /* Norse */
       "Val",
+#ifdef ZHLANG
+      "命运神龛",
+      "苏尔特尔洞穴",
+#else
       "the Shrine of Destiny",
       "the cave of Surtur",
+#endif
       PM_VALKYRIE,
       NON_PM /*PM_WINTER_WOLF_CUB*/,
       PM_NORN,
@@ -763,8 +823,13 @@ const struct Role roles[NUM_ROLES+1] = {
 #endif
       "Ptah", "Thoth", "Anhur", /* Egyptian */
       "Wiz",
+#ifdef ZHLANG
+      "孤独之塔",
+      "黑暗之塔",
+#else
       "the Lonely Tower",
       "the Tower of Darkness",
+#endif
       PM_WIZARD,
       PM_KITTEN,
       PM_NEFERET_THE_GREEN,
@@ -795,6 +860,95 @@ const struct Role roles[NUM_ROLES+1] = {
     /* Array terminator */
     UNDEFINED_ROLE,
 };
+
+#ifdef ZHLANG
+/*
+ * The role names in roles[] above are translated for display.  Option and
+ * player-name parsing, however, must keep accepting the English names
+ * ("role:Valkyrie"), which are identifiers in config files; this table
+ * mirrors the untranslated role.c entries.  The second column is the
+ * female name for the two roles which distinguish gender.
+ */
+static const char *const role_names_en[NUM_ROLES][2] = {
+    { "Archeologist", 0 },
+    { "Barbarian", 0 },
+    { "Caveman", "Cavewoman" },
+    { "Healer", 0 },
+    { "Knight", 0 },
+    { "Monk", 0 },
+    { "Priest", "Priestess" },
+    { "Rogue", 0 },
+    { "Ranger", 0 },
+    { "Samurai", 0 },
+    { "Tourist", 0 },
+    { "Valkyrie", 0 },
+    { "Wizard", 0 },
+};
+
+/* Chinese display names for races/genders/alignments; the internal tables
+   keep the English names used for lookups. */
+staticfn const char *
+zh_race_name(int racenum)
+{
+    static const char *const zh_races[NUM_RACES] = {
+        "人类", "精灵", "矮人", "侏儒", "兽人"
+    };
+
+    if (racenum >= 0 && racenum < NUM_RACES)
+        return zh_races[racenum];
+    return "";
+}
+
+staticfn const char *
+zh_gender_name(int gendnum)
+{
+    static const char *const zh_genders[] = {
+        "男性", "女性", "中性", "群体"
+    };
+
+    if (gendnum >= 0 && gendnum < (int) SIZE(zh_genders))
+        return zh_genders[gendnum];
+    return "";
+}
+
+staticfn const char *
+zh_align_name(int alignnum)
+{
+    static const char *const zh_aligns[] = {
+        "守序", "中立", "混沌", "无阵营"
+    };
+
+    if (alignnum >= 0 && alignnum < (int) SIZE(zh_aligns))
+        return zh_aligns[alignnum];
+    return "";
+}
+
+/* Translate the role-selection menu's internal words when they are shown;
+   the strings themselves stay English because they are compared. */
+staticfn const char *
+zh_role_ui_word(const char *en)
+{
+    static const struct {
+        const char *en, *zh;
+    } words[] = {
+        { "name", "名字" },      { "role", "职业" },
+        { "race", "种族" },      { "gender", "性别" },
+        { "alignment", "阵营" }, { "filter", "过滤" },
+        { "human", "人类" },     { "elf", "精灵" },
+        { "dwarf", "矮人" },     { "gnome", "侏儒" },
+        { "orc", "兽人" },       { "male", "男性" },
+        { "female", "女性" },    { "lawful", "守序" },
+        { "neutral", "中立" },   { "chaotic", "混沌" },
+        { 0, 0 }
+    };
+    int i;
+
+    for (i = 0; words[i].en; i++)
+        if (!strcmp(en, words[i].en))
+            return words[i].zh;
+    return en;
+}
+#endif /* ZHLANG */
 
 /* Table of all races */
 
@@ -923,7 +1077,9 @@ const struct Align aligns[] = {
 };
 
 staticfn int randrole_filtered(void);
+#ifndef ZHLANG
 staticfn char *promptsep(char *, int);
+#endif
 staticfn int role_gendercount(int);
 staticfn int race_alignmentcount(int);
 
@@ -985,10 +1141,22 @@ str2role(const char *str)
         /* Or the filecode? */
         if (!strcmpi(str, roles[i].filecode))
             return i;
+#ifdef ZHLANG
+        /* The Chinese build shows translated names but keeps accepting
+           the English ones in config files and player-name suffixes. */
+        if (!strncmpi(str, role_names_en[i][0], len))
+            return i;
+        if (role_names_en[i][1] && !strncmpi(str, role_names_en[i][1], len))
+            return i;
+#endif
     }
 
     if ((len == 1 && (*str == '*' || *str == '@'))
-        || !strncmpi(str, randomstr, len))
+        || !strncmpi(str, randomstr, len)
+#ifdef ZHLANG
+        || !strncmp(str, "随机", len)
+#endif
+        )
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1052,9 +1220,19 @@ str2race(const char *str)
         if (!strcmpi(str, races[i].filecode))
             return i;
     }
+#ifdef ZHLANG
+    /* optionally accept the Chinese race names as well */
+    for (i = 0; races[i].noun; i++)
+        if (!strncmp(str, zh_race_name(i), len))
+            return i;
+#endif
 
     if ((len == 1 && (*str == '*' || *str == '@'))
-        || !strncmpi(str, randomstr, len))
+        || !strncmpi(str, randomstr, len)
+#ifdef ZHLANG
+        || !strncmp(str, "随机", len)
+#endif
+        )
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1116,8 +1294,18 @@ str2gend(const char *str)
         if (!strcmpi(str, genders[i].filecode))
             return i;
     }
+#ifdef ZHLANG
+    /* optionally accept the Chinese gender names as well */
+    for (i = 0; i < ROLE_GENDERS; i++)
+        if (!strncmp(str, zh_gender_name(i), len))
+            return i;
+#endif
     if ((len == 1 && (*str == '*' || *str == '@'))
-        || !strncmpi(str, randomstr, len))
+        || !strncmpi(str, randomstr, len)
+#ifdef ZHLANG
+        || !strncmp(str, "随机", len)
+#endif
+        )
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1179,8 +1367,18 @@ str2align(const char *str)
         if (!strcmpi(str, aligns[i].filecode))
             return i;
     }
+#ifdef ZHLANG
+    /* optionally accept the Chinese alignment names as well */
+    for (i = 0; i < ROLE_ALIGNS; i++)
+        if (!strncmp(str, zh_align_name(i), len))
+            return i;
+#endif
     if ((len == 1 && (*str == '*' || *str == '@'))
-        || !strncmpi(str, randomstr, len))
+        || !strncmpi(str, randomstr, len)
+#ifdef ZHLANG
+        || !strncmp(str, "随机", len)
+#endif
+        )
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1601,6 +1799,7 @@ clearrolefilter(int which)
     }
 }
 
+#ifndef ZHLANG
 staticfn char *
 promptsep(char *buf, int num_post_attribs)
 {
@@ -1615,6 +1814,7 @@ promptsep(char *buf, int num_post_attribs)
         Strcat(buf, conjuct);
     return buf;
 }
+#endif /* !ZHLANG */
 
 staticfn int
 role_gendercount(int rolenum)
@@ -1787,7 +1987,7 @@ root_plselection_prompt(
         && !validrole(rolenum)) {
         if (donefirst)
             Strcat(buf, " ");
-        Strcat(buf, "character");
+        Strcat(buf, TR("character", "角色"));
         /*donefirst = TRUE;*/
     }
     /* <your lawful female gnomish cavewoman> || <your lawful female gnome>
@@ -1805,6 +2005,40 @@ build_plselection_prompt(
     char *buf, int buflen,
     int rolenum, int racenum, int gendnum, int alignnum)
 {
+#ifdef ZHLANG
+    /*
+     * Build the Chinese form of "Shall I pick ... for you?"  Instead of the
+     * English grammar machinery (which appends " the ", possessive 's',
+     * "for you?" and so on) describe the already specified facets directly.
+     */
+    char desc[BUFSZ];
+
+    if (buflen < QBUFSZ)
+        return (char *) "要我为你挑选一个角色吗？[ynaq] ";
+
+    desc[0] = '\0';
+    if (alignnum != ROLE_NONE && alignnum != ROLE_RANDOM
+        && alignnum >= 0 && alignnum < ROLE_ALIGNS)
+        Strcat(desc, zh_align_name(alignnum));
+    if (gendnum != ROLE_NONE && gendnum != ROLE_RANDOM && gendnum >= 0
+        && gendnum < ROLE_GENDERS
+        && (rolenum == ROLE_NONE || !roles[rolenum].name.f))
+        Strcat(desc, zh_gender_name(gendnum));
+    if (racenum != ROLE_NONE && racenum != ROLE_RANDOM && racenum >= 0)
+        Strcat(desc, zh_race_name(racenum));
+    if (validrole(rolenum)) {
+        const char *rolename = (gendnum == 1 && roles[rolenum].name.f)
+                                   ? roles[rolenum].name.f
+                                   : roles[rolenum].name.m;
+
+        Strcat(desc, rolename);
+    }
+    if (desc[0])
+        Sprintf(buf, "要我为你挑选%s吗？[ynaq] ", desc);
+    else
+        Sprintf(buf, "要我为你挑选角色、种族、性别和阵营吗？[ynaq] ");
+    return buf;
+#else
     const char *defprompt = "Shall I pick a character for you? [ynaq] ";
     int num_post_attribs = 0;
     char tmpbuf[BUFSZ], *p;
@@ -1874,6 +2108,7 @@ build_plselection_prompt(
     }
     Strcat(buf, " for you? [ynaq] ");
     return buf;
+#endif
 }
 
 #undef BP_ALIGN
@@ -2149,31 +2384,56 @@ role_menu_extra(int which, winid where, boolean preselect)
     any = cg.zeroany; /* zero out all bits */
     if (constrainer) {
         any.a_int = 0;
+#ifdef ZHLANG
         /* use four spaces of padding to fake a grayed out menu choice */
+        Sprintf(buf, "%4s%s决定了%s", "", zh_role_ui_word(constrainer),
+                zh_role_ui_word(forcedvalue));
+#else
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
+#endif
         add_menu_str(where, buf);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
+#ifdef ZHLANG
+        Sprintf(buf, "先选择%s%s", (f >= 0) ? "另一项" : "",
+                zh_role_ui_word(what));
+#else
         Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
+#endif
         add_menu(where, &nul_glyphinfo, &any, RS_menu_let[which], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
         char setfiltering[40];
 
         any.a_int = RS_menu_arg(RS_filter);
+#ifdef ZHLANG
+        Sprintf(setfiltering, "%s职业/种族等过滤",
+                gotrolefilter() ? "重置" : "设置");
+#else
         Sprintf(setfiltering, "%s role/race/&c filtering",
                 gotrolefilter() ? "Reset" : "Set");
+#endif
         add_menu(where, &nul_glyphinfo, &any, '~', 0, ATR_NONE,
                  clr, setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, &nul_glyphinfo, &any, '*', 0,
-                 ATR_NONE, clr, "Random",
+                 ATR_NONE, clr,
+#ifdef ZHLANG
+                 "随机",
+#else
+                 "Random",
+#endif
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
         add_menu(where, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, clr, "Quit",
+                 ATR_NONE, clr,
+#ifdef ZHLANG
+                 "退出",
+#else
+                 "Quit",
+#endif
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);
@@ -2342,21 +2602,42 @@ Hello(struct monst *mtmp)
 {
     switch (Role_switch) {
     case PM_KNIGHT:
+#ifdef ZHLANG
+        return "致敬";
+#else
         return "Salutations"; /* Olde English */
+#endif
     case PM_SAMURAI:
+#ifdef ZHLANG
+        return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER]) ? "欢迎光临"
+                                                            : "你好";
+#else
         return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER])
                     ? "Irasshaimase"
                     : "Konnichi wa"; /* Japanese */
+#endif
     case PM_TOURIST:
+#ifdef ZHLANG
+        return "你好";
+#else
         return "Aloha"; /* Hawaiian */
+#endif
     case PM_VALKYRIE:
+#ifdef ZHLANG
+        return "你好";
+#else
         return
 #ifdef MAIL_STRUCTURES
                (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
 #endif
                "Velkommen"; /* Norse */
+#endif
     default:
+#ifdef ZHLANG
+        return "你好";
+#else
         return "Hello";
+#endif
     }
 }
 
@@ -2565,7 +2846,11 @@ genl_player_setup(int screenheight)
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
                     role_menu_extra(RS_filter, win, FALSE);
                     role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
+#ifdef ZHLANG
+                    Strcpy(pbuf, "选择职业");
+#else
                     Strcpy(pbuf, "Pick a role or profession");
+#endif
                     end_menu(win, pbuf);
                     n = select_menu(win, PICK_ONE, &selected);
                     /*
@@ -2663,7 +2948,11 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
+#ifdef ZHLANG
+                        Strcpy(pbuf, "选择种族");
+#else
                         Strcpy(pbuf, "Pick a race or species");
+#endif
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2755,7 +3044,11 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
+#ifdef ZHLANG
+                        Strcpy(pbuf, "选择性别");
+#else
                         Strcpy(pbuf, "Pick a gender or sex");
+#endif
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2845,7 +3138,11 @@ genl_player_setup(int screenheight)
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_filter, win, FALSE);
                         role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
+#ifdef ZHLANG
+                        Strcpy(pbuf, "选择阵营");
+#else
                         Strcpy(pbuf, "Pick an alignment or creed");
+#endif
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         if (n > 0) {
@@ -2913,21 +3210,45 @@ genl_player_setup(int screenheight)
         any = cg.zeroany; /* zero out all bits */
         /* [ynaq] menu choices */
         any.a_int = 1;
-        add_menu(win, &nul_glyphinfo, &any, 'y', 0,
-                 ATR_NONE, clr, "Yes; start game", MENU_ITEMFLAGS_SELECTED);
+        add_menu(win, &nul_glyphinfo, &any, 'y', 0, ATR_NONE, clr,
+#ifdef ZHLANG
+                 "是；开始游戏",
+#else
+                 "Yes; start game",
+#endif
+                 MENU_ITEMFLAGS_SELECTED);
         any.a_int = 2;
-        add_menu(win, &nul_glyphinfo, &any, 'n', 0,
-                 ATR_NONE, clr, "No; choose role again", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 'n', 0, ATR_NONE, clr,
+#ifdef ZHLANG
+                 "否；重新选择",
+#else
+                 "No; choose role again",
+#endif
+                 MENU_ITEMFLAGS_NONE);
         if (iflags.renameallowed) {
             any.a_int = 3;
             add_menu(win, &nul_glyphinfo, &any, 'a', 0, ATR_NONE,
-                     clr, "Not yet; choose another name",
+                     clr,
+#ifdef ZHLANG
+                     "再等等；换个名字",
+#else
+                     "Not yet; choose another name",
+#endif
                      MENU_ITEMFLAGS_NONE);
         }
         any.a_int = -1;
-        add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 'q', 0, ATR_NONE, clr,
+#ifdef ZHLANG
+                 "退出",
+#else
+                 "Quit",
+#endif
+                 MENU_ITEMFLAGS_NONE);
+#ifdef ZHLANG
+        Sprintf(pbuf, "这样可以吗？[yn%sq]", iflags.renameallowed ? "a" : "");
+#else
         Sprintf(pbuf, "Is this ok? [yn%sq]", iflags.renameallowed ? "a" : "");
+#endif
         end_menu(win, pbuf);
         n = select_menu(win, PICK_ONE, &selected);
         /* [pick-one menus with a preselected entry behave oddly...] */
@@ -2993,23 +3314,44 @@ reset_role_filtering(void)
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     /* no extra blank line preceding this entry; end_menu supplies one */
+#ifdef ZHLANG
+    add_menu_str(win, "排除的职业");
+#else
     add_menu_str(win, "Unacceptable roles");
+#endif
     setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
+#ifdef ZHLANG
+    add_menu_str(win, "排除的种族");
+#else
     add_menu_str(win, "Unacceptable races");
+#endif
     setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
+#ifdef ZHLANG
+    add_menu_str(win, "排除的性别");
+#else
     add_menu_str(win, "Unacceptable genders");
+#endif
     setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     add_menu_str(win, "");
+#ifdef ZHLANG
+    add_menu_str(win, "排除的阵营");
+#else
     add_menu_str(win, "Unacceptable alignments");
+#endif
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
+#ifdef ZHLANG
+    Sprintf(filterprompt, "选择所有适用项%s",
+            gotrolefilter() ? "，或取消已不适用的项" : "");
+#else
     Sprintf(filterprompt, "Pick all that apply%s",
             gotrolefilter() ? " and/or unpick any that no longer apply" : "");
+#endif
     end_menu(win, filterprompt);
     n = select_menu(win, PICK_ANY, &selected);
 
@@ -3070,9 +3412,29 @@ plsel_startmenu(int ttyrows, int aspect)
        Samurai => Human+lawful, Valkyrie => female) */
     rigid_role_checks();
 
-    rolename = (ROLE < 0) ? "<role>"
+    rolename = (ROLE < 0)
+#ifdef ZHLANG
+                   ? "<职业>"
+#else
+                   ? "<role>"
+#endif
                : (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                  : roles[ROLE].name.m;
+#ifdef ZHLANG
+    /* no %.20s truncation: that could cut a multi-byte character */
+    if (!svp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
+        /* "<role> <race> <gender> <alignment>" */
+        Sprintf(qbuf, "%s %s %s %s", rolename,
+                (RACE < 0) ? "<种族>" : zh_race_name(RACE),
+                (GEND < 0) ? "<性别>" : zh_gender_name(GEND),
+                (ALGN < 0) ? "<阵营>" : zh_align_name(ALGN));
+    } else {
+        /* "<name>: <alignment><gender><race><role>" */
+        Sprintf(qbuf, "%s：%s%s%s%s", svp.plname,
+                zh_align_name(ALGN), zh_gender_name(GEND),
+                zh_race_name(RACE), rolename);
+    }
+#else
     if (!svp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
         /* "<role> <race.noun> <gender> <alignment>" */
         Sprintf(qbuf, "%.20s %.20s %.20s %.20s",
@@ -3089,6 +3451,7 @@ plsel_startmenu(int ttyrows, int aspect)
                 races[RACE].adj,
                 rolename);
     }
+#endif
 
     win = create_nhwindow(NHW_MENU);
     if (win == WIN_ERR)
@@ -3117,7 +3480,10 @@ setup_rolemenu(
     anything any;
     int i;
     boolean role_ok;
-    char thisch, lastch = '\0', rolenamebuf[50];
+    char thisch, rolenamebuf[50];
+#ifndef ZHLANG
+    char lastch = '\0';
+#endif
     int clr = NO_COLOR;
 
     any = cg.zeroany; /* zero out all bits */
@@ -3133,9 +3499,14 @@ setup_rolemenu(
             any.a_int = i + 1;
         else
             any.a_string = roles[i].name.m;
+#ifdef ZHLANG
+        /* the Chinese name's first byte is not a usable menu accelerator */
+        thisch = (char) ('a' + (i % 26));
+#else
         thisch = lowc(*roles[i].name.m);
         if (thisch == lastch)
             thisch = highc(thisch);
+#endif
         Strcpy(rolenamebuf, roles[i].name.m);
         if (roles[i].name.f) {
             /* role has distinct name for female (C,P) */
@@ -3154,7 +3525,9 @@ setup_rolemenu(
                  ATR_NONE, clr, an(rolenamebuf),
                  (!filtering && !role_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+#ifndef ZHLANG
         lastch = thisch;
+#endif
     }
 }
 
@@ -3190,7 +3563,12 @@ setup_racemenu(
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, clr, races[i].noun,
+                 ATR_NONE, clr,
+#ifdef ZHLANG
+                 zh_race_name(i),
+#else
+                 races[i].noun,
+#endif
                  (!filtering && !race_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -3226,7 +3604,12 @@ setup_gendmenu(
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, clr, genders[i].adj,
+                 ATR_NONE, clr,
+#ifdef ZHLANG
+                 zh_gender_name(i),
+#else
+                 genders[i].adj,
+#endif
                  (!filtering && !gend_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -3262,7 +3645,12 @@ setup_algnmenu(
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, clr, aligns[i].adj,
+                 ATR_NONE, clr,
+#ifdef ZHLANG
+                 zh_align_name(i),
+#else
+                 aligns[i].adj,
+#endif
                  (!filtering && !algn_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }

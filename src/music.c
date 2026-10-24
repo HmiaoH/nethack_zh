@@ -776,7 +776,7 @@ do_improvisation(struct obj *instr)
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
-                Sprintf(buf, "using a magical horn on %sself", uhim());
+                Sprintf(buf, TR("using a magical horn on %sself", "对%sself使用魔法号角"), uhim());
                 Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
@@ -1008,7 +1008,7 @@ do_play_instrument(struct obj *instr)
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE
         && !(Stunned || Confusion || Hallucination)) {
-        c = ynq("Improvise?");
+        c = ynq(TR("Improvise?", "要即兴演奏吗？"));
         if (c == 'q')
             goto nevermind;
     }
@@ -1017,13 +1017,13 @@ do_play_instrument(struct obj *instr)
         return do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
 
     if (u.uevent.uheard_tune == 2)
-        c = ynq("Play the passtune?");
+        c = ynq(TR("Play the passtune?", "要演奏通行曲调吗？"));
     if (c == 'q') {
         goto nevermind;
     } else if (c == 'y') {
         Strcpy(buf, svt.tune);
     } else {
-        getlin("What tune are you playing? [5 notes, A-G]", buf);
+        getlin(TR("What tune are you playing? [5 notes, A-G]", "你在演奏什么曲调？［5个音符，A-G］"), buf);
         (void) mungspaces(buf);
         if (*buf == '\033')
             goto nevermind;
@@ -1108,31 +1108,19 @@ do_play_instrument(struct obj *instr)
                     if (gears) {
                         Soundeffect(se_tumbler_click, 50);
                         Soundeffect(se_gear_turn, 50);
-#ifdef ZHLANG
-                        You_hear("听到%d个弹片咔嚓声和%d个齿轮转动声。",
-                                 tumblers, plur(tumblers), gears,
-                                 plur(gears));
-#else
-                        You_hear("%d tumbler%s click and %d gear%s turn.",
-                                 tumblers, plur(tumblers), gears,
-                                 plur(gears));
-#endif
+                        You_hear(
+                            TR("%d tumbler%s click and %d gear%s turn.",
+                               "%d个弹片%s咔嚓声和%d个齿轮%s转动声。"),
+                            tumblers, plur(tumblers), gears, plur(gears));
                     } else {
                         Soundeffect(se_tumbler_click, 50);
-#ifdef ZHLANG
-                        You_hear("听到%d个弹片咔嚓声。", tumblers,
-                                 plur(tumblers));
-#else
-                        You_hear("%d tumbler%s click.", tumblers,
-                                 plur(tumblers));
-#endif
+                        You_hear(TR("%d tumbler%s click.",
+                                    "%d个弹片%s咔嚓声。"),
+                                 tumblers, plur(tumblers));
                     }
                 } else if (gears) {
-#ifdef ZHLANG
-                    You_hear("听到%d个齿轮转动声。", gears, plur(gears));
-#else
-                    You_hear("%d gear%s turn.", gears, plur(gears));
-#endif
+                    You_hear(TR("%d gear%s turn.", "%d个齿轮%s转动声。"),
+                             gears, plur(gears));
                     /* could only get `gears == 5' by playing five
                        correct notes followed by excess; otherwise,
                        tune would have matched above */

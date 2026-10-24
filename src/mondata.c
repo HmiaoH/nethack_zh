@@ -918,6 +918,25 @@ name_to_monplus(
     if (remainder_p)
         *remainder_p = (const char *) 0;
 
+#ifdef ZHLANG
+    /* C3: accept Chinese monster names for the #genocide and polymorph
+       prompts.  Chinese wishes have already been rewritten to English
+       before they reach readobjnam()'s name lookups. */
+    if (zh_nonascii(in_str)) {
+        unsigned zhlen = 0;
+        int zhgend = NEUTRAL;
+        int zhmon = zh_mon_name(in_str, &zhlen, &zhgend);
+
+        if (zhmon != NON_PM) {
+            if (remainder_p)
+                *remainder_p = in_str + zhlen;
+            if (gender_name_var)
+                *gender_name_var = zhgend;
+            return zhmon;
+        }
+    }
+#endif
+
     str = strcpy(buf, in_str);
 
     if (!strncmp(str, "a ", 2))

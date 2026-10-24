@@ -304,6 +304,7 @@ static const struct instance_globals_d g_init_d = {
     DUMMY, /* dogname */
     /* end.c */
     0L, /* done_seq */
+    FALSE, /* done_dying */
     /* mon.c */
     FALSE, /* disintegested */
     /* objname.c */

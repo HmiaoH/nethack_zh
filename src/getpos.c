@@ -153,7 +153,7 @@ getpos_help_keyxhelp(
             filtertxt = strsubst(strcpy(fbuf, filtertxt),
                                  "this area", "area");
     }
-    Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
+    Sprintf(sbuf, TR("Use '%s'/'%s' to %s%s%s.", "用「%s」/「%s」来%s%s%s。"),
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of " : move_cursor_to,
             gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
@@ -187,12 +187,12 @@ getpos_help(boolean force, const char *goal)
             visctrl(cmd_from_func(do_run_east)),
             fastmovemode[iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
-    Sprintf(sbuf, "(or prefix normal move with '%s' or '%s' to fast-move)",
+    Sprintf(sbuf, TR("(or prefix normal move with '%s' or '%s' to fast-move)", "（或在普通移动前加上「%s」或「%s」快速移动）"),
             visctrl(cmd_from_func(do_run)),
             visctrl(cmd_from_func(do_rush)));
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
-    Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
+    putstr(tmpwin, 0, TR("Or enter a background symbol (ex. '<').", "也可以输入背景符号（例如「<」）。"));
+    Sprintf(sbuf, TR("Use '%s' to move the cursor on yourself.", "用「%s」把光标移到自己身上。"),
             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
@@ -225,12 +225,12 @@ getpos_help(boolean force, const char *goal)
                           visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
-    Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
+    Sprintf(sbuf, TR("Use '%s' to change fast-move mode to %s.", "用「%s」把快速移动模式改为%s。"),
             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
-        Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
+        Sprintf(sbuf, TR("Use '%s' to toggle menu listing for possible targets.", "用「%s」切换可能目标的菜单列表。"),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
         putstr(tmpwin, 0, sbuf);
         Sprintf(sbuf,
@@ -242,17 +242,17 @@ getpos_help(boolean force, const char *goal)
         char kbuf[BUFSZ];
 
         if (getpos_getvalid) {
-            Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
+            Sprintf(sbuf, TR("Use '%s' or '%s' to move to valid locations.", "用「%s」或「%s」在有效位置间移动。"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
-            Sprintf(sbuf, "Use '%s' to toggle marking of valid locations.",
+            Sprintf(sbuf, TR("Use '%s' to toggle marking of valid locations.", "用「%s」切换有效位置的标记。"),
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
-        Sprintf(sbuf, "Use '%s' to toggle automatic description.",
+        Sprintf(sbuf, TR("Use '%s' to toggle automatic description.", "用「%s」切换自动描述。"),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
@@ -300,7 +300,7 @@ getpos_help(boolean force, const char *goal)
         }
     }
     if (!force)
-        putstr(tmpwin, 0, "Type Space or Escape when you're done.");
+        putstr(tmpwin, 0, TR("Type Space or Escape when you're done.", "完成后按空格或 Esc。"));
     putstr(tmpwin, 0, "");
     display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
@@ -560,7 +560,7 @@ dxdy_to_dist_descr(coordxy dx, coordxy dy, boolean fulldir)
     int dst;
 
     if (!dx && !dy) {
-        Sprintf(buf, "here");
+        Sprintf(buf, TR("here", "这里"));
     } else if ((dst = xytodir(dx, dy)) != -1) {
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
@@ -724,7 +724,7 @@ getpos_menu(coord *ccp, int gloc)
         }
     }
 
-    Sprintf(tmpbuf, "Pick %s%s%s",
+    Sprintf(tmpbuf, TR("Pick %s%s%s", "选择%s%s%s"),
             an(gloc_descr[gloc][1]),
             gloc_filtertxt[iflags.getloc_filter],
             iflags.getloc_travelmode ? " for travel destination" : "");
@@ -1166,9 +1166,9 @@ getpos(coord *ccp, boolean force, const char *goal)
                     char note[QBUFSZ];
 
                     if (!force)
-                        Strcpy(note, "aborted");
+                        Strcpy(note, TR("aborted", "已取消"));
                     else /* hjkl */
-                        Sprintf(note, "use '%s', '%s', '%s', '%s' or '%s'",
+                        Sprintf(note, TR("use '%s', '%s', '%s', '%s' or '%s'", "可用「%s」「%s」「%s」「%s」或「%s」"),
                                 visctrl(cmd_from_func(do_move_west)),
                                 visctrl(cmd_from_func(do_move_south)),
                                 visctrl(cmd_from_func(do_move_north)),

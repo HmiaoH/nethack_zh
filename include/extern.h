@@ -145,8 +145,15 @@ extern void init_artifacts(void);
 extern void save_artifacts(NHFILE *);
 extern void restore_artifacts(NHFILE *);
 extern const char *artiname(int);
+#ifdef ZHLANG
+extern const char *artiname_zh(int);
+#endif
 extern struct obj *mk_artifact(struct obj *, aligntyp, uchar, boolean);
 extern const char *artifact_name(const char *, short *, boolean) NONNULLARG1;
+#ifdef ZHLANG
+extern const char *artifact_name_zh(const char *, short *, boolean)
+                                                                  NONNULLARG1;
+#endif
 extern boolean exist_artifact(int, const char *) NONNULLPTRS;
 extern void artifact_exists(struct obj *, const char *, boolean, unsigned) ;
 extern void found_artifact(int);
@@ -941,6 +948,7 @@ extern void recbranch_mapseen(d_level *, d_level *) NONNULLPTRS;
 extern void overview_stats(winid, const char *, long *, long *) NONNULLPTRS;
 extern void remdun_mapseen(int);
 extern const char *endgamelevelname(char *, int);
+extern const char *dname_zh(const char *);
 
 /* ### earlyarg.c ### */
 
@@ -2117,6 +2125,10 @@ extern lua_State * nhl_init(nhl_sandbox_info *) NONNULLARG1;
 /* nhl_done contains a test for NULL arg1, preventing NONNULLARG1 */
 extern void nhl_done(lua_State *) NO_NNARGS;
 extern boolean nhl_loadlua(lua_State *, const char *) NONNULLARG12;
+#ifdef ZHLANG
+/* English -> Chinese message table for text from the shared Lua scripts */
+extern const char *nhl_zh_msgs(const char *);
+#endif
 extern char *get_nh_lua_variables(void);
 extern void save_luadata(NHFILE *) NONNULLARG1;
 extern void restore_luadata(NHFILE *) NONNULLARG1;

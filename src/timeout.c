@@ -359,7 +359,7 @@ sickness_dialogue(void)
         if (Hallucination && strstri(buf, "Death's door")) {
             /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
             Strcpy(pronounbuf, mhe(&gy.youmonst));
-            Sprintf(eos(buf), "  %s %s inviting you in.",
+            Sprintf(eos(buf), TR("  %s %s inviting you in.", "  %s %s邀请你进去。"),
                     /* upstart() modifies its argument but vtense() doesn't
                        care whether or not that has already happened */
                     upstart(pronounbuf), vtense(pronounbuf, "are"));
@@ -520,7 +520,7 @@ slimed_to_death(struct kinfo *kptr)
         Strcpy(svk.killer.name, kptr->name);
     } else {
         svk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(svk.killer.name, "turned into green slime");
+        Strcpy(svk.killer.name, TR("turned into green slime", "变成了绿色史莱姆"));
     }
     dealloc_killer(kptr);
 
@@ -551,10 +551,10 @@ slimed_to_death(struct kinfo *kptr)
         char slimebuf[BUFSZ];
 
         svk.killer.format = KILLED_BY;
-        Strcpy(svk.killer.name, "slimicide");
+        Strcpy(svk.killer.name, TR("slimicide", "史莱姆疫"));
         /* vary the message depending upon whether life-save was due to
            amulet or due to declining to die in explore or wizard mode */
-        Strcpy(slimebuf, "green slime has been genocided...");
+        Strcpy(slimebuf, TR("green slime has been genocided...", "绿色史莱姆已被灭绝……"));
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
 #ifdef ZHLANG
@@ -753,7 +753,7 @@ nh_timeout(void)
                     Strcpy(svk.killer.name, kptr->name);
                 } else {
                     svk.killer.format = NO_KILLER_PREFIX;
-                    Strcpy(svk.killer.name, "killed by petrification");
+                    Strcpy(svk.killer.name, TR("killed by petrification", "死于石化"));
                 }
                 dealloc_killer(kptr);
                 /* (unlike sliming, you aren't changing form here) */
@@ -1313,13 +1313,13 @@ hatch_egg(anything *arg, long timeout)
                 mon2 = egg->ocarry;
                 if (canseemon(mon2)
                     && (!mon2->wormno || cansee(mon2->mx, mon2->my))) {
-                    Sprintf(carriedby, "%s pack",
+                    Sprintf(carriedby, TR("%s pack", "%s背包"),
                             s_suffix(a_monnam(mon2)));
                     knows_egg = TRUE;
                 } else if (is_pool(mon->mx, mon->my)) {
-                    Strcpy(carriedby, "empty water");
+                    Strcpy(carriedby, TR("empty water", "空无一物的水中"));
                 } else {
-                    Strcpy(carriedby, "thin air");
+                    Strcpy(carriedby, TR("thin air", "稀薄的空气中"));
                 }
 #ifdef ZHLANG
                 You_see("%s %s out of %s!", monnambuf,
@@ -1441,7 +1441,7 @@ slip_or_trip(void)
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
-            Sprintf(svk.killer.name, "tripping over %s corpse",
+            Sprintf(svk.killer.name, TR("tripping over %s corpse", "被%s的尸体绊倒"),
                     an(mons[otmp->corpsenm].pmnames[NEUTRAL]));
             instapetrify(svk.killer.name);
         }
@@ -2377,9 +2377,9 @@ print_queue(winid win, timer_element *base)
     char buf[BUFSZ];
 
     if (!base) {
-        putstr(win, 0, " <empty>");
+        putstr(win, 0, TR(" <empty>", " <空>"));
     } else {
-        putstr(win, 0, "timeout  id   kind   call");
+        putstr(win, 0, TR("timeout  id   kind   call", "超时  编号  类型  调用"));
         for (curr = base; curr; curr = curr->next) {
 #ifdef VERBOSE_TIMER
             Sprintf(buf, " %4ld   %4ld  %-6s %s(%s)", curr->timeout,
@@ -2410,10 +2410,10 @@ wiz_timeout_queue(void)
     if (win == WIN_ERR)
         return ECMD_OK;
 
-    Sprintf(buf, "Current time = %ld.", svm.moves);
+    Sprintf(buf, TR("Current time = %ld.", "当前时间 = %ld。"), svm.moves);
     putstr(win, 0, buf);
     putstr(win, 0, "");
-    putstr(win, 0, "Active timeout queue:");
+    putstr(win, 0, TR("Active timeout queue:", "活动中的超时队列："));
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
@@ -2435,16 +2435,16 @@ wiz_timeout_queue(void)
     }
     putstr(win, 0, "");
     if (!count) {
-        putstr(win, 0, "No timed properties.");
+        putstr(win, 0, TR("No timed properties.", "没有定时属性。"));
     } else {
-        putstr(win, 0, "Timed properties:");
+        putstr(win, 0, TR("Timed properties:", "定时属性："));
         putstr(win, 0, "");
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
             p = propertynames[i].prop_num;
             intrinsic = u.uprops[p].intrinsic;
             if (intrinsic & TIMEOUT) {
                 if (specindx > 0 && i >= specindx) {
-                    putstr(win, 0, " -- settable via #wizintrinsic only --");
+                    putstr(win, 0, TR(" -- settable via #wizintrinsic only --", " ——只能通过#wizintrinsic设置 ——"));
                     specindx = 0;
                 }
                 /* timeout value can be up to 16777215 (0x00ffffff) but
@@ -2461,12 +2461,12 @@ wiz_timeout_queue(void)
         putstr(win, 0, "");
         /* decremented when engulfer makes a move, so can last longer than
            the number of turns reported if engulfer is slow */
-        Sprintf(buf, "Swallow countdown is %u.", u.uswldtim);
+        Sprintf(buf, TR("Swallow countdown is %u.", "吞咽倒计时为%u。"), u.uswldtim);
         putstr(win, 0, buf);
     }
     if (u.uinvault) {
         putstr(win, 0, "");
-        Sprintf(buf, "Vault counter is %d.", u.uinvault);
+        Sprintf(buf, TR("Vault counter is %d.", "金库计数器为%d。"), u.uinvault);
         putstr(win, 0, buf);
     }
     if (any_visible_region()) {
@@ -2474,7 +2474,7 @@ wiz_timeout_queue(void)
     }
     if (svl.level.flags.stasis_until >= svm.moves) {
         putstr(win, 0, "");
-        Sprintf(buf, "Level is no-teleport for %ld %s.",
+        Sprintf(buf, TR("Level is no-teleport for %ld %s.", "本层在%ld%s内禁止传送。"),
                 svl.level.flags.stasis_until - svm.moves + 1L,
                 (svl.level.flags.stasis_until - svm.moves > 0L)
                   ? "turns" : "more turn");
@@ -2626,9 +2626,9 @@ start_timer(
         char idbuf[QBUFSZ];
 
 #ifdef VERBOSE_TIMER
-        Sprintf(idbuf, "%s timer", timeout_funcs[func_index].name);
+        Sprintf(idbuf, TR("%s timer", "%s计时器"), timeout_funcs[func_index].name);
 #else
-        Sprintf(idbuf, "%s timer (%d)", kind_name(kind), (int) func_index);
+        Sprintf(idbuf, TR("%s timer (%d)", "%s计时器（%d）"), kind_name(kind), (int) func_index);
 #endif
         impossible("Attempted to start duplicate %s, aborted.", idbuf);
         return FALSE;

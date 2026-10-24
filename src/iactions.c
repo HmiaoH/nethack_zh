@@ -353,7 +353,6 @@ itemactions(struct obj *otmp)
 #ifdef ZHLANG
         const char *verb = (otmp == uquiver) ? "装入箭袋" : "挥舞",
                    *action = (otmp == uquiver) ? "取消准备" : "卸下武器",
-                   *which = is_plural(otmp) ? "这些" : "此",
                    *what = ((otmp->oclass == WEAPON_CLASS || is_weptool(otmp))
                             ? "武器" : "物品");
         Sprintf(buf,  "%s '%c' 以%s%s",

@@ -333,7 +333,7 @@ fopen_config_file(const char *filename, int src)
 
     envp = nh_getenv("HOME");
     if (!envp || !*envp)
-        Strcpy(tmp_config, "NetHack.cnf");
+        Strcpy(tmp_config, "NetHack.cnf"); /* NOTRANS */
     else
         Sprintf(tmp_config, "%s%s%s", envp,
                 !strchr(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
@@ -344,7 +344,7 @@ fopen_config_file(const char *filename, int src)
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
     if (!envp)
-        Strcpy(tmp_config, ".nethackrc");
+        Strcpy(tmp_config, ".nethackrc"); /* NOTRANS */
     else
         Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
 
@@ -1619,7 +1619,7 @@ config_erradd(const char *buf)
         config_error_data->origline_shown = TRUE;
     }
     if (config_error_data->line_num > 0 && !config_error_data->secure) {
-        Sprintf(lineno, "Line %d: ", config_error_data->line_num);
+        Sprintf(lineno, TR("Line %d: ", "第 %d 行："), config_error_data->line_num);
     } else
         lineno[0] = '\0';
 
@@ -2111,7 +2111,7 @@ portable_sysconf_only_this_statement(int statementid)
 
     exepath = windows_exepath();
     if (exepath) {
-        Snprintf(portable_sysconf, sizeof portable_sysconf, "%s/sysconf",
+        Snprintf(portable_sysconf, sizeof portable_sysconf, "%s/sysconf", /* NOTRANS */
                  exepath);
         if (portable_sysconf[0] && file_exists(portable_sysconf)) {
 #ifdef SYSCF

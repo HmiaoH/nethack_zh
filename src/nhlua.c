@@ -4,6 +4,9 @@
 
 #include "hack.h"
 #include "dlb.h"
+#ifdef ZHLANG
+#include "utf8map.h"
+#endif
 
 /* minimum and maximum LUA_VERSION_NUM expected by this version of NetHack */
 #ifndef NHL_MIN_VERSION_NUM_EXPECTED
@@ -103,6 +106,12 @@ staticfn void nhl_warn(void *, const char *, int);
 staticfn void nhl_clearfromtable(lua_State *, int, int, struct e *);
 staticfn int nhl_panic(lua_State *);
 staticfn void nhl_hookfn(lua_State *, lua_Debug *);
+#ifdef ZHLANG
+/* English -> Chinese message table from dat/msgs_zh.lua; see nhl_zh_msgs() */
+staticfn boolean load_zh_msgs(void);
+static lua_State *zh_msgs_L;
+static boolean zh_msgs_tried;
+#endif
 #endif /* !SFCTOOL */
 
 #ifndef SFCTOOL
@@ -170,6 +179,16 @@ l_nhcore_done(void)
         nhl_done(gl.luacore);
         gl.luacore = 0;
     }
+#ifdef ZHLANG
+    if (zh_msgs_L) {
+        boolean save_in_lua = iflags.in_lua;
+
+        nhl_done(zh_msgs_L);
+        iflags.in_lua = save_in_lua;
+        zh_msgs_L = (lua_State *) 0;
+        zh_msgs_tried = FALSE;
+    }
+#endif
     end_luapat();
 }
 
@@ -211,7 +230,7 @@ nhl_error(lua_State *L, const char *msg)
 
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "lS", &ar);
-    Sprintf(buf, "%s (line %d ", msg, ar.currentline);
+    Sprintf(buf, TR("%s (line %d ", "%s（第 %d 行 "), msg, ar.currentline);
     Sprintf(eos(buf), "%.*s)",
             /* (max length of ar.short_src is actually LUA_IDSIZE
                so this is overkill for it, but crucial for ar.source) */
@@ -636,15 +655,131 @@ nhl_impossible(lua_State *L)
     return 0;
 }
 
-/* pline("It hits!") */
-/* pline("It hits!", true) */
+#ifdef ZHLANG
+/*
+ * Runtime translation of the player-visible strings which live in the
+ * Lua level/tutorial scripts (the dat directory's .lua files).  Those
+ * scripts are shared with the English build, so instead of being
+ * translated in place their messages are mapped through dat/msgs_zh.lua:
+ *
+ *     return { ["English original"] = "中文", ... }
+ *
+ * Some scripts build a message by concatenation ("Use '" .. key), so a
+ * key which is a prefix of the text is also accepted; the longest
+ * matching key wins and everything past it is kept as is.  When the
+ * table can not be loaded, or no key matches, the original text is
+ * returned unchanged.
+ */
+#define ZHMSGS_FILE "msgs_zh.lua"
+
+staticfn boolean
+load_zh_msgs(void)
+{
+    dlb *fh;
+
+    if (zh_msgs_L)
+        return TRUE;
+    if (zh_msgs_tried)
+        return FALSE;
+
+    /* data file not installed (e.g. unusual build): stay with English.
+       Don't latch a failure here: dlb_fopen() also fails before the data
+       files have been initialized, and a later message may well be able
+       to load the table. */
+    fh = dlb_fopen(ZHMSGS_FILE, RDBMODE);
+    if (!fh)
+        return FALSE;
+    (void) dlb_fclose(fh);
+    zh_msgs_tried = TRUE; /* don't keep retrying a broken/unloadable table */
+
+    /*
+     * A plain Lua state is enough for a static data table; using it
+     * instead of nhl_init() avoids loading nhlib.lua and touching
+     * iflags.in_lua for every game.
+     */
+    zh_msgs_L = luaL_newstate();
+    if (!zh_msgs_L) {
+        zh_msgs_tried = FALSE;
+        return FALSE;
+    }
+    luaL_openlibs(zh_msgs_L);
+    lua_settop(zh_msgs_L, 0);
+    if (!nhl_loadlua(zh_msgs_L, ZHMSGS_FILE)
+        || !lua_istable(zh_msgs_L, 1)) {
+        lua_close(zh_msgs_L);
+        zh_msgs_L = (lua_State *) 0;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/* translate one message (or message fragment) from the Lua level scripts */
+const char *
+nhl_zh_msgs(const char *text)
+{
+    static char zbuf[2 * BUFSZ];
+    size_t tlen, bestlen = 0;
+    const char *best = (const char *) 0;
+
+    if (!text || !*text)
+        return text;
+    if (!load_zh_msgs())
+        return text;
+
+    tlen = strlen(text);
+    lua_pushnil(zh_msgs_L); /* table is at stack index 1 */
+    while (lua_next(zh_msgs_L, 1) != 0) {
+        if (lua_type(zh_msgs_L, -2) == LUA_TSTRING
+            && lua_type(zh_msgs_L, -1) == LUA_TSTRING) {
+            size_t klen;
+            const char *key = lua_tolstring(zh_msgs_L, -2, &klen);
+
+            if (klen && klen <= tlen && klen > bestlen
+                && !strncmp(text, key, klen)) {
+                bestlen = klen;
+                best = lua_tostring(zh_msgs_L, -1);
+            }
+        }
+        lua_pop(zh_msgs_L, 1);
+    }
+    if (!best)
+        return text;
+    if (bestlen == tlen)
+        return best;
+    /* partial match: translated prefix plus the untranslated remainder */
+    Snprintf(zbuf, sizeof zbuf, "%s%s", best, text + bestlen);
+    /* if the result was truncated, drop an incomplete character at the end
+       so that no broken UTF-8 sequence is ever handed to the display */
+    {
+        size_t zl = strlen(zbuf), i = 0, boundary = 0;
+
+        while (i < zl) {
+            int sl = u8_seqlen(&zbuf[i]);
+
+            if (i + (size_t) sl > zl)
+                break; /* incomplete sequence at the end */
+            i += (size_t) sl;
+            boundary = i;
+        }
+        zbuf[boundary] = '\0';
+    }
+    return zbuf;
+}
+#endif /* ZHLANG */
+
+#ifndef ZHLANG
+#define nhl_zh_msgs(text) (text)
+#endif
+
+/* pline(TR("It hits!", "击中了！")) */
+/* pline(TR("It hits!", "击中了！"), true) */
 staticfn int
 nhl_pline(lua_State *L)
 {
     int argc = lua_gettop(L);
 
     if (argc == 1 || argc == 2) {
-        pline("%s", luaL_checkstring(L, 1));
+        pline("%s", nhl_zh_msgs(luaL_checkstring(L, 1)));
         if (lua_toboolean(L, 2))
             display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
     } else
@@ -653,14 +788,14 @@ nhl_pline(lua_State *L)
     return 0;
 }
 
-/* verbalize("Fool!") */
+/* verbalize(TR("Fool!", "蠢货！")) */
 staticfn int
 nhl_verbalize(lua_State *L)
 {
     int argc = lua_gettop(L);
 
     if (argc == 1)
-        verbalize("%s", luaL_checkstring(L, 1));
+        verbalize("%s", nhl_zh_msgs(luaL_checkstring(L, 1)));
     else
         nhl_error(L, "Wrong args");
 
@@ -833,8 +968,53 @@ nhl_text(lua_State *L)
         while (lua_gettop(L) > 0) {
             char *ostr = dupstr(luaL_checkstring(L, 1));
             char *ptr, *str = ostr;
+#ifndef ZHLANG
             char *lstr = str + strlen(str) - 1;
+#endif
 
+#ifdef ZHLANG
+            /*
+             * Break by display columns (u8_width), never in the middle
+             * of a UTF-8 sequence: Chinese text has no spaces to wrap
+             * at, so a too-long line is cut hard at 76 columns.  When a
+             * space is available it is still preferred.
+             */
+            for (;;) {
+                char *p = str;
+                int cw, sl, width = 0;
+
+                while (*p && *p != '\n') {
+                    sl = u8_seqlen(p);
+                    /* width of this character == drop when removed */
+                    cw = u8_width(p) - u8_width(p + sl);
+                    if (width + cw > 76)
+                        break;
+                    width += cw;
+                    p += sl;
+                }
+                if (!*p) { /* the remainder fits on one line */
+                    add_menu_str(tmpwin, str);
+                    break;
+                }
+                if (*p == '\n') {
+                    ptr = p;
+                } else {
+                    char *sp = p;
+
+                    if (p == str) /* single char wider than the limit? */
+                        p = str + u8_seqlen(str);
+                    /* prefer breaking at the last space, else hard wrap */
+                    while (sp > str && sp[-1] != ' ')
+                        --sp;
+                    ptr = (sp > str) ? (sp - 1) : p;
+                }
+                *ptr = '\0';
+                add_menu_str(tmpwin, str);
+                str = ptr + 1;
+                if (!*str)
+                    break;
+            }
+#else
             do {
                 char *nlp = strchr(str, '\n');
 
@@ -851,6 +1031,7 @@ nhl_text(lua_State *L)
                 add_menu_str(tmpwin, str);
                 str = ptr + 1;
             } while (*str && str <= lstr);
+#endif
             lua_pop(L, 1);
             free(ostr);
         }
@@ -1210,7 +1391,14 @@ nhl_int_to_obj_name(lua_State *L)
         lua_Integer i = luaL_checkinteger(L, 1);
 
         if (i >= 0 && i < NUM_OBJECTS && OBJ_NAME(objects[i])) {
+#ifdef ZHLANG
+            /* English identifier, not the Chinese display name */
+            lua_pushstring(L, obj_descr[objects[i].oc_name_idx].oc_name
+                                 ? obj_descr[objects[i].oc_name_idx].oc_name
+                                 : "");
+#else
             lua_pushstring(L, OBJ_NAME(objects[i]));
+#endif
             buf[0] = def_oc_syms[(int)objects[i].oc_class].sym;
             buf[1] = '\0';
             lua_pushstring(L, buf);
@@ -2164,11 +2352,11 @@ nhl_pcall(lua_State *L, int nargs, int nresults, const char *name)
 #ifdef NHL_SANDBOX
     if (nud && nud->perpcall && gl.loglua) {
         long ic = nud->statctr * NHL_SB_STEPSIZE; // an approximation
-        livelog_printf(LL_DEBUG, "LUASTATS PCAL %d:%s %ld", nud->sid,
+        livelog_printf(LL_DEBUG, "LUASTATS PCAL %d:%s %ld", nud->sid, /* NOTRANS */
                        nud->name, ic);
     }
     if (nud && nud->memlimit && gl.loglua) {
-        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu", nud->sid,
+        livelog_printf(LL_DEBUG, "LUASTATS PMEM %d:%s %lu", nud->sid, /* NOTRANS */
                        nud->name, (long unsigned) nhl_getmeminuse(L));
     }
 #endif
@@ -2395,11 +2583,11 @@ nhl_done(lua_State *L)
         if (gl.loglua) {
             if (nud && nud->osteps) {
                 long ic = nud->statctr * NHL_SB_STEPSIZE; // an approximation
-                livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld", nud->sid,
+                livelog_printf(LL_DEBUG, "LUASTATS DONE %d:%s %ld", nud->sid, /* NOTRANS */
                                nud->name, ic);
             }
             if (nud && nud->memlimit && !nud->perpcall) {
-                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu", nud->sid,
+                livelog_printf(LL_DEBUG, "LUASTATS DMEM %d:%s %lu", nud->sid, /* NOTRANS */
                                nud->name, (long unsigned) nhl_getmeminuse(L));
             }
         }

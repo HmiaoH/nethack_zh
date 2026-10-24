@@ -182,7 +182,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             map_invisible(x, y);
         else
             newsym(x, y);
-        There("is %s here.",
+        There(TR("is %s here.", "这里有%s。"),
               canspotmon(mon) ? a_monnam(mon) : "something hidden");
     }
 
@@ -366,7 +366,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
             setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
-            pline("%s %scatches the gold.", Monnam(mtmp),
+            pline(TR("%s %scatches the gold.", "%s %s抓住了金币。"), Monnam(mtmp),
                   was_sleeping ? "awakens and " : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
@@ -549,7 +549,7 @@ container_impact_dmg(
             } else {
                 Soundeffect(se_glass_shattering, 25);
             }
-            You_hear("a muffled %s.", result);
+            You_hear(TR("a muffled %s.", "你听到一声沉闷的%s。"), result);
             if (costly) {
                 if (frominv && !otmp->unpaid)
                     otmp->no_charge = 1;
@@ -627,7 +627,7 @@ really_kick_object(coordxy x, coordxy y)
         if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {
             if (!trap->tseen)
                 find_trap(trap);
-            You_cant("kick %s that's in a %s!", something,
+            You_cant(TR("kick %s that's in a %s!", "你无法踢%s，它陷在%s里！"), something,
                      Hallucination ? "tizzy"
                          : (trap->ttyp == WEB) ? "web"
                              : "pit");
@@ -664,7 +664,7 @@ really_kick_object(coordxy x, coordxy y)
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
-            Sprintf(svk.killer.name, "kicking %s barefoot",
+            Sprintf(svk.killer.name, TR("kicking %s barefoot", "光脚踢%s"),
                     killer_xname(gk.kickedobj));
             instapetrify(svk.killer.name);
         }
@@ -743,9 +743,9 @@ really_kick_object(coordxy x, coordxy y)
                 #endif
             else
                 #ifdef ZHLANG
-                pline("%s没有松脱。",
+                pline("%s%s。",
                       The(distant_name(gk.kickedobj, xname)),
-                      otense(gk.kickedobj, "do"));
+                      "没有松脱");
                 #else
                 pline("%s %sn't come loose.",
                       The(distant_name(gk.kickedobj, xname)),
@@ -761,8 +761,8 @@ really_kick_object(coordxy x, coordxy y)
             #endif
         else
             #ifdef ZHLANG
-            pline("%s松脱了。", The(distant_name(gk.kickedobj, xname)),
-                  otense(gk.kickedobj, "come"));
+            pline("%s%s了。", The(distant_name(gk.kickedobj, xname)),
+                  "松脱");
             #else
             pline("%s %s loose.", The(distant_name(gk.kickedobj, xname)),
                   otense(gk.kickedobj, "come"));
@@ -1258,9 +1258,9 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
                        rnd_class(DILITHIUM_CRYSTAL, LUCKSTONE - 1), x, y,
                        FALSE, TRUE);
             if (Blind)
-                You("kick %s loose!", something);
+                You(TR("kick %s loose!", "你踢松了%s！"), something);
             else {
-                You("kick loose some ornamental coins and gems!");
+                You(TR("kick loose some ornamental coins and gems!", "你踢出了一些装饰性的金币和宝石！"));
                 newsym(x, y);
             }
             /* prevent endless milking */
@@ -1283,7 +1283,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             kick_dumb(x, y);
             return ECMD_TIME;
         }
-        You("kick %s.", (Blind ? something : "the altar"));
+        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : "the altar"));
         altar_wrath(x, y);
         if (!rn2(3)) {
             kick_ouch(x, y, "");
@@ -1297,7 +1297,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             kick_dumb(x, y);
             return ECMD_TIME;
         }
-        You("kick %s.", (Blind ? something : "the fountain"));
+        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : "the fountain"));
         if (!rn2(3)) {
             kick_ouch(x, y, "");
             return ECMD_TIME;
@@ -1340,7 +1340,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             del_engr_at(x, y);
             if (Blind) {
                 /* [feel this happen if Deaf?] */
-                pline("Crack!  %s broke!", Something);
+                pline(TR("Crack!  %s broke!", "啪！%s碎了！"), Something);
             } else {
 #ifdef ZHLANG
                 pline_The("墓碑倒下摔碎了！");
@@ -1364,7 +1364,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             if (!rn2(6)
                 && !(svm.mvitals[PM_KILLER_BEE].mvflags & G_GONE)
                 && !(gm.maploc->looted & TREE_SWARM))
-                You_hear("a low buzzing."); /* a warning */
+                You_hear(TR("a low buzzing.", "你听到低沉的嗡嗡声。")); /* a warning */
             kick_ouch(x, y, "");
             return ECMD_TIME;
         }
@@ -1466,7 +1466,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             Soundeffect(se_gushing_sound, 100);
             if (Blind) {
                 if (!Deaf)
-                    You_hear("a gushing sound.");
+                    You_hear(TR("a gushing sound.", "你听到喷涌的水声。"));
             } else {
 #ifdef ZHLANG
                 pline("一股%s软泥从排水口涌出！",
@@ -1484,7 +1484,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
         } else if (!(gm.maploc->looted & S_LDWASHER) && !rn2(3)
                    && !(svm.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
             /* can't resist... */
-            pline("%s returns!", (Blind ? Something : "The dish washer"));
+            pline(TR("%s returns!", "%s回来了！"), (Blind ? Something : "The dish washer"));
             if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
                         MM_NOMSG | ((gend == 1 || (gend == 2 && rn2(2)))
                                     ? MM_MALE : MM_FEMALE)))
@@ -1537,7 +1537,7 @@ dokick(void)
 #endif
         no_kick = TRUE;
     } else if (u.usteed) {
-        if (yn_function("Kick your steed?", ynchars, 'y', TRUE) == 'y') {
+        if (yn_function(TR("Kick your steed?", "要踢你的坐骑吗？"), ynchars, 'y', TRUE) == 'y') {
             #ifdef ZHLANG
             You("踢了%s。", mon_nam(u.usteed));
             #else
@@ -1587,7 +1587,7 @@ dokick(void)
             break;
         case TT_WEB:
         case TT_BEARTRAP:
-            You_cant("move your %s!", body_part(LEG));
+            You_cant(TR("move your %s!", "你无法挪动你的%s！"), body_part(LEG));
             break;
         default:
             break;
@@ -1625,7 +1625,7 @@ dokick(void)
     if (u.uswallow) {
         switch (rn2(3)) {
         case 0:
-            You_cant("move your %s!", body_part(LEG));
+            You_cant(TR("move your %s!", "你无法挪动你的%s！"), body_part(LEG));
             break;
         case 1:
             if (digests(u.ustuck->data)) {
@@ -1917,10 +1917,10 @@ impact_drop(
                   dct == oct ? "the " : dct == 1L ? "an" : "", what);
             #endif
         else if (oct == dct)
-            pline("%s adjacent %s %s.", dct == 1L ? "The" : "All the", what,
+            pline(TR("%s adjacent %s %s.", "%s旁边的%s%s。"), dct == 1L ? "The" : "All the", what,
                   gg.gate_str);
         else
-            pline("%s adjacent %s %s.",
+            pline(TR("%s adjacent %s %s.", "%s旁边的%s%s。"),
                   dct == 1L ? "One of the" : "Some of the",
                   dct == 1L ? "objects falls" : what, gg.gate_str);
     }
@@ -1948,7 +1948,7 @@ impact_drop(
                     pline("\"%s, you are a thief!\"", svp.plname);
 #endif
             } else
-                You_hear("a scream, \"Thief!\"");
+                You_hear(TR("a scream, \"Thief!\"", "你听到一声尖叫：「有贼！」"));
             hot_pursuit(shkp);
             (void) angry_guards(FALSE);
             return;
@@ -2069,7 +2069,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
         } else {
             Soundeffect(se_glass_crashing, 25);
         }
-        You_hear("a muffled %s.", result);
+        You_hear(TR("a muffled %s.", "你听到一声沉闷的%s。"), result);
         obj_extract_self(otmp);
         obfree(otmp, (struct obj *) 0);
         return TRUE;
@@ -2258,15 +2258,15 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         if (num) { /* means: other objects are impacted */
-            Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),
+            Sprintf(xbuf, TR(" %s %s object%s", " %s %s物体%s"), otense(otmp, "hit"),
                     (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");
         } else { /* chain-only msg */
-            Sprintf(xbuf, " %s your chain", otense(otmp, "rattle"));
+            Sprintf(xbuf, TR(" %s your chain", " %s你的铁链"), otense(otmp, "rattle"));
         }
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " and %s %s.",
+            Sprintf(eos(xbuf), TR(" and %s %s.", "，%s %s。"),
                     otense(otmp, "fall"), gg.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)

@@ -906,7 +906,7 @@ getspell(int *spell_no)
         else
             Sprintf(lets, "a-zA-%c", 'A' + nspells - 27);
 
-        Snprintf(qbuf, sizeof qbuf, "Cast which spell? [%s *?]", lets);
+        Snprintf(qbuf, sizeof qbuf, TR("Cast which spell? [%s *?]", "要施放哪个法术？［%s *?］"), lets);
         for (retry_limit = 0; ; ++retry_limit) {
             if (retry_limit == 10) {
                 /* limit is mainly to prevent the fuzzer from getting stuck
@@ -965,7 +965,7 @@ dowizcast(void)
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
                  OBJ_NAME(objects[n]), MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "Cast which spell?");
+    end_menu(win, TR("Cast which spell?", "要施放哪个法术？"));
     n = select_menu(win, PICK_ONE, &selected);
     destroy_nhwindow(win);
     if (n > 0) {
@@ -1657,7 +1657,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                     if (!u.dx && !u.dy && !u.dz) {
                         if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                             char buf[BUFSZ];
-                            Sprintf(buf, "zapped %sself with a spell",
+                            Sprintf(buf, TR("zapped %sself with a spell", "用法术击中了%sself"),
                                     uhim());
                             losehp(damage, buf, NO_KILLER_PREFIX);
                         }
@@ -1735,7 +1735,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                     char buf[BUFSZ];
 
-                    Sprintf(buf, "zapped %sself with a spell", uhim());
+                    Sprintf(buf, TR("zapped %sself with a spell", "用法术击中了%sself"), uhim());
                     if (physical_damage)
                         damage = Maybe_Half_Phys(damage);
                     losehp(damage, buf, NO_KILLER_PREFIX);
@@ -2266,7 +2266,7 @@ spellsortmenu(void)
                  (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "View known spells list sorted");
+    end_menu(tmpwin, TR("View known spells list sorted", "查看已知法术列表（已排序）"));
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -2303,7 +2303,7 @@ dovspell(void)
                 if (spellsortmenu())
                     sortspells();
             } else {
-                Sprintf(qbuf, "Reordering spells; swap '%c' with",
+                Sprintf(qbuf, TR("Reordering spells; swap '%c' with", "重新排序法术：把「%c」与"),
                         spellet(splnum));
                 if (!dospellmenu(qbuf, splnum, &othnum))
                     break;
@@ -2378,14 +2378,14 @@ dospellmenu(
      * need to be subtracted.
      */
     if (!iflags.menu_tab_sep) {
-        Sprintf(buf, "%s%-20s Level %-12s Fail Retention",
+        Sprintf(buf, TR("%s%-20s Level %-12s Fail Retention", "%s%-20s 等级 %-12s 失败率 记忆率"),
                 splaction == SPELLMENU_DUMP ? "" : "    ",
                 "Name",
                 "Category");
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
         sep = ' ';
     } else {
-        Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
+        Sprintf(buf, TR("Name\tLevel\tCategory\tFail\tRetention", "名称\t等级\t类别\t失败率\t记忆率"));
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
         sep = '\t';
     }
@@ -2582,7 +2582,7 @@ spellretention(int idx, char * outbuf)
 
     if (turnsleft < 1L) {
         /* spell has expired; hero can't successfully cast it anymore */
-        Strcpy(outbuf, "(gone)");
+        Strcpy(outbuf, TR("(gone)", "（已消失）"));
     } else if (turnsleft >= (long) KEEN) {
         /* full retention, first turn or immediately after reading book */
         Strcpy(outbuf, "100%");

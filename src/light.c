@@ -942,12 +942,12 @@ wiz_light_sources(void)
     if (win == WIN_ERR)
         return ECMD_OK;
 
-    Sprintf(buf, "Mobile light sources: hero @ (%2d,%2d)", u.ux, u.uy);
+    Sprintf(buf, TR("Mobile light sources: hero @ (%2d,%2d)", "移动光源：英雄 @ (%2d,%2d)"), u.ux, u.uy);
     putstr(win, 0, buf);
     putstr(win, 0, "");
 
     if (gl.light_base) {
-        putstr(win, 0, "location range flags  type    id");
+        putstr(win, 0, TR("location range flags  type    id", "位置   范围  标志   类型    id"));
         putstr(win, 0, "-------- ----- ------ ----  -------");
         for (ls = gl.light_base; ls; ls = ls->next) {
             Sprintf(buf, "  %2d,%2d   %2d   0x%04x  %s  %s", ls->x, ls->y,
@@ -966,7 +966,7 @@ wiz_light_sources(void)
             putstr(win, 0, buf);
         }
     } else
-        putstr(win, 0, "<none>");
+        putstr(win, 0, TR("<none>", "＜无＞"));
 
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);

@@ -163,7 +163,7 @@ throw_obj(struct obj *obj, int shotlimit)
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
         #endif
-        Sprintf(svk.killer.name, "throwing %s bare-handed",
+        Sprintf(svk.killer.name, TR("throwing %s bare-handed", "徒手投掷%s"),
                 killer_xname(obj));
         instapetrify(svk.killer.name);
     }
@@ -635,8 +635,8 @@ endmultishot(boolean verbose)
         if (verbose && !svc.context.mon_moving) {
             #ifdef ZHLANG
             You("在第%d%s%s后停止了%s。",
+                gm.m_shot.i, "次",
                 gm.m_shot.s ? "射击" : "投掷",
-                gm.m_shot.i, ordin(gm.m_shot.i),
                 gm.m_shot.s ? "射击" : "投掷");
             #else
             You("stop %s after the %d%s %s.",
@@ -960,7 +960,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
         if (touch_petrifies(mon->data)
             /* this is a bodily collision, so check for body armor */
             && !uarmu && !uarm && !uarmc) {
-            Sprintf(svk.killer.name, "bumping into %s",
+            Sprintf(svk.killer.name, TR("bumping into %s", "撞上%s"),
                     an(pmname(mon->data, NEUTRAL)));
             instapetrify(svk.killer.name);
         }
@@ -1582,7 +1582,7 @@ toss_up(struct obj *obj, boolean hitsroof)
  petrify:
             svk.killer.format = KILLED_BY;
             /* what goes up... */
-            Strcpy(svk.killer.name, "elementary physics");
+            Strcpy(svk.killer.name, TR("elementary physics", "初等物理学"));
             #ifdef ZHLANG
             You("变成了石头。");
             #else
@@ -1996,7 +1996,7 @@ throwit(
                             pline(Blind
                                       ? "%s lands %s your %s."
                                       : "%s back to you, landing %s your %s.",
-                                  Blind ? Something : Tobjnam(obj, "return"),
+                                  Blind ? Something : Tobjnam(obj, TR("return", "返回")),
                                   Levitation ? "beneath" : "at",
                                   makeplural(body_part(FOOT)));
                         }
@@ -2015,7 +2015,7 @@ throwit(
                                 Blind
                                     ? "%s your %s!"
                                     : "%s back toward you, hitting your %s!",
-                                Tobjnam(obj, Blind ? "hit" : "fly"),
+                                Tobjnam(obj, Blind ? TR("hit", "击中") : "fly"),
                                 body_part(ARM));
                         }
                         if (obj->oartifact)
@@ -2991,7 +2991,7 @@ breakmsg(struct obj *obj, boolean in_view)
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */
         if (!in_view)
-            You_hear("%s shatter!", something);
+            You_hear(TR("%s shatter!", "%s碎裂了！"), something);
         else
             #ifdef ZHLANG
             pline("%s shatter%s%s!", Doname2(obj),

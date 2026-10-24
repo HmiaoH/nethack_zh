@@ -445,7 +445,7 @@ ohitmon(
                 if (!harmless)
                     Strcpy(how, exclam(damage)); /* "!" or "." */
                 else
-                    Sprintf(how, " but passes harmlessly through %.9s.",
+                    Sprintf(how, TR(" but passes harmlessly through %.9s.", "，但无害地穿过了%.9s。"),
                             mhim(mtmp));
                 hit(distant_name(otmp, mshot_xname), mtmp, how);
             }
@@ -651,7 +651,7 @@ u_catch_thrown_obj(struct obj *otmp)
         && calc_capacity(otmp->owt) <= SLT_ENCUMBER && !rn2(catch_chance)) {
         char buf[BUFSZ];
 
-        Snprintf(buf, BUFSZ, "You catch the %s!", simpleonames(otmp));
+        Snprintf(buf, BUFSZ, TR("You catch the %s!", "你接住了%s！"), simpleonames(otmp));
         (void) hold_another_object(otmp, "You catch, but drop, the %s.",
                                    simpleonames(otmp), buf);
         return TRUE;
@@ -940,8 +940,8 @@ m_throw(
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y)
                     && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
 #ifdef ZHLANG
-                    pline("%s掉到了水槽上。", The(mshot_xname(singleobj)),
-                          otense(singleobj, "掉"));
+                    pline("%s%s水槽上。", The(mshot_xname(singleobj)),
+                          "掉到了");
 #else
                     pline("%s %s onto the sink.", The(mshot_xname(singleobj)),
                           otense(singleobj, Hallucination ? "plop" : "drop"));
@@ -1047,7 +1047,9 @@ return_from_mtoss(
             if (cansee(x, y))
                 newsym(x, y);
         } else {
+#ifndef ZHLANG
             boolean mlevitating = FALSE;  /* msg future-proofing only */
+#endif
 
             dmg = rn2(2);
             if (!dmg) {

@@ -16,6 +16,13 @@
 
 extern void mkmap(lev_init *);
 
+#ifdef ZHLANG
+/* Look up a message from the shared level scripts in dat/msgs_zh.lua.
+   Implemented in nhlua.c; declared locally to keep it out of the shared
+   headers.  Returns the argument unchanged when there is no translation. */
+extern const char *nhl_zh_msgs(const char *);
+#endif
+
 staticfn void solidify_map(void);
 staticfn void map_cleanup(void);
 staticfn void lvlfill_maze_grid(int, int, int, int, schar);
@@ -2028,8 +2035,11 @@ create_monster(monster *m, struct mkroom *croom)
 
             case M_AP_OBJECT:
                 for (i = 0; i < NUM_OBJECTS; i++)
-                    if (OBJ_NAME(objects[i])
-                        && !strcmp(OBJ_NAME(objects[i]), m->appear_as.str))
+                    /* internal lookup: Lua scripts use English object ids,
+                       so compare against the untranslated table (A2) */
+                    if (OBJ_NAME_EN(objects[i])
+                        && !strcmp(OBJ_NAME_EN(objects[i]),
+                                   m->appear_as.str))
                         break;
                 if (i == NUM_OBJECTS) {
                     impossible("create_monster: can't find object \"%s\"",
@@ -3090,7 +3100,13 @@ lspo_message(lua_State *L)
 
     create_des_coder();
 
+#ifdef ZHLANG
+    /* shared level scripts carry the English text; translate the fragment
+       through dat/msgs_zh.lua before it is appended to lev_message */
+    msg = nhl_zh_msgs(luaL_checkstring(L, 1));
+#else
     msg = luaL_checkstring(L, 1);
+#endif
 
     old_n = gl.lev_message ? (Strlen(gl.lev_message) + 1) : 0;
     n = Strlen(msg);
@@ -3422,11 +3438,11 @@ get_table_int_or_random(lua_State *L, const char *name, int rndval)
             lua_pop(L, 1);
             return rndval;
         }
-        Sprintf(buf, "Expected integer or \"random\" for \"%s\", got ", name);
+        Sprintf(buf, TR("Expected integer or \"random\" for \"%s\", got ", "「%s」应为整数或「random」，但得到 "), name);
         if (tmp)
             Sprintf(eos(buf), "\"%s\"", tmp);
         else
-            Strcat(buf, "<Null>");
+            Strcat(buf, TR("<Null>", "＜空值＞"));
         nhl_error(L, buf);
         /*NOTREACHED*/
         lua_pop(L, 1);
@@ -3832,7 +3848,7 @@ lspo_level_flags(lua_State *L)
         else {
             char buf[BUFSZ];
 
-            Sprintf(buf, "Unknown level flag %s", s);
+            Sprintf(buf, TR("Unknown level flag %s", "未知的关卡标志 %s"), s);
             nhl_error(L, buf);
         }
     }
@@ -3928,6 +3944,19 @@ lspo_engraving(lua_State *L)
     } else {
         nhl_error(L, "Wrong parameters");
     }
+
+#ifdef ZHLANG
+    /* translate the engraving text from dat/msgs_zh.lua (tutorial notes,
+       "X marks the spot." and so on); keep the English when untranslated */
+    if (txt) {
+        const char *zhtxt = nhl_zh_msgs(txt);
+
+        if (zhtxt != txt) {
+            Free(txt);
+            txt = dupstr(zhtxt);
+        }
+    }
+#endif
 
     if (x == -1 && y == -1)
         ecoord = SP_COORD_PACK_RANDOM(0);
@@ -5280,7 +5309,7 @@ get_table_intarray_entry(lua_State *L, int tableidx, int entrynum)
     } else {
         char buf[BUFSZ];
 
-        Sprintf(buf, "Array entry #%i is %s, expected number",
+        Sprintf(buf, TR("Array entry #%i is %s, expected number", "数组第 #%i 项是 %s，应为数字"),
                 1, luaL_typename(L, -1));
         nhl_error(L, buf);
     }

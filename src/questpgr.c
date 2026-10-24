@@ -8,6 +8,12 @@
 /*  quest-specific pager routines. */
 
 #ifdef ZHLANG
+/* Chinese display name for the dungeon shown by %Z; implemented in
+   dungeon.c (F1/F2).  Declared locally until the shared header has it. */
+extern const char *dname_zh(const char *en);
+#endif
+
+#ifdef ZHLANG
 #define QTEXT_FILE "quest_zh.lua"
 #else
 #define QTEXT_FILE "quest.lua"
@@ -55,8 +61,13 @@ ldrname(void)
 {
     int i = gu.urole.ldrnum;
 
+#ifdef ZHLANG
+    /* Chinese has no "the" prefix; pmname() gives the translated name */
+    Sprintf(gn.nambuf, "%s", pmname(&mons[i], NEUTRAL));
+#else
     Sprintf(gn.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].pmnames[NEUTRAL]);
+#endif
     return gn.nambuf;
 }
 
@@ -129,8 +140,12 @@ neminame(void)
 {
     int i = gu.urole.neminum;
 
+#ifdef ZHLANG
+    Sprintf(gn.nambuf, "%s", pmname(&mons[i], NEUTRAL));
+#else
     Sprintf(gn.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].pmnames[NEUTRAL]);
+#endif
     return gn.nambuf;
 }
 
@@ -139,7 +154,11 @@ guardname(void) /* return your role leader's guard monster name */
 {
     int i = gu.urole.guardnum;
 
+#ifdef ZHLANG
+    return pmname(&mons[i], NEUTRAL);
+#else
     return mons[i].pmnames[NEUTRAL];
+#endif
 }
 
 staticfn const char *
@@ -214,6 +233,30 @@ qtext_pronoun(
      * For %o, treat all artifacts as neuter; some have plural names,
      * which genders[] doesn't handle; cvt_buf[] already contains name.
      */
+#ifdef ZHLANG
+    /* Chinese pronouns have no capitalization: 他/她/它 (它们 for plural
+       artifacts) and their possessive forms.  cvt_buf[] holds the Chinese
+       name by now, so test the English artifact name for the plural. */
+    if (who == 'o'
+        && (strstri(artiname(gu.urole.questarti), "Eyes ")
+            || strcmpi(artiname(gu.urole.questarti),
+                       makesingular(artiname(gu.urole.questarti))))) {
+        pnoun = (lwhich == 'j') ? "它们的" : "它们";
+    } else {
+        godgend = (who == 'd') ? svq.quest_status.godgend
+            : (who == 'l') ? svq.quest_status.ldrgend
+            : (who == 'n') ? svq.quest_status.nemgend
+            : 2; /* default to neuter */
+        /* index 0=male, 1=female, 2=neuter (genders[]) */
+        pnoun = (lwhich == 'j')
+                    ? ((godgend == 1) ? "她的" : (godgend == 2) ? "它的"
+                                                                : "他的")
+                    : ((godgend == 1) ? "她" : (godgend == 2) ? "它" : "他");
+    }
+    Strcpy(gc.cvt_buf, pnoun);
+    nhUse(which);
+    return;
+#else
     if (who == 'o'
         && (strstri(gc.cvt_buf, "Eyes ")
             || strcmpi(gc.cvt_buf, makesingular(gc.cvt_buf)))) {
@@ -234,7 +277,29 @@ qtext_pronoun(
     if (lwhich != which)
         gc.cvt_buf[0] = highc(gc.cvt_buf[0]);
     return;
+#endif
 }
+
+#ifdef ZHLANG
+/* Chinese names for the fixed alignment words used by %a/%A (align_str()
+   itself has to stay English: it is also an internal value elsewhere). */
+staticfn const char *
+zh_align_str(aligntyp alignment)
+{
+    switch ((int) alignment) {
+    case A_CHAOTIC:
+        return "混沌";
+    case A_NEUTRAL:
+        return "中立";
+    case A_LAWFUL:
+        return "守序";
+    case A_NONE:
+        return "无阵营";
+    }
+    return "未知";
+}
+
+#endif /* ZHLANG */
 
 staticfn void
 convert_arg(char c)
@@ -256,10 +321,18 @@ convert_arg(char c)
         str = rank_of(MIN_QUEST_LEVEL, Role_switch, flags.female);
         break;
     case 's':
+#ifdef ZHLANG
+        str = (flags.female) ? "姐妹" : "兄弟";
+#else
         str = (flags.female) ? "sister" : "brother";
+#endif
         break;
     case 'S':
+#ifdef ZHLANG
+        str = (flags.female) ? "女儿" : "儿子";
+#else
         str = (flags.female) ? "daughter" : "son";
+#endif
         break;
     case 'l':
         str = ldrname();
@@ -269,6 +342,12 @@ convert_arg(char c)
         break;
     case 'O':
     case 'o':
+#ifdef ZHLANG
+        str = the(artiname_zh(gu.urole.questarti));
+        /* Chinese artifact names are whole names (e.g. "探测之球"); there
+           is no "the Foo of Bar" short form, so %O keeps the full name. */
+        nhUse(c);
+#else
         str = the(artiname(gu.urole.questarti));
         if (c == 'O') {
             /* shorten "the Foo of Bar" to "the Foo"
@@ -278,6 +357,7 @@ convert_arg(char c)
             if (p)
                 *p = '\0';
         }
+#endif
         break;
     case 'n':
         str = neminame();
@@ -286,16 +366,31 @@ convert_arg(char c)
         str = guardname();
         break;
     case 'G':
+#ifdef ZHLANG
+        /* "your %G%d" = "your god/goddess <name>" */
+        str = !strcmpi(align_gtitle(u.ualignbase[A_ORIGINAL]), "goddess")
+                  ? "女神"
+                  : "神";
+#else
         str = align_gtitle(u.ualignbase[A_ORIGINAL]);
+#endif
         break;
     case 'H':
         str = homebase();
         break;
     case 'a':
+#ifdef ZHLANG
+        str = zh_align_str(u.ualignbase[A_ORIGINAL]);
+#else
         str = align_str(u.ualignbase[A_ORIGINAL]);
+#endif
         break;
     case 'A':
+#ifdef ZHLANG
+        str = zh_align_str(u.ualign.type);
+#else
         str = align_str(u.ualign.type);
+#endif
         break;
     case 'd':
         str = align_gname(u.ualignbase[A_ORIGINAL]);
@@ -304,19 +399,39 @@ convert_arg(char c)
         str = align_gname(A_LAWFUL);
         break;
     case 'C':
+#ifdef ZHLANG
+        str = "混沌";
+#else
         str = "chaotic";
+#endif
         break;
     case 'N':
+#ifdef ZHLANG
+        str = "中立";
+#else
         str = "neutral";
+#endif
         break;
     case 'L':
+#ifdef ZHLANG
+        str = "守序";
+#else
         str = "lawful";
+#endif
         break;
     case 'x':
+#ifdef ZHLANG
+        str = Blind ? "感知到" : "看见";
+#else
         str = Blind ? "sense" : "see";
+#endif
         break;
     case 'Z':
+#ifdef ZHLANG
+        str = dname_zh(svd.dungeons[0].dname);
+#else
         str = svd.dungeons[0].dname;
+#endif
         break;
     case '%':
         str = "%";
@@ -369,9 +484,18 @@ convert_line(char *in_line, char *out_line)
                 case 'I':
                 case 'j': /* his/her */
                 case 'J':
-                    if (strchr("dlno", lowc(*(c - 1))))
+                    if (strchr("dlno", lowc(*(c - 1)))) {
                         qtext_pronoun(*(c - 1), *c);
-                    else
+#ifdef ZHLANG
+                        /* English builds "%oiself" as <pronoun> + "self";
+                           Chinese needs 自己 after the pronoun instead of
+                           leaving the English word behind */
+                        if (!strncmp(c + 1, "self", 4)) {
+                            Strcat(gc.cvt_buf, "自己");
+                            c += 4;
+                        }
+#endif
+                    } else
                         --c; /* default action */
                     break;
 
@@ -390,7 +514,21 @@ convert_line(char *in_line, char *out_line)
                     FALLTHROUGH;
                     /*FALLTHRU*/
                 case 's':
+#ifdef ZHLANG
+                    /*
+                     * Chinese possession is 的.  quest_zh.lua sometimes
+                     * writes the 的 itself ("%ls的诊室") and sometimes not
+                     * ("%ls脸上"), so only add it when the following text
+                     * doesn't start with one.  Deity names (%d) stay
+                     * English; the translated sentence always supplies the
+                     * 的 for those, and no ASCII "'s" may appear.
+                     */
+                    if (zh_nonascii(gc.cvt_buf)
+                        && strncmp(c + 1, "的", sizeof "的" - 1))
+                        Strcat(gc.cvt_buf, "的");
+#else
                     Strcpy(gc.cvt_buf, s_suffix(gc.cvt_buf));
+#endif
                     break;
 
                 /* strip any "the" prefix */

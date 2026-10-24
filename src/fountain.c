@@ -612,7 +612,7 @@ dipfountain(struct obj *obj)
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;
             exercise(A_WIS, TRUE);
-            livelog_printf(LL_ARTIFACT, "was given %s by the %s",
+            livelog_printf(LL_ARTIFACT, TR("was given %s by the %s", "%s由%s赐予"),
                            artiname(ART_EXCALIBUR), lady);
         }
         update_inventory();

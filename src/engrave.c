@@ -219,7 +219,7 @@ void
 cant_reach_floor(coordxy x, coordxy y, boolean up,
                  boolean check_pit, boolean wand_engraving)
 {
-    pline("%s can't reach the %s.",
+    pline(TR("%s can't reach the %s.", "%s够不到%s。"),
           wand_engraving
               ? "The wand does nothing more, and the tip of the wand"
               : "You",
@@ -1177,7 +1177,7 @@ doengrave(void)
     }
 
     if (de->otmp == &hands_obj) {
-        Strcat(strcpy(de->fbuf, "your "), body_part(FINGERTIP));
+        Strcat(strcpy(de->fbuf, TR("your ", "你的")), body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
         de->writer = yname(de->otmp);
@@ -1364,7 +1364,7 @@ doengrave(void)
         } else if (de->type == de->oep->engr_type
                    && (!Blind || de->oep->engr_type == BURN
                        || de->oep->engr_type == ENGRAVE)) {
-            c = yn_function("Do you want to add to the current engraving?",
+            c = yn_function(TR("Do you want to add to the current engraving?", "要在当前刻文上续写吗？"),
                             ynqchars, 'y', TRUE);
             if (c == 'q') {
                 pline1(Never_mind);
@@ -1447,18 +1447,18 @@ doengrave(void)
 
     /* Tell adventurer what is going on */
     if (de->otmp != &hands_obj)
-        You("%s the %s with %s%s.", de->everb, de->eloc,
+        You(TR("%s the %s with %s%s.", "%s%s，用%s%s。"), de->everb, de->eloc,
             /* since doname() yields "N items" when quantity is more than
                one, match that by using "1 of" rather than "one of" when
                informing the player that the stack will be split */
             (de->type == ENGRAVE && de->otmp->quan > 1L) ? "1 of " : "",
             doname(de->otmp));
     else
-        You("%s the %s with your %s.",
+        You(TR("%s the %s with your %s.", "%s%s，用你的%s。"),
             de->everb, de->eloc, body_part(FINGERTIP));
 
     /* Prompt for engraving! */
-    Sprintf(de->qbuf, "What do you want to %s the %s here?",
+    Sprintf(de->qbuf, TR("What do you want to %s the %s here?", "你想在这里%s什么%s？"),
             de->everb, de->eloc);
     getlin(de->qbuf, de->ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
@@ -1491,7 +1491,7 @@ doengrave(void)
     /* A single `x' is the traditional signature of an illiterate person */
     if (de->len != 1 || (!strchr(de->ebuf, 'x') && !strchr(de->ebuf, 'X')))
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by engraving \"%s\"",
+            livelog_printf(LL_CONDUCT, TR("became literate by engraving \"%s\"", "通过刻写「%s」学会了识字"),
                            de->ebuf);
 
     /* Mix up engraving if surface or state of mind is unsound.

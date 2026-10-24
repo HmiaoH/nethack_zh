@@ -694,7 +694,7 @@ visible_region_summary(winid win)
 
         if (!hdr_done++) {
             putstr(win, 0, "");
-            putstr(win, 0, "Visible regions");
+            putstr(win, 0, TR("Visible regions", "可见区域"));
         }
         /*
          * TODO? sort the regions by time-to-live or by bounding box.
@@ -708,9 +708,9 @@ visible_region_summary(winid win)
         Sprintf(buf, "%5ld", reg->ttl + 1L);
         damg = reg->arg.a_int;
         if (damg)
-            Sprintf(typbuf, "poison gas (%d)", damg);
+            Sprintf(typbuf, TR("poison gas (%d)", "毒气（%d）"), damg);
         else
-            Strcpy(typbuf, "vapor");
+            Strcpy(typbuf, TR("vapor", "雾气"));
         Sprintf(eos(buf), "%s%-16s", fldsep, typbuf);
         Sprintf(eos(buf), "%s@[%d,%d..%d,%d]", fldsep,
                 reg->bounding_box.lx, reg->bounding_box.ly,
@@ -995,15 +995,15 @@ enter_force_field(genericptr_t p1, genericptr_t p2)
 
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
-            You("bump into %s.  Ouch!",
+            You(TR("bump into %s.  Ouch!", "撞上了%s。好痛！"),
                 Hallucination ? "an invisible tree"
                               : "some kind of invisible wall");
         else
-            pline("Ouch!");
+            pline(TR("Ouch!", "好痛！"));
     } else {
         mtmp = (struct monst *) p2;
         if (canseemon(mtmp))
-            pline("%s bumps into %s!", Monnam(mtmp), something);
+            pline(TR("%s bumps into %s!", "%s撞上了%s！"), Monnam(mtmp), something);
     }
     return FALSE;
 }

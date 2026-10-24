@@ -546,8 +546,8 @@ doc_extcmd_flagstr(
     if (!efp) {
         char qbuf[QBUFSZ];
 
-        add_menu_str(menuwin, "[A] Command autocompletes");
-        Sprintf(qbuf, "[m] Command accepts '%s' prefix",
+        add_menu_str(menuwin, TR("[A] Command autocompletes", "[A] 命令支持自动补全"));
+        Sprintf(qbuf, TR("[m] Command accepts '%s' prefix", "[m] 命令接受「%s」前缀"),
                 visctrl(cmd_from_func(do_reqmenu)));
         add_menu_str(menuwin, qbuf);
         return (char *) 0;
@@ -951,7 +951,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("Hide [h] or spin a web [s]?",
+        c = yn_function(TR("Hide [h] or spin a web [s]?", "隐藏[h]还是织网[s]？"),
                         hidespinchars, 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;
@@ -981,7 +981,7 @@ domonability(void)
                magical breathing */
             (void) split_mon(&gy.youmonst, (struct monst *) 0);
         } else {
-            There("is no fountain here.");
+            There(TR("is no fountain here.", "这里没有喷泉。"));
         }
     } else if (is_unicorn(uptr)) {
         use_unicorn_horn((struct obj **) 0);
@@ -3265,12 +3265,12 @@ get_changed_key_binds(strbuf_t *sbuf)
         keys[bind->key] = 1;
         if (bind->userbind && bind->cmd && bind->cmd->key != bind->key) {
             if ((bind->cmd->flags & CMD_PARAM) != 0)
-                Sprintf(buf, "BIND=%s:%s(%s)%s", key2txt(bind->key, buf2),
+                Sprintf(buf, "BIND=%s:%s(%s)%s", key2txt(bind->key, buf2), /* NOTRANS */
                         bind->cmd->ef_txt,
                         bind->param,
                         sbuf ? "\n" : "");
             else
-                Sprintf(buf, "BIND=%s:%s%s", key2txt(bind->key, buf2),
+                Sprintf(buf, "BIND=%s:%s%s", key2txt(bind->key, buf2), /* NOTRANS */
                         bind->cmd->ef_txt,
                         sbuf ? "\n" : "");
             if (sbuf)
@@ -3286,7 +3286,7 @@ get_changed_key_binds(strbuf_t *sbuf)
         struct ext_func_tab *ec = &extcmdlist[i];
 
         if (ec->key && !keys[ec->key]) {
-            Sprintf(buf, "BIND=%s:nothing%s", key2txt(ec->key, buf2),
+            Sprintf(buf, "BIND=%s:nothing%s", key2txt(ec->key, buf2), /* NOTRANS */
                     sbuf ? "\n" : "");
             if (sbuf)
                 strbuf_append(sbuf, buf);
@@ -3334,10 +3334,10 @@ handler_rebind_keys_add(boolean keyfirst)
         struct Cmd_bind *bind = cmdbind_get(key);
 
         if (bind && bind->cmd) {
-            Sprintf(buf, "Key '%s' is currently bound to \"%s\".",
+            Sprintf(buf, TR("Key '%s' is currently bound to \"%s\".", "按键「%s」当前绑定到「%s」。"),
                     key2txt(key, buf2), bind->cmd->ef_txt);
         } else {
-            Sprintf(buf, "Key '%s' is not bound to anything.",
+            Sprintf(buf, TR("Key '%s' is not bound to anything.", "按键「%s」未绑定任何内容。"),
                     key2txt(key, buf2));
         }
         add_menu_str(win, buf);
@@ -3363,9 +3363,9 @@ handler_rebind_keys_add(boolean keyfirst)
              MENU_ITEMFLAGS_NONE);
     }
     if (key)
-        Sprintf(buf, "Bind '%s' to what command?", key2txt(key, buf2));
+        Sprintf(buf, TR("Bind '%s' to what command?", "把「%s」绑定到什么命令？"), key2txt(key, buf2));
     else
-        Sprintf(buf, "Bind what command?");
+        Sprintf(buf, TR("Bind what command?", "要绑定哪个命令？"));
     end_menu(win, buf);
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
@@ -3378,7 +3378,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
         if (i == -1) {
             ec = NULL;
-            Strcat(cmdstr, "nothing");
+            Strcat(cmdstr, "nothing"); /* NOTRANS */
             goto bindit;
         } else {
             ec = &extcmdlist[i-1];
@@ -3388,7 +3388,7 @@ handler_rebind_keys_add(boolean keyfirst)
                 char querybuf[BUFSZ];
 
                 parambuf[0] = '\0';
-                Sprintf(querybuf, "Command %s requires a parameter:", ec->ef_txt);
+                Sprintf(querybuf, TR("Command %s requires a parameter:", "命令%s需要一个参数："), ec->ef_txt);
                 getlin(querybuf, parambuf);
                 (void) mungspaces(parambuf);
                 Snprintf(cmdstr, BUFSZ-1, "%s(%s)", ec->ef_txt, parambuf);
@@ -3465,7 +3465,7 @@ handler_rebind_keys(void)
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
                  "view changed key binds", MENU_ITEMFLAGS_NONE);
     }
-    end_menu(win, "Do what?");
+    end_menu(win, TR("Do what?", "要做什么？"));
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -3514,7 +3514,7 @@ handler_change_autocompletions(void)
                  MENU_ITEMFLAGS_NONE);
     }
 
-    end_menu(win, "Which commands autocomplete?");
+    end_menu(win, TR("Which commands autocomplete?", "哪些命令支持自动补全？"));
     n = select_menu(win, PICK_ANY, &picks);
     if (n >= 0) {
         int j;
@@ -3608,20 +3608,20 @@ key2extcmddesc(uchar key)
        that match !number_pad movement (like 'j' for "jump") */
     key2cmdbuf[0] = '\0';
     if (movecmd(k = key, MV_WALK))
-        Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
+        Strcpy(key2cmdbuf, TR("move", "移动")); /* "move or attack"? */
     else if (movecmd(k = key, MV_RUSH))
-        Strcpy(key2cmdbuf, "rush");
+        Strcpy(key2cmdbuf, TR("rush", "疾行"));
     else if (movecmd(k = key, MV_RUN))
-        Strcpy(key2cmdbuf, "run");
+        Strcpy(key2cmdbuf, TR("run", "奔跑"));
     if (digit(key) || (gc.Cmd.num_pad && digit(unmeta(key)))) {
         key2cmdbuf[0] = '\0';
         if (!gc.Cmd.num_pad)
-            Strcpy(key2cmdbuf, "start of, or continuation of, a count");
+            Strcpy(key2cmdbuf, TR("start of, or continuation of, a count", "计数的开头或延续"));
         else if (key == '5' || key == M_5)
-            Sprintf(key2cmdbuf, "%s prefix",
+            Sprintf(key2cmdbuf, TR("%s prefix", "%s前缀"),
                     (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
         else if (key == '0' || (gc.Cmd.pcHack_compat && key == M_0))
-            Strcpy(key2cmdbuf, "synonym for 'i'");
+            Strcpy(key2cmdbuf, TR("synonym for 'i'", "「i」的同义词"));
         if (*key2cmdbuf)
             return key2cmdbuf;
     }
@@ -3952,7 +3952,7 @@ dokeylist(void)
 
     /* directional keys */
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Directional keys:");
+    putstr(datawin, 0, TR("Directional keys:", "方向键："));
     show_direction_keys(datawin, '.', FALSE); /* '.'==self in direct'n grid */
 
     if (!iflags.num_pad) {
@@ -3961,11 +3961,11 @@ dokeylist(void)
      "Ctrl+<direction> will run in specified direction until something very");
         Sprintf(buf, "%7s %s", "", "interesting is seen.");
         putstr(datawin, 0, buf);
-        Strcpy(buf, "Shift"); /* append the rest below */
+        Strcpy(buf, TR("Shift", "Shift 键")); /* append the rest below */
     } else {
         /* num_pad */
         putstr(datawin, 0, "");
-        Strcpy(buf, "Meta"); /* append the rest next */
+        Strcpy(buf, TR("Meta", "Meta 键")); /* append the rest next */
     }
     Strcat(buf,
           "+<direction> will run in specified direction until you encounter");
@@ -3974,7 +3974,7 @@ dokeylist(void)
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "Miscellaneous keys:");
+    putstr(datawin, 0, TR("Miscellaneous keys:", "其他按键："));
     for (i = 0; misc_keys[i].desc; ++i) {
         if (misc_keys[i].numpad && !iflags.num_pad)
             continue;
@@ -3996,7 +3996,7 @@ dokeylist(void)
     Sprintf(buf2, "[%s]", key2txt(key, buf));
     Sprintf(buf, "%-21s", buf2);
 #endif
-    Strcat(buf, " interrupt: break out of NetHack (SIGINT)");
+    Strcat(buf, TR(" interrupt: break out of NetHack (SIGINT)", " 中断：退出 NetHack（SIGINT）"));
     putstr(datawin, 0, buf);
     /* keyless special key commands, if any */
     if (spkey_gap) {
@@ -4023,14 +4023,14 @@ dokeylist(void)
 
     if (keylist_putcmds(datawin, TRUE, GENERALCMD, IGNORECMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "General commands:");
+        putstr(datawin, 0, TR("General commands:", "一般命令："));
         (void) keylist_putcmds(datawin, FALSE, GENERALCMD,
                                IGNORECMD, keys_used);
     }
 
     if (keylist_putcmds(datawin, TRUE, 0, GENERALCMD | IGNORECMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Game commands:");
+        putstr(datawin, 0, TR("Game commands:", "游戏命令："));
         (void) keylist_putcmds(datawin, FALSE, 0,
                                GENERALCMD | IGNORECMD,
                                keys_used);
@@ -4039,7 +4039,7 @@ dokeylist(void)
     if (wizard && keylist_putcmds(datawin, TRUE,
                                   WIZMODECMD, INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Debug mode commands:");
+        putstr(datawin, 0, TR("Debug mode commands:", "调试模式命令："));
         (void) keylist_putcmds(datawin, FALSE,
                                WIZMODECMD, INTERNALCMD, keys_used);
     }
@@ -4264,13 +4264,13 @@ key2txt(uchar c, char *txt) /* sufficiently long buffer */
     /* should probably switch to "SPC", "ESC", "RET"
        since nethack's documentation uses ESC for <escape> */
     if (c == ' ')
-        Sprintf(txt, "<space>");
+        Sprintf(txt, TR("<space>", "<空格>"));
     else if (c == '\033')
-        Sprintf(txt, "<esc>"); /* "<escape>" won't fit */
+        Sprintf(txt, TR("<esc>", "<Esc>")); /* "<escape>" won't fit */
     else if (c == '\n')
-        Sprintf(txt, "<enter>"); /* "<return>" won't fit */
+        Sprintf(txt, TR("<enter>", "<回车>")); /* "<return>" won't fit */
     else if (c == '\177')
-        Sprintf(txt, "<del>"); /* "<delete>" won't fit */
+        Sprintf(txt, TR("<del>", "<删除>")); /* "<delete>" won't fit */
     else
         Strcpy(txt, visctrl((char) c));
     return txt;
@@ -4337,7 +4337,7 @@ all_options_autocomplete(strbuf_t *sbuf)
 
     for (efp = extcmdlist; efp->ef_txt; efp++)
         if ((efp->flags & AUTOCOMP_ADJ) != 0) {
-            Sprintf(buf, "AUTOCOMPLETE=%s%s\n",
+            Sprintf(buf, "AUTOCOMPLETE=%s%s\n", /* NOTRANS */
                     (efp->flags & AUTOCOMPLETE) ? "" : "!",
                     efp->ef_txt);
             strbuf_append(sbuf, buf);
@@ -5051,7 +5051,7 @@ getdir(const char *s)
     if (gi.in_doagain || *readchar_queue) {
         dirsym = readchar();
     } else {
-        dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
+        dirsym = yn_function((s && *s != '^') ? s : TR("In what direction?", "朝哪个方向？"),
                              (char *) 0, '\0', FALSE);
 
         /* for the fuzzer, usually force the result to be a valid direction,
@@ -5274,10 +5274,10 @@ help_dir(
     if (prefixhandling
         && (sym == gc.Cmd.spkeys[NHKF_GETDIR_SELF]
             || (gc.Cmd.num_pad && sym == gc.Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
-        Sprintf(buf, "You can't %s%s yourself.", dothat, how);
+        Sprintf(buf, TR("You can't %s%s yourself.", "你不能%s%s自己。"), dothat, how);
     /* for movement prefix followed by up or down */
     } else if (prefixhandling && (sym == '<' || sym == '>')) {
-        Sprintf(buf, "You can't %s %s.", dothat,
+        Sprintf(buf, TR("You can't %s %s.", "你不能%s%s。"), dothat,
                 /* was "upwards" and "downwards", but they're considered
                    to be variants of canonical "upward" and "downward" */
                 (sym == '<') ? "upward" : "downward");
@@ -5288,7 +5288,7 @@ help_dir(
     if (!viawindow) {
         if (prefixhandling) {
             if (!*buf)
-                Sprintf(buf, "Invalid direction for '%s' prefix.",
+                Sprintf(buf, TR("Invalid direction for '%s' prefix.", "「%s」前缀的方向无效。"),
                         visctrl(spkey));
             #ifdef ZHLANG
             pline("%s", buf);
@@ -5313,7 +5313,7 @@ help_dir(
         putstr(win, 0, buf);
         putstr(win, 0, "");
     } else if (msg) {
-        Sprintf(buf, "cmdassist: %s", msg);
+        Sprintf(buf, TR("cmdassist: %s", "命令辅助：%s"), msg);
         putstr(win, 0, buf);
         putstr(win, 0, "");
     }
@@ -5324,7 +5324,7 @@ help_dir(
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!strchr(wiz_only_list, sym) || wizard)) {
-            Sprintf(buf, "Are you trying to use ^%c%s?", sym,
+            Sprintf(buf, TR("Are you trying to use ^%c%s?", "你是想使用^%c%s吗？"), sym,
                     strchr(wiz_only_list, sym) ? ""
                         : " as specified in the Guidebook");
             putstr(win, 0, buf);
@@ -5333,13 +5333,13 @@ help_dir(
             putstr(win, 0, "");
             putstr(win, 0,
                   "To use that command, hold down the <Ctrl> key as a shift");
-            Sprintf(buf, "and press the <%c> key.", sym);
+            Sprintf(buf, TR("and press the <%c> key.", "然后按<%c>键。"), sym);
             putstr(win, 0, buf);
             putstr(win, 0, "");
         }
     }
 
-    Sprintf(buf, "Valid direction keys%s%s%s are:",
+    Sprintf(buf, TR("Valid direction keys%s%s%s are:", "有效的方向键%s%s%s是："),
             prefixhandling ? " to " : "", prefixhandling ? dothat : "",
             NODIAG(u.umonnum) ? " in your current form" : "");
     putstr(win, 0, buf);
@@ -5352,11 +5352,11 @@ help_dir(
            self is excluded as a viable direction for every prefix */
         putstr(win, 0, "");
         putstr(win, 0, "          <  up");
-        putstr(win, 0, "          >  down");
+        putstr(win, 0, TR("          >  down", "          >  下"));
         if (!prefixhandling) {
             int selfi = gc.Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
 
-            Sprintf(buf,   "       %4s  direct at yourself",
+            Sprintf(buf,   TR("       %4s  direct at yourself", "       %4s  指向自己"),
                     visctrl(gc.Cmd.spkeys[selfi]));
             putstr(win, 0, buf);
         }
@@ -5527,7 +5527,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         return K;
 
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
-        Sprintf(buf, "Drink from the %s",
+        Sprintf(buf, TR("Drink from the %s", "从%s喝水"),
                 defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
         mcmd_addmenu(win, MCMD_QUAFF, buf), ++K;
     }
@@ -5539,17 +5539,17 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar"), ++K;
 
     if (stway && stway->up) {
-        Sprintf(buf, "Go up the %s",
+        Sprintf(buf, TR("Go up the %s", "沿%s向上"),
                 stway->isladder ? "ladder" : "stairs");
         mcmd_addmenu(win, MCMD_UP, buf), ++K;
     }
     if (stway && !stway->up) {
-        Sprintf(buf, "Go down the %s",
+        Sprintf(buf, TR("Go down the %s", "沿%s向下"),
                 stway->isladder ? "ladder" : "stairs");
         mcmd_addmenu(win, MCMD_DOWN, buf), ++K;
     }
     if (u.usteed) { /* another movement choice */
-        Sprintf(buf, "Dismount %s",
+        Sprintf(buf, TR("Dismount %s", "从%s上下来"),
                 x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
         mcmd_addmenu(win, MCMD_DISMOUNT, buf), ++K;
@@ -5557,7 +5557,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 
 #if 0
     if (Upolyd) { /* before objects */
-        Sprintf(buf, "Use %s special ability",
+        Sprintf(buf, TR("Use %s special ability", "使用%s的特殊能力"),
                 s_suffix(pmname(&mons[u.umonnum], Ugender)));
         mcmd_addmenu(win, MCMD_MONABILITY, buf), ++K;
     }
@@ -5566,18 +5566,18 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     if (OBJ_AT(x, y)) {
         struct obj *otmp = svl.level.objects[x][y];
 
-        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        Sprintf(buf, TR("Pick up %s", "拾起%s"), otmp->nexthere ? "items" : doname(otmp));
         mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
 
         if (Is_container(otmp)) {
-            Sprintf(buf, "Loot %s", doname(otmp));
+            Sprintf(buf, TR("Loot %s", "搜刮%s"), doname(otmp));
             mcmd_addmenu(win, MCMD_LOOT, buf), ++K;
 
-            Sprintf(buf, "Tip %s", doname(otmp));
+            Sprintf(buf, TR("Tip %s", "倾倒%s"), doname(otmp));
             mcmd_addmenu(win, MCMD_TIP, buf), ++K;
         }
         if (otmp->oclass == FOOD_CLASS) {
-            Sprintf(buf, "Eat %s", doname(otmp));
+            Sprintf(buf, TR("Eat %s", "吃%s"), doname(otmp));
             mcmd_addmenu(win, MCMD_EAT, buf), ++K;
         }
     }
@@ -5637,7 +5637,7 @@ there_cmd_menu_next2u(
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
             card = (carrying(CREDIT_CARD) != 0);
             if (key_or_pick || card) {
-                Sprintf(buf, "%sunlock the door",
+                Sprintf(buf, TR("%sunlock the door", "%s打开门锁"),
                         key_or_pick ? "lock or " : "");
                 mcmd_addmenu(win, MCMD_LOCK_DOOR, upstart(buf)), ++K;
             }
@@ -5674,22 +5674,22 @@ there_cmd_menu_next2u(
                               SUPPRESS_SADDLE, FALSE);
 
         if (!u.usteed) {
-            Sprintf(buf, "Ride %s", mnam);
+            Sprintf(buf, TR("Ride %s", "骑上%s"), mnam);
             mcmd_addmenu(win, MCMD_RIDE, buf), ++K;
         }
-        Sprintf(buf, "Remove saddle from %s", mnam);
+        Sprintf(buf, TR("Remove saddle from %s", "从%s身上取下鞍具"), mnam);
         mcmd_addmenu(win, MCMD_REMOVE_SADDLE, buf), ++K;
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
-        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp));
+        Sprintf(buf, TR("Put saddle on %s", "给%s装上鞍具"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
     }
     if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
-        Sprintf(buf, "Talk to %s", mon_nam(mtmp));
+        Sprintf(buf, TR("Talk to %s", "与%s交谈"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
 
-        Sprintf(buf, "Swap places with %s", mon_nam(mtmp));
+        Sprintf(buf, TR("Swap places with %s", "与%s交换位置"), mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
         Sprintf(buf, "%s %s",
@@ -5700,7 +5700,7 @@ there_cmd_menu_next2u(
 
     if ((mtmp && !(mtmp->mpeaceful || mtmp->mtame))
         || glyph_is_invisible(glyph_at(x, y))) {
-        Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
+        Sprintf(buf, TR("Attack %s", "攻击%s"), mtmp ? mon_nam(mtmp) : "unseen creature");
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;
@@ -6179,9 +6179,9 @@ get_count(
         if (cnt > 9 || backspaced || echoalways) {
             clear_nhwindow(WIN_MESSAGE);
             if (backspaced && !cnt && !showzero) {
-                Sprintf(qbuf, "Count: ");
+                Sprintf(qbuf, TR("Count: ", "计数："));
             } else {
-                Sprintf(qbuf, "Count: %ld", cnt);
+                Sprintf(qbuf, TR("Count: %ld", "计数：%ld"), cnt);
                 backspaced = FALSE;
             }
             #ifdef ZHLANG
@@ -6194,7 +6194,7 @@ get_count(
     }
 
     if (historicmsg || (conditionalmsg && *count != first)) {
-        Sprintf(qbuf, "Count: %ld ", *count);
+        Sprintf(qbuf, TR("Count: %ld ", "计数：%ld "), *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);
     }

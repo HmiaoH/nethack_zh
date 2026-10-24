@@ -373,13 +373,13 @@ check_wornmask_slots(void)
                 if (otmp == o)
                     break;
             if (!otmp)
-                Sprintf(whybuf, "%s (%s) not found in invent",
+                Sprintf(whybuf, TR("%s (%s) not found in invent", "在物品栏中找不到 %s（%s）"),
                         wp->w_what, fmt_ptr(o));
             else if ((o->owornmask & m) == 0L)
-                Sprintf(whybuf, "%s bit not set in owornmask [0x%08lx]",
+                Sprintf(whybuf, TR("%s bit not set in owornmask [0x%08lx]", "owornmask 中未设置 %s 位 [0x%08lx]"),
                         wp->w_what, o->owornmask);
             else if ((o->owornmask & ~(m | IGNORE_SLOTS)) != 0L)
-                Sprintf(whybuf, "%s wrong bit set in owornmask [0x%08lx]",
+                Sprintf(whybuf, TR("%s wrong bit set in owornmask [0x%08lx]", "owornmask 中设置了错误的 %s 位 [0x%08lx]"),
                         wp->w_what, o->owornmask);
             if (whybuf[0])
                 impossible("Worn-slot insanity: %s.", whybuf);
@@ -396,7 +396,7 @@ check_wornmask_slots(void)
                    W_ARM bit set if we didn't screen it out here */
                 && (m != W_ARM || otmp != uskin
                     || (otmp->owornmask & I_SPECIAL) == 0L)) {
-                Sprintf(whybuf, "%s [0x%08lx] has %s mask 0x%08lx bit set",
+                Sprintf(whybuf, TR("%s [0x%08lx] has %s mask 0x%08lx bit set", "%s [0x%08lx] 设置了 %s 掩码 0x%08lx 的位"),
                         simpleonames(otmp), otmp->owornmask, wp->w_what, m);
                 impossible("Worn-slot insanity: %s.", whybuf);
             }
@@ -414,19 +414,19 @@ check_wornmask_slots(void)
             if (otmp == o)
                 break;
         if (!otmp)
-            Sprintf(whybuf, "%s (%s) not found in invent",
+            Sprintf(whybuf, TR("%s (%s) not found in invent", "在物品栏中找不到 %s（%s）"),
                     what, fmt_ptr(o));
         else if ((o->owornmask & m) != m)
-            Sprintf(whybuf, "%s bits not set in owornmask [0x%08lx]",
+            Sprintf(whybuf, TR("%s bits not set in owornmask [0x%08lx]", "owornmask 中未设置 %s 位组合 [0x%08lx]"),
                     what, o->owornmask);
         else if ((o->owornmask & ~(m | IGNORE_SLOTS)) != 0L)
-            Sprintf(whybuf, "%s wrong bit set in owornmask [0x%08lx]",
+            Sprintf(whybuf, TR("%s wrong bit set in owornmask [0x%08lx]", "owornmask 中设置了错误的 %s 位 [0x%08lx]"),
                     what, o->owornmask);
         else if (!Is_dragon_scales(o))
-            Sprintf(whybuf, "%s (%s) %s not dragon scales",
+            Sprintf(whybuf, TR("%s (%s) %s not dragon scales", "%s（%s）%s 不是龙鳞"),
                     what, simpleonames(o), otense(o, "are"));
         else if (Dragon_scales_to_pm(o) != &mons[u.umonnum])
-            Sprintf(whybuf, "%s, hero is not %s",
+            Sprintf(whybuf, TR("%s, hero is not %s", "%s，主角不是%s"),
                     what, an(mons[u.umonnum].pmnames[NEUTRAL]));
         if (whybuf[0])
             impossible("Worn-slot insanity: %s.", whybuf);
@@ -439,7 +439,7 @@ check_wornmask_slots(void)
         const char *why = NULL;
 
         if (!uwep || !uswapwep) {
-            Sprintf(whybuf, "without %s%s%s",
+            Sprintf(whybuf, TR("without %s%s%s", "没有%s%s%s"),
                     !uwep ? "uwep" : "",
                     (!uwep && !uswapwep) ? " and without " : "",
                     !uswapwep ? "uswapwep" : "");
@@ -943,7 +943,7 @@ m_dowear_type(
                uses accessory verbs for armor but we can live with that */
             if (old) {
                 Strcpy(oldarm, distant_name(old, doname));
-                Snprintf(buf, sizeof buf, " removes %s and", oldarm);
+                Snprintf(buf, sizeof buf, TR(" removes %s and", " 取下了%s并"), oldarm);
             } else {
                 buf[0] = oldarm[0] = '\0';
             }
@@ -1478,7 +1478,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
 #else
             You("touch %s.", mon_nam(u.usteed));
 #endif
-            Sprintf(buf, "falling off %s",
+            Sprintf(buf, TR("falling off %s", "从%s上跌落"),
                     an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }

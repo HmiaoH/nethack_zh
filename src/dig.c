@@ -475,7 +475,7 @@ dig(void)
 #else
                 You("hit yourself in the %s.", body_part(FOOT));
 #endif
-                Sprintf(kbuf, "chopping off %s own %s", uhis(),
+                Sprintf(kbuf, TR("chopping off %s own %s", "砍掉了%s自己的%s"), uhis(),
                         body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
@@ -979,7 +979,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                         assign_level(&tolevel, &valley_level);
                     } else if (Is_botlevel(&u.uz)) {
                         if (canseemon(mtmp))
-                            pline("%s avoids the trap.", Monnam(mtmp));
+                            pline(TR("%s avoids the trap.", "%s避开了陷阱。"), Monnam(mtmp));
                         return;
                     } else {
                         get_level(&tolevel, depth(&u.uz) + 1);
@@ -1028,7 +1028,7 @@ liquid_flow(
     unearth_objs(x, y);
 
     if (fillmsg)
-        pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? TR("lava", "岩浆") : "water"));
     /* handle object damage before hero damage; affects potential bones */
     if ((objchain = svl.level.objects[x][y]) != 0) {
         if (typ == LAVAPOOL)
@@ -1121,7 +1121,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) != 0) {
         if (ttmp && is_pit(ttmp->ttyp)
             && rn2(2)) {
-            pline_The("boulder settles into the %spit.",
+            pline_The(TR("boulder settles into the %spit.", "巨石陷进了%s坑里。"),
                       (dig_x != u.ux || dig_y != u.uy) ? "adjacent " : "");
             ttmp->ttyp = PIT; /* crush spikes */
         } else {
@@ -1153,7 +1153,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              * We can't dig a hole here since that will destroy
              * the drawbridge.  The following is a cop-out. --dlc
              */
-            pline_The("%s %shere is too hard to dig in.",
+            pline_The(TR("%s %shere is too hard to dig in.", "%s%s处太硬了，挖不动。"),
                       surface(dig_x, dig_y),
                       (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
         } else {
@@ -1166,10 +1166,10 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
 
     /* the following two are here for the wand of digging */
     } else if (IS_THRONE(old_typ)) {
-        pline_The("throne is too hard to break apart.");
+        pline_The(TR("throne is too hard to break apart.", "王座太坚固了，无法打碎。"));
 
     } else if (IS_ALTAR(old_typ)) {
-        pline_The("altar is too hard to break apart.");
+        pline_The(TR("altar is too hard to break apart.", "祭坛太坚固了，无法打碎。"));
 
     } else {
         typ = fillholetyp(dig_x, dig_y, FALSE);
@@ -1425,7 +1425,7 @@ use_pick_axe2(struct obj *obj)
 #else
         You("hit yourself with %s.", yname(uwep));
 #endif
-        Sprintf(buf, "%s own %s", uhis(), OBJ_NAME(objects[obj->otyp]));
+        Sprintf(buf, TR("%s own %s", "%s自己的%s"), uhis(), OBJ_NAME(objects[obj->otyp]));
         losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
         disp.botl = TRUE;
         return ECMD_TIME;
@@ -1482,9 +1482,9 @@ pline("Clang!");
 #endif
                 wake_nearby(FALSE);
             } else if (IS_WATERWALL(lev->typ)) {
-                pline("Splash!");
+                pline(TR("Splash!", "哗啦！"));
             } else if (lev->typ == LAVAWALL) {
-                pline("Splash!");
+                pline(TR("Splash!", "哗啦！"));
                 (void) fire_damage(uwep, FALSE, rx, ry);
             } else if (IS_TREE(lev->typ)) {
                 #ifdef ZHLANG
@@ -1612,7 +1612,7 @@ You("%s %s.", svc.context.digging.chew ? "begin" : "continue",
         }
     } else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
         /* it must be air -- water checked above */
-        You("swing %s through thin air.", yobjnam(obj, (char *) 0));
+        You(TR("swing %s through thin air.", "你挥着%s在稀薄的空气里划了个空。"), yobjnam(obj, (char *) 0));
     } else if (!can_reach_floor(FALSE)) {
         cant_reach_floor(u.ux, u.uy, FALSE, FALSE, FALSE);
     } else if (is_pool_or_lava(u.ux, u.uy)) {
@@ -1851,7 +1851,7 @@ You_feel("an unexpected draft.");
             /* U.S. classification system uses 1-A for eligible to serve
                and 4-F for ineligible due to physical or mental defect;
                some intermediate values exist but are rarely seen */
-            You_feel("like you are %s.",
+            You_feel(TR("like you are %s.", "你觉得自己像%s。"),
                      (ACURR(A_STR) < 6 || ACURR(A_DEX) < 6
                       || ACURR(A_CON) < 6 || ACURR(A_CHA) < 6
                       || ACURR(A_INT) < 6 || ACURR(A_WIS) < 6) ? "4-F"
@@ -2575,7 +2575,7 @@ rot_corpse(anything *arg, long timeout)
         if (flags.verbose) {
             char *cname = corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
-            Your("%s%s %s away%c", obj == uwep ? "wielded " : "", cname,
+            Your(TR("%s%s %s away%c", "你的%s%s%s掉了%c"), obj == uwep ? "wielded " : "", cname,
                  otense(obj, "rot"), obj == uwep ? '!' : '.');
         }
         if (obj->owornmask) {
@@ -2613,11 +2613,11 @@ bury_monst(struct monst *mtmp)
     debugpline1("bury_monst: %s", mon_nam(mtmp));
     if (canseemon(mtmp)) {
         if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
-            pline_The("%s opens up, but %s is not swallowed!",
+            pline_The(TR("%s opens up, but %s is not swallowed!", "%s裂开了，但%s没有被吞下！"),
                       surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
             return;
         } else
-            pline_The("%s opens up and swallows %s!",
+            pline_The(TR("%s opens up and swallows %s!", "%s裂开，把%s吞了进去！"),
                       surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
     }
 
@@ -2632,9 +2632,9 @@ bury_you(void)
     debugpline0("bury_you");
     if (!Levitation && !Flying) {
         if (u.uswallow)
-            You_feel("a sensation like falling into a trap!");
+            You_feel(TR("a sensation like falling into a trap!", "你感觉像是掉进了陷阱！"));
         else
-            pline_The("%s opens beneath you and you fall in!",
+            pline_The(TR("%s opens beneath you and you fall in!", "%s在你脚下裂开，你掉了进去！"),
                       surface(u.ux, u.uy));
 
         u.uburied = TRUE;
@@ -2661,7 +2661,7 @@ escape_tomb(void)
     debugpline0("escape_tomb");
     if ((Teleportation || can_teleport(gy.youmonst.data))
         && (Teleport_control || rn2(3) < Luck+2)) {
-        You("attempt a teleport spell.");
+        You(TR("attempt a teleport spell.", "你尝试施放传送法术。"));
         (void) dotele(FALSE);        /* calls unearth_you() */
     } else if (u.uburied) { /* still buried after 'port attempt */
         boolean good;
@@ -2671,7 +2671,7 @@ escape_tomb(void)
             || (unsolid(gy.youmonst.data)
                 && gy.youmonst.data != &mons[PM_WATER_ELEMENTAL])
             || (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))) {
-            You("%s up through the %s.",
+            You(TR("%s up through the %s.", "你%s，向上穿过%s。"),
                 (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
                    ? "try to tunnel"
                    : (amorphous(gy.youmonst.data))
@@ -2693,7 +2693,7 @@ struct obj *otmp;
 {
     debugpline0("bury_obj");
     if (cansee(otmp->ox, otmp->oy))
-        pline_The("objects on the %s tumble into a hole!",
+        pline_The(TR("objects on the %s tumble into a hole!", "%s上的物品纷纷掉进了一个洞里！"),
                   surface(otmp->ox, otmp->oy));
 
     bury_objs(otmp->ox, otmp->oy);

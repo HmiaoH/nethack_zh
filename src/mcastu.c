@@ -446,10 +446,10 @@ death_inflicted_by(
            can't cast spells */
         if (!type_is_pname(champtr) && !the_unique_pm(mptr))
             realnm = an(realnm);
-        Sprintf(eos(outbuf), " inflicted by %s%s",
+        Sprintf(eos(outbuf), TR(" inflicted by %s%s", "，由%s%s造成"),
                 the_unique_pm(mptr) ? "the " : "", realnm);
         if (champtr != mptr)
-            Sprintf(eos(outbuf), " imitating %s", an(fakenm));
+            Sprintf(eos(outbuf), TR(" imitating %s", "，冒充%s"), an(fakenm));
     }
     return outbuf;
 }

@@ -702,7 +702,7 @@ getbones(void)
         if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];
 
-            Sprintf(errbuf, "This is bones level '%s', not '%s'!",
+            Sprintf(errbuf, TR("This is bones level '%s', not '%s'!", "这是骸骨关卡「%s」，而不是「%s」！"),
                     oldbonesid, bonesid);
             if (wizard) {
                 pline1(errbuf);
@@ -758,7 +758,7 @@ getbones(void)
          * So no point in a mysterious message for a normal event
          * -- just generate a new level for those N-1 games.
          */
-        /* pline("Cannot unlink bones."); */
+        /* pline(TR("Cannot unlink bones.", "无法解除骸骨文件的链接。")); */
         return 0;
     }
     return ok;

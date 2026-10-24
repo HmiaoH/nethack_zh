@@ -127,7 +127,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 #if 0 /* dead code; maybe someday someone will track down why... */
         if (ib) {
             if (cansee(mtmp->mx, mtmp->my))
-                pline("%s picks up %s.", Monnam(mtmp),
+                pline(TR("%s picks up %s.", "%s捡起了%s。"), Monnam(mtmp),
                       distant_name(ib, doname));
             obj_extract_self(ib);
             (void) mpickobj(mtmp, ib);
@@ -328,7 +328,7 @@ priestname(
         if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
             article = ARTICLE_THE;
         if (article == ARTICLE_THE) {
-            Strcpy(pname, "the ");
+            Strcpy(pname, TR("the ", "这个 "));
         } else if (!strcmp(what, "Angel")) {
             /* bypass just_an(); it would yield "" due to treating capital A
                as indicating a personal name */
@@ -342,21 +342,21 @@ priestname(
         /* avoid "a invisible priest" */
         if (!strcmp(pname, "a "))
             Strcpy(pname, "an ");
-        Strcat(pname, "invisible ");
+        Strcat(pname, TR("invisible ", "隐形的"));
     }
     if (mon->isminion && EMIN(mon)->renegade) {
         /* avoid "an renegade Angel" */
         if (!strcmp(pname, "an ") && !mon->minvis)
             Strcpy(pname, "a ");
-        Strcat(pname, "renegade ");
+        Strcat(pname, TR("renegade ", "叛逃的"));
     }
 
     if (mon->ispriest || aligned_priest) {
         if (high_priest)
-            Strcat(pname, do_hallu ? "grand " : "high ");
+            Strcat(pname, do_hallu ? TR("grand ", "大") : "high ");
     } else {
         if (mon->mtame && !strcmpi(what, "Angel"))
-            Strcat(pname, "guardian ");
+            Strcat(pname, TR("guardian ", "守护"));
     }
 
     Strcat(pname, what);
@@ -468,7 +468,7 @@ intemple(int roomno)
                 msg1 = "You desecrate this place by your presence!";
             }
         } else if (svm.moves >= epri_p->enter_time) {
-            Sprintf(buf, "Pilgrim, you enter a %s place!",
+            Sprintf(buf, TR("Pilgrim, you enter a %s place!", "朝圣者，你进入了一处%s之地！"),
                     !shrined ? "desecrated" : "sacred");
             msg1 = buf;
         }
@@ -704,7 +704,7 @@ priest_talk(struct monst *priest)
         if (quan < 1)
             quan = 1;
 
-        Sprintf(buf, "How much will you offer (suggested: %ld or %ld)?",
+        Sprintf(buf, TR("How much will you offer (suggested: %ld or %ld)?", "你要献上多少（建议：%ld 或 %ld）？"),
                 suggested * quan, suggested * quan * 2);
 
         if (flags.debug)

@@ -164,7 +164,7 @@ dosave0(void)
     dotrow = 2;
     curs(WIN_MAP, 1, 1);
     if (!WINDOWPORT(X11))
-        putstr(WIN_MAP, 0, "Saving:");
+        putstr(WIN_MAP, 0, TR("Saving:", "正在保存："));
 #endif
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);
@@ -427,7 +427,7 @@ savestateinlock(void)
 
         Sfi_int(nhfp, &hpid, "gamestate-hackpid");
         if (svh.hackpid != hpid) {
-            Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
+            Sprintf(whynot, TR("Level #0 pid (%d) doesn't match ours (%d)!", "第 0 层 pid（%d）与我们（%d）不符！"),
                     hpid, svh.hackpid);
             goto giveup;
         }

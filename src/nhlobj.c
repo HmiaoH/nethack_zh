@@ -199,11 +199,26 @@ l_obj_objects_to_table(lua_State *L)
 
     lua_newtable(L);
 
+#ifdef ZHLANG
+    /* The Lua interface hands out English identifiers: scripts look
+       objects up by name.  Chinese display names are extra fields. */
+    if (obj_descr[o->oc_name_idx].oc_name)
+        nhl_add_table_entry_str(L, "name",
+                                obj_descr[o->oc_name_idx].oc_name);
+    if (obj_descr[o->oc_descr_idx].oc_descr)
+        nhl_add_table_entry_str(L, "descr",
+                                obj_descr[o->oc_descr_idx].oc_descr);
+    if (OBJ_NAME(*o))
+        nhl_add_table_entry_str(L, "name_zh", OBJ_NAME(*o));
+    if (OBJ_DESCR(*o))
+        nhl_add_table_entry_str(L, "descr_zh", OBJ_DESCR(*o));
+#else
     if (OBJ_NAME(objects[otyp]))
         nhl_add_table_entry_str(L, "name", OBJ_NAME(objects[otyp]));
     if (OBJ_DESCR(objects[otyp]))
         nhl_add_table_entry_str(L, "descr",
                                 OBJ_DESCR(objects[otyp]));
+#endif
     if (o->oc_uname)
         nhl_add_table_entry_str(L, "uname", o->oc_uname);
 
@@ -262,11 +277,29 @@ l_obj_to_table(lua_State *L)
     nhl_add_table_entry_int(L, "ox", obj->ox);
     nhl_add_table_entry_int(L, "oy", obj->oy);
     nhl_add_table_entry_int(L, "otyp", obj->otyp);
-    if (OBJ_NAME(objects[obj->otyp]))
-        nhl_add_table_entry_str(L, "otyp_name", OBJ_NAME(objects[obj->otyp]));
-    if (OBJ_DESCR(objects[obj->otyp]))
-        nhl_add_table_entry_str(L, "otyp_descr",
-                                OBJ_DESCR(objects[obj->otyp]));
+    if (obj->otyp >= 0 && obj->otyp < NUM_OBJECTS) {
+        struct objclass *oc = &objects[obj->otyp];
+
+#ifdef ZHLANG
+        /* English identifiers for the Lua interface; Chinese as extra
+           display fields (same reasoning as objects_to_table). */
+        if (obj_descr[oc->oc_name_idx].oc_name)
+            nhl_add_table_entry_str(L, "otyp_name",
+                                    obj_descr[oc->oc_name_idx].oc_name);
+        if (obj_descr[oc->oc_descr_idx].oc_descr)
+            nhl_add_table_entry_str(L, "otyp_descr",
+                                    obj_descr[oc->oc_descr_idx].oc_descr);
+        if (OBJ_NAME(*oc))
+            nhl_add_table_entry_str(L, "otyp_name_zh", OBJ_NAME(*oc));
+        if (OBJ_DESCR(*oc))
+            nhl_add_table_entry_str(L, "otyp_descr_zh", OBJ_DESCR(*oc));
+#else
+        if (OBJ_NAME(*oc))
+            nhl_add_table_entry_str(L, "otyp_name", OBJ_NAME(*oc));
+        if (OBJ_DESCR(*oc))
+            nhl_add_table_entry_str(L, "otyp_descr", OBJ_DESCR(*oc));
+#endif
+    }
     nhl_add_table_entry_int(L, "owt", obj->owt);
     nhl_add_table_entry_int(L, "quan", obj->quan);
     nhl_add_table_entry_int(L, "spe", obj->spe);

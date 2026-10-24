@@ -117,12 +117,14 @@ new_were(struct monst *mon)
     if (canseemon(mon) && !Hallucination)
 #ifdef ZHLANG
         pline("%s 变成了 %s。", Monnam(mon),
+              is_human(&mons[pm]) ? "人类"
+                                  : pmname(&mons[pm], Mgender(mon)));
 #else
         pline("%s changes into a %s.", Monnam(mon),
-#endif
               is_human(&mons[pm]) ? "human"
                                   /* pmname()+4: skip past "were" prefix */
                                   : pmname(&mons[pm], Mgender(mon)) + 4);
+#endif
 
     set_mon_data(mon, &mons[pm]);
     if (helpless(mon)) {
@@ -167,19 +169,19 @@ were_summon(
             typ = rn2(3) ? PM_SEWER_RAT
                          : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
             if (genbuf)
-                Strcpy(genbuf, "rat");
+                Strcpy(genbuf, TR("rat", "鼠"));
             break;
         case PM_WEREJACKAL:
         case PM_HUMAN_WEREJACKAL:
             typ = rn2(7) ? PM_JACKAL : rn2(3) ? PM_COYOTE : PM_FOX;
             if (genbuf)
-                Strcpy(genbuf, "jackal");
+                Strcpy(genbuf, TR("jackal", "胡狼"));
             break;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
             typ = rn2(5) ? PM_WOLF : rn2(2) ? PM_WARG : PM_WINTER_WOLF;
             if (genbuf)
-                Strcpy(genbuf, "wolf");
+                Strcpy(genbuf, TR("wolf", "狼"));
             break;
         default:
             continue;
@@ -206,7 +208,7 @@ you_were(void)
         return;
     if (controllable_poly) {
         /* `+4' => skip "were" prefix to get name of beast */
-        Sprintf(qbuf, "Do you want to change into %s?",
+        Sprintf(qbuf, TR("Do you want to change into %s?", "要变成%s吗？"),
                 an(mons[u.ulycn].pmnames[NEUTRAL] + 4));
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;

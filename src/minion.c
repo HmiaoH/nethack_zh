@@ -343,8 +343,7 @@ demon_talk(struct monst *mtmp)
 #endif
         else if (canseemon(mtmp))
 #ifdef ZHLANG
-            pline("%s说了些什么。", Amonnam(mtmp),
-                  says());
+            pline("%s%s。", Amonnam(mtmp), "说了些什么");
 #else
             pline("%s %s something.", Amonnam(mtmp),
                   says());
@@ -420,7 +419,7 @@ demon_talk(struct monst *mtmp)
     /* if 'mtmp' is unrecognizable due to hero's hallucination,
        #chronicle will reveal its true identity -- just live with that;
        also, avoid random hallucinatory currency() units */
-    livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+    livelog_printf(LL_UMONST, TR("bribed %s with %ld %s for safe passage", "贿赂%s，给了 %ld %s 以求安全通行"),
                    x_monnam(mtmp, ARTICLE_A, (char *) 0, EXACT_NAME, FALSE),
                    offer, (offer == 1L) ? "zorkmid" : "zorkmids");
     mongone(mtmp);

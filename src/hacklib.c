@@ -340,6 +340,22 @@ strcasecpy(char *dst, const char *src)
     return result;
 }
 
+#ifdef ZHLANG
+/* Is 'str' non-empty and does it contain a byte outside 7-bit ASCII?
+   Chinese is stored as UTF-8, whose bytes never occur in English text, so
+   this is how the grammar helpers detect names they must leave alone. */
+boolean
+zh_nonascii(const char *str)
+{
+    if (!str)
+        return FALSE;
+    for (; *str; ++str)
+        if ((unsigned char) *str & 0x80)
+            return TRUE;
+    return FALSE;
+}
+#endif /* ZHLANG */
+
 /* return a name converted to possessive */
 char *
 s_suffix(const char *s)
@@ -347,6 +363,16 @@ s_suffix(const char *s)
     static char buf[BUFSZ];
 
     Strcpy(buf, s);
+#ifdef ZHLANG
+    /* Chinese possessive is "的" after the noun, not "'s" (B1) */
+    if (zh_nonascii(s)) {
+        /* plain strlen(): hacklib.c gets linked into util programs that
+           don't include strutil.o, where Strlen_() lives */
+        if (strlen(buf) + 3 < BUFSZ)
+            Strcat(buf, "的");
+        return buf;
+    }
+#endif
     if (!strcmpi(buf, "it")) /* it -> its */
         Strcat(buf, "s");
     else if (!strcmpi(buf, "you")) /* you -> your */
@@ -368,6 +394,11 @@ ing_suffix(const char *s)
     char *p;
 
     Strcpy(buf, s);
+#ifdef ZHLANG
+    /* Chinese verbs don't get an English "ing" suffix (B2) */
+    if (zh_nonascii(s))
+        return buf;
+#endif
     p = eos(buf);
     onoff[0] = *p = *(p + 1) = '\0';
     if ((p >= &buf[3] && !strcmpi(p - 3, " on"))
@@ -389,7 +420,7 @@ ing_suffix(const char *s)
         *(p - 1) = '\0';
     } else if (p >= &buf[1] && *(p - 1) == 'e') /* grease -> greas + ing */
         *(p - 1) = '\0';
-    Strcat(buf, "ing");
+    Strcat(buf, "ing"); /* NOTRANS */
     if (onoff[0])
         Strcat(buf, onoff);
     return buf;

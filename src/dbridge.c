@@ -362,7 +362,7 @@ E_phrase(struct entity *etmp, const char *verb)
 {
     static char wholebuf[80];
 
-    Strcpy(wholebuf, is_u(etmp) ? "You" : Monnam(etmp->emon));
+    Strcpy(wholebuf, is_u(etmp) ? TR("You", "你") : Monnam(etmp->emon));
     if (!verb || !*verb)
         return wholebuf;
     Strcat(wholebuf, " ");
@@ -416,7 +416,7 @@ e_died(
             /* use more specific killer if specified */
             if (!svk.killer.name[0]) {
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "falling drawbridge");
+                Strcpy(svk.killer.name, TR("falling drawbridge", "落下的吊桥"));
             }
             done(how);
             /* So, you didn't die */
@@ -466,7 +466,7 @@ e_died(
             if (DEADMONSTER(etmp->emon)) {
                 if (seeit)
 #ifdef ZHLANG
-                    pline("不幸的是，%s仍然被压扁了。",
+                    pline("%s很不幸，%s仍然被压扁了。",
                           mon_nam(etmp->emon), mhe(etmp->emon));
 #else
                     pline("Unfortunately for %s, %s is still crushed.",
@@ -766,7 +766,7 @@ do_entity(struct entity *etmp)
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "closing drawbridge");
+            Strcpy(svk.killer.name, TR("closing drawbridge", "闭合的吊桥"));
             e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
@@ -817,7 +817,7 @@ do_entity(struct entity *etmp)
 #endif
             }
         svk.killer.format = NO_KILLER_PREFIX;
-        Strcpy(svk.killer.name, "fell from a drawbridge");
+        Strcpy(svk.killer.name, TR("fell from a drawbridge", "从吊桥上摔落"));
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -1097,7 +1097,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                       E_phrase(etmp2, "are"));
 #endif
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "exploding drawbridge");
+            Strcpy(svk.killer.name, TR("exploding drawbridge", "爆炸的吊桥"));
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -1144,7 +1144,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 }
             }
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "collapsing drawbridge");
+            Strcpy(svk.killer.name, TR("collapsing drawbridge", "坍塌的吊桥"));
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

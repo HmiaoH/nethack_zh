@@ -327,6 +327,9 @@ struct instance_globals_d {
 
     /* end.c */
     long done_seq; /* for counting deaths occurring on same hero_seq */
+    boolean done_dying; /* a death message is about to be shown; used by the
+                         * tty top line so that it does not have to recognize
+                         * the (possibly translated) message text */
 
     /* mon.c */
     boolean disintegested;

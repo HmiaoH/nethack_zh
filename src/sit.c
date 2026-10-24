@@ -58,7 +58,7 @@ throne_sit_effect(void)
             int which;
 
             buf[0] = '\0';
-            getlin("Throne sit effect (1..13) [0=random]", buf);
+            getlin(TR("Throne sit effect (1..13) [0=random]", "王座入座效果（1..13）［0=随机］"), buf);
             if (buf[0] == '\033') {
                 pline("%s", Never_mind);
                 return; /* caller will still cause a move to elapse */
@@ -814,7 +814,7 @@ dosit(void)
 #endif
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
-        You(sit_message, hliquid("lava"));
+        You(sit_message, hliquid(TR("lava", "岩浆")));
         burn_away_slime();
         if (likes_lava(gy.youmonst.data)) {
     #ifdef ZHLANG

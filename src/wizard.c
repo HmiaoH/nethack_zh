@@ -930,7 +930,7 @@ cuss(struct monst *mtmp)
         }
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
-        com_pager("angel_cuss"); /* TODO: the Hallucination msg */
+        com_pager("angel_cuss"); /* TODO: the Hallucination msg */ /* NOTRANS */
         /*com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
           + QT_ANGELIC);*/
     } else {
@@ -941,7 +941,7 @@ cuss(struct monst *mtmp)
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
 #endif
         else
-            com_pager("demon_cuss");
+            com_pager("demon_cuss"); /* NOTRANS */
     }
     wake_nearto(mtmp->mx, mtmp->my, 5 * 5);
 }
