@@ -2542,8 +2542,8 @@ arti_invoke(struct obj *obj)
             newsym(u.ux, u.uy);
             if (on)
 #ifdef ZHLANG
-                Your(TR("body takes on a %s transparency...", "身体呈现出%s的透明感……"),
-                     Hallucination ? "normal" : "strange"); /* NOTRANS */
+                Your("身体呈现出%s的透明感……",
+                     Hallucination ? "正常" : "奇异");
 #else
                 Your("body takes on a %s transparency...",
                      Hallucination ? "normal" : "strange");

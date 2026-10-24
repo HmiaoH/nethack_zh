@@ -1005,8 +1005,8 @@ nh_timeout(void)
 #endif
                     else
 #ifdef ZHLANG
-                        pline(TR("You're back to your %s self again.", "你又恢复成%s的自己了。"),
-                              !Upolyd ? "normal" : "unusual"); /* NOTRANS */
+                        pline("你又恢复成%s的自己了。",
+                              !Upolyd ? "正常" : "不寻常");
 #else
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");

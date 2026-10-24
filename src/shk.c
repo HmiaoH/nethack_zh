@@ -2436,7 +2436,8 @@ dopayobj(
         Sprintf(qsfx, TR(" for %ld %s.  Pay?", " 要%ld%s。付款吗？"), ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
-                         (quan == 1L) ? "that" : "those");
+                         (quan == 1L) ? TR("that", "那个")
+                                      : TR("those", "那些"));
         if (y_n(qbuf) == 'n') {
             buy = PAY_SKIP;                         /* don't want to buy */
         }
@@ -4258,8 +4259,10 @@ sellobj(
             Sprintf(qbuf, TR("Will you accept %ld %s in credit for ", "你愿意接受%ld%s的赊账作为"), tmpcr,
                     currency(tmpcr));
             record_price_quote(obj->otyp, tmpcr / obj->quan, FALSE);
-            c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
-                               (obj->quan == 1L) ? "that" : "those"));
+            c = ynaq(safe_qbuf(qbuf, qbuf, TR("?", "？"), obj, doname,
+                               thesimpleoname,
+                               (obj->quan == 1L) ? TR("that", "那个")
+                                                 : TR("those", "那些")));
             if (c == 'a') {
                 c = 'y';
                 ga.auto_credit = TRUE;
@@ -4355,7 +4358,8 @@ sellobj(
                     one ? "it" : TR("them", "它们"));
             record_price_quote(obj->otyp, offer / obj->quan, FALSE);
             (void) safe_qbuf(qbuf, qbuf, qsfx, obj, xname, simpleonames,
-                             one ? "that" : "those");
+                             one ? TR("that", "那个")
+                                 : TR("those", "那些"));
         } else
             qbuf[0] = '\0'; /* just to pacify lint */
 

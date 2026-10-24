@@ -2543,9 +2543,10 @@ doseduce(struct monst *mon)
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
-                                 " looks pretty.  May I have it?\"", ring,
-                                 xname, simpleonames, "ring");
+                (void) safe_qbuf(qbuf, TR("\"That ", "「那个"),
+                                 TR(" looks pretty.  May I have it?\"",
+                                    "看起来很漂亮。可以给我吗？」"), ring,
+                                 xname, simpleonames, TR("ring", "戒指"));
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
@@ -2579,9 +2580,11 @@ doseduce(struct monst *mon)
             }
             /* confirmation prompt when charisma is high bypassed if deaf */
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(qbuf, "\"That ",
-                                " looks pretty.  Would you wear it for me?\"",
-                                 ring, xname, simpleonames, "ring");
+                (void) safe_qbuf(qbuf, TR("\"That ", "「那个"),
+                                 TR(" looks pretty.  Would you wear it for me?\"",
+                                    "看起来很漂亮。你愿意为我戴上吗？」"),
+                                 ring, xname, simpleonames,
+                                 TR("ring", "戒指"));
                 makeknown(RIN_ADORNMENT);
                 SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')

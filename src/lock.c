@@ -621,8 +621,9 @@ pick_lock(
                     /* "There is <a box> here; <verb> <it|its lock>?" */
                     Sprintf(qsfx, TR(" here; %s %s?", "；要%s%s吗？"),
                             verb, it ? "it" : TR("its lock", "它的锁"));
-                    (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
-                                     ansimpleoname, "a box");
+                    (void) safe_qbuf(qbuf, TR("There is ", "这里有"), qsfx,
+                                     otmp, doname, ansimpleoname,
+                                     TR("a box", "一个箱子"));
                     otmp->lknown = 1;
 
                     c = ynq(qbuf);
@@ -929,8 +930,10 @@ doforce(void)
                 otmp->lknown = 1;
                 continue;
             }
-            (void) safe_qbuf(qbuf, "There is ", " here; force its lock?",
-                             otmp, doname, ansimpleoname, "a box");
+            (void) safe_qbuf(qbuf, TR("There is ", "这里有"),
+                             TR(" here; force its lock?", "这里；要强行撬锁吗？"),
+                             otmp, doname, ansimpleoname,
+                             TR("a box", "一个箱子"));
             otmp->lknown = 1;
 
             c = ynq(qbuf);

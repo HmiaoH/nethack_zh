@@ -2592,9 +2592,9 @@ use_misc(struct monst *mtmp)
         if (vismon && mtmp->minvis) { /* was seen, now invisible */
             if (canspotmon(mtmp)) {
                 #ifdef ZHLANG
-                pline(TR("%s body takes on a %s transparency.", "%s身体呈现出%s的透明感。"),
+                pline("%s身体呈现出%s的透明感。",
                       upstart(s_suffix(nambuf)),
-                      Hallucination ? "normal" : "strange"); /* NOTRANS */
+                      Hallucination ? "正常" : "奇异");
                 #else
                 pline("%s body takes on a %s transparency.",
                       upstart(s_suffix(nambuf)),

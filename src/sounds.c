@@ -1418,7 +1418,7 @@ dochat(void)
 
     if (u.dz) {
         #ifdef ZHLANG
-        pline(TR("They won't hear you %s there.", "%s边的人听不到你。"), u.dz < 0 ? "up" : "down"); /* NOTRANS */
+        pline("%s边的人听不到你。", u.dz < 0 ? "上" : "下");
         #else
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
         #endif
@@ -1605,7 +1605,7 @@ tiphat(void)
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
             #ifdef ZHLANG
-            pline(TR("There's no one %s there.", "%s边没有人。"), (u.dz < 0) ? "up" : "down"); /* NOTRANS */
+            pline("%s边没有人。", (u.dz < 0) ? "上" : "下");
             #else
             pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
             #endif

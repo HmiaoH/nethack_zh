@@ -279,7 +279,9 @@ make_vomiting(long xtime, boolean talk)
             You_feel(TR("much less nauseated now.", "现在不那么恶心了。"));
 }
 
+#ifndef ZHLANG
 static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
+#endif
 static const char eyemsg[] = "%s momentarily %s.";
 
 void
@@ -325,7 +327,14 @@ You("can see again.");
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("itch", "发痒")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, TR("brighten", "变亮"), Hallucination ? "sadder" : "normal"); /* NOTRANS */
+#ifdef ZHLANG
+                Your("视力似乎%s了一瞬间，但现在又%s了。",
+                     TR("brighten", "变亮"),
+                     Hallucination ? "更黯淡" : "正常");
+#else
+                Your(vismsg, TR("brighten", "变亮"),
+                     Hallucination ? "sadder" : "normal");
+#endif
             }
         }
     }
@@ -359,7 +368,14 @@ pline("A cloud of darkness falls upon you.");
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("twitch", "抽动")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, TR("dim", "变暗"), Hallucination ? "happier" : "normal"); /* NOTRANS */
+#ifdef ZHLANG
+                Your("视力似乎%s了一瞬间，但现在又%s了。",
+                     TR("dim", "变暗"),
+                     Hallucination ? "更明亮" : "正常");
+#else
+                Your(vismsg, TR("dim", "变暗"),
+                     Hallucination ? "happier" : "normal");
+#endif
             }
         }
     }
@@ -447,7 +463,12 @@ make_hallucinated(
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("itch", "发痒")));
             } else { /* Grayswandir */
-                Your(vismsg, TR("flatten", "变平"), "normal"); /* NOTRANS */
+#ifdef ZHLANG
+                Your("视力似乎%s了一瞬间，但现在又%s了。",
+                     TR("flatten", "变平"), "正常");
+#else
+                Your(vismsg, TR("flatten", "变平"), "normal");
+#endif
             }
         }
     }
@@ -690,7 +711,7 @@ dopotion(struct obj *otmp)
         gp.potion_unkn++;
         #ifdef ZHLANG
 You("有一瞬间%s的感觉，然后它消失了。",
-            Hallucination ? "normal" : "peculiar"); /* NOTRANS */
+            Hallucination ? "正常" : "奇异");
 #else
 You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "peculiar");
@@ -1589,7 +1610,7 @@ staticfn void
 peffect_polymorph(struct obj *otmp)
 {
     #ifdef ZHLANG
-You_feel("有点%s。", Hallucination ? "normal" : "strange"); /* NOTRANS */
+You_feel("有点%s。", Hallucination ? "正常" : "奇异");
 #else
 You_feel("a little %s.", Hallucination ? "normal" : "strange");
 #endif
@@ -1738,7 +1759,7 @@ strange_feeling(struct obj *obj, const char *txt)
     if (flags.beginner || !txt)
         #ifdef ZHLANG
 You("有一瞬间%s的感觉，然后它消失了。",
-            Hallucination ? "normal" : "strange"); /* NOTRANS */
+            Hallucination ? "正常" : "奇异");
 #else
 You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "strange");
@@ -1976,7 +1997,7 @@ pline("%s.", Tobjnam(obj, "evaporate"));
             break;
         case POT_POLYMORPH:
             #ifdef ZHLANG
-You_feel("有点%s。", Hallucination ? "normal" : "strange"); /* NOTRANS */
+You_feel("有点%s。", Hallucination ? "正常" : "奇异");
 #else
 You_feel("a little %s.", Hallucination ? "normal" : "strange");
 #endif

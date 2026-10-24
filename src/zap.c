@@ -3585,10 +3585,16 @@ pline("A trapdoor appears beneath you.");
                 if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
                     pline1(nothing_happens);
                 else
-                    pline(TR("Blood %ss %s your %s.", "血%ss，%s你的%s。"),
-                          is_lava(u.ux, u.uy) ? "boil" : "pool", /* NOTRANS */
-                          Levitation ? TR("beneath", "下方") : "at",
+#ifdef ZHLANG
+                    pline("血在你的%s%s。",
+                          Levitation ? "下方" : "双脚旁",
+                          is_lava(u.ux, u.uy) ? "沸腾" : "汇聚");
+#else
+                    pline("Blood %ss %s your %s.",
+                          is_lava(u.ux, u.uy) ? "boil" : "pool",
+                          Levitation ? "beneath" : "at",
                           makeplural(body_part(FOOT)));
+#endif
             }
         }
         break;
@@ -5143,7 +5149,7 @@ dobuzz(
                             hit(flash_str(fltyp, FALSE), mon, ".");
                             pline(TR("%s absorbs the deadly %s!", "%s吸收了致命的%s！"), Monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? TR("blast", "冲击波")
-                                                              : "ray"); /* NOTRANS */
+                                                              : TR("ray", "射线"));
                             pline(TR("It seems even stronger than before.", "它似乎比之前更强了。"));
                         }
                         break; /* Out of while loop */
@@ -6627,11 +6633,19 @@ makewish(void)
     Snprintf(wish, sizeof wish, TR("\"%s\", got \"%s\"", "「%s」，得到了「%s」"), bufcpy, doname(otmp));
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
+#ifdef ZHLANG
         livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       TR("made %s first wish - %s", "%s的首次许愿——%s"), uhis(), wish);
+                       "首次许愿——%s", wish);
     else if (!oldwisharti && u.uconduct.wisharti)
         livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       TR("made %s first artifact wish - %s", "%s的首次神器许愿——%s"), uhis(), wish);
+                       "首次神器许愿——%s", wish);
+#else
+        livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
+                       "made %s first wish - %s", uhis(), wish);
+    else if (!oldwisharti && u.uconduct.wisharti)
+        livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
+                       "made %s first artifact wish - %s", uhis(), wish);
+#endif
     else
         livelog_printf((LL_WISH | maybe_LL_arti), TR("wished for %s", "许愿得到了%s"), wish);
     /* TODO? maybe generate a second event describing what was received since

@@ -823,7 +823,8 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
-            Strcpy(buf, (next2u(x, y)) ? TR("land", "陆地") : "unknown"); /* NOTRANS */
+            Strcpy(buf, (next2u(x, y)) ? TR("land", "陆地")
+                                       : TR("unknown", "未知"));
         } else {
             Strcpy(buf, TR("unexplored area", "未探索区域"));
         }
@@ -875,7 +876,8 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             } else if (Underwater && !Is_waterlevel(&u.uz)) {
                 /* "unknown" == previously mapped but not visible when
                    submerged; better terminology appreciated... */
-                Strcpy(buf, (next2u(x, y)) ? TR("land", "陆地") : "unknown"); /* NOTRANS */
+                Strcpy(buf, (next2u(x, y)) ? TR("land", "陆地")
+                                           : TR("unknown", "未知"));
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
                 Strcpy(buf, TR("stone", "石头"));

@@ -642,7 +642,8 @@ study_book(struct obj *spellbook)
                              spellbook->o_id)) {
                 if (!u.uconduct.literate++)
                     livelog_printf(LL_CONDUCT,
-                                   "became literate by reading %s", /* NOTRANS */
+                                   TR("became literate by reading %s",
+                                      "通过阅读%s学会了识字"),
                                    tribtitle);
 
                 check_unpaid(spellbook);

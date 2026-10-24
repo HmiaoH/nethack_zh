@@ -881,8 +881,8 @@ There("are %s objects here.", (ct <= 10) ? "several" : "many");
             if (!all_of_a_type) {
                 char qbuf[BUFSZ];
 
-                (void) safe_qbuf(qbuf, "Pick up ", "?", obj, doname,
-                                 ansimpleoname, something);
+                (void) safe_qbuf(qbuf, TR("Pick up ", "拾起"), TR("?", "？"),
+                                 obj, doname, ansimpleoname, something);
                 switch ((obj->quan < 2L) ? ynaq(qbuf) : ynNaq(qbuf)) {
                 case 'q':
                     goto end_query; /* out 2 levels */
@@ -1834,8 +1834,8 @@ You("are carrying too much stuff to pick up %s %s.",
                           : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
                             : slightloadpfx,
                         !container ? TR("lifting", "抬起") : TR("removing", "取下"));
-                (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
-                                 ansimpleoname, something);
+                (void) safe_qbuf(qbuf, qbuf, TR(".  Continue?", "。继续吗？"),
+                                 obj, doname, ansimpleoname, something);
                 obj->quan = savequan;
                 switch (ynq(qbuf)) {
                 case 'q':
@@ -3324,12 +3324,15 @@ use_container(
     for (;;) { /* repeats iff '?' or ':' gets chosen */
         outmaybe = (outokay || !gc.current_container->cknown);
         if (!outmaybe)
-            (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
+            (void) safe_qbuf(qbuf, (char *) 0,
+                             TR(" is empty.  Do what with it?",
+                                "是空的。要拿它怎么办？"),
                              gc.current_container, Yname2, Ysimple_name2,
-                             "This");
+                             TR("This", "这个"));
         else
-            (void) safe_qbuf(qbuf, "Do what with ", "?", gc.current_container,
-                             yname, ysimple_name, "it");
+            (void) safe_qbuf(qbuf, TR("Do what with ", "要对"),
+                             TR("?", "做什么？"), gc.current_container,
+                             yname, ysimple_name, TR("it", "它"));
         /* ask player about what to do with this container */
         if (flags.menu_style == MENU_PARTIAL
             || flags.menu_style == MENU_FULL) {

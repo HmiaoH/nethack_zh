@@ -3518,8 +3518,8 @@ optfn_pettype(
         Sprintf(opts, "%s", (gp.preferred_pet == 'c') ? TR("cat", "猫")
                            : (gp.preferred_pet == 'd') ? TR("dog", "狗")
                              : (gp.preferred_pet == 'h') ? TR("horse", "马")
-                               : (gp.preferred_pet == 'n') ? "none" /* NOTRANS */
-                                 : "random"); /* NOTRANS */
+                               : (gp.preferred_pet == 'n') ? TR("none", "无")
+                                 : TR("random", "随机"));
         return optn_ok;
     }
     if (req == get_cnf_val) {
@@ -5076,10 +5076,19 @@ optfn_whatis_filter(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
+#ifdef ZHLANG
+        if (req == get_cnf_val) { /* config value stays an English token */
+            Sprintf(opts, "%s",
+                    (iflags.getloc_filter == GFILTER_VIEW) ? "view"
+                    : (iflags.getloc_filter == GFILTER_AREA) ? "area"
+                    : "none"); /* NOTRANS */
+            return optn_ok;
+        }
+#endif
         Sprintf(opts, "%s",
-                (iflags.getloc_filter == GFILTER_VIEW) ? "view" /* NOTRANS */
+                (iflags.getloc_filter == GFILTER_VIEW) ? TR("view", "视野")
                 : (iflags.getloc_filter == GFILTER_AREA) ? TR("area", "区域")
-                : "none"); /* NOTRANS */
+                : TR("none", "无"));
         return optn_ok;
     }
     if (req == do_handler) {
@@ -5882,7 +5891,7 @@ handler_menustyle(void)
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
 #ifdef ZHLANG
-        pline(TR("'menustyle'%s\"%s\"。", TR("'menustyle'%s“%s”。", "'menustyle'%s为「%s」。")), chngd ? "已改为" : "仍为",
+        pline("'menustyle'%s为「%s」。", chngd ? "已改为" : "仍为",
               menutype[(int) flags.menu_style][0]);
 #else
         pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
@@ -6210,7 +6219,7 @@ handler_msg_window(void)
             }
 #endif
 #ifdef ZHLANG
-            pline(TR("'msg_window'%.20s\"%.20s\"。", TR("'msg_window'%.20s“%.20s”。", "'msg_window'%.20s为「%.20s」。")),
+            pline("'msg_window'%.20s为「%.20s」。",
                   chngd ? "已改为" : "仍为", buf);
 #else
             pline("'msg_window' %.20s \"%.20s\".",

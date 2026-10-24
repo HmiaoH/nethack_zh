@@ -732,8 +732,9 @@ docall(struct obj *obj)
         Sprintf(qbuf, TR("Call a stream of %s fluid:", "把这股%s流体称作："),
                 OBJ_DESCR(objects[obj->otyp]));
     else
-        (void) safe_qbuf(qbuf, "Call ", ":", obj,
-                         docall_xname, simpleonames, "thing");
+        (void) safe_qbuf(qbuf, TR("Call ", "把"), TR(":", "："), obj,
+                         docall_xname, simpleonames,
+                         TR("thing", "东西"));
     /* pointer to old name */
     uname_p = &(objects[obj->otyp].oc_uname);
     /* use getlin() to get a name string from the player */

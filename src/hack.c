@@ -2354,7 +2354,7 @@ domove_fight_empty(coordxy x, coordxy y)
             Sprintf(buf, "%s",
                     (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
                          ? TR("an air bubble", "一个空气泡")
-                         : "nothing"); /* NOTRANS */
+                         : TR("nothing", "空无一物"));
         } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is;

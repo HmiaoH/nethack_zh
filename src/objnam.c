@@ -927,8 +927,10 @@ xname_flags(
         } else if (un) {
             xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (ocl->oc_magic) {
-            Strcat(buf, " 标签为");
+            Strcpy(buf, "标签为");
             Strcat(buf, dn);
+            Strcat(buf, "的卷轴");
+            break;
         } else {
             Strcpy(buf, dn);
             Strcat(buf, " 卷轴");

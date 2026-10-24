@@ -2445,8 +2445,13 @@ eataccessory(struct obj *otmp)
                 if (!oldprop && !EInvis && !BInvis && !See_invisible
                     && !Blind) {
                     newsym(u.ux, u.uy);
-                    Your(TR("body takes on a %s transparency...", "你的身体呈现出一种%s的透明感……"),
-                         Hallucination ? "normal" : "strange"); /* NOTRANS */
+#ifdef ZHLANG
+                    Your("你的身体呈现出一种%s的透明感……",
+                         Hallucination ? "正常" : "奇异");
+#else
+                    Your("body takes on a %s transparency...",
+                         Hallucination ? "normal" : "strange");
+#endif
                     makeknown(typ);
                 }
                 break;

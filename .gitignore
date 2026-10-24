@@ -128,3 +128,7 @@ lib/lua-*/
 
 # Release packages
 nethack-zh-*.tar.gz
+
+# Python bytecode
+__pycache__/
+*.pyc
