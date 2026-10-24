@@ -415,6 +415,23 @@ static const struct {
 
 /* clear away while-helpless when the cause of death caused that
    helplessness (ie, "petrified by <foo> while getting stoned") */
+#ifdef ZHLANG
+/* multi_reason is a display string; with the localization it can be the
+   Chinese text (translated at the assignment sites) while the table above
+   stays English, so accept either form. */
+staticfn const char *
+fixup_exclude_zh(const char *exclude)
+{
+    if (!strcmp(exclude, "getting stoned"))
+        return "逐渐石化";
+    if (!strcmp(exclude, "fainted from lack of food"))
+        return "因饥饿昏厥";
+    if (!strcmp(exclude, "fainted"))
+        return "昏厥";
+    return exclude;
+}
+#endif
+
 staticfn void
 fixup_death(int how)
 {
@@ -423,9 +440,19 @@ fixup_death(int how)
     if (gm.multi_reason) {
         for (i = 0; i < SIZE(death_fixups); ++i)
             if (death_fixups[i].why == how
-                && !strcmp(death_fixups[i].exclude, gm.multi_reason)) {
+                && (!strcmp(death_fixups[i].exclude, gm.multi_reason)
+#ifdef ZHLANG
+                    || !strcmp(fixup_exclude_zh(death_fixups[i].exclude),
+                               gm.multi_reason)
+#endif
+                    )) {
                 if (death_fixups[i].include) /* substitute alternate reason */
+#ifdef ZHLANG
+                    gm.multi_reason =
+                        (char *) fixup_exclude_zh(death_fixups[i].include);
+#else
                     gm.multi_reason = death_fixups[i].include;
+#endif
                 else /* remove the helplessness reason */
                     gm.multi_reason = (char *) 0;
                 gm.multireasonbuf[0] = '\0'; /* dynamic buf stale either way */
@@ -1549,7 +1576,7 @@ really_done(int how)
 
     if (bones_ok) {
 #ifdef ZHLANG
-        if (!wizard || paranoid_query(ParanoidBones, "保存尸体吗？"))
+        if (!wizard || paranoid_query(ParanoidBones, "保存遗骨关卡吗？"))
 #else
         if (!wizard || paranoid_query(ParanoidBones, "Save bones?"))
 #endif

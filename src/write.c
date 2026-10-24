@@ -93,7 +93,7 @@ dowrite(struct obj *pen)
         return ECMD_OK;
     } else if (Glib) {
 #ifdef ZHLANG
-        pline("%s从你的%s滑落。", Tobjnam(pen, "slip"),
+        pline("%s从你的%s滑落。", Tobjnam(pen, TR("slip", "突然")),
               fingers_or_gloves(FALSE));
 #else
         pline("%s from your %s.", Tobjnam(pen, "slip"),

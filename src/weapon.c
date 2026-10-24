@@ -947,7 +947,7 @@ mon_wield_item(struct monst *mon)
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
                 #ifdef ZHLANG
-                pline("%s%s在%s的%s上！", Tobjnam(obj, "weld"),
+                pline("%s%s在%s的%s上！", Tobjnam(obj, TR("weld", "焊牢")),
                       is_plural(obj) ? "themselves" : "itself",
                       s_suffix(mon_nam(mon)), mon_hand);
                 #else
@@ -962,7 +962,7 @@ mon_wield_item(struct monst *mon)
             begin_burn(obj, FALSE);
             if (canseemon(mon))
                 #ifdef ZHLANG
-                pline("%s在%s的%s中%s！", Tobjnam(obj, "shine"),
+                pline("%s在%s的%s中%s！", Tobjnam(obj, TR("shine", "正")),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
                       mbodypart(mon, HAND));
                 #else

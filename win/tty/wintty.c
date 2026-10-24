@@ -5028,13 +5028,17 @@ tty_putstatusfield(const char *text, int x, int y)
 
 #ifdef ZHLANG
     /* Status text can contain multi-byte UTF-8 characters (translated
-       title/alignment/condition words).  Write each sequence as a unit
-       and stop at a character boundary so a field never gets cut in the
-       middle of a character.  'x' and the column budget are display
-       columns (see tty_status_update() and check_fields()). */
+       title/alignment/condition words).  Write each sequence as a unit,
+       stop at a character boundary so a field is never cut in the middle
+       of a character, and advance the cursor bookkeeping by the display
+       width of the character rather than by its byte count.  Otherwise
+       tty_curs() believes the cursor is further right than it really is
+       and emits extra backspaces which overwrite the following field.
+       'x' and the column budget are display columns (see
+       tty_status_update() and check_fields()). */
     if (x < ncols && y < nrows) {
         const char *p = text;
-        int col = x, dat = x;
+        int col = x;
 
         if (x != cw->curx || y != cw->cury)
             tty_curs(NHW_STATUS, x, y);
@@ -5049,18 +5053,19 @@ tty_putstatusfield(const char *text, int x, int y)
             } else {
                 cw2 = 1;
             }
-            if (col + cw2 > ncols)
+            if (col + cw2 > ncols || col >= cw->cols)
                 break;
-            for (k = 0; k < slen; ++k) {
-                (void) putchar(*p);
-                ttyDisplay->curx++;
-                cw->curx++;
-                if (dat >= 1 && dat <= cw->cols)
-                    cw->data[y][dat - 1] = *p;
-                ++p;
-                ++dat;
-            }
+            for (k = 0; k < slen; ++k)
+                (void) putchar(p[k]);
+            /* shadow copy: one cell per character at its first column,
+               blank for the second cell of a wide character */
+            cw->data[y][col - 1] = *p;
+            if (cw2 == 2 && col < cw->cols)
+                cw->data[y][col] = ' ';
+            p += slen;
             col += cw2;
+            ttyDisplay->curx += cw2;
+            cw->curx = ttyDisplay->curx;
         }
     }
 #else

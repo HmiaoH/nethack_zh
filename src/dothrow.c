@@ -1241,7 +1241,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
         return; /* paranoia */
 
     nomul(-range);
-    gm.multi_reason = "moving through the air";
+    gm.multi_reason = TR("moving through the air", "正穿行于空中");
     gn.nomovemsg = ""; /* it just happens */
     if (verbose)
 #ifdef ZHLANG
@@ -1784,7 +1784,7 @@ throwit(
             && iflags.returning_missile
             && !impaired) {
             #ifdef ZHLANG
-            pline("%s the %s and returns to your hand!", Tobjnam(obj, "击中"),
+            pline(TR("%s the %s and returns to your hand!", "%s击中%s并回到你手中！"), Tobjnam(obj, "击中"),
                   ceiling(u.ux, u.uy));
             #else
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
@@ -1951,7 +1951,7 @@ throwit(
 
                 if (!impaired && rn2(100)) {
                     #ifdef ZHLANG
-                    pline("%s to your hand!", Tobjnam(obj, "返回"));
+                    pline(TR("%s to your hand!", "%s你手中！"), Tobjnam(obj, "返回"));
                     #else
                     pline("%s to your hand!", Tobjnam(obj, "return"));
                     #endif
@@ -2637,7 +2637,7 @@ thitmonst(
         if (*trail)
             monname = s_suffix(monname);
         #ifdef ZHLANG
-        pline("%s消失在%s%s。", Tobjnam(obj, "vanish"), monname, trail);
+        pline("%s消失在%s%s。", Tobjnam(obj, TR("vanish", "瞬间")), monname, trail);
         #else
         pline("%s into %s%s.", Tobjnam(obj, "vanish"), monname, trail);
         #endif
@@ -2994,7 +2994,7 @@ breakmsg(struct obj *obj, boolean in_view)
             You_hear(TR("%s shatter!", "%s碎裂了！"), something);
         else
             #ifdef ZHLANG
-            pline("%s shatter%s%s!", Doname2(obj),
+            pline(TR("%s shatter%s%s!", "%s碎裂%s%s！"), Doname2(obj),
                   (obj->quan == 1L) ? "了" : "", to_pieces);
             #else
             pline("%s shatter%s%s!", Doname2(obj),

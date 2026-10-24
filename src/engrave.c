@@ -214,11 +214,72 @@ can_reach_floor(boolean check_pit)
     return TRUE;
 }
 
+#ifdef ZHLANG
+/*
+ * Chinese display name for a surface()/ceiling() result.  Those helpers
+ * keep returning their English identifiers (other callers may compare
+ * them or use them as data); this is display only.
+ */
+staticfn const char *
+zh_engr_surface(const char *en)
+{
+    static const struct {
+        const char *en, *zh;
+    } names[] = {
+        { "maw", "巨口" },
+        { "husk", "残壳" },
+        { "nonesuch", "异物" },
+        { "air bubble", "气泡" },
+        { "cloud", "云层" },
+        { "air", "空中" },
+        { "bottom", "水底" },
+        { "water", "水面" },
+        { "ice", "冰面" },
+        { "lava", "熔岩" },
+        { "bridge", "桥面" },
+        { "altar", "祭坛" },
+        { "headstone", "墓碑" },
+        { "fountain", "喷泉" },
+        { "stairs", "楼梯" },
+        { "wall", "墙壁" },
+        { "doorway", "门口" },
+        { "floor", "地面" },
+        { "ground", "地面" },
+        { "vault's ceiling", "金库的天花板" },
+        { "temple's ceiling", "神殿的天花板" },
+        { "shop's ceiling", "商店的天花板" },
+        { "water above", "上方的水" },
+        { "sky", "天空" },
+        { "flames above", "上方的火焰" },
+        { "expanse above", "上方的旷野" },
+        { "water's surface", "水面" },
+        { "ceiling", "天花板" },
+        { "rock cavern", "岩洞" },
+        { 0, 0 }
+    };
+    int i;
+
+    if (!en)
+        return "";
+    for (i = 0; names[i].en; ++i)
+        if (!strcmp(en, names[i].en))
+            return names[i].zh;
+    return en;
+}
+#endif /* ZHLANG */
+
 /* give a message after caller has determined that hero can't reach */
 void
 cant_reach_floor(coordxy x, coordxy y, boolean up,
                  boolean check_pit, boolean wand_engraving)
 {
+#ifdef ZHLANG
+    pline("%s够不到%s。",
+          wand_engraving ? "魔杖的杖尖" : "你",
+          up ? zh_engr_surface(ceiling(x, y))
+             : (check_pit && can_reach_floor(FALSE)) ? "坑底"
+                                                     : zh_engr_surface(surface(x, y)));
+#else
     pline(TR("%s can't reach the %s.", "%s够不到%s。"),
           wand_engraving
               ? "The wand does nothing more, and the tip of the wand"
@@ -226,6 +287,7 @@ cant_reach_floor(coordxy x, coordxy y, boolean up,
           up  ? ceiling(x, y)
               : (check_pit && can_reach_floor(FALSE)) ? "bottom of the pit"
                                                       : surface(x, y));
+#endif
 }
 
 struct engr *
@@ -320,6 +382,9 @@ read_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
     const char *eloc = surface(x, y);
+#ifdef ZHLANG
+    const char *zh_eloc = zh_engr_surface(eloc);
+#endif
     int sensed = 0;
 
     /* Sensing an engraving does not require sight for some engraving types,
@@ -331,8 +396,8 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind) {
                 sensed = 1;
 #ifdef ZHLANG
-                pline("%s被写在这里的%s中。", Something,
-                      is_ice(x, y) ? "霜" : "尘土");
+                pline("这里的%s上写着点什么。",
+                      is_ice(x, y) ? "冰霜" : "尘土");
 #else
                 pline("%s is written here in the %s.", Something,
                       is_ice(x, y) ? "frost" : "dust");
@@ -344,7 +409,7 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
 #ifdef ZHLANG
-                pline("%s被刻在这里的%s上。", Something, eloc);
+                pline("这里的%s上刻着点什么。", zh_eloc);
 #else
                 pline("%s is engraved here on the %s.", Something, eloc);
 #endif
@@ -354,8 +419,8 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
 #ifdef ZHLANG
-                pline("一些文字被%s进了这里的%s中。",
-                      is_ice(x, y) ? "融化" : "烧", eloc);
+                pline("这里的%s上有些被%s过的文字。", zh_eloc,
+                      is_ice(x, y) ? "融化" : "烧灼");
 #else
                 pline("Some text has been %s into the %s here.",
                       is_ice(x, y) ? "melted" : "burned", eloc);
@@ -366,7 +431,7 @@ read_engr_at(coordxy x, coordxy y)
             if (!Blind) {
                 sensed = 1;
 #ifdef ZHLANG
-                pline("这里的%s上有些涂鸦。", eloc);
+                pline("这里的%s上有些涂鸦。", zh_eloc);
 #else
                 pline("There's some graffiti on the %s here.", eloc);
 #endif
@@ -414,10 +479,14 @@ read_engr_at(coordxy x, coordxy y)
                 || !((ep->engr_txt[pristine_text][off + elen - 1]
                       == et[elen - 1])
                      && strchr(".!?", et[elen - 1]))) {
+#ifdef ZHLANG
+                endpunct = "。";
+#else
                 endpunct = ".";
+#endif
             }
 #ifdef ZHLANG
-            You("%s：\"%s\"%s", (Blind) ? "感受到了文字" : "读到", et,
+            You("%s：“%s”%s", (Blind) ? "感受到了文字" : "读到", et,
                 endpunct);
 #else
             You("%s: \"%s\"%s", (Blind) ? "feel the words" : "read", et,
@@ -548,14 +617,16 @@ u_can_engrave(void)
            but yields the 'jello' result in doengrave() */
     } else if (is_lava(u.ux, u.uy)) {
 #ifdef ZHLANG
-        You_cant("不能在%s上书写！", surface(u.ux, u.uy));
+        You_cant("不能在%s上书写！",
+                 zh_engr_surface(surface(u.ux, u.uy)));
 #else
         You_cant("write on the %s!", surface(u.ux, u.uy));
 #endif
         return FALSE;
     } else if (is_pool(u.ux, u.uy) || IS_FOUNTAIN(levtyp)) {
 #ifdef ZHLANG
-        You_cant("不能在%s上书写！", surface(u.ux, u.uy));
+        You_cant("不能在%s上书写！",
+                 zh_engr_surface(surface(u.ux, u.uy)));
 #else
         You_cant("write on the %s!", surface(u.ux, u.uy));
 #endif
@@ -666,7 +737,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         if (!Blind) {
 #ifdef ZHLANG
             Sprintf(de->post_engr_text, "%s上的虫子慢下来了！",
-                    surface(u.ux, u.uy));
+                    zh_engr_surface(surface(u.ux, u.uy)));
 #else
             Sprintf(de->post_engr_text, "The bugs on the %s slow down!",
                     surface(u.ux, u.uy));
@@ -677,7 +748,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         if (!Blind) {
 #ifdef ZHLANG
             Sprintf(de->post_engr_text, "%s上的虫子快起来了！",
-                    surface(u.ux, u.uy));
+                    zh_engr_surface(surface(u.ux, u.uy)));
 #else
             Sprintf(de->post_engr_text, "The bugs on the %s speed up!",
                     surface(u.ux, u.uy));
@@ -714,7 +785,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
 #ifdef ZHLANG
             Sprintf(de->post_engr_text,
                     "%s上布满了弹孔！",
-                    surface(u.ux, u.uy));
+                    zh_engr_surface(surface(u.ux, u.uy)));
 #else
             Sprintf(de->post_engr_text,
                     "The %s is riddled by bullet holes!",
@@ -728,7 +799,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
         if (!Blind) {
 #ifdef ZHLANG
             Sprintf(de->post_engr_text, "%s上的虫子不动了！",
-                    surface(u.ux, u.uy));
+                    zh_engr_surface(surface(u.ux, u.uy)));
 #else
             Sprintf(de->post_engr_text, "The bugs on the %s stop moving!",
                     surface(u.ux, u.uy));
@@ -754,7 +825,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
             if (!Blind) {
 #ifdef ZHLANG
                 pline_The("%s上的刻字消失了！",
-                          surface(u.ux, u.uy));
+                          zh_engr_surface(surface(u.ux, u.uy)));
 #else
                 pline_The("engraving on the %s vanishes!",
                           surface(u.ux, u.uy));
@@ -769,7 +840,7 @@ doengrave_sfx_item_WAN(struct _doengrave_ctx *de)
             if (!Blind) {
 #ifdef ZHLANG
                 pline_The("%s上的刻字消失了！",
-                          surface(u.ux, u.uy));
+                          zh_engr_surface(surface(u.ux, u.uy)));
 #else
                 pline_The("engraving on the %s vanishes!",
                           surface(u.ux, u.uy));
@@ -980,15 +1051,15 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
             if (welded(de->otmp))
 #ifdef ZHLANG
                 pline("%s只能在%s上划出痕迹。",
-                      Yname2(de->otmp), surface(u.ux, u.uy));
+                      Yname2(de->otmp),
+                      zh_engr_surface(surface(u.ux, u.uy)));
 #else
                 pline("%s can only scratch the %s.",
                       Yname2(de->otmp), surface(u.ux, u.uy));
 #endif
             else if ((int) de->otmp->spe <= -3)
 #ifdef ZHLANG
-                pline("%s对于雕刻来说太钝了。",
-                      Yobjnam2(de->otmp, "are"));
+                pline("%s对于雕刻来说太钝了。", Yname2(de->otmp));
 #else
                 pline("%s too dull for engraving.",
                       Yobjnam2(de->otmp, "are"));
@@ -1037,8 +1108,8 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
 #endif
                     else
 #ifdef ZHLANG
-                        pline("%s%s了。", Yobjnam2(de->otmp, "get"),
-                              de->frosted ? "变得满是霜" : "变得满是灰");
+                        pline("%s沾上了%s。", Yname2(de->otmp),
+                              de->frosted ? "霜" : "灰尘");
 #else
                         pline("%s %s.", Yobjnam2(de->otmp, "get"),
                               de->frosted ? "frosty" : "dusty");
@@ -1055,8 +1126,8 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                 }
             } else {
 #ifdef ZHLANG
-                pline("%s%s了。", Yobjnam2(de->otmp, "get"),
-                      de->frosted ? "变得满是霜" : "变得满是灰");
+                pline("%s沾上了%s。", Yname2(de->otmp),
+                      de->frosted ? "霜" : "灰尘");
 #else
                 pline("%s %s.", Yobjnam2(de->otmp, "get"),
                       de->frosted ? "frosty" : "dusty");
@@ -1091,6 +1162,33 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
 staticfn void
 doengrave_ctx_verb(struct _doengrave_ctx *de)
 {
+#ifdef ZHLANG
+    /* Chinese verb only; the location is supplied separately */
+    switch (de->type) {
+    default:
+        de->everb = de->adding ? "续写" : "写";
+        break;
+    case DUST:
+        de->everb = de->adding ? "续写" : "写";
+        de->eloc = de->frosted ? "霜" : "尘土";
+        break;
+    case HEADSTONE:
+        de->everb = de->adding ? "续刻" : "刻";
+        break;
+    case ENGRAVE:
+        de->everb = de->adding ? "续刻" : "刻";
+        break;
+    case BURN:
+        de->everb = de->adding ? "续刻" : (de->frosted ? "融化刻" : "烧刻");
+        break;
+    case MARK:
+        de->everb = de->adding ? "继续涂写" : "涂写";
+        break;
+    case ENGR_BLOOD:
+        de->everb = de->adding ? "继续涂写" : "涂写";
+        break;
+    }
+#else
     switch (de->type) {
     default:
         de->everb = de->adding ? "add to the weird writing on"
@@ -1118,6 +1216,7 @@ doengrave_ctx_verb(struct _doengrave_ctx *de)
         de->everb = de->adding ? "add to the scrawl on" : "scrawl on";
         break;
     }
+#endif
 }
 
 /* Mohs' Hardness Scale:
@@ -1212,7 +1311,7 @@ doengrave(void)
         } else {
 #ifdef ZHLANG
             You("用魔杖朝下方的%s做了个手势。",
-                surface(u.ux, u.uy));
+                zh_engr_surface(surface(u.ux, u.uy)));
 #else
             You("gesture, with your wand, towards the %s below you.",
                 surface(u.ux, u.uy));
@@ -1234,7 +1333,7 @@ doengrave(void)
         if (de->otmp == &hands_obj) { /* using only finger */
 #ifdef ZHLANG
             You("只会在%s上弄出一个小污迹。",
-                surface(u.ux, u.uy));
+                zh_engr_surface(surface(u.ux, u.uy)));
 #else
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
@@ -1406,11 +1505,8 @@ doengrave(void)
             } else if (de->type == DUST || de->type == MARK
                        || de->type == ENGR_BLOOD) {
 #ifdef ZHLANG
-                You("无法擦掉%s在%s上的信息。",
-                    (de->oep->engr_type == BURN)
-                        ? (de->frosted ? "融化进" : "烧进")
-                        : "刻在",
-                    surface(u.ux, u.uy));
+                You("无法擦掉刻在%s上的信息。",
+                    zh_engr_surface(surface(u.ux, u.uy)));
 #else
                 You("cannot wipe out the message that is %s the %s here.",
                     (de->oep->engr_type == BURN)
@@ -1442,10 +1538,22 @@ doengrave(void)
     }
 
     de->eloc = surface(u.ux, u.uy);
+#ifdef ZHLANG
+    de->eloc = zh_engr_surface(de->eloc);
+#endif
     de->adding = (de->oep && !de->eow);
     doengrave_ctx_verb(de);
 
     /* Tell adventurer what is going on */
+#ifdef ZHLANG
+    if (de->otmp != &hands_obj)
+        You("用%s在%s上%s。", doname(de->otmp), de->eloc, de->everb);
+    else
+        You("用你的%s在%s上%s。", body_part(FINGERTIP), de->eloc, de->everb);
+
+    /* Prompt for engraving! */
+    Sprintf(de->qbuf, "你要在%s上%s什么？", de->eloc, de->everb);
+#else
     if (de->otmp != &hands_obj)
         You(TR("%s the %s with %s%s.", "%s%s，用%s%s。"), de->everb, de->eloc,
             /* since doname() yields "N items" when quantity is more than
@@ -1460,6 +1568,7 @@ doengrave(void)
     /* Prompt for engraving! */
     Sprintf(de->qbuf, TR("What do you want to %s the %s here?", "你想在这里%s什么%s？"),
             de->everb, de->eloc);
+#endif
     getlin(de->qbuf, de->ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
     mungspaces(de->ebuf);
@@ -1474,8 +1583,7 @@ doengrave(void)
         if (de->zapwand) {
             if (!Blind)
 #ifdef ZHLANG
-                pline("%s，然后%s。", Tobjnam(de->otmp, "glow"),
-                      otense(de->otmp, "fade"));
+                pline("%s发光，然后渐渐暗淡。", Yname2(de->otmp));
 #else
                 pline("%s, then %s.", Tobjnam(de->otmp, "glow"),
                       otense(de->otmp, "fade"));

@@ -1314,7 +1314,7 @@ use_crystal_ball(struct obj **optr)
         switch (rnd((obj->oartifact || obj->blessed) ? 4 : 5)) {
         case 1:
 #ifdef ZHLANG
-            pline("%s太令人费解了！", Tobjnam(obj, "are"));
+            pline("%s太令人费解了！", Tobjnam(obj, TR("are", "已经")));
 #else
             pline("%s too much to comprehend!", Tobjnam(obj, "are"));
 #endif
@@ -1379,7 +1379,7 @@ use_crystal_ball(struct obj **optr)
 
     if (Hallucination) {
         nomul(-rnd(charged ? 4 : 2));
-        gm.multi_reason = "gazing into a Magic 8-Ball (tm)";
+        gm.multi_reason = TR("gazing into a Magic 8-Ball (tm)", "正凝视魔法八号球（tm）");
         gn.nomovemsg = "";
 
         if (!charged) {
@@ -1470,7 +1470,7 @@ use_crystal_ball(struct obj **optr)
     You("peer into %s...", the(xname(obj)));
 #endif
     nomul(-rnd(charged ? 10 : 2));
-    gm.multi_reason = "gazing into a crystal ball";
+    gm.multi_reason = TR("gazing into a crystal ball", "正凝视水晶球");
     gn.nomovemsg = "";
 
     if (!charged) {

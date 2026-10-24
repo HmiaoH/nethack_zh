@@ -370,7 +370,8 @@ doread(void)
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                               "became literate by reading a fortune cookie");
+                               TR("became literate by reading a fortune cookie",
+                                  "通过阅读幸运饼干学会了识字"));
         useup(scroll);
         return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
@@ -396,9 +397,12 @@ doread(void)
             return ECMD_TIME;
         }
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s", /* NOTRANS */
-                           (scroll->otyp == T_SHIRT) ? "a T-shirt"
-                           : "an apron");
+            livelog_printf(LL_CONDUCT,
+                           TR("became literate by reading %s",
+                              "通过阅读%s学会了识字"),
+                           (scroll->otyp == T_SHIRT)
+                               ? TR("a T-shirt", "一件T恤")
+                               : TR("an apron", "一件围裙"));
 
         /* populate 'buf[]' */
         mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
@@ -443,9 +447,12 @@ pline("It reads:");
               !Blind ? "There is writing" : "You feel lettering",
               simpleonames(scroll), cap_text);
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s", /* NOTRANS */
-                           (otyp == DUNCE_CAP) ? "a dunce cap"
-                                               : "a cornuthaum");
+            livelog_printf(LL_CONDUCT,
+                           TR("became literate by reading %s",
+                              "通过阅读%s学会了识字"),
+                           (otyp == DUNCE_CAP)
+                               ? TR("a dunce cap", "一顶笨蛋帽")
+                               : TR("a cornuthaum", "一顶巫师尖帽"));
 
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
@@ -494,7 +501,8 @@ pline("It reads:");
               (flags.verbose || Blind) ? "." : "");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a credit card");
+                           TR("became literate by reading a credit card",
+                              "通过阅读信用卡学会了识字"));
 
         return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
@@ -530,7 +538,8 @@ pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
 #endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a magic marker");
+                           TR("became literate by reading a magic marker",
+                              "通过阅读记号笔学会了识字"));
 
         return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
@@ -545,7 +554,8 @@ pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
 #endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a coin's engravings");
+                           TR("became literate by reading a coin's engravings",
+                              "通过阅读硬币上的刻字学会了识字"));
 
         return ECMD_TIME;
     } else if (is_art(scroll, ART_ORB_OF_FATE)) {
@@ -564,7 +574,8 @@ pline("\"Odin.\"");
 #endif
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                   "became literate by reading the divine signature of Odin");
+                   TR("became literate by reading the divine signature of Odin",
+                      "通过阅读奥丁的神圣签名学会了识字"));
 
         return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
@@ -585,7 +596,8 @@ pline("The candy bar's wrapper is blank.");
         pline(TR("The wrapper reads: \"%s\".", "包装纸上写着：%s。"), wrapper);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by reading a candy bar wrapper");
+                           TR("became literate by reading a candy bar wrapper",
+                              "通过阅读糖果包装纸学会了识字"));
 
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
@@ -634,10 +646,14 @@ pline("The candy bar's wrapper is blank.");
     if (otyp != SPE_BOOK_OF_THE_DEAD && otyp != SPE_NOVEL
         && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
         if (!u.uconduct.literate++)
-            livelog_printf(LL_CONDUCT, "became literate by reading %s", /* NOTRANS */
-                           (scroll->oclass == SPBOOK_CLASS) ? "a book"
-                           : (scroll->oclass == SCROLL_CLASS) ? "a scroll"
-                             : something);
+            livelog_printf(LL_CONDUCT,
+                           TR("became literate by reading %s",
+                              "通过阅读%s学会了识字"),
+                           (scroll->oclass == SPBOOK_CLASS)
+                               ? TR("a book", "一本书")
+                           : (scroll->oclass == SCROLL_CLASS)
+                               ? TR("a scroll", "一卷卷轴")
+                             : TR("something", "某种东西"));
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll) ? ECMD_TIME : ECMD_OK;
@@ -2830,7 +2846,8 @@ pline("%s.", (j + 1 < 5)
         if (*buf == '\033' || !strcmpi(buf, "none")
             || !strcmpi(buf, "'none'") || !strcmpi(buf, "nothing")) {
             livelog_printf(LL_GENOCIDE,
-                           "declined to perform class genocide");
+                           TR("declined to perform class genocide",
+                              "拒绝执行类别灭绝"));
             return;
         }
         /* "?" runs #genocided to show existing genocides, then re-prompts;
@@ -2905,10 +2922,14 @@ pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
                     if (!ll_done++) {
                         if (!num_genocides())
                             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                                     "performed %s first genocide (class %c)",
-                                           uhis(), def_monsyms[class].sym);
+                                     TR("performed %s first genocide (class %c)",
+                                        "%s首次执行了类别%c的灭绝"),
+                                           (flags.female ? "她" : "他"),
+                                           def_monsyms[class].sym);
                         else
-                            livelog_printf(LL_GENOCIDE, "genocided class %c", /* NOTRANS */
+                            livelog_printf(LL_GENOCIDE,
+                                           TR("genocided class %c",
+                                              "灭绝了整个%c类生物"),
                                            def_monsyms[class].sym);
                     }
 
@@ -3068,7 +3089,9 @@ pline("%s.", (i + 1 < 5)
                 if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
 
-                livelog_printf(LL_GENOCIDE, "declined to perform genocide"); /* NOTRANS */
+                livelog_printf(LL_GENOCIDE,
+                               TR("declined to perform genocide",
+                                  "拒绝执行灭绝"));
                 return;
             }
             /* "?" or "'?'" runs #genocided to show existing genocides */
@@ -3150,10 +3173,14 @@ verbalize("No, mortal!  That will not be done.");
     if (how & REALLY) {
         if (!num_genocides())
             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                           "performed %s first genocide (%s)",
-                           uhis(), makeplural(realbuf));
+                           TR("performed %s first genocide (%s)",
+                              "%s首次进行了灭绝（%s）"),
+                           (flags.female ? "她" : "他"),
+                           makeplural(realbuf));
         else
-            livelog_printf(LL_GENOCIDE, "genocided %s", makeplural(realbuf)); /* NOTRANS */
+            livelog_printf(LL_GENOCIDE,
+                           TR("genocided %s", "灭绝了%s"),
+                           makeplural(realbuf));
 
         /* setting no-corpse affects wishing and random tin generation */
         svm.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);

@@ -167,7 +167,7 @@ stoned_dialogue(void)
     case 3: /* limbs turned to stone */
         stop_occupation();
         nomul(-3); /* can't move anymore */
-        gm.multi_reason = "getting stoned";
+        gm.multi_reason = TR("getting stoned", "逐渐石化");
         gn.nomovemsg = You_can_move_again; /* not unconscious */
         /* "your limbs have turned to stone" so terminate wounded legs */
         if (Wounded_legs && !u.usteed)
@@ -279,7 +279,7 @@ sleep_dialogue(void)
 
     if (i == 4)
 #ifdef ZHLANG
-        You("yawn.");
+        You(TR("yawn.", "打了个哈欠。"));
 #else
         You("yawn.");
 #endif
@@ -399,7 +399,7 @@ levitation_dialogue(void)
                               && !Is_waterlevel(&u.uz));
 
 #ifdef ZHLANG
-            urgent_pline(s, danger ? "over" : "in",
+            urgent_pline(s, danger ? TR("over", "上方") : "in",
                          danger ? surface(u.ux, u.uy) : "air");
 #else
             urgent_pline(s, danger ? "over" : "in",
@@ -558,14 +558,14 @@ slimed_to_death(struct kinfo *kptr)
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
 #ifdef ZHLANG
-            urgent_pline("Yes, you do.  %s", upstart(slimebuf));
+            urgent_pline(TR("Yes, you do.  %s", "会的，你确实会死。%s"), upstart(slimebuf));
 #else
             urgent_pline("Yes, you do.  %s", upstart(slimebuf));
 #endif
         else
             /* follows "The medallion crumbles to dust." */
 #ifdef ZHLANG
-            urgent_pline("Unfortunately, %s", slimebuf);
+            urgent_pline(TR("Unfortunately, %s", "不幸的是，%s"), slimebuf);
 #else
             urgent_pline("Unfortunately, %s", slimebuf);
 #endif
@@ -724,7 +724,7 @@ nh_timeout(void)
             find_ac();
             if (!Blind)
 #ifdef ZHLANG
-                Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
+                Norep(TR("The %s haze around you %s.", "%s色的雾气在你周围%s。"), hcolor(NH_GOLDEN),
                       u.uspellprot ? "becomes less dense" : "disappears");
 #else
                 Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
@@ -736,7 +736,7 @@ nh_timeout(void)
     if (u.ugallop) {
         if (--u.ugallop == 0L && u.usteed)
 #ifdef ZHLANG
-            pline("%s stops galloping.", Monnam(u.usteed));
+            pline(TR("%s stops galloping.", "%s停止了疾驰。"), Monnam(u.usteed));
 #else
             pline("%s stops galloping.", Monnam(u.usteed));
 #endif
@@ -771,7 +771,7 @@ nh_timeout(void)
                 if ((u.usick_type & SICK_NONVOMITABLE) == 0
                     && rn2(100) < ACURR(A_CON)) {
 #ifdef ZHLANG
-                    You("have recovered from your illness.");
+                    You(TR("have recovered from your illness.", "已从疾病中康复。"));
 #else
                     You("have recovered from your illness.");
 #endif
@@ -781,7 +781,7 @@ nh_timeout(void)
                     break;
                 }
 #ifdef ZHLANG
-                urgent_pline("You die from your illness.");
+                urgent_pline(TR("You die from your illness.", "你死于疾病。"));
 #else
                 urgent_pline("You die from your illness.");
 #endif
@@ -809,7 +809,7 @@ nh_timeout(void)
             case FAST:
                 if (!Very_fast)
 #ifdef ZHLANG
-                    You_feel("yourself slow down%s.",
+                    You_feel(TR("yourself slow down%s.", "自己慢了下来%s。"),
                              Fast ? " a bit" : "");
 #else
                     You_feel("yourself slow down%s.",
@@ -881,7 +881,7 @@ nh_timeout(void)
                     incr_itimeout(&HSleepy, rnd(100));
                 } else if (Sleepy) {
 #ifdef ZHLANG
-                    You("fall asleep.");
+                    You(TR("fall asleep.", "睡着了。"));
 #else
                     You("fall asleep.");
 #endif
@@ -906,7 +906,7 @@ nh_timeout(void)
                 if (was_flying && !Flying) {
                     disp.botl = TRUE;
 #ifdef ZHLANG
-                    You("land.");
+                    You(TR("land.", "落地了。"));
 #else
                     You("land.");
 #endif
@@ -924,7 +924,7 @@ nh_timeout(void)
                     }
                     if (!Unaware)
 #ifdef ZHLANG
-                        You("no longer feel safe from acid.");
+                        You(TR("no longer feel safe from acid.", "不再觉得能免受酸的侵蚀。"));
 #else
                         You("no longer feel safe from acid.");
 #endif
@@ -941,7 +941,7 @@ nh_timeout(void)
                     }
                     if (!Unaware)
 #ifdef ZHLANG
-                        You("no longer feel secure from petrification.");
+                        You(TR("no longer feel secure from petrification.", "不再觉得能免受石化。"));
 #else
                         You("no longer feel secure from petrification.");
 #endif
@@ -960,7 +960,7 @@ nh_timeout(void)
                    if hero has acquired fire resistance in the meantime */
                 if (!Fire_resistance)
 #ifdef ZHLANG
-                    Your("temporary ability to survive burning has ended.");
+                    Your(TR("temporary ability to survive burning has ended.", "暂时抵御火焰的能力已经消失。"));
 #else
                     Your("temporary ability to survive burning has ended.");
 #endif
@@ -969,7 +969,7 @@ nh_timeout(void)
                 /* [see fire resistance] */
                 if (!Wwalking)
 #ifdef ZHLANG
-                    Your("temporary ability to walk on liquid has ended.");
+                    Your(TR("temporary ability to walk on liquid has ended.", "暂时在水面行走的能力已经消失。"));
 #else
                     Your("temporary ability to walk on liquid has ended.");
 #endif
@@ -987,7 +987,7 @@ nh_timeout(void)
                     svc.context.warntype.speciesidx = NON_PM;
                     if (wptr)
 #ifdef ZHLANG
-                        You("are no longer warned about %s.",
+                        You(TR("are no longer warned about %s.", "不再收到有关%s的警示。"),
                             makeplural(wptr->pmnames[NEUTRAL]));
 #else
                         You("are no longer warned about %s.",
@@ -999,13 +999,13 @@ nh_timeout(void)
                 if (!Passes_walls) {
                     if (stuck_in_wall())
 #ifdef ZHLANG
-                        You_feel("hemmed in again.");
+                        You_feel(TR("hemmed in again.", "又感到被围困住了。"));
 #else
                         You_feel("hemmed in again.");
 #endif
                     else
 #ifdef ZHLANG
-                        pline("You're back to your %s self again.",
+                        pline(TR("You're back to your %s self again.", "你又恢复成%s的自己了。"),
                               !Upolyd ? "normal" : "unusual");
 #else
                         pline("You're back to your %s self again.",
@@ -1017,7 +1017,7 @@ nh_timeout(void)
                 if (!Breathless) {
                     if (region_danger())
 #ifdef ZHLANG
-                        You("cough%s",
+                        You(TR("cough%s", "咳嗽%s"),
                             Poison_resistance ? "." : " and spit blood!");
 #else
                         You("cough%s",
@@ -1034,7 +1034,7 @@ nh_timeout(void)
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
 #ifdef ZHLANG
-                    Your("amulet vanishes!");
+                    Your(TR("amulet vanishes!", "护身符消失了！"));
 #else
                     Your("amulet vanishes!");
 #endif
@@ -1047,7 +1047,7 @@ nh_timeout(void)
                 if (u.umoved && !(Levitation || Flying)) {
                     slip_or_trip();
                     nomul(-2);
-                    gm.multi_reason = "fumbling";
+                    gm.multi_reason = TR("fumbling", "手忙脚乱");
                     gn.nomovemsg = "";
                     /* The more you are carrying the more likely you
                      * are to make noise when you fumble.  Adjustments
@@ -1056,7 +1056,7 @@ nh_timeout(void)
                     if ((inv_weight() > (WT_NOISY_INV * -1))) {
                         if (!Deaf)
 #ifdef ZHLANG
-                            You("make a lot of noise!");
+                            You(TR("make a lot of noise!", "发出了很大的响声！"));
 #else
                             You("make a lot of noise!");
 #endif
@@ -1098,7 +1098,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
 {
     stop_occupation();
     nomul(how_long);
-    gm.multi_reason = "sleeping";
+    gm.multi_reason = TR("sleeping", "熟睡");
 #if 0   /* this was broken; the fix for 'how_long' will result in changed
          * behavior for sounds that don't go through You_hear() so needs
          * testing */
@@ -1257,7 +1257,7 @@ hatch_egg(anything *arg, long timeout)
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
 #ifdef ZHLANG
-                You_feel("%s %s from your pack!", something,
+                You_feel(TR("%s %s from your pack!", "感到有%s从你的背包里%s！"), something,
                          locomotion(mon->data, "drop"));
 #else
                 You_feel("%s %s from your pack!", something,
@@ -1265,7 +1265,7 @@ hatch_egg(anything *arg, long timeout)
 #endif
             else
 #ifdef ZHLANG
-                You_see("%s %s out of your pack!", monnambuf,
+                You_see(TR("%s %s out of your pack!", "%s%s从你的背包里出来！"), monnambuf,
                         locomotion(mon->data, "drop"));
 #else
                 You_see("%s %s out of your pack!", monnambuf,
@@ -1273,7 +1273,7 @@ hatch_egg(anything *arg, long timeout)
 #endif
             if (yours) {
 #ifdef ZHLANG
-                pline("%s %s %s like \"%s%s\"",
+                pline(TR("%s %s %s like \"%s%s\"", "%s%s%s像「%s%s」"),
                       siblings ? "Their" : "Its",
                       ing_suffix(cry_sound(mon)),
                       (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
@@ -1288,7 +1288,7 @@ hatch_egg(anything *arg, long timeout)
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
 #ifdef ZHLANG
-                verbalize("Gleep!");
+                verbalize(TR("Gleep!", "咕叽！"));
 #else
                 verbalize("Gleep!");
 #endif /* Mything eggs :-) */
@@ -1299,7 +1299,7 @@ hatch_egg(anything *arg, long timeout)
             if (cansee_hatchspot) {
                 knows_egg = TRUE;
 #ifdef ZHLANG
-                You_see("%s hatch.", monnambuf);
+                You_see(TR("%s hatch.", "%s孵化了。"), monnambuf);
 #else
                 You_see("%s hatch.", monnambuf);
 #endif
@@ -1322,7 +1322,7 @@ hatch_egg(anything *arg, long timeout)
                     Strcpy(carriedby, TR("thin air", "稀薄的空气中"));
                 }
 #ifdef ZHLANG
-                You_see("%s %s out of %s!", monnambuf,
+                You_see(TR("%s %s out of %s!", "%s%s从%s出来！"), monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
 #else
                 You_see("%s %s out of %s!", monnambuf,
@@ -1426,7 +1426,7 @@ slip_or_trip(void)
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
 #ifdef ZHLANG
-            pline("Egads!  %s bite%s your %s!", what,
+            pline(TR("Egads!  %s bite%s your %s!", "天哪！%s咬%s你的%s！"), what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
 #else
             pline("Egads!  %s bite%s your %s!", what,
@@ -1434,7 +1434,7 @@ slip_or_trip(void)
 #endif
         } else {
 #ifdef ZHLANG
-            You("trip over %s.", what);
+            You(TR("trip over %s.", "被%s绊倒了。"), what);
 #else
             You("trip over %s.", what);
 #endif
@@ -1450,7 +1450,7 @@ slip_or_trip(void)
         boolean ice_only = !(EFumbling || (HFumbling & ~FROMOUTSIDE));
 
 #ifdef ZHLANG
-        pline("%s %s %s the ice.",
+        pline(TR("%s %s %s the ice.", "%s%s%s冰面。"),
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
                        : "You",
@@ -1483,7 +1483,7 @@ slip_or_trip(void)
                 || !saddle->cursed)
             && (!ice_only || !rn2(3))) {
 #ifdef ZHLANG
-            You("lose your balance.");
+            You(TR("lose your balance.", "失去了平衡。"));
 #else
             You("lose your balance.");
 #endif
@@ -1506,7 +1506,7 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
 #ifdef ZHLANG
-                You("trip over your own %s.",
+                You(TR("trip over your own %s.", "被自己的%s绊倒了。"),
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
 #else
                 You("trip over your own %s.",
@@ -1515,7 +1515,7 @@ slip_or_trip(void)
                 break;
             case 2:
 #ifdef ZHLANG
-                You("slip %s.",
+                You(TR("slip %s.", "滑了一跤%s。"),
                     Hallucination ? "on a banana peel" : "and nearly fall");
 #else
                 You("slip %s.",
@@ -1524,14 +1524,14 @@ slip_or_trip(void)
                 break;
             case 3:
 #ifdef ZHLANG
-                You("flounder.");
+                You(TR("flounder.", "挣扎了一下。"));
 #else
                 You("flounder.");
 #endif
                 break;
             default:
 #ifdef ZHLANG
-                You("stumble.");
+                You(TR("stumble.", "踉跄了一下。"));
 #else
                 You("stumble.");
 #endif
@@ -1545,7 +1545,7 @@ slip_or_trip(void)
             switch (rn2(4)) {
             case 1:
 #ifdef ZHLANG
-                Your("%s slip out of the stirrups.",
+                Your(TR("%s slip out of the stirrups.", "%s从马镫里滑了出来。"),
                      makeplural(body_part(FOOT)));
 #else
                 Your("%s slip out of the stirrups.",
@@ -1554,21 +1554,21 @@ slip_or_trip(void)
                 break;
             case 2:
 #ifdef ZHLANG
-                You("let go of the reins.");
+                You(TR("let go of the reins.", "松开了缰绳。"));
 #else
                 You("let go of the reins.");
 #endif
                 break;
             case 3:
 #ifdef ZHLANG
-                You("bang into the saddle-horn.");
+                You(TR("bang into the saddle-horn.", "撞上了马鞍前桥。"));
 #else
                 You("bang into the saddle-horn.");
 #endif
                 break;
             default:
 #ifdef ZHLANG
-                You("slide to one side of the saddle.");
+                You(TR("slide to one side of the saddle.", "滑到了马鞍的一侧。"));
 #else
                 You("slide to one side of the saddle.");
 #endif
@@ -1587,14 +1587,14 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
     case OBJ_INVENT:
     case OBJ_MINVENT:
 #ifdef ZHLANG
-        pline("%s flickers%s.", Yname2(obj), tailer);
+        pline(TR("%s flickers%s.", "%s%s闪烁了一下。"), Yname2(obj), tailer);
 #else
         pline("%s flickers%s.", Yname2(obj), tailer);
 #endif
         break;
     case OBJ_FLOOR:
 #ifdef ZHLANG
-        You_see("%s flicker%s.", an(xname(obj)), tailer);
+        You_see(TR("%s flicker%s.", "%s%s闪烁了一下。"), an(xname(obj)), tailer);
 #else
         You_see("%s flicker%s.", an(xname(obj)), tailer);
 #endif
@@ -1610,27 +1610,27 @@ lantern_message(struct obj *obj)
     switch (obj->where) {
     case OBJ_INVENT:
 #ifdef ZHLANG
-        Your("lantern is getting dim.");
+        Your(TR("lantern is getting dim.", "提灯正在变暗。"));
 #else
         Your("lantern is getting dim.");
 #endif
         if (Hallucination)
 #ifdef ZHLANG
-            pline("Batteries have not been invented yet.");
+            pline(TR("Batteries have not been invented yet.", "电池还没有被发明出来。"));
 #else
             pline("Batteries have not been invented yet.");
 #endif
         break;
     case OBJ_FLOOR:
 #ifdef ZHLANG
-        You_see("a lantern getting dim.");
+        You_see(TR("a lantern getting dim.", "一盏提灯正在变暗。"));
 #else
         You_see("a lantern getting dim.");
 #endif
         break;
     case OBJ_MINVENT:
 #ifdef ZHLANG
-        pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
+        pline(TR("%s lantern is getting dim.", "%s提灯正在变暗。"), s_suffix(Monnam(obj->ocarry)));
 #else
         pline("%s lantern is getting dim.", s_suffix(Monnam(obj->ocarry)));
 #endif
@@ -1713,14 +1713,14 @@ burn_object(anything *arg, long timeout)
                 /*FALLTHRU*/
             case OBJ_MINVENT:
 #ifdef ZHLANG
-                pline("%spotion of oil has burnt away.", whose);
+                pline(TR("%spotion of oil has burnt away.", "%s油烧尽了。"), whose);
 #else
                 pline("%spotion of oil has burnt away.", whose);
 #endif
                 break;
             case OBJ_FLOOR:
 #ifdef ZHLANG
-                You_see("a burning potion of oil go out.");
+                You_see(TR("a burning potion of oil go out.", "一瓶燃烧的油熄灭了。"));
 #else
                 You_see("a burning potion of oil go out.");
 #endif
@@ -1766,14 +1766,14 @@ burn_object(anything *arg, long timeout)
                     case OBJ_INVENT:
                     case OBJ_MINVENT:
 #ifdef ZHLANG
-                        pline("%s seems about to go out.", Yname2(obj));
+                        pline(TR("%s seems about to go out.", "%s似乎快要熄灭了。"), Yname2(obj));
 #else
                         pline("%s seems about to go out.", Yname2(obj));
 #endif
                         break;
                     case OBJ_FLOOR:
 #ifdef ZHLANG
-                        You_see("%s about to go out.", an(xname(obj)));
+                        You_see(TR("%s about to go out.", "%s快要熄灭了。"), an(xname(obj)));
 #else
                         You_see("%s about to go out.", an(xname(obj)));
 #endif
@@ -1794,13 +1794,13 @@ burn_object(anything *arg, long timeout)
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
 #ifdef ZHLANG
-                        pline("%slantern has run out of power.", whose);
+                        pline(TR("%slantern has run out of power.", "%s提灯没电了。"), whose);
 #else
                         pline("%slantern has run out of power.", whose);
 #endif
                     else
 #ifdef ZHLANG
-                        pline("%s has gone out.", Yname2(obj));
+                        pline(TR("%s has gone out.", "%s熄灭了。"), Yname2(obj));
 #else
                         pline("%s has gone out.", Yname2(obj));
 #endif
@@ -1808,13 +1808,13 @@ burn_object(anything *arg, long timeout)
                 case OBJ_FLOOR:
                     if (obj->otyp == BRASS_LANTERN)
 #ifdef ZHLANG
-                        You_see("a lantern run out of power.");
+                        You_see(TR("a lantern run out of power.", "一盏提灯没电了。"));
 #else
                         You_see("a lantern run out of power.");
 #endif
                     else
 #ifdef ZHLANG
-                        You_see("%s go out.", an(xname(obj)));
+                        You_see(TR("%s go out.", "%s熄灭了。"), an(xname(obj)));
 #else
                         You_see("%s go out.", an(xname(obj)));
 #endif
@@ -1848,7 +1848,7 @@ burn_object(anything *arg, long timeout)
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
 #ifdef ZHLANG
-                    pline("%s%scandle%s getting short.", whose,
+                    pline(TR("%s%scandle%s getting short.", "%s%s蜡烛%s快烧完了。"), whose,
                           menorah ? "candelabrum's " : "",
                           many ? "s are" : " is");
 #else
@@ -1859,7 +1859,7 @@ burn_object(anything *arg, long timeout)
                     break;
                 case OBJ_FLOOR:
 #ifdef ZHLANG
-                    You_see("%scandle%s getting short.",
+                    You_see(TR("%scandle%s getting short.", "%s蜡烛%s快烧完了。"),
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s" : "");
@@ -1879,7 +1879,7 @@ burn_object(anything *arg, long timeout)
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
 #ifdef ZHLANG
-                    pline("%s%scandle%s flame%s flicker%s low!", whose,
+                    pline(TR("%s%scandle%s flame%s flicker%s low!", "%s%s蜡烛%s火焰%s摇曳%s！"), whose,
                           menorah ? "candelabrum's " : "", many ? "s'" : "'s",
                           many ? "s" : "", many ? "" : "s");
 #else
@@ -1890,7 +1890,7 @@ burn_object(anything *arg, long timeout)
                     break;
                 case OBJ_FLOOR:
 #ifdef ZHLANG
-                    You_see("%scandle%s flame%s flicker low!",
+                    You_see(TR("%scandle%s flame%s flicker low!", "%s蜡烛%s火焰%s摇曳！"),
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
                             many ? "s'" : "'s", many ? "s" : "");
@@ -1915,7 +1915,7 @@ burn_object(anything *arg, long timeout)
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
 #ifdef ZHLANG
-                        pline("%scandelabrum's flame%s.", whose,
+                        pline(TR("%scandelabrum's flame%s.", "%s烛台的火焰%s。"), whose,
                               many ? "s die" : " dies");
 #else
                         pline("%scandelabrum's flame%s.", whose,
@@ -1924,7 +1924,7 @@ burn_object(anything *arg, long timeout)
                         break;
                     case OBJ_FLOOR:
 #ifdef ZHLANG
-                        You_see("a candelabrum's flame%s die.",
+                        You_see(TR("a candelabrum's flame%s die.", "一座烛台的火焰%s熄灭。"),
                                 many ? "s" : "");
 #else
                         You_see("a candelabrum's flame%s die.",
@@ -1941,7 +1941,7 @@ burn_object(anything *arg, long timeout)
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
 #ifdef ZHLANG
-                        pline("%s %s consumed!", Yname2(obj),
+                        pline(TR("%s %s consumed!", "%s%s被烧尽了！"), Yname2(obj),
                               many ? "are" : "is");
 #else
                         pline("%s %s consumed!", Yname2(obj),
@@ -1954,7 +1954,7 @@ burn_object(anything *arg, long timeout)
                           You see a wax candle consumed!
                          */
 #ifdef ZHLANG
-                        You_see("%s%s consumed!", many ? "some " : "",
+                        You_see(TR("%s%s consumed!", "%s%s被烧尽了！"), many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
 #else
                         You_see("%s%s consumed!", many ? "some " : "",
@@ -2231,7 +2231,7 @@ do_storms(void)
         Soundeffect(se_kaboom_boom_boom, 80);
 #endif
 #ifdef ZHLANG
-        pline("Kaboom!!!  Boom!!  Boom!!");
+        pline(TR("Kaboom!!!  Boom!!  Boom!!", "轰！！！轰！！轰！！"));
 #else
         pline("Kaboom!!!  Boom!!  Boom!!");
 #endif
@@ -2240,12 +2240,12 @@ do_storms(void)
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);
-            gm.multi_reason = "hiding from thunderstorm";
+            gm.multi_reason = TR("hiding from thunderstorm", "躲避雷暴");
             gn.nomovemsg = 0;
         }
     } else
 #ifdef ZHLANG
-        You_hear("a rumbling noise.");
+        You_hear(TR("a rumbling noise.", "一阵轰隆声。"));
 #else
         You_hear("a rumbling noise.");
 #endif

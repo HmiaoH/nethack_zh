@@ -2926,7 +2926,7 @@ trapeffect_landmine(
             trapkilled = TRUE;
         if (unconscious()) {
             gm.multi = -1;
-            gn.nomovemsg = "The explosion awakens you!";
+            gn.nomovemsg = TR("The explosion awakens you!", "爆炸把你惊醒了！");
         }
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
             ? Trap_Caught_Mon : Trap_Effect_Finished;
@@ -4947,7 +4947,7 @@ domagictrap(void)
             break;
         case 17:
             #ifdef ZHLANG
-            You(Hallucination ? "smell hamburgers." : "闻到了烧焦的肉味。");
+            You(Hallucination ? TR("smell hamburgers.", "闻到了汉堡的味道。") : "闻到了烧焦的肉味。");
 #else
             You(Hallucination ? "smell hamburgers." : "smell charred flesh.");
 #endif
@@ -7348,7 +7348,7 @@ chest_trap(
                 pline("Suddenly you are frozen in place!");
 #endif
                 nomul(-d(5, 6));
-                gm.multi_reason = "frozen by a trap";
+                gm.multi_reason = TR("frozen by a trap", "被陷阱冻住");
                 exercise(A_DEX, FALSE);
                 gn.nomovemsg = You_can_move_again;
             } else
@@ -7810,7 +7810,7 @@ lava_effects(void)
                 if (usurvive && !Blind)
                     #ifdef ZHLANG
                     pline("%s发出奇怪的%s光芒，但没有损坏。",
-                          The(xname(obj)), hcolor("dark red"));
+                          The(xname(obj)), hcolor(TR("dark red", "暗红色")));
 #else
                     pline("%s glows a strange %s, but remains intact.",
                           The(xname(obj)), hcolor("dark red"));

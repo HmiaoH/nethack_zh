@@ -485,7 +485,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
         #ifdef ZHLANG
-        You_cant("do that while you are buried!");
+        You_cant(TR("do that while you are buried!", "在被埋着的时候那样做！"));
         #else
         You_cant("do that while you are buried!");
         #endif
@@ -514,7 +514,7 @@ doextcmd(void)
             return ECMD_OK;
         if (iflags.menu_requested && !accept_menu_prefix(&extcmdlist[idx])) {
             #ifdef ZHLANG
-            pline("'%s' prefix has no effect for the %s command.",
+            pline(TR("'%s' prefix has no effect for the %s command.", "「%s」前缀对%s命令无效。"),
                   visctrl(cmd_from_func(do_reqmenu)),
                   extcmdlist[idx].ef_txt);
             #else
@@ -988,13 +988,13 @@ domonability(void)
         return ECMD_TIME;
     } else if (uptr->msound == MS_SHRIEK) {
         #ifdef ZHLANG
-        You("shriek.");
+        You(TR("shriek.", "尖叫。"));
         #else
         You("shriek.");
         #endif
         if (u.uburied)
             #ifdef ZHLANG
-            pline("Unfortunately sound does not carry well through rock.");
+            pline(TR("Unfortunately sound does not carry well through rock.", "可惜声音在岩石中传不远。"));
             #else
             pline("Unfortunately sound does not carry well through rock.");
             #endif
@@ -1007,13 +1007,13 @@ domonability(void)
         return ECMD_TIME;
     } else if (Upolyd) {
         #ifdef ZHLANG
-        pline("Any special ability you may have is purely reflexive.");
+        pline(TR("Any special ability you may have is purely reflexive.", "你可能拥有的任何特殊能力都纯粹是反射性的。"));
         #else
         pline("Any special ability you may have is purely reflexive.");
         #endif
     } else {
         #ifdef ZHLANG
-        You("don't have a special ability in your normal form!");
+        You(TR("don't have a special ability in your normal form!", "在你的正常形态下没有特殊能力！"));
         #else
         You("don't have a special ability in your normal form!");
         #endif
@@ -1026,7 +1026,7 @@ enter_explore_mode(void)
 {
     if (discover) {
         #ifdef ZHLANG
-        You("are already in explore mode.");
+        You(TR("are already in explore mode.", "已经处于探索模式。"));
         #else
         You("are already in explore mode.");
         #endif
@@ -1036,7 +1036,7 @@ enter_explore_mode(void)
         if (!authorize_explore_mode()) {
             if (!wizard) {
                 #ifdef ZHLANG
-                You("cannot access explore mode.");
+                You(TR("cannot access explore mode.", "无法进入探索模式。"));
                 #else
                 You("cannot access explore mode.");
                 #endif
@@ -1053,7 +1053,7 @@ enter_explore_mode(void)
             }
         }
         #ifdef ZHLANG
-        pline("Beware!  From explore mode there will be no return to %s,",
+        pline(TR("Beware!  From explore mode there will be no return to %s,", "当心！进入探索模式后就再也无法回到%s，"),
               oldmode);
         #else
         pline("Beware!  From explore mode there will be no return to %s,",
@@ -1065,14 +1065,14 @@ enter_explore_mode(void)
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
             #ifdef ZHLANG
-            You("are now in non-scoring explore mode.");
+            You(TR("are now in non-scoring explore mode.", "现在处于不计分的探索模式。"));
             #else
             You("are now in non-scoring explore mode.");
             #endif
         } else {
             clear_nhwindow(WIN_MESSAGE);
             #ifdef ZHLANG
-            pline("Continuing with %s.", oldmode);
+            pline(TR("Continuing with %s.", "继续使用%s。"), oldmode);
             #else
             pline("Continuing with %s.", oldmode);
             #endif
@@ -1099,7 +1099,7 @@ makemap_prepost(boolean pre, boolean wiztower)
             if (Is_mineend_level(&u.uz)) {
                 if (remove_achievement(ACH_MINE_PRIZE))
                     #ifdef ZHLANG
-                    pline(Unachieve, "Mine's-end");
+                    pline(Unachieve, TR("Mine's-end", "矿坑尽头"));
                     #else
                     pline(Unachieve, "Mine's-end");
                     #endif
@@ -1107,7 +1107,7 @@ makemap_prepost(boolean pre, boolean wiztower)
             } else if (Is_sokoend_level(&u.uz)) {
                 if (remove_achievement(ACH_SOKO_PRIZE))
                     #ifdef ZHLANG
-                    pline(Unachieve, "Soko-prize");
+                    pline(Unachieve, TR("Soko-prize", "索科班奖品"));
                     #else
                     pline(Unachieve, "Soko-prize");
                     #endif
@@ -1459,7 +1459,7 @@ lookaround_known_room(coordxy x, coordxy y)
         #endif
     } else if (u_have_seen_bounds_selection(sel)) {
         #ifdef ZHLANG
-        You("guess %s to be %s %s.",
+        You(TR("guess %s to be %s %s.", "猜%s是%s%s。"),
             u_at(x, y) ? "this" : "that",
             an(selection_size_description(sel, qbuf)),
             rmno >= 0 ? "room" : "area");
@@ -1471,7 +1471,7 @@ lookaround_known_room(coordxy x, coordxy y)
         #endif
     } else {
         #ifdef ZHLANG
-        You("can't guess the size of %s area.",
+        You(TR("can't guess the size of %s area.", "无法猜出%s区域的大小。"),
             u_at(x, y) ? "this" : "that");
         #else
         You("can't guess the size of %s area.",
@@ -1555,7 +1555,7 @@ dotoggleoption(void)
         return toggle_bool_option(gc.cmd_bind->param);
     } else {
         #ifdef ZHLANG
-        pline("Use #optionsfull to set any option instead.");
+        pline(TR("Use #optionsfull to set any option instead.", "请改用 #optionsfull 设置任意选项。"));
         #else
         pline("Use #optionsfull to set any option instead.");
         #endif
@@ -1756,7 +1756,7 @@ do_reqmenu(void)
 {
     if (iflags.menu_requested) {
         #ifdef ZHLANG
-        Norep("Double %s prefix, canceled.",
+        Norep(TR("Double %s prefix, canceled.", "重复的%s前缀，已取消。"),
               visctrl(cmd_from_func(do_reqmenu)));
         #else
         Norep("Double %s prefix, canceled.",
@@ -1776,7 +1776,7 @@ do_rush(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
         #ifdef ZHLANG
-        Norep("Double rush prefix, canceled.");
+        Norep(TR("Double rush prefix, canceled.", "重复的疾行前缀，已取消。"));
         #else
         Norep("Double rush prefix, canceled.");
         #endif
@@ -1796,7 +1796,7 @@ do_run(void)
 {
     if ((gd.domove_attempting & DOMOVE_RUSH)) {
         #ifdef ZHLANG
-        Norep("Double run prefix, canceled.");
+        Norep(TR("Double run prefix, canceled.", "重复的奔跑前缀，已取消。"));
         #else
         Norep("Double run prefix, canceled.");
         #endif
@@ -1816,7 +1816,7 @@ do_fight(void)
 {
     if (svc.context.forcefight) {
         #ifdef ZHLANG
-        Norep("Double fight prefix, canceled.");
+        Norep(TR("Double fight prefix, canceled.", "重复的战斗前缀，已取消。"));
         #else
         Norep("Double fight prefix, canceled.");
         #endif
@@ -1841,7 +1841,7 @@ do_repeat(void)
 
         if (!cmdq_peek(CQ_REPEAT)) {
             #ifdef ZHLANG
-            Norep("There is no command available to repeat.");
+            Norep(TR("There is no command available to repeat.", "没有可重复的命令。"));
             #else
             Norep("There is no command available to repeat.");
             #endif
@@ -3316,7 +3316,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
     if (keyfirst) {
         #ifdef ZHLANG
-        pline("Bind which key? ");
+        pline(TR("Bind which key? ", "绑定哪个按键？ "));
         #else
         pline("Bind which key? ");
         #endif
@@ -3400,7 +3400,7 @@ handler_rebind_keys_add(boolean keyfirst)
  bindit:
         if (!key) {
             #ifdef ZHLANG
-            pline("Bind which key? ");
+            pline(TR("Bind which key? ", "绑定哪个按键？ "));
             #else
             pline("Bind which key? ");
             #endif
@@ -3415,7 +3415,7 @@ handler_rebind_keys_add(boolean keyfirst)
         if (bind_key(key, cmdstr, TRUE)) {
             if (prevcmd && prevcmd->cmd != ec) {
                 #ifdef ZHLANG
-                pline("Changed key '%s' from \"%s\" to \"%s\".",
+                pline(TR("Changed key '%s' from \"%s\" to \"%s\".", "已将按键 %s 从“%s”改为“%s”。"),
                       key2txt(key, buf2), prevcmd->cmd->ef_txt, cmdstr);
                 #else
                 pline("Changed key '%s' from \"%s\" to \"%s\".",
@@ -3423,7 +3423,7 @@ handler_rebind_keys_add(boolean keyfirst)
                 #endif
             } else if (!prevcmd) {
                 #ifdef ZHLANG
-                pline("Bound key '%s' to \"%s\".",
+                pline(TR("Bound key '%s' to \"%s\".", "已将按键 %s 绑定到“%s”。"),
                       key2txt(key, buf2), cmdstr);
                 #else
                 pline("Bound key '%s' to \"%s\".",
@@ -3432,7 +3432,7 @@ handler_rebind_keys_add(boolean keyfirst)
             }
         } else {
             #ifdef ZHLANG
-            pline("Key binding failed?!");
+            pline(TR("Key binding failed?!", "按键绑定失败了？！"));
             #else
             pline("Key binding failed?!");
             #endif
@@ -4830,7 +4830,7 @@ rhack(int key)
                            && !svc.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     #ifdef ZHLANG
-                    You_cant("get there from here...");
+                    You_cant(TR("get there from here...", "从这里到那里……"));
                     #else
                     You_cant("get there from here...");
                     #endif
@@ -4886,7 +4886,7 @@ rhack(int key)
 
     if (bad_command) {
         #ifdef ZHLANG
-        custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
+        custompline(SUPPRESS_HISTORY, TR("Unknown command '%s'.", "未知命令 %s。"), visctrl(key));
         #else
         custompline(SUPPRESS_HISTORY, "Unknown command '%s'.", visctrl(key));
         #endif
@@ -5173,7 +5173,7 @@ getdir(const char *s)
             }
             if (!did_help)
                 #ifdef ZHLANG
-                pline("What a strange direction!");
+                pline(TR("What a strange direction!", "多么奇怪的方向！"));
                 #else
                 pline("What a strange direction!");
                 #endif
@@ -5181,7 +5181,7 @@ getdir(const char *s)
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
         #ifdef ZHLANG
-        You_cant("orient yourself that direction.");
+        You_cant(TR("orient yourself that direction.", "朝那个方向调整身体。"));
         #else
         You_cant("orient yourself that direction.");
         #endif
@@ -6444,7 +6444,7 @@ dotravel(void)
         iflags.getloc_filter = gfilt;
     } else {
         #ifdef ZHLANG
-        pline("Where do you want to travel to?");
+        pline(TR("Where do you want to travel to?", "你想旅行到哪里？"));
         #else
         pline("Where do you want to travel to?");
         #endif
@@ -6467,7 +6467,7 @@ dotravel_target(void)
     if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
         /* assume <0,0>, the value assigned when travel reaches destination */
         #ifdef ZHLANG
-        pline("No travel destination set.");
+        pline(TR("No travel destination set.", "尚未设置旅行目的地。"));
         #else
         pline("No travel destination set.");
         #endif
@@ -6476,7 +6476,7 @@ dotravel_target(void)
         /* maybe interrupted while traveling then just walked rest of way
            so destination hasn't been reset yet */
         #ifdef ZHLANG
-        You("are already here.");
+        You(TR("are already here.", "已经在这里了。"));
         #else
         You("are already here.");
         #endif
@@ -6803,7 +6803,7 @@ dosuspend_core(void)
     } else
 #endif
         #ifdef ZHLANG
-        Norep(cmdnotavail, "#suspend");
+        Norep(cmdnotavail, "#suspend"); /* NOTRANS */
         #else
         Norep(cmdnotavail, "#suspend");
         #endif
@@ -6824,7 +6824,7 @@ dosh_core(void)
     urealtime.start_timing = getnow();
 #else
     #ifdef ZHLANG
-    Norep(cmdnotavail, "#shell");
+    Norep(cmdnotavail, "#shell"); /* NOTRANS */
     #else
     Norep(cmdnotavail, "#shell");
     #endif

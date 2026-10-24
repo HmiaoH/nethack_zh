@@ -73,7 +73,7 @@ beehive_mon_sound(struct monst *mtmp)
         case 0:
             Soundeffect(se_low_buzzing, 30);
             #ifdef ZHLANG
-            You_hear("a low buzzing.");
+            You_hear(TR("a low buzzing.", "低沉的嗡嗡声。"));
             #else
             You_hear("a low buzzing.");
             #endif
@@ -81,7 +81,7 @@ beehive_mon_sound(struct monst *mtmp)
         case 1:
             Soundeffect(se_angry_drone, 100);
             #ifdef ZHLANG
-            You_hear("an angry drone.");
+            You_hear(TR("an angry drone.", "愤怒的嗡鸣声。"));
             #else
             You_hear("an angry drone.");
             #endif
@@ -89,7 +89,7 @@ beehive_mon_sound(struct monst *mtmp)
         case 2:
             Soundeffect(se_bees, 100);
             #ifdef ZHLANG
-            You_hear("bees in your %sbonnet!",
+            You_hear(TR("bees in your %sbonnet!", "有蜜蜂在你%s帽子里嗡嗡作响！"),
                      uarmh ? "" : "(nonexistent) ");
             #else
             You_hear("bees in your %sbonnet!",
@@ -113,7 +113,7 @@ morgue_mon_sound(struct monst *mtmp)
         switch (rn2(2) + hallu) {
         case 0:
             #ifdef ZHLANG
-            You("suddenly realize it is unnaturally quiet.");
+            You(TR("suddenly realize it is unnaturally quiet.", "突然意识到这里异常安静。"));
             #else
             You("suddenly realize it is unnaturally quiet.");
             #endif
@@ -290,7 +290,7 @@ dosounds(void)
                     } else {
                         Soundeffect(se_someone_searching, 30);
                         #ifdef ZHLANG
-                        You_hear("someone searching.");
+                        You_hear(TR("someone searching.", "有人在搜寻。"));
                         #else
                         You_hear("someone searching.");
                         #endif
@@ -303,14 +303,14 @@ dosounds(void)
             case 0:
                 Soundeffect(se_guards_footsteps, 30);
                 #ifdef ZHLANG
-                You_hear("the footsteps of a guard on patrol.");
+                You_hear(TR("the footsteps of a guard on patrol.", "巡逻守卫的脚步声。"));
                 #else
                 You_hear("the footsteps of a guard on patrol.");
                 #endif
                 break;
             case 2:
                 #ifdef ZHLANG
-                You_hear("Ebenezer Scrooge!");
+                You_hear(TR("Ebenezer Scrooge!", "有人喊了一声埃比尼泽·斯克鲁奇！"));
                 #else
                 You_hear("Ebenezer Scrooge!");
                 #endif
@@ -585,7 +585,7 @@ beg(struct monst *mtmp)
             map_invisible(mtmp->mx, mtmp->my);
         SetVoice(mtmp, 0, 80, 0);
         #ifdef ZHLANG
-        verbalize("I'm hungry.");
+        verbalize(TR("I'm hungry.", "我饿了。"));
         #else
         verbalize("I'm hungry.");
         #endif
@@ -596,7 +596,7 @@ beg(struct monst *mtmp)
            excluded by the first two cases */
         if (canspotmon(mtmp))
             #ifdef ZHLANG
-            pline("%s seems famished.", Monnam(mtmp));
+            pline(TR("%s seems famished.", "%s似乎饿坏了。"), Monnam(mtmp));
             #else
             pline("%s seems famished.", Monnam(mtmp));
             #endif
@@ -888,7 +888,7 @@ domonnoise(struct monst *mtmp)
     case MS_WERE:
         if (flags.moonphase == FULL_MOON && (night() ^ !rn2(13))) {
             #ifdef ZHLANG
-            pline("%s throws back %s head and lets out a blood curdling %s!",
+            pline(TR("%s throws back %s head and lets out a blood curdling %s!", "%s仰起%s头，发出一声令人毛骨悚然的%s！"),
                   Monnam(mtmp), mhis(mtmp),
                   (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
             #else
@@ -1039,17 +1039,17 @@ domonnoise(struct monst *mtmp)
     case MS_BONES:
         Soundeffect(se_bone_rattle, 60);
         #ifdef ZHLANG
-        pline("%s rattles noisily.", Monnam(mtmp));
+        pline(TR("%s rattles noisily.", "%s的骨头哗啦作响。"), Monnam(mtmp));
         #else
         pline("%s rattles noisily.", Monnam(mtmp));
         #endif
         #ifdef ZHLANG
-        You("freeze for a moment.");
+        You(TR("freeze for a moment.", "僵住了一瞬。"));
         #else
         You("freeze for a moment.");
         #endif
         nomul(-2);
-        gm.multi_reason = "scared by rattling";
+        gm.multi_reason = TR("scared by rattling", "被骨头响声吓住");
         gn.nomovemsg = 0;
         break;
     case MS_LAUGH: {
@@ -1087,7 +1087,7 @@ domonnoise(struct monst *mtmp)
             switch (rn2(4)) {
             case 0:
                 #ifdef ZHLANG
-                pline("%s boasts about %s gem collection.", Monnam(mtmp),
+                pline(TR("%s boasts about %s gem collection.", "%s吹嘘起%s的宝石收藏。"), Monnam(mtmp),
                       mhis(mtmp));
                 #else
                 pline("%s boasts about %s gem collection.", Monnam(mtmp),
@@ -1214,7 +1214,7 @@ domonnoise(struct monst *mtmp)
         if (mtmp->mpeaceful) {
             SetVoice(mtmp, 0, 80, 0);
             #ifdef ZHLANG
-            verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
+            verbalize(TR("Just the facts, %s.", "只要事实，%s。"), flags.female ? "Ma'am" : "Sir");
             #else
             verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
             #endif
@@ -1358,7 +1358,7 @@ dochat(void)
 
     if (is_silent(gy.youmonst.data)) {
         #ifdef ZHLANG
-        pline("As %s, you cannot speak.",
+        pline(TR("As %s, you cannot speak.", "身为%s，你无法说话。"),
               an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         #else
         pline("As %s, you cannot speak.",
@@ -1368,7 +1368,7 @@ dochat(void)
     }
     if (Strangled) {
         #ifdef ZHLANG
-        You_cant("speak.  You're choking!");
+        You_cant(TR("speak.  You're choking!", "说话。你快窒息了！"));
         #else
         You_cant("speak.  You're choking!");
         #endif
@@ -1376,7 +1376,7 @@ dochat(void)
     }
     if (u.uswallow) {
         #ifdef ZHLANG
-        pline("They won't hear you out there.");
+        pline(TR("They won't hear you out there.", "外面的人听不到你。"));
         #else
         pline("They won't hear you out there.");
         #endif
@@ -1406,7 +1406,7 @@ dochat(void)
     if (u.usteed && u.dz > 0) {
         if (helpless(u.usteed)) {
             #ifdef ZHLANG
-            pline("%s seems not to notice you.", Monnam(u.usteed));
+            pline(TR("%s seems not to notice you.", "%s似乎没注意到你。"), Monnam(u.usteed));
             #else
             pline("%s seems not to notice you.", Monnam(u.usteed));
             #endif
@@ -1417,7 +1417,7 @@ dochat(void)
 
     if (u.dz) {
         #ifdef ZHLANG
-        pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
+        pline(TR("They won't hear you %s there.", "%s边的人听不到你。"), u.dz < 0 ? "up" : "down");
         #else
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
         #endif
@@ -1436,7 +1436,7 @@ dochat(void)
         }
          */
         #ifdef ZHLANG
-        pline("Talking to yourself is a bad habit for a dungeoneer.");
+        pline(TR("Talking to yourself is a bad habit for a dungeoneer.", "自言自语对地牢探险者来说是个坏习惯。"));
         #else
         pline("Talking to yourself is a bad habit for a dungeoneer.");
         #endif
@@ -1471,7 +1471,7 @@ dochat(void)
                 ;
             } else if (!Hallucination) {
                 #ifdef ZHLANG
-                pline("It's like talking to a wall.");
+                pline(TR("It's like talking to a wall.", "这就像对着一堵墙说话。"));
                 #else
                 pline("It's like talking to a wall.");
                 #endif
@@ -1507,7 +1507,7 @@ dochat(void)
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp))
             #ifdef ZHLANG
-            pline("%s seems not to notice you.", Monnam(mtmp));
+            pline(TR("%s seems not to notice you.", "%s似乎没注意到你。"), Monnam(mtmp));
             #else
             pline("%s seems not to notice you.", Monnam(mtmp));
             #endif
@@ -1521,7 +1521,7 @@ dochat(void)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         #ifdef ZHLANG
-        pline("%s is eating noisily.", Monnam(mtmp));
+        pline(TR("%s is eating noisily.", "%s吃东西的声音很响。"), Monnam(mtmp));
         #else
         pline("%s is eating noisily.", Monnam(mtmp));
         #endif
@@ -1533,7 +1533,7 @@ dochat(void)
                     : "is inaudible";
 
         #ifdef ZHLANG
-        pline("Any response%s%s %s.",
+        pline(TR("Any response%s%s %s.", "%s%s的回应%s。"),
               canspotmon(mtmp) ? " from " : "",
               canspotmon(mtmp) ? mon_nam(mtmp) : "",
               xresponse);
@@ -1587,7 +1587,7 @@ tiphat(void)
        'multi' to account for that, but we'll pretend that no extra time
        beyond the current move is necessary */
     #ifdef ZHLANG
-    You("briefly doff your %s.", helm_simple_name(uarmh));
+    You(TR("briefly doff your %s.", "短暂地摘下你的%s。"), helm_simple_name(uarmh));
     #else
     You("briefly doff your %s.", helm_simple_name(uarmh));
     #endif
@@ -1596,7 +1596,7 @@ tiphat(void)
         if (u.usteed && u.dz > 0) {
             if (helpless(u.usteed))
                 #ifdef ZHLANG
-                pline("%s doesn't notice.", Monnam(u.usteed));
+                pline(TR("%s doesn't notice.", "%s没有察觉。"), Monnam(u.usteed));
                 #else
                 pline("%s doesn't notice.", Monnam(u.usteed));
                 #endif
@@ -1604,7 +1604,7 @@ tiphat(void)
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
             #ifdef ZHLANG
-            pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
+            pline(TR("There's no one %s there.", "%s边没有人。"), (u.dz < 0) ? "up" : "down");
             #else
             pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
             #endif
@@ -1646,14 +1646,14 @@ tiphat(void)
 
     if (unseen || (statue && Hallucination)) {
         #ifdef ZHLANG
-        pline("That %screature is ignoring you!", unseen ? "unseen " : "");
+        pline(TR("That %screature is ignoring you!", "那%s生物根本不理你！"), unseen ? "unseen " : "");
         #else
         pline("That %screature is ignoring you!", unseen ? "unseen " : "");
         #endif
     } else if (!mtmp || !responsive_mon_at(x, y)) {
         if (vismon) /* 'vismon' is only True when 'mtmp' is non-Null */
             #ifdef ZHLANG
-            pline("%s seems not to notice you.", Monnam(mtmp));
+            pline(TR("%s seems not to notice you.", "%s似乎没注意到你。"), Monnam(mtmp));
             #else
             pline("%s seems not to notice you.", Monnam(mtmp));
             #endif
@@ -1666,13 +1666,13 @@ tiphat(void)
         if (vismon && humanoid(mtmp->data) && mtmp->mpeaceful && !Conflict) {
             if ((otmp = which_armor(mtmp, W_ARMH)) == 0) {
                 #ifdef ZHLANG
-                pline("%s waves.", Monnam(mtmp));
+                pline(TR("%s waves.", "%s挥了挥手。"), Monnam(mtmp));
                 #else
                 pline("%s waves.", Monnam(mtmp));
                 #endif
             } else if (otmp->cursed) {
                 #ifdef ZHLANG
-                pline("%s grasps %s %s but can't remove it.", Monnam(mtmp),
+                pline(TR("%s grasps %s %s but can't remove it.", "%s抓住%s%s，却摘不下来。"), Monnam(mtmp),
                       mhis(mtmp), helm_simple_name(otmp));
                 #else
                 pline("%s grasps %s %s but can't remove it.", Monnam(mtmp),
@@ -1681,7 +1681,7 @@ tiphat(void)
                 otmp->bknown = 1;
             } else {
                 #ifdef ZHLANG
-                pline("%s tips %s %s in response.", Monnam(mtmp),
+                pline(TR("%s tips %s %s in response.", "%s回礼时轻抬了一下%s%s。"), Monnam(mtmp),
                       mhis(mtmp), helm_simple_name(otmp));
                 #else
                 pline("%s tips %s %s in response.", Monnam(mtmp),
@@ -1696,7 +1696,7 @@ tiphat(void)
                 twice = (Deaf || which > 0 || rn2(3)) ? 0 : rn1(2, 1);
 
             #ifdef ZHLANG
-            pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
+            pline(TR("%s %s%s%s at you...", "%s对你%s%s%s……"), Monnam(mtmp), reaction[which],
                   twice ? " and " : "", twice ? reaction[twice] : "");
             #else
             pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
@@ -1707,7 +1707,7 @@ tiphat(void)
                 map_invisible(x, y);
         } else if (vismon) {
             #ifdef ZHLANG
-            pline("%s doesn't respond.", Monnam(mtmp));
+            pline(TR("%s doesn't respond.", "%s没有回应。"), Monnam(mtmp));
             #else
             pline("%s doesn't respond.", Monnam(mtmp));
             #endif

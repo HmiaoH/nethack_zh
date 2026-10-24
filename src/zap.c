@@ -2302,7 +2302,7 @@ bhito(struct obj *obj, struct obj *otmp)
                        below are superfluous because containers don't stack */
                     if (obj->otrapped)
                         #ifdef ZHLANG
-pline("%s有陷阱！", Tobjnam(obj, "are"));
+pline("%s有陷阱！", Tobjnam(obj, TR("are", "已经")));
 #else
 pline("%s trapped!", Tobjnam(obj, "are"));
 #endif
@@ -2311,7 +2311,7 @@ pline("%s trapped!", Tobjnam(obj, "are"));
 
                 if (!obj->cobj) {
                     #ifdef ZHLANG
-pline("%s是空的。", Tobjnam(obj, "are"));
+pline("%s是空的。", Tobjnam(obj, TR("are", "已经")));
 #else
 pline("%s empty.", Tobjnam(obj, "are"));
 #endif
@@ -2804,7 +2804,7 @@ pline("%s glows and fades.", The(xname(obj)));
     }
     if (obj && obj->spe < 0) {
         #ifdef ZHLANG
-pline("%s化为了灰烬。", Tobjnam(obj, "turn"));
+pline("%s化为了灰烬。", Tobjnam(obj, TR("turn", "已经")));
 #else
 pline("%s to dust.", Tobjnam(obj, "turn"));
 #endif

@@ -40,22 +40,23 @@ static const struct color_names colornames[] = {
 };
 
 struct attr_names {
-    const char *name;
+    const char *name;   /* canonical English token, used for config files */
+    const char *zhname; /* Chinese menu text (display only; may be Null) */
     int attr;
 };
 
 static const struct attr_names attrnames[] = {
-    { "none", ATR_NONE },
-    { "bold", ATR_BOLD },
-    { "dim", ATR_DIM },
-    { "italic", ATR_ITALIC },
-    { "underline", ATR_ULINE },
-    { "blink", ATR_BLINK },
-    { "inverse", ATR_INVERSE },
-    { (const char *) 0, ATR_NONE }, /* everything after this is an alias */
-    { "normal", ATR_NONE },
-    { "uline", ATR_ULINE },
-    { "reverse", ATR_INVERSE },
+    { "none", "无", ATR_NONE },
+    { "bold", "粗体", ATR_BOLD },
+    { "dim", "暗淡", ATR_DIM },
+    { "italic", "斜体", ATR_ITALIC },
+    { "underline", "下划线", ATR_ULINE },
+    { "blink", "闪烁", ATR_BLINK },
+    { "inverse", "反色", ATR_INVERSE },
+    { (const char *) 0, (const char *) 0, ATR_NONE }, /* aliases after this */
+    { "normal", (const char *) 0, ATR_NONE },
+    { "uline", (const char *) 0, ATR_ULINE },
+    { "reverse", (const char *) 0, ATR_INVERSE },
 };
 
 /* { colortyp, tableindex, rgbindx, name, r, g, b }, */
@@ -399,18 +400,38 @@ query_attr(const char *prompt, int dflt_attr)
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
-    boolean allow_many = (prompt && !strncmpi(prompt, "Choose", 6));
+    /* botl.c cues "multiple attributes are allowed" by passing a prompt
+       which starts with "Choose"; in the translated game that prompt is
+       Chinese, so recognize its wording too */
+    boolean allow_many = (prompt
+                          && (!strncmpi(prompt, "Choose", 6)
+#ifdef ZHLANG
+                              || !strncmp(prompt, "选择当", 9)
+                              || !strncmp(prompt, "选择始终高亮", 18)
+#endif
+                              ));
     int clr = NO_COLOR;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(attrnames); i++) {
+        const char *menutext;
+
         if (!attrnames[i].name)
             break;
+        /* menu shows the translated name; match_str2attr() keeps matching
+           and writing the canonical English token */
+#ifdef ZHLANG
+        menutext = (attrnames[i].zhname && *attrnames[i].zhname)
+                       ? attrnames[i].zhname
+                       : attrnames[i].name;
+#else
+        menutext = attrnames[i].name;
+#endif
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                 attrnames[i].attr, clr, attrnames[i].name,
+                 attrnames[i].attr, clr, menutext,
                  (attrnames[i].attr == dflt_attr) ? MENU_ITEMFLAGS_SELECTED
                                                   : MENU_ITEMFLAGS_NONE);
     }

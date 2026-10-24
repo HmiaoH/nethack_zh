@@ -1083,11 +1083,26 @@ test_move(
                     if (sym == S_stone)
                         Strcpy(buf, TR("solid stone", "坚硬的石头"));
                     else if (sym >= 0)
+#ifdef ZHLANG
+                        /* R6: defsyms[].explanation is English; only the
+                           solid obstacles which can be bumped into are
+                           needed here */
+                        Strcpy(buf, (sym >= S_vwall && sym <= S_trwall)
+                                       ? "墙"
+                                       : (sym == S_tree) ? "树"
+                                                         : "障碍物");
+#else
                         Strcpy(buf, an(defsyms[sym].explanation));
+#endif
                     else
                         Sprintf(buf, TR("impossible [background glyph=%d]", "不可能［背景符号=%d］"),
                                 glyph);
+#ifdef ZHLANG
+                    /* whole Chinese sentence: 那里是墙。 */
+                    pline_dir(xytodir(dx, dy), "那里是%s。", buf);
+#else
                     pline_dir(xytodir(dx, dy), "It's %s.", buf);
+#endif
                 }
             }
             return FALSE;
@@ -2942,7 +2957,7 @@ domove_core(void)
             mtmp->mux = u.ux, mtmp->muy = u.uy;
 
 #ifdef ZHLANG
-            pline("%s和你交换了位置...",
+            pline("%s和你交换了位置……",
                   !noticed_it ? Something : YMonnam(mtmp));
 #else
             pline("%s swaps places with you...",
@@ -3033,7 +3048,7 @@ domove_core(void)
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
-        gm.multi_reason = "dragging an iron ball";
+        gm.multi_reason = TR("dragging an iron ball", "正拖着铁球");
         gn.nomovemsg = "";
     }
 

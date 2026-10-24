@@ -223,13 +223,13 @@ u_slow_down(void)
     HFast = 0L;
     if (!Fast)
 #ifdef ZHLANG
-        You("slow down.");
+        You(TR("slow down.", "慢了下来。"));
 #else
         You("slow down.");
 #endif
     else /* speed boots */
 #ifdef ZHLANG
-        Your("quickness feels less natural.");
+        Your(TR("quickness feels less natural.", "身手不再那么轻快了。"));
 #else
         Your("quickness feels less natural.");
 #endif
@@ -280,7 +280,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
         if (compat) {
 #ifdef ZHLANG
-            pline("%s tries to touch you and misses!", Monst_name);
+            pline(TR("%s tries to touch you and misses!", "%s试着碰你，却落空了！"), Monst_name);
 #else
             pline("%s tries to touch you and misses!", Monst_name);
 #endif
@@ -288,21 +288,21 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
             switch (rn2(3)) {
             case 0:
 #ifdef ZHLANG
-                pline("%s %s wildly and misses!", Monst_name, swings);
+                pline(TR("%s %s wildly and misses!", "%s%s得又急又乱，却没有打中！"), Monst_name, swings);
 #else
                 pline("%s %s wildly and misses!", Monst_name, swings);
 #endif
                 break;
             case 1:
 #ifdef ZHLANG
-                pline("%s attacks a spot beside you.", Monst_name);
+                pline(TR("%s attacks a spot beside you.", "%s朝你身旁的空处攻击。"), Monst_name);
 #else
                 pline("%s attacks a spot beside you.", Monst_name);
 #endif
                 break;
             case 2:
 #ifdef ZHLANG
-                pline("%s strikes at %s!", Monst_name,
+                pline(TR("%s strikes at %s!", "%s朝%s击去！"), Monst_name,
                       is_waterwall(mtmp->mux,mtmp->muy)
                         ? "empty water"
                         : "thin air");
@@ -315,7 +315,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
                 break;
             default:
 #ifdef ZHLANG
-                pline("%s %s wildly!", Monst_name, swings);
+                pline(TR("%s %s wildly!", "%s%s得毫无章法！"), Monst_name, swings);
 #else
                 pline("%s %s wildly!", Monst_name, swings);
 #endif
@@ -326,7 +326,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
         /* give 'displaced' message even if hero is Blind */
         if (compat)
 #ifdef ZHLANG
-            pline("%s smiles %s at your %sdisplaced image...", Monst_name,
+            pline(TR("%s smiles %s at your %sdisplaced image...", "%s%s地对着你%s的错位影像微笑……"), Monst_name,
                   (compat == 2) ? "engagingly" : "seductively",
                   Invis ? "invisible " : "");
 #else
@@ -336,7 +336,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 #endif
         else
 #ifdef ZHLANG
-            pline("%s strikes at your %sdisplaced image and misses you!",
+            pline(TR("%s strikes at your %sdisplaced image and misses you!", "%s朝你%s的错位影像击去，却没打中你！"),
                   /* Note:  if you're both invisible and displaced, only
                    * monsters which see invisible will attack your displaced
                    * image, since the displaced image is also invisible. */
@@ -354,13 +354,13 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
            bubbles shake the player here and there */
         if (compat)
 #ifdef ZHLANG
-            pline("%s reaches towards your distorted image.", Monst_name);
+            pline(TR("%s reaches towards your distorted image.", "%s朝你扭曲的影像伸出手。"), Monst_name);
 #else
             pline("%s reaches towards your distorted image.", Monst_name);
 #endif
         else
 #ifdef ZHLANG
-            pline("%s is fooled by water reflections and misses!",
+            pline(TR("%s is fooled by water reflections and misses!", "%s被水面的倒影骗过，落空了！"),
                   Monst_name);
 #else
             pline("%s is fooled by water reflections and misses!",
@@ -382,7 +382,7 @@ expels(
     if (message) {
         if (digests(mdat)) {
 #ifdef ZHLANG
-            You("get regurgitated!");
+            You(TR("get regurgitated!", "被吐了出来！"));
 #else
             You("get regurgitated!");
 #endif
@@ -413,7 +413,7 @@ expels(
                     Strcpy(blast, TR(" with a squelch", "，伴随着咕叽一声"));
                 }
 #ifdef ZHLANG
-                You("get expelled from %s%s!", mon_nam(mtmp), blast);
+                You(TR("get expelled from %s%s!", "被%s赶了出来%s！"), mon_nam(mtmp), blast);
 #else
                 You("get expelled from %s%s!", mon_nam(mtmp), blast);
 #endif
@@ -426,7 +426,7 @@ expels(
     /* to cover for a case where mtmp is not in a next square */
     if (um_dist(mtmp->mx, mtmp->my, 1))
 #ifdef ZHLANG
-        pline("Brrooaa...  You land hard at some distance.");
+        pline(TR("Brrooaa...  You land hard at some distance.", "布噜哇……你重重地落在了远处。"));
 #else
         pline("Brrooaa...  You land hard at some distance.");
 #endif
@@ -686,7 +686,7 @@ mattacku(struct monst *mtmp)
             struct obj *obj;
 
 #ifdef ZHLANG
-            You("fall from the %s!", ceiling(u.ux, u.uy));
+            You(TR("fall from the %s!", "从%s上摔了下来！"), ceiling(u.ux, u.uy));
 #else
             You("fall from the %s!", ceiling(u.ux, u.uy));
 #endif
@@ -735,7 +735,7 @@ mattacku(struct monst *mtmp)
             obj = which_armor(mtmp, WORN_HELMET);
             if (hard_helmet(obj)) {
 #ifdef ZHLANG
-                Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)),
+                Your(TR("blow glances off %s %s.", "攻击从%s的%s上弹开了。"), s_suffix(mon_nam(mtmp)),
                      helm_simple_name(obj));
 #else
                 Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)),
@@ -744,7 +744,7 @@ mattacku(struct monst *mtmp)
             } else {
                 if (3 + find_mac(mtmp) <= rnd(20)) {
 #ifdef ZHLANG
-                    pline("%s is hit by a falling piercer (you)!",
+                    pline(TR("%s is hit by a falling piercer (you)!", "%s被落下的穿刺兽击中（你造成的）！"),
                           Monnam(mtmp));
 #else
                     pline("%s is hit by a falling piercer (you)!",
@@ -754,7 +754,7 @@ mattacku(struct monst *mtmp)
                         killed(mtmp);
                 } else
 #ifdef ZHLANG
-                    pline("%s is almost hit by a falling piercer (you)!",
+                    pline(TR("%s is almost hit by a falling piercer (you)!", "%s差点被落下的穿刺兽击中（你造成的）！"),
                           Monnam(mtmp));
 #else
                     pline("%s is almost hit by a falling piercer (you)!",
@@ -766,7 +766,7 @@ mattacku(struct monst *mtmp)
             /* surface hider */
             if (!youseeit) {
 #ifdef ZHLANG
-                pline("It tries to move where you are hiding.");
+                pline(TR("It tries to move where you are hiding.", "它试图移动到你的藏身之处。"));
 #else
                 pline("It tries to move where you are hiding.");
 #endif
@@ -839,13 +839,13 @@ mattacku(struct monst *mtmp)
             map_invisible(mtmp->mx, mtmp->my);
         if (sticky && !youseeit)
 #ifdef ZHLANG
-            pline("It gets stuck on you.");
+            pline(TR("It gets stuck on you.", "它粘在了你身上。"));
 #else
             pline("It gets stuck on you.");
 #endif
         else /* see note about m_monnam() above */
 #ifdef ZHLANG
-            pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
+            pline(TR("Wait, %s!  That's a %s named %s!", "等等，%s！那是个%s，名叫%s！"), m_monnam(mtmp),
                   pmname(gy.youmonst.data, Ugender), svp.plname);
 #else
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
@@ -879,7 +879,7 @@ mattacku(struct monst *mtmp)
 #endif
         else /* see note about m_monnam() above */
 #ifdef ZHLANG
-            pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
+            pline(TR("Wait, %s!  That %s is really %s named %s!", "等等，%s！那个%s其实是%s，名叫%s！"), m_monnam(mtmp),
                   mimic_obj_name(&gy.youmonst),
                   an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
 #else
@@ -945,7 +945,7 @@ mattacku(struct monst *mtmp)
         } else if (!range2) {
             if (youseeit || sensemon(mtmp))
 #ifdef ZHLANG
-                pline("%s starts to attack you, but pulls back.",
+                pline(TR("%s starts to attack you, but pulls back.", "%s刚要攻击你，却又缩了回去。"),
                       Monnam(mtmp));
 #else
                 pline("%s starts to attack you, but pulls back.",
@@ -953,7 +953,7 @@ mattacku(struct monst *mtmp)
 #endif
             else
 #ifdef ZHLANG
-                You_feel("%s move nearby.", something);
+                You_feel(TR("%s move nearby.", "%s在附近移动。"), something);
 #else
                 You_feel("%s move nearby.", something);
 #endif
@@ -1084,7 +1084,7 @@ mattacku(struct monst *mtmp)
 #endif
                         }
 #ifdef ZHLANG
-                        You_hear("a %s nearby.",
+                        You_hear(TR("a %s nearby.", "附近传来一阵%s。"),
                                  is_whirly(mtmp->data) ? "rushing noise"
                                                        : "splat");
 #else
@@ -1165,7 +1165,7 @@ mattacku(struct monst *mtmp)
         if (sum[i] == M_ATTK_HIT) { /* successful attack */
             if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
-                gn.nomovemsg = "The combat suddenly awakens you.";
+                gn.nomovemsg = TR("The combat suddenly awakens you.", "战斗的响动突然把你惊醒了。");
             }
         }
         if ((sum[i] & M_ATTK_AGR_DIED))
@@ -1228,13 +1228,13 @@ summonmu(struct monst *mtmp, boolean youseeit)
                 if (numhelp > 0) {
                     if (numseen == 0)
 #ifdef ZHLANG
-                        You_feel("hemmed in.");
+                        You_feel(TR("hemmed in.", "被围住了。"));
 #else
                         You_feel("hemmed in.");
 #endif
                 } else {
 #ifdef ZHLANG
-                    pline("But none comes.");
+                    pline(TR("But none comes.", "但没有谁过来。"));
 #else
                     pline("But none comes.");
 #endif
@@ -1257,7 +1257,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
                 if (numhelp > 0) {
                     if (numseen < 1) {
 #ifdef ZHLANG
-                        You_feel("hemmed in.");
+                        You_feel(TR("hemmed in.", "被围住了。"));
 #else
                         You_feel("hemmed in.");
 #endif
@@ -1285,7 +1285,7 @@ diseasemu(struct permonst *mdat)
 {
     if (Sick_resistance) {
 #ifdef ZHLANG
-        You_feel("a slight illness.");
+        You_feel(TR("a slight illness.", "有点不舒服。"));
 #else
         You_feel("a slight illness.");
 #endif
@@ -1343,7 +1343,7 @@ u_slip_free(
 
         if (obj->greased && !rn2(2)) {
 #ifdef ZHLANG
-            pline_The("grease wears off.");
+            pline_The(TR("grease wears off.", "油脂失效了。"));
 #else
             pline_The("grease wears off.");
 #endif
@@ -1449,7 +1449,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
                 if (!strcmp(Amonbuf, "It")) /* note: not strcmpi() */
                     Strcpy(Amonbuf, Something);
 #ifdef ZHLANG
-                pline("%s was hidden under %s!", Amonbuf, what);
+                pline(TR("%s was hidden under %s!", "%s原来藏在%s下面！"), Amonbuf, what);
 #else
                 pline("%s was hidden under %s!", Amonbuf, what);
 #endif
@@ -1593,7 +1593,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
             Strcpy(buf, mon_nam(u.usteed));
 #ifdef ZHLANG
-            urgent_pline("%s %s forward and plucks you off %s!",
+            urgent_pline(TR("%s %s forward and plucks you off %s!", "%s向前%s，把你从%s上抓了下来！"),
                          Some_Monnam(mtmp),
                          /* 't', purple 'w' */
                          is_animal(mtmp->data) ? "lunges"
@@ -1640,7 +1640,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         if (u.utrap) {
 #ifdef ZHLANG
-            You("are released from the %s!",
+            You(TR("are released from the %s!", "从%s中脱身了！"),
                 (u.utraptype == TT_WEB) ? "web" : "trap");
 #else
             You("are released from the %s!",
@@ -1654,7 +1654,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             const char *s = (i > 1) ? "leashes" : "leash";
 
 #ifdef ZHLANG
-            pline_The("%s %s loose.", s, vtense(s, "snap"));
+            pline_The(TR("%s %s loose.", "%s %s，松脱了。"), s, vtense(s, "snap"));
 #else
             pline_The("%s %s loose.", s, vtense(s, "snap"));
 #endif
@@ -1731,7 +1731,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             tmp = 0;
         } else if (u.uswldtim == 0) {
 #ifdef ZHLANG
-            pline("%s totally digests you!", Monnam(mtmp));
+            pline(TR("%s totally digests you!", "%s把你彻底消化了！"), Monnam(mtmp));
 #else
             pline("%s totally digests you!", Monnam(mtmp));
 #endif
@@ -1740,7 +1740,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 tmp *= 2; /* sorry */
         } else {
 #ifdef ZHLANG
-            pline("%s%s digests you!", Monnam(mtmp),
+            pline(TR("%s%s digests you!", "%s%s消化了你！"), Monnam(mtmp),
                   (u.uswldtim == 2) ? " thoroughly"
                                     : (u.uswldtim == 1) ? " utterly" : "");
 #else
@@ -1755,7 +1755,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         physical_damage = TRUE;
         if (mtmp->data == &mons[PM_FOG_CLOUD]) {
 #ifdef ZHLANG
-            You("are laden with moisture and %s",
+            You(TR("are laden with moisture and %s", "浑身浸满水汽，%s"),
                 flaming(gy.youmonst.data)
                     ? "are smoldering out!"
                     : Breathless ? "find it mildly uncomfortable."
@@ -1775,7 +1775,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 tmp = 0;
         } else {
 #ifdef ZHLANG
-            You("are %s!", enfolds(mtmp->data) ? "being squashed"
+            You(TR("are %s!", "正被%s！"), enfolds(mtmp->data) ? "being squashed"
                                                : "pummeled with debris");
 #else
             You("are %s!", enfolds(mtmp->data) ? "being squashed"
@@ -1787,7 +1787,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     case AD_ACID:
         if (Acid_resistance) {
 #ifdef ZHLANG
-            You("are covered with a seemingly harmless goo.");
+            You(TR("are covered with a seemingly harmless goo.", "身上糊着一层看似无害的黏液。"));
 #else
             You("are covered with a seemingly harmless goo.");
 #endif
@@ -1798,13 +1798,13 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         } else {
             if (Hallucination)
 #ifdef ZHLANG
-                pline("Ouch!  You've been slimed!");
+                pline(TR("Ouch!  You've been slimed!", "哎哟！你被黏液糊了一身！"));
 #else
                 pline("Ouch!  You've been slimed!");
 #endif
             else
 #ifdef ZHLANG
-                You("are covered in slime!  It burns!");
+                You(TR("are covered in slime!  It burns!", "浑身都是黏液！火辣辣地疼！"));
 #else
                 You("are covered in slime!  It burns!");
 #endif
@@ -1819,7 +1819,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
                 if (!Blinded)
 #ifdef ZHLANG
-                    You_cant("see in here!");
+                    You_cant(TR("see in here!", "看清这里！"));
 #else
                     You_cant("see in here!");
 #endif
@@ -1839,14 +1839,14 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     case AD_ELEC:
         if (!mtmp->mcan && rn2(2)) {
 #ifdef ZHLANG
-            pline_The("air around you crackles with electricity.");
+            pline_The(TR("air around you crackles with electricity.", "你周围的空气噼啪作响，迸出电弧。"));
 #else
             pline_The("air around you crackles with electricity.");
 #endif
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
 #ifdef ZHLANG
-                You("seem unhurt.");
+                You(TR("seem unhurt.", "似乎毫发无伤。"));
 #else
                 You("seem unhurt.");
 #endif
@@ -1864,7 +1864,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Cold_resistance) {
                 shieldeff(u.ux, u.uy);
 #ifdef ZHLANG
-                You_feel("mildly chilly.");
+                You_feel(TR("mildly chilly.", "有点冷。"));
 #else
                 You_feel("mildly chilly.");
 #endif
@@ -1873,7 +1873,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 tmp = 0;
             } else {
 #ifdef ZHLANG
-                You("are freezing to death!");
+                You(TR("are freezing to death!", "快冻死了！"));
 #else
                 You("are freezing to death!");
 #endif
@@ -1887,7 +1887,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Fire_resistance) {
                 shieldeff(u.ux, u.uy);
 #ifdef ZHLANG
-                You_feel("mildly hot.");
+                You_feel(TR("mildly hot.", "有点热。"));
 #else
                 You_feel("mildly hot.");
 #endif
@@ -1896,7 +1896,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 tmp = 0;
             } else {
 #ifdef ZHLANG
-                You("are burning to a crisp!");
+                You(TR("are burning to a crisp!", "快被烧焦了！"));
 #else
                 You("are burning to a crisp!");
 #endif
@@ -1942,7 +1942,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         ; /* life-saving has already expelled swallowed hero */
     } else if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
 #ifdef ZHLANG
-        pline("%s very hurriedly %s you!", Monnam(mtmp),
+        pline(TR("%s very hurriedly %s you!", "%s慌忙地%s了你！"), Monnam(mtmp),
               digests(mtmp->data) ? "regurgitates"
               : enfolds(mtmp->data) ? "releases"
                 : "expels");
@@ -1959,7 +1959,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
            however, polymorphing into a huge form while already
            swallowed is still possible */
 #ifdef ZHLANG
-        You("get %s!", digests(mtmp->data) ? "regurgitated"
+        You(TR("get %s!", "被%s了！"), digests(mtmp->data) ? "regurgitated"
                        : enfolds(mtmp->data) ? "released"
                          : "expelled");
 #else
@@ -1970,7 +1970,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         if (flags.verbose
             && (digests(mtmp->data) && Slow_digestion))
 #ifdef ZHLANG
-            pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
+            pline(TR("Obviously %s doesn't like your taste.", "显然%s不喜欢你的味道。"), mon_nam(mtmp));
 #else
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
 #endif
@@ -1998,7 +1998,7 @@ explmu(
 
     if (!ufound) {
 #ifdef ZHLANG
-        pline("%s explodes at a spot in %s!",
+        pline(TR("%s explodes at a spot in %s!", "%s在%s中炸开了！"),
               canseemon(mtmp) ? Monnam(mtmp) : "It",
               is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
                                                 : "thin air");
@@ -2026,7 +2026,7 @@ explmu(
             /* sometimes you're affected even if it's invisible */
             if (mon_visible(mtmp) || (rnd(tmp /= 2) > u.ulevel)) {
 #ifdef ZHLANG
-                You("are blinded by a blast of light!");
+                You(TR("are blinded by a blast of light!", "被一道强光晃瞎了！"));
 #else
                 You("are blinded by a blast of light!");
 #endif
@@ -2039,7 +2039,7 @@ explmu(
 #endif
             } else if (flags.verbose)
 #ifdef ZHLANG
-                You("get the impression it was not terribly bright.");
+                You(TR("get the impression it was not terribly bright.", "觉得那道光不怎么亮。"));
 #else
                 You("get the impression it was not terribly bright.");
 #endif
@@ -2053,7 +2053,7 @@ explmu(
             boolean chg;
             if (!Hallucination)
 #ifdef ZHLANG
-                You("are caught in a blast of kaleidoscopic light!");
+                You(TR("are caught in a blast of kaleidoscopic light!", "被一片万花筒般的彩光笼罩了！"));
 #else
                 You("are caught in a blast of kaleidoscopic light!");
 #endif
@@ -2075,7 +2075,7 @@ explmu(
     }
     if (not_affected) {
 #ifdef ZHLANG
-        You("seem unaffected by it.");
+        You(TR("seem unaffected by it.", "似乎没有受到影响。"));
 #else
         You("seem unaffected by it.");
 #endif
@@ -2135,7 +2135,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             }
             if (is_medusa && Hallucination && !rn2(3))
 #ifdef ZHLANG
-                pline("Someone seems overdue for a serpent cut.");
+                pline(TR("Someone seems overdue for a serpent cut.", "看来某人早该被理个蛇发了。"));
 #else
                 pline("Someone seems overdue for a serpent cut.");
 #endif
@@ -2192,7 +2192,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
             && !Stone_resistance && !Unaware) {
 #ifdef ZHLANG
-            You("meet %s gaze.", s_suffix(mon_nam(mtmp)));
+            You(TR("meet %s gaze.", "与%s的目光相遇。"), s_suffix(mon_nam(mtmp)));
 #else
             You("meet %s gaze.", s_suffix(mon_nam(mtmp)));
 #endif
@@ -2200,7 +2200,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
 #ifdef ZHLANG
-            urgent_pline("You turn to stone...");
+            urgent_pline(TR("You turn to stone...", "你变成了石头……"));
 #else
             urgent_pline("You turn to stone...");
 #endif
@@ -2228,7 +2228,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
 #endif
                 else
 #ifdef ZHLANG
-                    You("are getting more and more confused.");
+                    You(TR("are getting more and more confused.", "越来越混乱了。"));
 #else
                     You("are getting more and more confused.");
 #endif
@@ -2270,7 +2270,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 int blnd = d((int) mattk->damn, (int) mattk->damd);
 
 #ifdef ZHLANG
-                You("are blinded by %s radiance!", s_suffix(mon_nam(mtmp)));
+                You(TR("are blinded by %s radiance!", "被%s的光辉晃瞎了！"), s_suffix(mon_nam(mtmp)));
 #else
                 You("are blinded by %s radiance!", s_suffix(mon_nam(mtmp)));
 #endif
@@ -2313,7 +2313,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 if (Fire_resistance) {
                     shieldeff(u.ux, u.uy);
 #ifdef ZHLANG
-                    pline_The("fire doesn't feel hot!");
+                    pline_The(TR("fire doesn't feel hot!", "火焰一点也不烫！"));
 #else
                     pline_The("fire doesn't feel hot!");
 #endif
@@ -2344,7 +2344,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             } else {
                 fall_asleep(-rnd(10), TRUE);
 #ifdef ZHLANG
-                pline("%s gaze makes you very sleepy...",
+                pline(TR("%s gaze makes you very sleepy...", "%s的目光让你昏昏欲睡……"),
                       s_suffix(Monnam(mtmp)));
 #else
                 pline("%s gaze makes you very sleepy...",
@@ -2509,13 +2509,13 @@ doseduce(struct monst *mon)
     seewho = canseemon(mon);
     if (!seewho)
 #ifdef ZHLANG
-        pline("Someone caresses you...");
+        pline(TR("Someone caresses you...", "有人爱抚着你……"));
 #else
         pline("Someone caresses you...");
 #endif
     else
 #ifdef ZHLANG
-        You_feel("very attracted to %s.", mon_nam(mon));
+        You_feel(TR("very attracted to %s.", "被%s深深吸引了。"), mon_nam(mon));
 #else
         You_feel("very attracted to %s.", mon_nam(mon));
 #endif
@@ -2552,7 +2552,7 @@ doseduce(struct monst *mon)
                     continue;
             } else
 #ifdef ZHLANG
-                pline("%s decides she'd like %s, and takes it.",
+                pline(TR("%s decides she'd like %s, and takes it.", "%s决定她想要%s，就把它拿走了。"),
                       Who, yname(ring));
 #else
                 pline("%s decides she'd like %s, and takes it.",
@@ -2588,14 +2588,14 @@ doseduce(struct monst *mon)
                     continue;
             } else {
 #ifdef ZHLANG
-                pline("%s decides you'd look prettier wearing %s,",
+                pline(TR("%s decides you'd look prettier wearing %s,", "%s觉得你戴上%s会更好看，"),
                       Who, yname(ring));
 #else
                 pline("%s decides you'd look prettier wearing %s,",
                       Who, yname(ring));
 #endif
 #ifdef ZHLANG
-                pline("and puts it on your finger.");
+                pline(TR("and puts it on your finger.", "然后把它戴在了你的手指上。"));
 #else
                 pline("and puts it on your finger.");
 #endif
@@ -2603,7 +2603,7 @@ doseduce(struct monst *mon)
             makeknown(RIN_ADORNMENT);
             if (!uright) {
 #ifdef ZHLANG
-                pline("%s puts %s on your right %s.",
+                pline(TR("%s puts %s on your right %s.", "%s把%s戴在你的右%s上。"),
                       Who, the(xname(ring)), body_part(HAND));
 #else
                 pline("%s puts %s on your right %s.",
@@ -2612,7 +2612,7 @@ doseduce(struct monst *mon)
                 setworn(ring, RIGHT_RING);
             } else if (!uleft) {
 #ifdef ZHLANG
-                pline("%s puts %s on your left %s.",
+                pline(TR("%s puts %s on your left %s.", "%s把%s戴在你的左%s上。"),
                       Who, the(xname(ring)), body_part(HAND));
 #else
                 pline("%s puts %s on your left %s.",
@@ -2625,7 +2625,7 @@ doseduce(struct monst *mon)
                    but trying to figure that out in advance in order to use
                    alternate wording is not worth the effort */
 #ifdef ZHLANG
-                pline("%s replaces %s with %s.",
+                pline(TR("%s replaces %s with %s.", "%s把%s换成了%s。"),
                       Who, yname(uright), yname(ring));
 #else
                 pline("%s replaces %s with %s.",
@@ -2640,7 +2640,7 @@ doseduce(struct monst *mon)
             } else if (uleft && uleft->otyp != RIN_ADORNMENT) {
                 /* see "replaces" note above */
 #ifdef ZHLANG
-                pline("%s replaces %s with %s.",
+                pline(TR("%s replaces %s with %s.", "%s把%s换成了%s。"),
                       Who, yname(uleft), yname(ring));
 #else
                 pline("%s replaces %s with %s.",
@@ -2696,7 +2696,7 @@ doseduce(struct monst *mon)
             if (!(ld() && mon->female)) {
                 SetVoice(mon, 0, 80, 0);
 #ifdef ZHLANG
-                verbalize("You're such a %s; I wish...",
+                verbalize(TR("You're such a %s; I wish...", "你真是个%s；我倒希望……"),
                           flags.female ? "sweet lady" : "nice guy");
 #else
                 verbalize("You're such a %s; I wish...",
@@ -2710,7 +2710,7 @@ doseduce(struct monst *mon)
                 if (yourgloves)
                     observe_object(yourgloves);
 #ifdef ZHLANG
-                verbalize("Well, then you owe me %s%s!",
+                verbalize(TR("Well, then you owe me %s%s!", "好吧，那你欠我%s%s！"),
                           yourgloves ? yname(yourgloves)
                                      : "twelve pairs of gloves",
                           yourgloves ? " and eleven more pairs of gloves"
@@ -2756,7 +2756,7 @@ doseduce(struct monst *mon)
     if (rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
 #ifdef ZHLANG
-        pline("%s seems to have enjoyed it more than you...",
+        pline(TR("%s seems to have enjoyed it more than you...", "%s似乎比你更享受……"),
               noit_Monnam(mon));
 #else
         pline("%s seems to have enjoyed it more than you...",
@@ -2765,7 +2765,7 @@ doseduce(struct monst *mon)
         switch (rn2(5)) {
         case 0:
 #ifdef ZHLANG
-            You_feel("drained of energy.");
+            You_feel(TR("drained of energy.", "能量被抽干了。"));
 #else
             You_feel("drained of energy.");
 #endif
@@ -2777,7 +2777,7 @@ doseduce(struct monst *mon)
             break;
         case 1:
 #ifdef ZHLANG
-            You("are down in the dumps.");
+            You(TR("are down in the dumps.", "情绪低落。"));
 #else
             You("are down in the dumps.");
 #endif
@@ -2787,7 +2787,7 @@ doseduce(struct monst *mon)
             break;
         case 2:
 #ifdef ZHLANG
-            Your("senses are dulled.");
+            Your(TR("senses are dulled.", "感官变得迟钝了。"));
 #else
             Your("senses are dulled.");
 #endif
@@ -2798,14 +2798,14 @@ doseduce(struct monst *mon)
         case 3:
             if (!resists_drli(&gy.youmonst)) {
 #ifdef ZHLANG
-                You_feel("out of shape.");
+                You_feel(TR("out of shape.", "身体状态变差了。"));
 #else
                 You_feel("out of shape.");
 #endif
                 losexp("overexertion");
             } else {
 #ifdef ZHLANG
-                You("have a curious feeling...");
+                You(TR("have a curious feeling...", "有种异样的感觉……"));
 #else
                 You("have a curious feeling...");
 #endif
@@ -2818,7 +2818,7 @@ doseduce(struct monst *mon)
             int tmp;
 
 #ifdef ZHLANG
-            You_feel("exhausted.");
+            You_feel(TR("exhausted.", "筋疲力尽了。"));
 #else
             You_feel("exhausted.");
 #endif
@@ -2831,14 +2831,14 @@ doseduce(struct monst *mon)
     } else {
         mon->mspec_used = rnd(100); /* monster is worn out */
 #ifdef ZHLANG
-        You("seem to have enjoyed it more than %s...", noit_mon_nam(mon));
+        You(TR("seem to have enjoyed it more than %s...", "似乎比%s更享受……"), noit_mon_nam(mon));
 #else
         You("seem to have enjoyed it more than %s...", noit_mon_nam(mon));
 #endif
         switch (rn2(5)) {
         case 0:
 #ifdef ZHLANG
-            You_feel("raised to your full potential.");
+            You_feel(TR("raised to your full potential.", "潜能被完全激发了出来。"));
 #else
             You_feel("raised to your full potential.");
 #endif
@@ -2849,7 +2849,7 @@ doseduce(struct monst *mon)
             break;
         case 1:
 #ifdef ZHLANG
-            You_feel("good enough to do it again.");
+            You_feel(TR("good enough to do it again.", "状态好得可以再来一次。"));
 #else
             You_feel("good enough to do it again.");
 #endif
@@ -2859,7 +2859,7 @@ doseduce(struct monst *mon)
             break;
         case 2:
 #ifdef ZHLANG
-            You("will always remember %s...", noit_mon_nam(mon));
+            You(TR("will always remember %s...", "会永远记得%s……"), noit_mon_nam(mon));
 #else
             You("will always remember %s...", noit_mon_nam(mon));
 #endif
@@ -2869,7 +2869,7 @@ doseduce(struct monst *mon)
             break;
         case 3:
 #ifdef ZHLANG
-            pline("That was a very educational experience.");
+            pline(TR("That was a very educational experience.", "那可真是很有教育意义的一次经历。"));
 #else
             pline("That was a very educational experience.");
 #endif
@@ -2878,7 +2878,7 @@ doseduce(struct monst *mon)
             break;
         case 4:
 #ifdef ZHLANG
-            You_feel("restored to health!");
+            You_feel(TR("restored to health!", "恢复了健康！"));
 #else
             You_feel("restored to health!");
 #endif
@@ -2895,7 +2895,7 @@ doseduce(struct monst *mon)
         ;
     } else if (rn2(20) < ACURR(A_CHA)) {
 #ifdef ZHLANG
-        pline("%s demands that you pay %s, but you refuse...",
+        pline(TR("%s demands that you pay %s, but you refuse...", "%s要求你付%s，但你拒绝了……"),
               noit_Monnam(mon), noit_mhim(mon));
 #else
         pline("%s demands that you pay %s, but you refuse...",
@@ -2928,13 +2928,13 @@ doseduce(struct monst *mon)
             if (!Deaf) {
                 SetVoice(mon, 0, 80, 0);
 #ifdef ZHLANG
-                verbalize("It's on the house!");
+                verbalize(TR("It's on the house!", "这次算店里请客！"));
 #else
                 verbalize("It's on the house!");
 #endif
             } else {
 #ifdef ZHLANG
-                pline("No charge.");
+                pline(TR("No charge.", "不收费。"));
 #else
                 pline("No charge.");
 #endif
@@ -2976,7 +2976,7 @@ mayberem(struct monst *mon,
     /* being deaf overrides confirmation prompt for high charisma */
     if (Deaf) {
 #ifdef ZHLANG
-        pline("%s takes off your %s.", seducer, str);
+        pline(TR("%s takes off your %s.", "%s脱下了你的%s。"), seducer, str);
 #else
         pline("%s takes off your %s.", seducer, str);
 #endif
@@ -2993,7 +2993,7 @@ mayberem(struct monst *mon,
                 body_part(HAIR));
         SetVoice(mon, 0, 80, 0);
 #ifdef ZHLANG
-        verbalize("Take off your %s; %s.", str,
+        verbalize(TR("Take off your %s; %s.", "把你的%s脱掉；%s。"), str,
                   (obj == uarm)
                      ? "let's get a little closer"
                      : (obj == uarmc || obj == uarms)
@@ -3219,7 +3219,7 @@ passiveum(
         case AD_PHYS:
             if (oldu_mattk->aatyp == AT_BOOM) {
 #ifdef ZHLANG
-                You("explode!");
+                You(TR("explode!", "爆炸了！"));
 #else
                 You("explode!");
 #endif
@@ -3238,7 +3238,7 @@ passiveum(
                     && (perceives(mtmp->data) || !Invis)) {
                     if (Blind) {
 #ifdef ZHLANG
-                        pline("As a blind %s, you cannot defend yourself.",
+                        pline(TR("As a blind %s, you cannot defend yourself.", "身为失明的%s，你无法自卫。"),
                               pmname(gy.youmonst.data,
                                      flags.female ? FEMALE : MALE));
 #else

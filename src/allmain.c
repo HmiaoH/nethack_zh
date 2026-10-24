@@ -862,7 +862,7 @@ newgame(void)
                 rerolls_this_second = 1;
             } else {
                 if (rerolls_this_second >= sysopt.maxrerollrate) {
-                    if (!paranoid_query(TRUE, "Continue rerolling?"))
+                    if (!paranoid_query(TRUE, TR("Continue rerolling?", "继续重掷吗？")))
                         break;
                     goto check_reroll_time;
                 }

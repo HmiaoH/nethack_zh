@@ -109,6 +109,54 @@ append_str(char *buf, const char *new_str)
     return 1; /* something was appended, possibly just part of " or " */
 }
 
+#ifdef ZHLANG
+/* Chinese race name for display (the races[] table keeps English). */
+staticfn const char *
+zh_pager_race(const char *adj)
+{
+    if (!strcmp(adj, "human"))
+        return "人类";
+    if (!strcmp(adj, "elven"))
+        return "精灵";
+    if (!strcmp(adj, "dwarven"))
+        return "矮人";
+    if (!strcmp(adj, "gnomish"))
+        return "侏儒";
+    if (!strcmp(adj, "orcish"))
+        return "兽人";
+    return adj;
+}
+
+/* Chinese name of a surface() result, for display only */
+staticfn const char *
+zh_pager_surface(const char *en)
+{
+    if (!strcmp(en, "floor") || !strcmp(en, "ground"))
+        return "地面";
+    if (!strcmp(en, "ice"))
+        return "冰面";
+    if (!strcmp(en, "water") || !strcmp(en, "bottom"))
+        return "水面";
+    if (!strcmp(en, "lava"))
+        return "熔岩";
+    if (!strcmp(en, "wall"))
+        return "墙壁";
+    if (!strcmp(en, "doorway"))
+        return "门口";
+    if (!strcmp(en, "bridge"))
+        return "桥面";
+    if (!strcmp(en, "altar"))
+        return "祭坛";
+    if (!strcmp(en, "headstone"))
+        return "墓碑";
+    if (!strcmp(en, "fountain"))
+        return "喷泉";
+    if (!strcmp(en, "stairs"))
+        return "楼梯";
+    return "地面";
+}
+#endif /* ZHLANG */
+
 /* shared by monster probing (via query_objlist!) as well as lookat() */
 char *
 self_lookat(char *outbuf)
@@ -118,11 +166,27 @@ self_lookat(char *outbuf)
     /* include race with role unless polymorphed */
     race[0] = '\0';
     if (!Upolyd)
+#ifdef ZHLANG
+        Sprintf(race, "%s", zh_pager_race(gu.urace.adj));
+#else
         Sprintf(race, "%s ", gu.urace.adj);
-    Sprintf(outbuf, TR("%s%s%s called %s", "%s%s%s，名为%s"),
-            /* being blinded may hide invisibility from self */
-            (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
-            pmname(&mons[u.umonnum], Ugender), svp.plname);
+#endif
+    /* being blinded may hide invisibility from self; the prefix is
+       selected outside the Sprintf call (a directive cannot live in a
+       macro argument) */
+    {
+        const char *inv_desc = "";
+
+        if (Invis && (senseself() || !Blind))
+#ifdef ZHLANG
+            inv_desc = "隐形的";
+#else
+            inv_desc = "invisible ";
+#endif
+        Sprintf(outbuf, TR("%s%s%s called %s", "%s%s%s，名为%s"),
+                inv_desc, race, pmname(&mons[u.umonnum], Ugender),
+                svp.plname);
+    }
     if (u.usteed)
         Sprintf(eos(outbuf), TR(", mounted on %s", "，骑在%s上"), y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE)
@@ -130,11 +194,19 @@ self_lookat(char *outbuf)
         mhidden_description(&gy.youmonst,
                             MHID_PREFIX | MHID_ARTICLE | MHID_REGION,
                             eos(outbuf));
-    if (Punished)
+    if (Punished) {
+        const char *chain_text =
+            uball ? ansimpleoname(uball) : TR("nothing?", "未知之物");
+
         Sprintf(eos(outbuf), TR(", chained to %s", "，被锁链拴在%s上"),
-                uball ? ansimpleoname(uball) : "nothing?");
+                chain_text);
+    }
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
+#ifdef ZHLANG
+        Sprintf(eos(outbuf), "，%s", trap_predicament(trapbuf, 0, FALSE));
+#else
         Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+#endif
     return outbuf;
 }
 
@@ -235,7 +307,11 @@ mhidden_description(
                 dealloc_obj(otmp); /* has no contents */
             }
         } else {
+#ifdef ZHLANG
+            Strcat(outbuf, "某个东西");
+#else
             Strcat(outbuf, something);
+#endif
         }
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (show_altmon) {
@@ -253,11 +329,21 @@ mhidden_description(
             /* remembered glyph, not glyph_at() which is 'mon' */
             if (glyph_is_object(glyph))
                 goto objfrommap;
+#ifdef ZHLANG
+            Strcat(outbuf, "某个东西");
+#else
             Strcat(outbuf, something);
+#endif
         } else if (is_hider(mon->data)) {
+#ifdef ZHLANG
+            Sprintf(eos(outbuf), " 在%s上",
+                    ceiling_hider(mon->data) ? "天花板"
+                       : zh_pager_surface(surface(x, y))); /* trapper */
+#else
             Sprintf(eos(outbuf), TR(" on the %s", " 在%s上"),
                     ceiling_hider(mon->data) ? "ceiling"
                        : surface(x, y)); /* trapper */
+#endif
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
                 Strcat(outbuf, TR(" in murky water", "，在浑浊的水中"));
@@ -1761,7 +1847,11 @@ add_quoted_engraving(
 }
 
 /* also used by getpos hack in getpos.c */
+#ifdef ZHLANG
+const char what_is_a_location[] = "怪物、物品或地点";
+#else
 const char what_is_a_location[] = "a monster, object or location";
+#endif
 
 int
 do_look(int mode, coord *click_cc)

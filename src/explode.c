@@ -827,7 +827,7 @@ scatter(
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy)) {
 #ifdef ZHLANG
-                    pline("%s碎裂了。", Tobjnam(otmp, "break"));
+                    pline("%s碎裂了。", Tobjnam(otmp, TR("break", "突然")));
 #else
                     pline("%s apart.", Tobjnam(otmp, "break"));
 #endif
@@ -853,7 +853,7 @@ scatter(
                     deltrap(trap);
                 if (cansee(sx, sy)) {
 #ifdef ZHLANG
-                    pline("%s崩塌了。", Tobjnam(otmp, "crumble"));
+                    pline("%s崩塌了。", Tobjnam(otmp, TR("crumble", "随之")));
 #else
                     pline("%s.", Tobjnam(otmp, "crumble"));
 #endif

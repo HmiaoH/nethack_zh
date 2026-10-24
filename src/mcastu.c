@@ -1006,7 +1006,7 @@ mcast_paralyze(struct monst *mtmp)
         monstunseesu(M_SEEN_MAGR);
     }
     nomul(-dmg);
-    gm.multi_reason = "paralyzed by a monster";
+    gm.multi_reason = TR("paralyzed by a monster", "被怪物麻痹");
     gn.nomovemsg = 0;
     return dmg;
 }

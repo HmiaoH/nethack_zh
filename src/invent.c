@@ -1724,22 +1724,86 @@ any_obj_ok(struct obj *obj)
 staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
-    if (!strcmp(action, "grease")) {
+    /* 'action' may already have been translated to Chinese by getobj();
+       accept both spellings so the hands description stays Chinese (R5/B5) */
+    if (!strcmp(action, "grease")
+#ifdef ZHLANG
+        || !strcmp(action, "涂油")
+#endif
+        ) {
         Sprintf(qbuf, TR("your %s", "你的%s"), fingers_or_gloves(FALSE));
-    } else if (!strcmp(action, "write with")) {
+    } else if (!strcmp(action, "write with")
+#ifdef ZHLANG
+               || !strcmp(action, "书写")
+#endif
+               ) {
         Sprintf(qbuf, TR("your %s", "你的%s"), body_part(FINGERTIP));
-    } else if (!strcmp(action, "wield")) {
+    } else if (!strcmp(action, "wield")
+#ifdef ZHLANG
+               || !strcmp(action, "挥舞")
+#endif
+               ) {
+#ifdef ZHLANG
+        Sprintf(qbuf, "你%s的手%s", uarmg ? "戴着手套" : "裸露",
+                !uwep ? "（已挥舞）" : "");
+#else
         Sprintf(qbuf, TR("your %s %s%s", "你的%s%s%s"), uarmg ? "gloved" : "bare",
                 makeplural(body_part(HAND)),
                 !uwep ? " (wielded)" : "");
-    } else if (!strcmp(action, "ready")) {
+#endif
+    } else if (!strcmp(action, "ready")
+#ifdef ZHLANG
+               || !strcmp(action, "装备")
+#endif
+               ) {
+#ifdef ZHLANG
+        Sprintf(qbuf, "空箭袋%s", uquiver ? "" : "（未装箭）");
+#else
         Sprintf(qbuf, TR("empty quiver%s", "空箭袋%s"),
                 !uquiver ? " (nothing readied)" : "");
+#endif
     } else {
         Sprintf(qbuf, TR("your %s", "你的%s"), makeplural(body_part(HAND)));
     }
     return qbuf;
 }
+
+#ifdef ZHLANG
+/* Chinese name of a direct verb passed to getobj(); several callers use an
+   English verb, and getobj()/silly_thing() build Chinese sentences around
+   it, so it has to be translated before it is embedded in them.  Returns
+   the input unchanged when there is no known translation. */
+staticfn const char *
+zh_getobj_verb(const char *word)
+{
+    static const char *const verbs_en[] = { "drink","zap","throw","rub",
+        "wield","wear","read","apply","dip","eat","fire","put in","drop",
+        "take off","remove","quiver","ready","shoot","put on",
+        "sacrifice","offer","invoke","name","call","tip","stash",
+        "open","close","loot","pay","buy","spill","force",
+        "engrave","write","adjust","swap","pick up",
+        /* less common getobj() verbs; without a translation they would be
+           spliced into the Chinese prompt as English (B5) */
+        "charge","destroy","grease","identify","split","untrap with",
+        "use or apply","write on","write with","rub the royal jelly on",
+        NULL };
+    static const char *const verbs_zh[] = { "喝","施放","投掷","擦拭",
+        "挥舞","穿上","阅读","使用","浸泡","吃","发射","放入","丢弃",
+        "脱下","取下","装箭","装备","射击","戴上",
+        "献祭","供奉","激发","命名","称呼","倒出","存放",
+        "打开","关闭","搜刮","支付","购买","泼洒","撬开",
+        "雕刻","书写","调整","交换","捡起",
+        "充能","摧毁","涂油","鉴定","拆分","解除陷阱",
+        "使用或应用","书写","书写","把皇家软糖涂在",
+        NULL };
+    int i;
+
+    for (i = 0; verbs_en[i]; ++i)
+        if (!strcmp(word, verbs_en[i]))
+            return verbs_zh[i];
+    return word;
+}
+#endif /* ZHLANG */
 
 /*
  * getobj returns:
@@ -1780,6 +1844,11 @@ getobj(
     Loot *sortedinvent, *srtinv;
     struct _cmd_queue cq, *cmdq;
     boolean need_more_cq = FALSE;
+#ifdef ZHLANG
+    /* R5: 'word' stays English here because the logic below compares it
+       (e.g. "throw"); zhword is used only for the Chinese prompts */
+    const char *zhword = zh_getobj_verb(word);
+#endif
 
  need_more_cq:
     if ((cmdq = cmdq_pop()) != 0) {
@@ -1915,29 +1984,9 @@ getobj(
         compactify(bp);
     *ap = '\0';
 
-#ifdef ZHLANG
-    {
-        const char *verbs_en[] = { "drink","zap","throw","rub","wield",
-            "wear","read","apply","dip","eat","fire","put in","drop",
-            "take off","remove","quiver","ready","shoot","put on",
-            "sacrifice","offer","invoke","name","call","tip","stash",
-            "open","close","loot","pay","buy","spill","force",
-            "engrave","write","adjust","swap","pick up",NULL };
-        const char *verbs_zh[] = { "喝","施放","投掷","擦拭","挥舞",
-            "穿上","阅读","使用","浸泡","吃","发射","放入","丢弃",
-            "脱下","取下","装箭","装备","射击","戴上",
-            "献祭","供奉","激发","命名","称呼","倒出","存放",
-            "打开","关闭","搜刮","支付","购买","泼洒","撬开",
-            "雕刻","书写","调整","交换","捡起",NULL };
-        int vi;
-        for (vi = 0; verbs_en[vi]; vi++)
-            if (!strcmp(word, verbs_en[vi])) { word = verbs_zh[vi]; break; }
-    }
-#endif
-
     if (suggested == 0 && !forceprompt && !allownone) {
 #ifdef ZHLANG
-        You("没有%s东西可以%s。", inaccess ? "其它" : "", word);
+        You("没有%s东西可以%s。", inaccess ? "其它" : "", zhword);
 #else
         You("don't have anything %sto %s.", inaccess ? "else " : "", word);
 #endif
@@ -1947,7 +1996,7 @@ getobj(
         cnt = 0L;
         cntgiven = FALSE;
 #ifdef ZHLANG
-        Sprintf(qbuf, "你想%s什么？", word);
+        Sprintf(qbuf, "你想%s什么？", zhword);
 #else
         Sprintf(qbuf, "What do you want to %s?", word);
 #endif
@@ -1988,7 +2037,11 @@ getobj(
         }
         if (ilet == HANDS_SYM) { /* '-' */
             if (!allownone)
+#ifdef ZHLANG
+                mime_action(zhword);
+#else
                 mime_action(word);
+#endif
             return (allownone ? &hands_obj : (struct obj *) 0);
         }
  redo_menu:
@@ -2005,11 +2058,19 @@ getobj(
 
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
+#ifdef ZHLANG
+                Snprintf(menuquery, sizeof menuquery, "你想%s什么？", zhword);
+#else
                 Snprintf(menuquery, sizeof menuquery,
-                         "What do you want to %s?", word);
+                         TR("What do you want to %s?", "你想%s什么？"), word);
+#endif
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)
+#ifdef ZHLANG
+                handsbuf = getobj_hands_txt(zhword, qbuf);
+#else
                 handsbuf = getobj_hands_txt(word, qbuf);
+#endif
             ilet = display_pickinv(allowed_choices, handsbuf,
                                    menuquery, allownone, TRUE,
                                    allowcnt ? &ctmp : (long *) 0);
@@ -2043,7 +2104,11 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
+#ifdef ZHLANG
+                You(TR("cannot %s gold.", "不能%s金币。"), zhword);
+#else
                 You(TR("cannot %s gold.", "不能%s金币。"), word);
+#endif
                 return (struct obj *) 0;
             }
             /*
@@ -2160,8 +2225,20 @@ silly_thing(const char *word,
         && (otmp->otyp == AMULET_OF_YENDOR
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
         pline_The(TR("Amulet doesn't like being called names.", "护身符不喜欢被乱起名字。"));
-    else
+    else {
+#ifdef ZHLANG
+        const char *zhword = zh_getobj_verb(word);
+
+        if (zh_nonascii(zhword))
+            pline(silly_thing_to, zhword); /* "%s那个太荒唐了。" */
+        else
+            /* no Chinese equivalent for this verb: use a generic sentence
+               rather than mixing English into the Chinese one (B5) */
+            pline("%s", "那样做太荒唐了。");
+#else
         pline(silly_thing_to, word);
+#endif
+    }
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2247,7 +2324,12 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!gi.invent) {
+#ifdef ZHLANG
+        You(TR("have nothing to %s.", "没有什么可以%s。"),
+            zh_getobj_verb(word));
+#else
         You(TR("have nothing to %s.", "没有什么可以%s。"), word);
+#endif
         if (resultflags)
             *resultflags = ALL_FINISHED;
         return 0;
@@ -2292,8 +2374,13 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     ilets[iletct] = '\0';
 
     for (;;) {
+#ifdef ZHLANG
+        Sprintf(qbuf, "你想%s哪类物品？[%s]",
+                zh_getobj_verb(word), ilets);
+#else
         Sprintf(qbuf, TR("What kinds of thing do you want to %s? [%s]", "你想%s哪类物品？[%s]"),
                 word, ilets);
+#endif
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
@@ -2490,13 +2577,19 @@ askchain(
                    class of objects is involved, so prefix the first
                    object being queried here with an explanation why */
                 if (take_out || put_in)
+#ifdef ZHLANG
+                    /* whole Chinese prefix: 取出: <物品>？ */
+                    Snprintf(qpfx, sizeof qpfx, "%s：",
+                             zh_getobj_verb(word));
+#else
                     Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
+#endif
                 first = FALSE;
             }
-            (void) safe_qbuf(qbuf, qpfx, "?", otmp,
+            (void) safe_qbuf(qbuf, qpfx, TR("?", "？"), otmp,
                              ininv ? safeq_xprname : doname,
                              ininv ? safeq_shortxprname : ansimpleoname,
-                             "item");
+                             TR("item", "物品"));
             /* nyaq(qbuf) or nyNaq(qbuf), bypassing canned input for ^A */
             sym = yn_function(qbuf,
                               (takeoff || ident || otmp->quan < 2L)
@@ -3022,7 +3115,9 @@ xprname(
         /* ordinary inventory display or pickup message */
         if (use_invlet)
             let = obj->invlet;
-        Strcpy(suffix, dot ? "." : "");
+        /* R6: the trailing sentence period is Chinese punctuation in the
+           ZHLANG build ("e - 2 银匕首。") */
+        Strcpy(suffix, dot ? TR(".", "。") : "");
     }
     sfxlen = (int) strlen(suffix);
     if (txtlen > BUFSZ - 1 - (4 + sfxlen)) /* 4: "c - " prefix */
@@ -5510,7 +5605,7 @@ display_minventory(
         /* was 'set_uasmon();' but that potentially has side-effects */
         gy.youmonst.data = &mons[u.umonnum]; /* basic part of set_uasmon() */
     } else {
-        invdisp_nothing(title ? title : tmp, "(none)");
+        invdisp_nothing(title ? title : tmp, TR("(none)", "（无）"));
         n = 0;
     }
 
@@ -5586,18 +5681,26 @@ display_cinventory(struct obj *obj)
     char qbuf[QBUFSZ];
     int n;
     menu_item *selected = 0;
+#ifdef ZHLANG
+    /* R6: Chinese container title is "<物品>里的物品：" - prefix is empty and
+       the wording goes after the object name */
+    const char *qpfx = "", *qsfx = "里的物品：", *lastR = "那个";
+#else
+    const char *qpfx = "Contents of ", *qsfx = ":", *lastR = "that";
+#endif
 
-    (void) safe_qbuf(qbuf, "Contents of ", ":", obj,
+    (void) safe_qbuf(qbuf, qpfx, qsfx, obj,
                      /* custom formatting routines to insert "trapped"
                         into the object's name when appropriate;
                         last resort "that" won't ever get used */
-                     cinv_doname, cinv_ansimpleoname, "that");
+                     cinv_doname, cinv_ansimpleoname,
+                     lastR);
 
     if (obj->cobj) {
         n = query_objlist(qbuf, &(obj->cobj), INVORDER_SORT,
                           &selected, PICK_NONE, allow_all);
     } else {
-        invdisp_nothing(qbuf, "(empty)");
+        invdisp_nothing(qbuf, TR("(empty)", "（空）"));
         n = 0;
     }
     if (n > 0) {

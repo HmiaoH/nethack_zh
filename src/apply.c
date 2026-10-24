@@ -1233,7 +1233,7 @@ use_mirror(struct obj *obj)
 #endif
                     if (!Hallucination || !rn2(4)) {
                         nomul(-rnd(MAXULEV + 6 - u.ulevel));
-                        gm.multi_reason = "gazing into a mirror";
+                        gm.multi_reason = TR("gazing into a mirror", "正凝视镜子");
                     }
                     gn.nomovemsg = 0; /* default, "you can move again" */
                 }
@@ -1533,7 +1533,7 @@ use_bell(struct obj **optr)
 #endif
             if (!obj_resists(obj, 93, 100)) {
                 #ifdef ZHLANG
-                pline("%s碎了！", Tobjnam(obj, "have"));
+                pline("%s碎了！", Tobjnam(obj, TR("have", "已经")));
 #else
                 pline("%s shattered!", Tobjnam(obj, "have"));
 #endif
@@ -1575,7 +1575,7 @@ use_bell(struct obj **optr)
 
         } else if (invoking) {
             #ifdef ZHLANG
-            pline("%s发出了令人不安的尖锐声音……", Tobjnam(obj, "issue"));
+            pline("%s发出了令人不安的尖锐声音……", Tobjnam(obj, TR("issue", "突然")));
 #else
             pline("%s an unsettling shrill sound...", Tobjnam(obj, "issue"));
 #endif
@@ -1688,8 +1688,7 @@ use_candelabrum(struct obj *obj)
               the(xname(obj)));
         if (!Blind)
             #ifdef ZHLANG
-            pline("%s点燃了。%s发出微弱的光。", obj->spe == 1 ? "It is" : "They are",
-                  Tobjnam(obj, "shine"));
+            pline("%s点燃了，发出微弱的光。", The(xname(obj)));
 #else
             pline("%s lit.  %s dimly.", obj->spe == 1 ? "It is" : "They are",
                   Tobjnam(obj, "shine"));
@@ -1720,13 +1719,13 @@ use_candelabrum(struct obj *obj)
         if (obj->spe == 7) {
             if (Blind)
                 #ifdef ZHLANG
-                pline("%s散发出奇怪的温暖！", Tobjnam(obj, "radiate"));
+                pline("%s散发出奇怪的温暖！", Tobjnam(obj, TR("radiate", "正")));
 #else
                 pline("%s a strange warmth!", Tobjnam(obj, "radiate"));
 #endif
             else
                 #ifdef ZHLANG
-                pline("%s发出奇怪的光芒！", Tobjnam(obj, "glow"));
+                pline("%s发出奇怪的光芒！", Tobjnam(obj, TR("glow", "正")));
 #else
                 pline("%s with a strange light!", Tobjnam(obj, "glow"));
 #endif
@@ -2095,7 +2094,7 @@ use_lamp(struct obj *obj)
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (!Blind) {
             #ifdef ZHLANG
-            pline("%s闪烁了一下，然后%s了。", Tobjnam(obj, "flicker"),
+            pline("%s闪烁了一下，然后%s了。", Tobjnam(obj, TR("flicker", "轻轻")),
                   otense(obj, "die"));
 #else
             pline("%s for a moment, then %s.", Tobjnam(obj, "flicker"),
@@ -2742,7 +2741,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
          */
         teleds(cc.x, cc.y, TELEDS_NO_FLAGS);
         nomul(-1);
-        gm.multi_reason = "jumping around";
+        gm.multi_reason = TR("jumping around", "正四处蹦跳");
         gn.nomovemsg = "";
         morehungry(rnd(25));
         return ECMD_TIME;
@@ -3260,7 +3259,7 @@ use_grease(struct obj *obj)
 
     if (Glib) {
         #ifdef ZHLANG
-        pline("%s从你的%s滑落了。", Tobjnam(obj, "slip"),
+        pline("%s从你的%s滑落了。", Tobjnam(obj, TR("slip", "突然")),
               fingers_or_gloves(FALSE));
 #else
         pline("%s from your %s.", Tobjnam(obj, "slip"),
@@ -3277,7 +3276,7 @@ use_grease(struct obj *obj)
             consume_obj_charge(obj, TRUE);
 
             #ifdef ZHLANG
-            pline("%s从你的%s滑落了。", Tobjnam(obj, "slip"),
+            pline("%s从你的%s滑落了。", Tobjnam(obj, TR("slip", "突然")),
                   fingers_or_gloves(FALSE));
 #else
             pline("%s from your %s.", Tobjnam(obj, "slip"),
@@ -3322,13 +3321,13 @@ use_grease(struct obj *obj)
     } else {
         if (obj->known)
             #ifdef ZHLANG
-            pline("%s空了。", Tobjnam(obj, "are"));
+            pline("%s空了。", Tobjnam(obj, TR("are", "已经")));
 #else
             pline("%s empty.", Tobjnam(obj, "are"));
 #endif
         else
             #ifdef ZHLANG
-            pline("%s似乎是空的。", Tobjnam(obj, "seem"));
+            pline("%s似乎是空的。", Tobjnam(obj, TR("seem", "现在")));
 #else
             pline("%s to be empty.", Tobjnam(obj, "seem"));
 #endif
@@ -3468,7 +3467,7 @@ use_stone(struct obj *tstone)
         switch (objects[obj->otyp].oc_material) {
         case CLOTH:
             #ifdef ZHLANG
-            pline("%s现在更光亮了一点。", Tobjnam(tstone, "look"));
+            pline("%s现在更光亮了一点。", Tobjnam(tstone, TR("look", "看上去")));
 #else
             pline("%s a little more polished now.", Tobjnam(tstone, "look"));
 #endif
@@ -3482,7 +3481,7 @@ use_stone(struct obj *tstone)
 #endif
             else
                 #ifdef ZHLANG
-                pline("%s现在更湿了一点。", Tobjnam(tstone, "are"));
+                pline("%s现在更湿了一点。", Tobjnam(tstone, TR("are", "已经")));
 #else
                 pline("%s a little wetter now.", Tobjnam(tstone, "are"));
 #endif
@@ -3957,6 +3956,10 @@ use_whip(struct obj *obj)
                     mon_hand = makeplural(mon_hand);
             } else
                 mon_hand = 0; /* lint suppression */
+#ifdef ZHLANG
+            nhUse(mon_hand); /* Chinese messages below describe the body
+                              * part differently and don't use it */
+#endif
 
             #ifdef ZHLANG
             You("用鞭子卷住了%s。", yname(otmp));
@@ -3964,9 +3967,15 @@ use_whip(struct obj *obj)
             You("wrap your bullwhip around %s.", yname(otmp));
 #endif
             if (gotit && mwelded(otmp)) {
+#ifdef ZHLANG
+                pline("%s粘在了%s身上%c",
+                      (otmp->quan == 1L) ? "它" : "它们", mon_nam(mtmp),
+                      !otmp->bknown ? '!' : '.');
+#else
                 pline(TR("%s welded to %s %s%c", "%s粘在了%s的%s上%c"),
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
                       mon_hand, !otmp->bknown ? '!' : '.');
+#endif
                 set_bknown(otmp, 1);
                 gotit = FALSE; /* can't pull it free */
             }
@@ -4045,8 +4054,7 @@ use_whip(struct obj *obj)
                 default:
                     /* to floor beneath mon */
                     #ifdef ZHLANG
-                    You("从%s的%s手中夺过了%s！", the(onambuf),
-                        s_suffix(mon_nam(mtmp)), mon_hand);
+                    You("从%s那里夺过了%s！", mon_nam(mtmp), the(onambuf));
 #else
                     You("yank %s from %s %s!", the(onambuf),
                         s_suffix(mon_nam(mtmp)), mon_hand);

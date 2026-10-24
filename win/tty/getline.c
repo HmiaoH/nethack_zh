@@ -13,6 +13,7 @@
 
 #include "wintty.h"
 #include "func_tab.h"
+#include "utf8map.h"
 
 char morc = 0; /* tell the outside world what char you chose */
 static boolean suppress_history;
@@ -24,6 +25,57 @@ static void hooked_tty_getlin(const char *, char *, getlin_hook_proc);
 extern int extcmd_via_menu(void); /* cmd.c */
 
 extern char erase_char, kill_char; /* from appropriate tty.c file */
+
+#ifdef ZHLANG
+/* Number of bytes in the UTF-8 sequence introduced by lead byte 'c'
+   (1 when 'c' is not a valid lead byte). */
+static int
+u8_lead_bytes(unsigned char c)
+{
+    if (c >= 0xC2 && c <= 0xDF)
+        return 2;
+    if (c >= 0xE0 && c <= 0xEF)
+        return 3;
+    if (c >= 0xF0 && c <= 0xF4)
+        return 4;
+    return 1;
+}
+
+/* Display width of the (multi-byte) character that ends at 'end'; the
+   start of that character is stored in *start. */
+static int
+u8_prevchar(const char *base, char *end, char **start)
+{
+    char *p = end - 1;
+    char tmp[8];
+    int n;
+
+    while (p > base && ((unsigned char) *p & 0xC0) == 0x80)
+        --p;
+    n = (int) (end - p);
+    if (n > (int) sizeof tmp - 1)
+        n = (int) sizeof tmp - 1;
+    (void) memcpy(tmp, p, (size_t) n);
+    tmp[n] = '\0';
+    *start = p;
+    return u8_width(tmp);
+}
+
+/* Move the top-line cursor back over 'backcols' columns, blank the next
+   'clearcols' columns and return the cursor to where it started. */
+static void
+u8_erase_span(int backcols, int clearcols)
+{
+    int k;
+
+    for (k = 0; k < backcols; ++k)
+        putsyms("\b");
+    for (k = 0; k < clearcols; ++k)
+        putsyms(" ");
+    for (k = 0; k < clearcols; ++k)
+        putsyms("\b");
+}
+#endif /* ZHLANG */
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -47,6 +99,7 @@ hooked_tty_getlin(
 {
     char *obufp = bufp;
     int c;
+    int pushback = -1; /* a byte read while completing a UTF-8 sequence */
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = FALSE;
 
@@ -80,7 +133,8 @@ hooked_tty_getlin(
         (void) fflush(stdout);
         Strcat(strcat(strcpy(gt.toplines, query), " "), obufp);
         term_curs_set(1);
-        c = pgetchar();
+        c = (pushback >= 0) ? pushback : pgetchar();
+        pushback = -1;
         term_curs_set(0);
         if (c == '\033' || c == EOF) {
             if (c == EOF)
@@ -141,6 +195,20 @@ hooked_tty_getlin(
         }
         if (c == erase_char || c == '\b') {
             if (bufp != obufp) {
+#ifdef ZHLANG
+                char *prev;
+                int w, tailw;
+
+                /* delete a whole UTF-8 character and move the cursor back
+                   by its display width, not by its byte count */
+                w = u8_prevchar(obufp, bufp, &prev);
+                tailw = u8_width(bufp);
+                if (w < 1)
+                    w = 1;
+                u8_erase_span(w, w + tailw);
+                bufp = prev;
+                *bufp = '\0';
+#else
 #ifdef NEWAUTOCOMP
                 char *i;
 
@@ -156,6 +224,7 @@ hooked_tty_getlin(
                     putsyms("\b");
                 *bufp = 0;
 #endif                            /* NEWAUTOCOMP */
+#endif /* ZHLANG */
             } else
                 tty_nhbell();
         } else if (c == '\n' || c == '\r') {
@@ -171,10 +240,47 @@ hooked_tty_getlin(
             char *i = eos(bufp);
 
 #endif /* NEWAUTOCOMP */
+#ifdef ZHLANG
+            {
+                char seq[8];
+                int got = 0, want, k;
+                unsigned char uc = (unsigned char) c;
+
+                /* Read (and then echo) a complete UTF-8 sequence at once.
+                   Echoing one byte at a time would place cursor-control
+                   escape sequences between the bytes of a character. */
+                want = u8_lead_bytes(uc);
+                if ((BUFSZ - 1 - (int) (bufp - obufp)) < want
+                    || (COLNO - (int) (bufp - obufp)) < want)
+                    want = 1;
+                seq[got++] = (char) c;
+                while (got < want) {
+                    int c2 = (pushback >= 0) ? pushback : pgetchar();
+
+                    pushback = -1;
+                    if (c2 == EOF || (unsigned char) c2 < 0x80
+                        || (unsigned char) c2 > 0xBF) {
+                        pushback = c2; /* not part of this character */
+                        break;
+                    }
+                    seq[got++] = (char) c2;
+                }
+                for (k = 0; k < got; ++k)
+                    bufp[k] = seq[k];
+                bufp += got;
+                *bufp = '\0';
+                putsyms(bufp - got);
+#ifdef NEWAUTOCOMP
+                if (got > 1)
+                    i = bufp; /* command completion is ASCII only */
+#endif
+            }
+#else
             *bufp = c;
             bufp[1] = 0;
             putsyms(bufp);
             bufp++;
+#endif
             if (hook && (*hook)(obufp)) {
                 putsyms(bufp);
 #ifndef NEWAUTOCOMP
@@ -195,6 +301,19 @@ hooked_tty_getlin(
             }
         } else if (c == kill_char || c == '\177') { /* Robert Viduya */
             /* this test last - @ might be the kill_char */
+#ifdef ZHLANG
+            {
+                int totalw = u8_width(obufp);
+                int tailw = u8_width(bufp);
+                int backw = totalw - tailw;
+
+                if (backw < 0)
+                    backw = 0;
+                u8_erase_span(backw, totalw);
+                bufp = obufp;
+                *bufp = '\0';
+            }
+#else
 #ifndef NEWAUTOCOMP
             while (bufp != obufp) {
                 bufp--;
@@ -207,6 +326,7 @@ hooked_tty_getlin(
                 putsyms("\b \b");
             *bufp = 0;
 #endif /* NEWAUTOCOMP */
+#endif /* ZHLANG */
         } else
             tty_nhbell();
     }

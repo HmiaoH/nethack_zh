@@ -76,19 +76,19 @@ amulet(void)
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
 #ifdef ZHLANG
-                    pline("%s发烫！", Tobjnam(amu, "feel"));
+                    pline("%s发烫！", Tobjnam(amu, TR("feel", "摸起来")));
 #else
                     pline("%s hot!", Tobjnam(amu, "feel"));
 #endif
                 else if (du <= 64)
 #ifdef ZHLANG
-                    pline("%s非常温暖。", Tobjnam(amu, "feel"));
+                    pline("%s非常温暖。", Tobjnam(amu, TR("feel", "摸起来")));
 #else
                     pline("%s very warm.", Tobjnam(amu, "feel"));
 #endif
                 else if (du <= 144)
 #ifdef ZHLANG
-                    pline("%s温暖。", Tobjnam(amu, "feel"));
+                    pline("%s温暖。", Tobjnam(amu, TR("feel", "摸起来")));
 #else
                     pline("%s warm.", Tobjnam(amu, "feel"));
 #endif

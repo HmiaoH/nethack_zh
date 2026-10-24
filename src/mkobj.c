@@ -2943,7 +2943,7 @@ hornoplenty(
                                            || levl[u.ux][u.uy].typ >= ICE)
                                           ? "哎呀！%s从你身边滑走！"
                                           : "哎呀！%s掉到了地上！",
-                                      The(aobjnam(obj, "slip")), (char *) 0);
+                                      The(aobjnam(obj, TR("slip", "突然"))), (char *) 0);
 #else
             obj = hold_another_object(obj,
                                       u.uswallow

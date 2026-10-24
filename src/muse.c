@@ -100,7 +100,7 @@ precheck(struct monst *mon, struct obj *obj)
                                             : (const char *) "ghost");
                         #endif
                         #ifdef ZHLANG
-                        pline("%s is frightened to death,"
+                        pline(TR("%s is frightened to death,", "%s被吓死了，")
                               " and unable to move.",
                               Monnam(mon));
                         #else
@@ -133,7 +133,7 @@ precheck(struct monst *mon, struct obj *obj)
                 if (vis)
                     pline_mon(mtmp, "In a cloud of smoke, %s emerges!", a_monnam(mtmp));
                 #ifdef ZHLANG
-                pline("%s speaks.", vis ? Monnam(mtmp) : Something);
+                pline(TR("%s speaks.", "%s开口说话了。"), vis ? Monnam(mtmp) : Something);
                 #else
                 pline("%s speaks.", vis ? Monnam(mtmp) : Something);
                 #endif
@@ -142,7 +142,7 @@ precheck(struct monst *mon, struct obj *obj)
                 SetVoice(mtmp, 0, 80, 0);
                 if (rn2(2)) {
                     #ifdef ZHLANG
-                    verbalize("You freed me!");
+                    verbalize(TR("You freed me!", "你释放了我！"));
                     #else
                     verbalize("You freed me!");
                     #endif
@@ -150,13 +150,13 @@ precheck(struct monst *mon, struct obj *obj)
                     set_malign(mtmp);
                 } else {
                     #ifdef ZHLANG
-                    verbalize("It is about time.");
+                    verbalize(TR("It is about time.", "也差不多到时候了。"));
                     #else
                     verbalize("It is about time.");
                     #endif
                     if (vis)
                         #ifdef ZHLANG
-                        pline("%s vanishes.", Monnam(mtmp));
+                        pline(TR("%s vanishes.", "%s消失了。"), Monnam(mtmp));
                         #else
                         pline("%s vanishes.", Monnam(mtmp));
                         #endif
@@ -182,7 +182,7 @@ precheck(struct monst *mon, struct obj *obj)
 
             Soundeffect(se_zap_then_explosion, 100);
             #ifdef ZHLANG
-            You_hear("a zap and an explosion %s.",
+            You_hear(TR("a zap and an explosion %s.", "电光和爆炸声%s。"),
                      (mdistu(mon) <= range * range)
                         ? "nearby" : "in the distance");
             #else
@@ -221,7 +221,7 @@ mzapwand(
 
         Soundeffect(se_zap, 100);
         #ifdef ZHLANG
-        You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
+        You_hear(TR("a %s zap.", "一声%s的电击声。"), (mdistu(mtmp) <= range * range)
                                  ? "nearby" : "distant");
         #else
         You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
@@ -230,7 +230,7 @@ mzapwand(
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         #ifdef ZHLANG
-        pline("%s with %s!",
+        pline(TR("%s with %s!", "%s，用的是%s！"),
               monverbself(mtmp, Monnam(mtmp), "zap", (char *) 0),
               doname(otmp));
         #else
@@ -260,7 +260,7 @@ mplayhorn(
 
         Soundeffect(se_horn_being_played, 50);
         #ifdef ZHLANG
-        You_hear("a horn being played %s.",
+        You_hear(TR("a horn being played %s.", "号角吹奏声%s。"),
                  (mdistu(mtmp) <= range * range)
                     ? "nearby" : "in the distance");
         #else
@@ -288,7 +288,7 @@ mplayhorn(
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
         #ifdef ZHLANG
-        pline("%s %s %s directed at you!",
+        pline(TR("%s %s %s directed at you!", "%s%s%s，直冲你而来！"),
               /* monverbself() would adjust the verb if hallucination made
                  subject plural; stick with singular here, at least for now */
               Monnam(mtmp), "plays", an(objnamp));
@@ -364,7 +364,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
     }
     if (mtmp->mconf) /* (note: won't get if not seen and hero can't hear) */
         #ifdef ZHLANG
-        pline("Being confused, %s mispronounces the magic words...",
+        pline(TR("Being confused, %s mispronounces the magic words...", "因为混乱，%s念错了咒语……"),
               vismon ? mon_nam(mtmp) : mhe(mtmp));
         #else
         pline("Being confused, %s mispronounces the magic words...",
@@ -381,7 +381,7 @@ mquaffmsg(struct monst *mtmp, struct obj *otmp)
     } else if (!Deaf) {
         Soundeffect(se_mon_chugging_potion, 25);
         #ifdef ZHLANG
-        You_hear("a chugging sound.");
+        You_hear(TR("a chugging sound.", "咕咚吞咽的声音。"));
         #else
         You_hear("a chugging sound.");
         #endif
@@ -930,7 +930,7 @@ use_defensive(struct monst *mtmp)
         } else if (!Deaf) {
             Soundeffect(se_bugle_playing_reveille, 100);
             #ifdef ZHLANG
-            You_hear("a bugle playing reveille!");
+            You_hear(TR("a bugle playing reveille!", "军号吹响了起床号！"));
             #else
             You_hear("a bugle playing reveille!");
             #endif
@@ -1053,7 +1053,7 @@ use_defensive(struct monst *mtmp)
         } else if (!Deaf) {
             Soundeffect(se_crash_through_floor, 100);
             #ifdef ZHLANG
-            You_hear("%s crash through the %s.", something,
+            You_hear(TR("%s crash through the %s.", "%s轰然穿过了%s。"), something,
                      surface(mtmp->mx, mtmp->my));
             #else
             You_hear("%s crash through the %s.", something,
@@ -1170,7 +1170,7 @@ use_defensive(struct monst *mtmp)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
                 #ifdef ZHLANG
-                pline("As %s climbs the stairs, a mysterious force"
+                pline(TR("As %s climbs the stairs, a mysterious force", "当%s爬上楼梯时，一股神秘的力量")
                       " momentarily surrounds %s...",
                       mon_nam(mtmp), mhim(mtmp));
                 #else
@@ -1716,7 +1716,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                 shieldeff(u.ux, u.uy);
                 Soundeffect(se_boing, 40);
                 #ifdef ZHLANG
-                pline("Boing!");
+                pline(TR("Boing!", "嘣！"));
                 #else
                 pline("Boing!");
                 #endif
@@ -1739,7 +1739,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
             shieldeff(mtmp->mx, mtmp->my);
             Soundeffect(se_boing, 40);
             #ifdef ZHLANG
-            pline("Boing!");
+            pline(TR("Boing!", "嘣！"));
             #else
             pline("Boing!");
             #endif
@@ -2049,13 +2049,13 @@ use_offensive(struct monst *mtmp)
         if (Hallucination) {
             SetVoice(mtmp, 0, 80, 0);
             #ifdef ZHLANG
-            verbalize("Say cheese!");
+            verbalize(TR("Say cheese!", "说「茄子」！"));
             #else
             verbalize("Say cheese!");
             #endif
         } else if (!Blind) {
             #ifdef ZHLANG
-            pline("%s takes a picture of you with %s!",
+            pline(TR("%s takes a picture of you with %s!", "%s用%s给你拍了张照片！"),
                   Monnam(mtmp), an(xname(otmp)));
             #else
             pline("%s takes a picture of you with %s!",
@@ -2065,7 +2065,7 @@ use_offensive(struct monst *mtmp)
         gm.m_using = TRUE;
         if (!Blind && !resists_blnd(&gy.youmonst)) {
             #ifdef ZHLANG
-            You("are blinded by the flash of light!");
+            You(TR("are blinded by the flash of light!", "被闪光刺得看不见了！"));
             #else
             You("are blinded by the flash of light!");
             #endif
@@ -2084,7 +2084,7 @@ use_offensive(struct monst *mtmp)
         if (mtmp->mconf) {
             if (vis)
                 #ifdef ZHLANG
-                pline("Oh, what a pretty fire!");
+                pline(TR("Oh, what a pretty fire!", "哦，多漂亮的火啊！"));
                 #else
                 pline("Oh, what a pretty fire!");
                 #endif
@@ -2103,7 +2103,7 @@ use_offensive(struct monst *mtmp)
             num = (2 * (rn1(3, 3) + 2 * bcsign(otmp)) + 1) / 3;
             if (Fire_resistance)
                 #ifdef ZHLANG
-                You("are not harmed.");
+                You(TR("are not harmed.", "没有受到伤害。"));
                 #else
                 You("are not harmed.");
                 #endif
@@ -2475,7 +2475,7 @@ mloot_container(
             if (vismon) {
                 if (howfar > 2) /* not adjacent */
                     #ifdef ZHLANG
-                    Norep("%s rummages through %s.", Monnam(mon), contnr_nam);
+                    Norep(TR("%s rummages through %s.", "%s在%s里翻找。"), Monnam(mon), contnr_nam);
                     #else
                     Norep("%s rummages through %s.", Monnam(mon), contnr_nam);
                     #endif
@@ -2484,7 +2484,7 @@ mloot_container(
                           doname(xobj), contnr_nam);
                 else /* adjacent, additional items */
                     #ifdef ZHLANG
-                    pline("%s removes %s.", upstart(mpronounbuf),
+                    pline(TR("%s removes %s.", "%s取出了%s。"), upstart(mpronounbuf),
                           doname(xobj));
                     #else
                     pline("%s removes %s.", upstart(mpronounbuf),
@@ -2592,7 +2592,7 @@ use_misc(struct monst *mtmp)
         if (vismon && mtmp->minvis) { /* was seen, now invisible */
             if (canspotmon(mtmp)) {
                 #ifdef ZHLANG
-                pline("%s body takes on a %s transparency.",
+                pline(TR("%s body takes on a %s transparency.", "%s身体呈现出%s的透明感。"),
                       upstart(s_suffix(nambuf)),
                       Hallucination ? "normal" : "strange");
                 #else
@@ -2602,7 +2602,7 @@ use_misc(struct monst *mtmp)
                 #endif
             } else {
                 #ifdef ZHLANG
-                pline("Suddenly you cannot see %s.", nambuf);
+                pline(TR("Suddenly you cannot see %s.", "突然你看不见%s了。"), nambuf);
                 #else
                 pline("Suddenly you cannot see %s.", nambuf);
                 #endif
@@ -2614,7 +2614,7 @@ use_misc(struct monst *mtmp)
         } else if (vismon && !mtmp->minvis) {
             /* cursed potion; mon tried to make itself invisible but failed */
             #ifdef ZHLANG
-            pline("%s briefly seems to be transparent.", Monnam(mtmp));
+            pline(TR("%s briefly seems to be transparent.", "%s似乎短暂地变透明了。"), Monnam(mtmp));
             #else
             pline("%s briefly seems to be transparent.", Monnam(mtmp));
             #endif
@@ -2626,7 +2626,7 @@ use_misc(struct monst *mtmp)
             /* cursed potion; this won't happen because a monster will only
                drink a potion of invisibility when not already invisible */
             #ifdef ZHLANG
-            pline("%s suddenly appears!", Monnam(mtmp));
+            pline(TR("%s suddenly appears!", "%s突然出现了！"), Monnam(mtmp));
             #else
             pline("%s suddenly appears!", Monnam(mtmp));
             #endif
@@ -2731,14 +2731,14 @@ use_misc(struct monst *mtmp)
                           Monnam(mtmp), hand_buf);
             if (obj->otyp == HEAVY_IRON_BALL) {
                 #ifdef ZHLANG
-                pline("%s fails to wrap around %s.", The_whip, the_weapon);
+                pline(TR("%s fails to wrap around %s.", "%s没能缠住%s。"), The_whip, the_weapon);
                 #else
                 pline("%s fails to wrap around %s.", The_whip, the_weapon);
                 #endif
                 return 1;
             }
             #ifdef ZHLANG
-            urgent_pline("%s wraps around %s you're wielding!", The_whip,
+            urgent_pline(TR("%s wraps around %s you're wielding!", "%s缠住了你正握着的%s！"), The_whip,
                          the_weapon);
             #else
             urgent_pline("%s wraps around %s you're wielding!", The_whip,
@@ -2746,7 +2746,7 @@ use_misc(struct monst *mtmp)
             #endif
             if (welded(obj)) {
                 #ifdef ZHLANG
-                pline("%s welded to your %s%c",
+                pline(TR("%s welded to your %s%c", "%s焊在了你的%s上%c"),
                       !is_plural(obj) ? "It is" : "They are", hand_buf,
                       !obj->bknown ? '!' : '.');
                 #else
@@ -2804,7 +2804,7 @@ staticfn void
 you_aggravate(struct monst *mtmp)
 {
     #ifdef ZHLANG
-    pline("For some reason, %s presence is known to you.",
+    pline(TR("For some reason, %s presence is known to you.", "不知为何，你感知到了%s的存在。"),
           s_suffix(noit_mon_nam(mtmp)));
     #else
     pline("For some reason, %s presence is known to you.",
@@ -2817,7 +2817,7 @@ you_aggravate(struct monst *mtmp)
     show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp, rn2_on_display_rng));
     display_self();
     #ifdef ZHLANG
-    You_feel("aggravated at %s.", noit_mon_nam(mtmp));
+    You_feel(TR("aggravated at %s.", "被%s激怒了。"), noit_mon_nam(mtmp));
     #else
     You_feel("aggravated at %s.", noit_mon_nam(mtmp));
     #endif
@@ -2825,7 +2825,7 @@ you_aggravate(struct monst *mtmp)
     docrt();
     if (unconscious()) {
         gm.multi = -1;
-        gn.nomovemsg = "Aggravated, you are jolted into full consciousness.";
+        gn.nomovemsg = TR("Aggravated, you are jolted into full consciousness.", "被激怒后，你猛地完全清醒过来。");
     }
     newsym(mtmp->mx, mtmp->my);
     if (!canspotmon(mtmp))
@@ -2983,7 +2983,7 @@ mon_reflects(struct monst *mon, const char *str)
     if (orefl && orefl->otyp == SHIELD_OF_REFLECTION) {
         if (str) {
             #ifdef ZHLANG
-            pline(str, s_suffix(mon_nam(mon)), "shield");
+            pline(str, s_suffix(mon_nam(mon)), TR("shield", "盾牌"));
             #else
             pline(str, s_suffix(mon_nam(mon)), "shield");
             #endif
@@ -2994,7 +2994,7 @@ mon_reflects(struct monst *mon, const char *str)
         /* due to wielded artifact weapon */
         if (str)
             #ifdef ZHLANG
-            pline(str, s_suffix(mon_nam(mon)), "weapon");
+            pline(str, s_suffix(mon_nam(mon)), TR("weapon", "武器"));
             #else
             pline(str, s_suffix(mon_nam(mon)), "weapon");
             #endif
@@ -3003,7 +3003,7 @@ mon_reflects(struct monst *mon, const char *str)
                && orefl->otyp == AMULET_OF_REFLECTION) {
         if (str) {
             #ifdef ZHLANG
-            pline(str, s_suffix(mon_nam(mon)), "amulet");
+            pline(str, s_suffix(mon_nam(mon)), TR("amulet", "护身符"));
             #else
             pline(str, s_suffix(mon_nam(mon)), "amulet");
             #endif
@@ -3015,7 +3015,7 @@ mon_reflects(struct monst *mon, const char *str)
                    || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
         if (str)
             #ifdef ZHLANG
-            pline(str, s_suffix(mon_nam(mon)), "armor");
+            pline(str, s_suffix(mon_nam(mon)), TR("armor", "护甲"));
             #else
             pline(str, s_suffix(mon_nam(mon)), "armor");
             #endif
@@ -3025,7 +3025,7 @@ mon_reflects(struct monst *mon, const char *str)
         /* Silver dragons only reflect when mature; babies do not */
         if (str)
             #ifdef ZHLANG
-            pline(str, s_suffix(mon_nam(mon)), "scales");
+            pline(str, s_suffix(mon_nam(mon)), TR("scales", "鳞片"));
             #else
             pline(str, s_suffix(mon_nam(mon)), "scales");
             #endif
@@ -3041,7 +3041,7 @@ ureflects(const char *fmt, const char *str)
     if (EReflecting & W_ARMS) {
         if (fmt && str) {
             #ifdef ZHLANG
-            pline(fmt, str, "shield");
+            pline(fmt, str, TR("shield", "盾牌"));
             #else
             pline(fmt, str, "shield");
             #endif
@@ -3052,7 +3052,7 @@ ureflects(const char *fmt, const char *str)
         /* Due to wielded artifact weapon */
         if (fmt && str)
             #ifdef ZHLANG
-            pline(fmt, str, "weapon");
+            pline(fmt, str, TR("weapon", "武器"));
             #else
             pline(fmt, str, "weapon");
             #endif
@@ -3060,7 +3060,7 @@ ureflects(const char *fmt, const char *str)
     } else if (EReflecting & W_AMUL) {
         if (fmt && str) {
             #ifdef ZHLANG
-            pline(fmt, str, "medallion");
+            pline(fmt, str, TR("medallion", "勋章"));
             #else
             pline(fmt, str, "medallion");
             #endif
@@ -3070,7 +3070,7 @@ ureflects(const char *fmt, const char *str)
     } else if (EReflecting & W_ARM) {
         if (fmt && str)
             #ifdef ZHLANG
-            pline(fmt, str, uskin ? "luster" : "armor");
+            pline(fmt, str, uskin ? TR("luster", "光泽") : "armor");
             #else
             pline(fmt, str, uskin ? "luster" : "armor");
             #endif
@@ -3078,7 +3078,7 @@ ureflects(const char *fmt, const char *str)
     } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]) {
         if (fmt && str)
             #ifdef ZHLANG
-            pline(fmt, str, "scales");
+            pline(fmt, str, TR("scales", "鳞片"));
             #else
             pline(fmt, str, "scales");
             #endif
@@ -3184,7 +3184,7 @@ mon_consume_unstone(
     if (stoning && vis) {
         if (Hallucination)
             #ifdef ZHLANG
-            pline("What a pity - %s just ruined a future piece of art!",
+            pline(TR("What a pity - %s just ruined a future piece of art!", "真可惜——%s刚刚毁掉了一件未来的艺术品！"),
                   mon_nam(mon));
             #else
             pline("What a pity - %s just ruined a future piece of art!",
@@ -3355,7 +3355,7 @@ muse_unslime(
         if (mon->mx == trap->tx && mon->my == trap->ty) {
             if (vis)
                 #ifdef ZHLANG
-                pline("%s triggers %s fire trap!", Mnam,
+                pline(TR("%s triggers %s fire trap!", "%s触发了%s火焰陷阱！"), Mnam,
                       trap->tseen ? "the" : "a");
                 #else
                 pline("%s triggers %s fire trap!", Mnam,
@@ -3370,7 +3370,7 @@ muse_unslime(
             newsym(mon->mx, mon->my);
             if (vis)
                 #ifdef ZHLANG
-                pline("%s %s %s %s fire trap!", Mnam,
+                pline(TR("%s %s %s %s fire trap!", "%s%s，%s%s火焰陷阱！"), Mnam,
                       vtense(fakename[0], locomotion(mon->data, "move")),
                       is_floater(mon->data) ? "over" : "onto",
                       trap->tseen ? "the" : "a");
@@ -3396,7 +3396,7 @@ muse_unslime(
         if (mon->mconf) {
             if (cansee(mon->mx, mon->my))
                 #ifdef ZHLANG
-                pline("Oh, what a pretty fire!");
+                pline(TR("Oh, what a pretty fire!", "哦，多漂亮的火啊！"));
                 #else
                 pline("Oh, what a pretty fire!");
                 #endif
@@ -3440,7 +3440,7 @@ muse_unslime(
             if (!Unaware)
                 observe_object(obj); /* hero is watching mon drink obj */
             #ifdef ZHLANG
-            pline("%s quaffs a burning %s",
+            pline(TR("%s quaffs a burning %s", "%s喝下了燃烧的%s"),
                   saw_lit ? upstart(strcpy(Pronoun, mhe(mon))) : Monnam(mon),
                   simpleonames(obj));
             #else

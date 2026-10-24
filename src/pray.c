@@ -855,7 +855,8 @@ gcrownu(void)
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(TR("I crown thee...  The Hand of Elbereth!", "我加冕你为……埃尔贝瑞斯之手！"));
         livelog_printf(LL_DIVINEGIFT,
-                       "was crowned \"The Hand of Elbereth\" by %s",
+                       TR("was crowned \"The Hand of Elbereth\" by %s",
+                          "被%s加冕为“埃尔贝瑞斯之手”"),
                        u_gname());
         break;
     case A_NEUTRAL:
@@ -865,8 +866,12 @@ gcrownu(void)
                                         artiname(ART_VORPAL_BLADE));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(TR("Thou shalt be my Envoy of Balance!", "你将成为我的平衡使者！"));
-        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance", /* NOTRANS */
+#ifdef ZHLANG
+        livelog_printf(LL_DIVINEGIFT, "成为了%s的平衡使者", u_gname());
+#else
+        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
                        s_suffix(u_gname()));
+#endif
         break;
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
@@ -874,11 +879,13 @@ gcrownu(void)
         already_exists = exist_artifact(RUNESWORD,
                                         artiname(ART_STORMBRINGER));
         what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
-                ? "take lives"
-                : "steal souls");
+                ? TR("take lives", "夺走生命")
+                : TR("steal souls", "窃取灵魂"));
         SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(TR("Thou art chosen to %s for My Glory!", "你被选中，为我的荣耀而%s！"), what);
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s", /* NOTRANS */
+        livelog_printf(LL_DIVINEGIFT,
+                       TR("was chosen to %s for the Glory of %s",
+                          "被选中去%s，为了%s的荣耀"),
                        what, u_gname());
         break;
     }
@@ -901,7 +908,7 @@ gcrownu(void)
         /* not an artifact, but treat like one for this situation;
            classify as a spoiler in case player hasn't IDed the book yet */
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER,
-                       "was bestowed with %s", bbuf);
+                       TR("was bestowed with %s", "被赐予了%s"), bbuf);
 
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
@@ -924,7 +931,8 @@ gcrownu(void)
             if (is_art(obj, ART_EXCALIBUR)) {
                 u.ugifts++;
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                               "had %s wielded %s transformed into %s",
+                               TR("had %s wielded %s transformed into %s",
+                                  "%s所持的%s化为了%s"),
                                uhis(), lbuf, artiname(ART_EXCALIBUR));
             }
         }
@@ -948,7 +956,7 @@ gcrownu(void)
             dropy(obj);
             u.ugifts++;
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                           "was bestowed with %s",
+                           TR("was bestowed with %s", "被赐予了%s"),
                            artiname(ART_VORPAL_BLADE));
         }
         /* acquire Vorpal Blade's skill regardless of weapon or gift */
@@ -974,7 +982,7 @@ gcrownu(void)
             dropy(obj);
             u.ugifts++;
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                           "was bestowed with %s",
+                           TR("was bestowed with %s", "被赐予了%s"),
                            artiname(ART_STORMBRINGER));
         }
         /* acquire Stormbringer's skill regardless of weapon or gift */
@@ -1784,7 +1792,7 @@ sacrifice_your_race(
                 dmon->mpeaceful = TRUE;
             You(TR("are terrified, and unable to move.", "被吓得动弹不得。"));
             nomul(-3);
-            gm.multi_reason = "being terrified of a demon";
+            gm.multi_reason = TR("being terrified of a demon", "正被恶魔吓坏");
             gn.nomovemsg = 0;
         } else
             pline_The("%s.", demonless_msg);
@@ -2003,8 +2011,9 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
 
     /* KMH, conduct */
     if (!u.uconduct.gnostic++)
-        livelog_printf(LL_CONDUCT, "rejected atheism" /* NOTRANS */
-                                   " by offering %s on an altar of %s",
+        livelog_printf(LL_CONDUCT,
+                       TR("rejected atheism by offering %s on an altar of %s",
+                          "拒绝了无神论：献上了%s，供于%s的祭坛上"),
                        corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                        a_gname());
 
@@ -2243,7 +2252,8 @@ dopray(void)
      */
     if (ParanoidPray) {
         ok = paranoid_query(ParanoidConfirm,
-                            "Are you sure you want to pray?");
+                            TR("Are you sure you want to pray?",
+                               "你确定要祈祷吗？"));
 #if 0
         /* clear command recall buffer; otherwise ^A to repeat p(ray) would
            do so without confirmation (if 'ok') or do nothing (if '!ok') */
@@ -2260,7 +2270,9 @@ dopray(void)
          * should not break conduct.  Also we can add more detail to the
          * livelog message as p_aligntyp will be known.
          */
-        livelog_printf(LL_CONDUCT, "rejected atheism with a prayer"); /* NOTRANS */
+        livelog_printf(LL_CONDUCT,
+                       TR("rejected atheism with a prayer",
+                          "以祈祷拒绝了无神论"));
 
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
@@ -2294,8 +2306,8 @@ dopray(void)
         }
     }
     nomul(-3);
-    gm.multi_reason = "praying";
-    gn.nomovemsg = "You finish your prayer.";
+    gm.multi_reason = TR("praying", "祈祷");
+    gn.nomovemsg = TR("You finish your prayer.", "你完成了祈祷。");
     ga.afternmv = prayer_done;
 
     if (gp.p_type == 3 && !Inhell) {
@@ -2460,7 +2472,9 @@ doturn(void)
         return ECMD_OK;
     }
     if (!u.uconduct.gnostic++)
-        livelog_printf(LL_CONDUCT, "rejected atheism by turning undead"); /* NOTRANS */
+        livelog_printf(LL_CONDUCT,
+                       TR("rejected atheism by turning undead",
+                          "通过驱散亡灵拒绝了无神论"));
 
     Gname = halu_gname(u.ualign.type);
 
@@ -2517,7 +2531,7 @@ doturn(void)
      *  the brief paralysis?]
      */
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
-    gm.multi_reason = "trying to turn the monsters";
+    gm.multi_reason = TR("trying to turn the monsters", "正试图驱退怪物");
     gn.nomovemsg = You_can_move_again;
     return ECMD_TIME;
 }

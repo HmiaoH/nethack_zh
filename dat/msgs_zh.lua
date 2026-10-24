@@ -85,4 +85,10 @@ return {
     ["Read the spellbook with '"] = "阅读法术书用 '",
     ["You \"quaff\" potions with '"] = "你「喝下」药水用 '",
     ["You find yourself suspended in an air bubble surrounded by water."] = "你发现自己悬在一个被水包围的气泡中。",
+    ["Tip: Farlooking or selecting a map location"] = "提示：远观或选择地图位置",
+    ["You are now in a \"farlook\" mode - the movement keys move the cursor,"] = "你现在处于“远观”模式——移动键移动的是光标，",
+    ["not your character.  Game time does not advance.  This mode is used"] = "而不是你的角色。游戏时间不会流逝。此模式用于",
+    ["to look around the map, or to select a location on it."] = "查看地图周围，或在地图上选择位置。",
+    ["When in this mode, you can press ESC to return to normal game mode,"] = "在此模式下，按 ESC 可返回正常游戏模式，",
+    ["and pressing ? will show the key help."] = "按 ? 可显示按键帮助。",
 }

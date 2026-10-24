@@ -371,8 +371,9 @@ do_oname(struct obj *obj)
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
 #ifdef ZHLANG
+        /* R6/F5: show the Chinese artifact name, not the English oname */
         pline("%s抵抗了这个尝试。",
-              has_oname(obj) ? ONAME(obj) : "神器");
+              has_oname(obj) ? artiname_zh(obj->oartifact) : "神器");
 #else
         pline("%s resists the attempt.",
               /* any artifact should always pass the has_oname() test

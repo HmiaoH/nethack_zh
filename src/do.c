@@ -954,7 +954,7 @@ engulfer_digests_food(struct obj *obj)
         }
         /* see or feel the effect */
         #ifdef ZHLANG
-pline("%s被立刻消化了！", Tobjnam(obj, "are"));
+pline("%s被立刻消化了！", Tobjnam(obj, TR("are", "已经")));
 #else
 pline("%s instantly digested!", Tobjnam(obj, "are"));
 #endif

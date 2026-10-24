@@ -235,7 +235,7 @@ you_unwere(boolean purify)
     if (!Unchanging && is_were(gy.youmonst.data)
         && !monster_nearby()
         && (!controllable_poly
-            || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
+            || !paranoid_query(ParanoidWerechange, TR("Remain in beast form?", "保持野兽形态吗？"))))
         rehumanize();
     else if (is_were(gy.youmonst.data) && !u.mtimedone)
         u.mtimedone = rn1(200, 200); /* 40% of initial were change */

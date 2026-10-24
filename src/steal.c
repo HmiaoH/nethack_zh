@@ -144,10 +144,22 @@ unresponsive(void)
     if (gm.multi >= 0)
         return FALSE;
 
+#ifdef ZHLANG
+    /* gm.multi_reason is player-visible and may be translated (this game's
+       text is Chinese), so recognize the Chinese wording for paralysis and
+       freezing as well as the original English verbs */
+    return (unconscious() || is_fainted()
+            || (gm.multi_reason
+                && (strstr(gm.multi_reason, "麻痹") != 0
+                    || strstr(gm.multi_reason, "冻") != 0
+                    || !strncmp(gm.multi_reason, "frozen", 6)
+                    || !strncmp(gm.multi_reason, "paralyzed", 9))));
+#else
     return (unconscious() || is_fainted()
             || (gm.multi_reason
                 && (!strncmp(gm.multi_reason, "frozen", 6)
                     || !strncmp(gm.multi_reason, "paralyzed", 9))));
+#endif
 }
 
 /* called via (*ga.afternmv)() when hero finishes taking off armor that
@@ -614,7 +626,7 @@ steal(struct monst *mtmp, char *objnambuf)
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
-                gm.multi_reason = "taking off clothes";
+                gm.multi_reason = TR("taking off clothes", "正脱下衣服");
                 gn.nomovemsg = 0;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;

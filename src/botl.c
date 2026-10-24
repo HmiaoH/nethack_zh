@@ -817,13 +817,17 @@ staticfn unsigned long match_str2conditionbitmask(const char *);
 staticfn unsigned long str2conditionbitmask(char *);
 staticfn boolean parse_condition(char (*)[QBUFSZ], int);
 staticfn char *hlattr2attrname(int, char *, size_t);
+#ifdef ZHLANG
+staticfn char *hlattr2attrname_zh(int, char *, size_t);
+#endif
 staticfn void status_hilite_linestr_add(int, struct hilite_s *, unsigned long,
-                                        const char *);
+                                        const char *, const char *);
 staticfn void status_hilite_linestr_done(void);
 staticfn int status_hilite_linestr_countfield(int);
 staticfn void status_hilite_linestr_gather_conditions(void);
 staticfn void status_hilite_linestr_gather(void);
 staticfn char *status_hilite2str(struct hilite_s *);
+staticfn char *status_hilite2str_core(struct hilite_s *, boolean, char *);
 staticfn int status_hilite_menu_choose_field(void);
 staticfn int status_hilite_menu_choose_behavior(int);
 staticfn int status_hilite_menu_choose_updownboth(int, const char *, boolean,
@@ -1421,8 +1425,20 @@ bot_via_windowport(void)
         }
         if (condtests[bl_parlyz].enabled
             && cache_multi_reason && !cache_avail[1]) {
+#ifdef ZHLANG
+                /* gm.multi_reason is player-visible, so it may have been
+                   translated; recognize both the Chinese wording and the
+                   original English verbs */
+                cache_reslt[1] = (strstr(cache_multi_reason, "麻痹") != 0
+                                  || strstr(cache_multi_reason, "冻") != 0
+                                  || !strncmp(cache_multi_reason,
+                                              "paralyzed", 9)
+                                  || !strncmp(cache_multi_reason,
+                                              "frozen", 6));
+#else
                 cache_reslt[1] = (!strncmp(cache_multi_reason, "paralyzed", 9)
                                  || !strncmp(cache_multi_reason, "frozen", 6));
+#endif
                 cache_avail[1] = TRUE;
         }
         if (cache_avail[0] && cache_reslt[0]) {
@@ -3612,12 +3628,53 @@ hlattr2attrname(int attrib, char *buf, size_t bufsz)
     return (char *) 0;
 }
 
+#ifdef ZHLANG
+/* Chinese display names for the status-highlight attributes.  These are
+   only used for menu display; the canonical English names produced by
+   hlattr2attrname() are what gets written back as hilite_status option
+   text, so the config file stays parseable. */
+staticfn char *
+hlattr2attrname_zh(int attrib, char *buf, size_t bufsz)
+{
+    if (attrib && buf) {
+        char attbuf[BUFSZ];
+        int first = 0;
+        size_t k;
+
+        attbuf[0] = '\0';
+        if (attrib == HL_NONE) {
+            Strcpy(buf, "正常");
+            return buf;
+        }
+        if (attrib & HL_BOLD)
+            Strcat(attbuf, first++ ? "+粗体" : "粗体");
+        if (attrib & HL_DIM)
+            Strcat(attbuf, first++ ? "+暗淡" : "暗淡");
+        if (attrib & HL_ITALIC)
+            Strcat(attbuf, first++ ? "+斜体" : "斜体");
+        if (attrib & HL_ULINE)
+            Strcat(attbuf, first++ ? "+下划线" : "下划线");
+        if (attrib & HL_BLINK)
+            Strcat(attbuf, first++ ? "+闪烁" : "闪烁");
+        if (attrib & HL_INVERSE)
+            Strcat(attbuf, first++ ? "+反色" : "反色");
+
+        k = strlen(attbuf);
+        if (k < (size_t)(bufsz - 1))
+            Strcpy(buf, attbuf);
+        return buf;
+    }
+    return (char *) 0;
+}
+#endif /* ZHLANG */
+
 struct _status_hilite_line_str {
     int id;
     int fld;
     struct hilite_s *hl;
     unsigned long mask;
-    char str[BUFSZ];
+    char str[BUFSZ];  /* canonical English text, for the config file */
+    char disp[BUFSZ]; /* player-visible text, translated where appropriate */
     struct _status_hilite_line_str *next;
 };
 
@@ -3630,7 +3687,8 @@ status_hilite_linestr_add(
     int fld,
     struct hilite_s *hl,
     unsigned long mask,
-    const char *str)
+    const char *str,
+    const char *dispstr)
 {
     struct _status_hilite_line_str *tmp, *nxt;
 
@@ -3642,10 +3700,13 @@ status_hilite_linestr_add(
     tmp->fld = fld;
     tmp->hl = hl;
     tmp->mask = mask;
-    if (fld == BL_TITLE)
+    if (fld == BL_TITLE) {
         Strcpy(tmp->str, str);
-    else
+        Strcpy(tmp->disp, dispstr ? dispstr : str);
+    } else {
         (void) stripchars(tmp->str, " ", str);
+        (void) stripchars(tmp->disp, " ", dispstr ? dispstr : str);
+    }
 
     if ((nxt = status_hilite_str) != 0) {
         while (nxt->next)
@@ -3763,6 +3824,10 @@ status_hilite_linestr_gather_conditions(void)
                 char clrbuf[BUFSZ];
                 char attrbuf[BUFSZ];
                 char condbuf[BUFSZ];
+#ifdef ZHLANG
+                char clrbuf_disp[BUFSZ];
+                char condbuf_disp[BUFSZ];
+#endif
                 char *tmpattr;
 
                 (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)),
@@ -3772,8 +3837,23 @@ status_hilite_linestr_gather_conditions(void)
                     Sprintf(eos(clrbuf), "&%s", tmpattr);
                 Snprintf(condbuf, sizeof(condbuf), "condition/%s/%s", /* NOTRANS */
                          conditionbitmask2str(cond_maps[i].bm), clrbuf);
+#ifdef ZHLANG
+                /* display-only variant with the attribute name translated */
+                (void) strNsubst(strcpy(clrbuf_disp, clr2colorname(clr)),
+                                 " ", "-", 0);
+                tmpattr = hlattr2attrname_zh(atr, attrbuf, BUFSZ);
+                if (tmpattr)
+                    Sprintf(eos(clrbuf_disp), "&%s", tmpattr);
+                Snprintf(condbuf_disp, sizeof(condbuf_disp),
+                         "condition/%s/%s", /* NOTRANS */
+                         conditionbitmask2str(cond_maps[i].bm), clrbuf_disp);
                 status_hilite_linestr_add(BL_CONDITION, 0,
-                                          cond_maps[i].bm, condbuf);
+                                          cond_maps[i].bm, condbuf,
+                                          condbuf_disp);
+#else
+                status_hilite_linestr_add(BL_CONDITION, 0,
+                                          cond_maps[i].bm, condbuf, 0);
+#endif
             }
         }
 }
@@ -3789,7 +3869,16 @@ status_hilite_linestr_gather(void)
     for (i = 0; i < MAXBLSTATS; i++) {
         hl = gb.blstats[0][i].thresholds;
         while (hl) {
-            status_hilite_linestr_add(i, hl, 0UL, status_hilite2str(hl));
+#ifdef ZHLANG
+            char strbuf[BUFSZ], dispbuf[BUFSZ];
+
+            status_hilite_linestr_add(
+                i, hl, 0UL,
+                status_hilite2str_core(hl, FALSE, strbuf),
+                status_hilite2str_core(hl, TRUE, dispbuf));
+#else
+            status_hilite_linestr_add(i, hl, 0UL, status_hilite2str(hl), 0);
+#endif
             hl = hl->next;
         }
     }
@@ -3798,10 +3887,13 @@ status_hilite_linestr_gather(void)
 }
 
 
+/* Compose the "field/behavior/color&attributes" text for one status
+   highlight rule.  'for_display' selects translated attribute names for
+   on-screen menus; the default (canonical) form is what is written back
+   to the hilite_status configuration option. */
 staticfn char *
-status_hilite2str(struct hilite_s *hl)
+status_hilite2str_core(struct hilite_s *hl, boolean for_display, char *buf)
 {
-    static char buf[BUFSZ];
     int clr = NO_COLOR, attr = ATR_NONE;
     char behavebuf[BUFSZ];
     char clrbuf[BUFSZ];
@@ -3871,13 +3963,28 @@ status_hilite2str(struct hilite_s *hl)
     split_clridx(hl->coloridx, &clr, &attr);
     (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)), " ", "-", 0);
     if (attr != HL_UNDEF) {
-        if ((tmpattr = hlattr2attrname(attr, attrbuf, BUFSZ)) != 0)
+#ifdef ZHLANG
+        tmpattr = for_display ? hlattr2attrname_zh(attr, attrbuf, BUFSZ)
+                              : hlattr2attrname(attr, attrbuf, BUFSZ);
+#else
+        nhUse(for_display);
+        tmpattr = hlattr2attrname(attr, attrbuf, BUFSZ);
+#endif
+        if (tmpattr)
             Sprintf(eos(clrbuf), "&%s", tmpattr);
     }
-    Snprintf(buf, sizeof(buf), "%s/%s/%s", initblstats[hl->fld].fldname,
+    Snprintf(buf, BUFSZ, "%s/%s/%s", initblstats[hl->fld].fldname,
              behavebuf, clrbuf);
 
     return buf;
+}
+
+staticfn char *
+status_hilite2str(struct hilite_s *hl)
+{
+    static char buf[BUFSZ];
+
+    return status_hilite2str_core(hl, FALSE, buf);
 }
 
 staticfn int
@@ -4596,8 +4703,11 @@ status_hilite_menu_fld(int fld)
             if (hlstr->fld == fld) {
                 any = cg.zeroany;
                 any.a_int = hlstr->id;
+                /* show the translated (display) form here; hlstr->str keeps
+                   the canonical English tokens for the config file */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         clr, hlstr->str, MENU_ITEMFLAGS_NONE);
+                         clr, *hlstr->disp ? hlstr->disp : hlstr->str,
+                         MENU_ITEMFLAGS_NONE);
             }
             hlstr = hlstr->next;
         }

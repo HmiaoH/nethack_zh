@@ -346,7 +346,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
         /* too light to do real damage */
         if (canseemon(mtmp)) {
             #ifdef ZHLANG
-            pline_The("%s harmlessly %s %s.", xname(gold),
+            pline_The(TR("%s harmlessly %s %s.", "%s无害地%s%s。"), xname(gold),
                       otense(gold, "击中"), mon_nam(mtmp));
             #else
             pline_The("%s harmlessly %s %s.", xname(gold),
@@ -1910,7 +1910,7 @@ impact_drop(
 
         if (missile)
             #ifdef ZHLANG
-            pline("From the impact, %sother %s.",
+            pline(TR("From the impact, %sother %s.", "受冲击影响，%s另一个%s。"),
                   dct == oct ? "the " : dct == 1L ? "一个" : "", what);
             #else
             pline("From the impact, %sother %s.",

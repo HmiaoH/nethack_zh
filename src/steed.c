@@ -17,7 +17,7 @@ void
 rider_cant_reach(void)
 {
 #ifdef ZHLANG
-    You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
+    You(TR("aren't skilled enough to reach from %s.", "不够熟练，无法从%s身上够到东西。"), y_monnam(u.usteed));
 #else
     You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
 #endif
@@ -57,7 +57,7 @@ use_saddle(struct obj *otmp)
     }
     if (!u.dx && !u.dy) {
 #ifdef ZHLANG
-        pline("Saddle yourself?  Very funny...");
+        pline(TR("Saddle yourself?  Very funny...", "给自己备鞍？真有意思……"));
 #else
         pline("Saddle yourself?  Very funny...");
 #endif
@@ -66,7 +66,7 @@ use_saddle(struct obj *otmp)
     if (!isok(u.ux + u.dx, u.uy + u.dy)
         || !(mtmp = m_at(u.ux + u.dx, u.uy + u.dy)) || !canspotmon(mtmp)) {
 #ifdef ZHLANG
-        pline("I see nobody there.");
+        pline(TR("I see nobody there.", "我没看到那里有人。"));
 #else
         pline("I see nobody there.");
 #endif
@@ -77,7 +77,7 @@ use_saddle(struct obj *otmp)
     if ((mtmp->misc_worn_check & W_SADDLE) != 0L
         || which_armor(mtmp, W_SADDLE)) {
 #ifdef ZHLANG
-        pline("%s doesn't need another one.", Monnam(mtmp));
+        pline(TR("%s doesn't need another one.", "%s不需要再装一副马鞍了。"), Monnam(mtmp));
 #else
         pline("%s doesn't need another one.", Monnam(mtmp));
 #endif
@@ -88,7 +88,7 @@ use_saddle(struct obj *otmp)
         char kbuf[BUFSZ];
 
 #ifdef ZHLANG
-        You("touch %s.", mon_nam(mtmp));
+        You(TR("touch %s.", "碰触%s。"), mon_nam(mtmp));
 #else
         You("touch %s.", mon_nam(mtmp));
 #endif
@@ -100,7 +100,7 @@ use_saddle(struct obj *otmp)
     }
     if (ptr == &mons[PM_AMOROUS_DEMON]) {
 #ifdef ZHLANG
-        pline("Shame on you!");
+        pline(TR("Shame on you!", "真可耻！"));
 #else
         pline("Shame on you!");
 #endif
@@ -110,7 +110,7 @@ use_saddle(struct obj *otmp)
     if (mtmp->isminion || mtmp->isshk || mtmp->ispriest || mtmp->isgd
         || mtmp->iswiz) {
 #ifdef ZHLANG
-        pline("I think %s would mind.", mon_nam(mtmp));
+        pline(TR("I think %s would mind.", "我觉得%s会介意的。"), mon_nam(mtmp));
 #else
         pline("I think %s would mind.", mon_nam(mtmp));
 #endif
@@ -118,7 +118,7 @@ use_saddle(struct obj *otmp)
     }
     if (!can_saddle(mtmp)) {
 #ifdef ZHLANG
-        You_cant("saddle such a creature.");
+        You_cant(TR("saddle such a creature.", "给这种生物备鞍。"));
 #else
         You_cant("saddle such a creature.");
 #endif
@@ -164,7 +164,7 @@ use_saddle(struct obj *otmp)
     /* Make the attempt */
     if (rn2(100) < chance) {
 #ifdef ZHLANG
-        You("put the saddle on %s.", mon_nam(mtmp));
+        You(TR("put the saddle on %s.", "把马鞍装到%s身上。"), mon_nam(mtmp));
 #else
         You("put the saddle on %s.", mon_nam(mtmp));
 #endif
@@ -175,7 +175,7 @@ use_saddle(struct obj *otmp)
         put_saddle_on_mon(otmp, mtmp);
     } else
 #ifdef ZHLANG
-        pline("%s resists!", Monnam(mtmp));
+        pline(TR("%s resists!", "%s反抗了！"), Monnam(mtmp));
 #else
         pline("%s resists!", Monnam(mtmp));
 #endif
@@ -249,7 +249,7 @@ mount_steed(
     /* Sanity checks */
     if (u.usteed) {
 #ifdef ZHLANG
-        You("are already riding %s.", mon_nam(u.usteed));
+        You(TR("are already riding %s.", "已经骑在%s上了。"), mon_nam(u.usteed));
 #else
         You("are already riding %s.", mon_nam(u.usteed));
 #endif
@@ -259,7 +259,7 @@ mount_steed(
     /* Is the player in the right form? */
     if (Hallucination && !force) {
 #ifdef ZHLANG
-        pline("Maybe you should find a designated driver.");
+        pline(TR("Maybe you should find a designated driver.", "也许你该找个代驾。"));
 #else
         pline("Maybe you should find a designated driver.");
 #endif
@@ -295,7 +295,7 @@ mount_steed(
                    || bigmonst(gy.youmonst.data)
                    || slithy(gy.youmonst.data))) {
 #ifdef ZHLANG
-        You("won't fit on a saddle.");
+        You(TR("won't fit on a saddle.", "坐不上马鞍。"));
 #else
         You("won't fit on a saddle.");
 #endif
@@ -303,7 +303,7 @@ mount_steed(
     }
     if (!force && (near_capacity() > SLT_ENCUMBER)) {
 #ifdef ZHLANG
-        You_cant("do that while carrying so much stuff.");
+        You_cant(TR("do that while carrying so much stuff.", "带着这么多东西做那件事。"));
 #else
         You_cant("do that while carrying so much stuff.");
 #endif
@@ -315,7 +315,7 @@ mount_steed(
                              || M_AP_TYPE(mtmp) == M_AP_FURNITURE
                              || M_AP_TYPE(mtmp) == M_AP_OBJECT))) {
 #ifdef ZHLANG
-        pline("I see nobody there.");
+        pline(TR("I see nobody there.", "我没看到那里有人。"));
 #else
         pline("I see nobody there.");
 #endif
@@ -329,7 +329,7 @@ mount_steed(
            to worm's head could trigger an impossible() in worm_cross()
            called from test_move(), so handle not-on-head before that */
 #ifdef ZHLANG
-        You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+        You(TR("couldn't ride %s, let alone its tail.", "连%s都骑不上，更别说它的尾巴了。"), a_monnam(mtmp));
 #else
         You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
 #endif
@@ -340,13 +340,13 @@ mount_steed(
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
 #ifdef ZHLANG
-            You("are unable to swing your %s over.", body_part(LEG));
+            You(TR("are unable to swing your %s over.", "无法把%s跨过去。"), body_part(LEG));
 #else
             You("are unable to swing your %s over.", body_part(LEG));
 #endif
         else
 #ifdef ZHLANG
-            You("are stuck here for now.");
+            You(TR("are stuck here for now.", "暂时被困在这里了。"));
 #else
             You("are stuck here for now.");
 #endif
@@ -357,7 +357,7 @@ mount_steed(
     otmp = which_armor(mtmp, W_SADDLE);
     if (!otmp) {
 #ifdef ZHLANG
-        pline("%s is not saddled.", Monnam(mtmp));
+        pline(TR("%s is not saddled.", "%s没有备鞍。"), Monnam(mtmp));
 #else
         pline("%s is not saddled.", Monnam(mtmp));
 #endif
@@ -369,7 +369,7 @@ mount_steed(
         char kbuf[BUFSZ];
 
 #ifdef ZHLANG
-        You("touch %s.", mon_nam(mtmp));
+        You(TR("touch %s.", "碰触%s。"), mon_nam(mtmp));
 #else
         You("touch %s.", mon_nam(mtmp));
 #endif
@@ -379,7 +379,7 @@ mount_steed(
     }
     if (!mtmp->mtame || mtmp->isminion) {
 #ifdef ZHLANG
-        pline("I think %s would mind.", mon_nam(mtmp));
+        pline(TR("I think %s would mind.", "我觉得%s会介意的。"), mon_nam(mtmp));
 #else
         pline("I think %s would mind.", mon_nam(mtmp));
 #endif
@@ -389,7 +389,7 @@ mount_steed(
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
 #ifdef ZHLANG
-        You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
+        You_cant(TR("mount %s while %s's trapped in %s.", "在%s%s被困在%s里时骑上去。"), mon_nam(mtmp),
                  mhe(mtmp), an(trapname(t->ttyp, FALSE)));
 #else
         You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
@@ -402,7 +402,7 @@ mount_steed(
         /* no longer tame */
         newsym(mtmp->mx, mtmp->my);
 #ifdef ZHLANG
-        pline("%s resists%s!", Monnam(mtmp),
+        pline(TR("%s resists%s!", "%s反抗了%s！"), Monnam(mtmp),
               mtmp->mleashed ? " and its leash comes off" : "");
 #else
         pline("%s resists%s!", Monnam(mtmp),
@@ -414,7 +414,7 @@ mount_steed(
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
 #ifdef ZHLANG
-        You_cant("ride that creature while under %s.",
+        You_cant(TR("ride that creature while under %s.", "在%s下骑那种生物。"),
                  hliquid("water"));
 #else
         You_cant("ride that creature while under %s.",
@@ -424,7 +424,7 @@ mount_steed(
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
 #ifdef ZHLANG
-        You_cant("ride such a creature.");
+        You_cant(TR("ride such a creature.", "骑这种生物。"));
 #else
         You_cant("ride such a creature.");
 #endif
@@ -435,7 +435,7 @@ mount_steed(
     if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation
         && !Lev_at_will) {
 #ifdef ZHLANG
-        You("cannot reach %s.", mon_nam(mtmp));
+        You(TR("cannot reach %s.", "够不到%s。"), mon_nam(mtmp));
 #else
         You("cannot reach %s.", mon_nam(mtmp));
 #endif
@@ -443,7 +443,7 @@ mount_steed(
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
 #ifdef ZHLANG
-        Your("%s armor is too stiff to be able to mount %s.",
+        Your(TR("%s armor is too stiff to be able to mount %s.", "%s护甲太僵硬，骑不上%s。"),
              uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
 #else
         Your("%s armor is too stiff to be able to mount %s.",
@@ -457,14 +457,14 @@ mount_steed(
             || (u.ulevel + mtmp->mtame < rnd(MAXULEV / 2 + 5)))) {
         if (Levitation) {
 #ifdef ZHLANG
-            pline("%s slips away from you.", Monnam(mtmp));
+            pline(TR("%s slips away from you.", "%s从你身边溜走了。"), Monnam(mtmp));
 #else
             pline("%s slips away from you.", Monnam(mtmp));
 #endif
             return FALSE;
         }
 #ifdef ZHLANG
-        You("slip while trying to get on %s.", mon_nam(mtmp));
+        You(TR("slip while trying to get on %s.", "在试图骑上%s时滑倒了。"), mon_nam(mtmp));
 #else
         You("slip while trying to get on %s.", mon_nam(mtmp));
 #endif
@@ -485,18 +485,18 @@ mount_steed(
         if (Levitation && !is_floater(ptr) && !is_flyer(ptr))
             /* Must have Lev_at_will at this point */
 #ifdef ZHLANG
-            pline("%s magically floats up!", Monnam(mtmp));
+            pline(TR("%s magically floats up!", "%s神奇地飘了起来！"), Monnam(mtmp));
 #else
             pline("%s magically floats up!", Monnam(mtmp));
 #endif
 #ifdef ZHLANG
-        You("mount %s.", mon_nam(mtmp));
+        You(TR("mount %s.", "骑上了%s。"), mon_nam(mtmp));
 #else
         You("mount %s.", mon_nam(mtmp));
 #endif
         if (Flying)
 #ifdef ZHLANG
-            You("and %s take flight together.", mon_nam(mtmp));
+            You(TR("and %s take flight together.", "与%s一同飞了起来。"), mon_nam(mtmp));
 #else
             You("and %s take flight together.", mon_nam(mtmp));
 #endif
@@ -511,7 +511,7 @@ mount_steed(
         steed_vs_stealth();
         if (was_stealthy && !Stealth)
 #ifdef ZHLANG
-            You("aren't stealthy anymore.");
+            You(TR("aren't stealthy anymore.", "不再悄无声息了。"));
 #else
             You("aren't stealthy anymore.");
 #endif
@@ -563,7 +563,7 @@ kick_steed(void)
             }
             if (helpless(u.usteed))
 #ifdef ZHLANG
-                pline("%s stirs.", He);
+                pline(TR("%s stirs.", "%s动了动。"), He);
 #else
                 pline("%s stirs.", He);
 #endif
@@ -577,7 +577,7 @@ kick_steed(void)
 #endif
         } else
 #ifdef ZHLANG
-            pline("%s does not respond.", He);
+            pline(TR("%s does not respond.", "%s没有反应。"), He);
 #else
             pline("%s does not respond.", He);
 #endif
@@ -597,7 +597,7 @@ kick_steed(void)
     }
 
 #ifdef ZHLANG
-    pline("%s gallops!", Monnam(u.usteed));
+    pline(TR("%s gallops!", "%s疾驰起来！"), Monnam(u.usteed));
 #else
     pline("%s gallops!", Monnam(u.usteed));
 #endif
@@ -762,7 +762,7 @@ dismount_steed(
     case DISMOUNT_KNOCKED:
     case DISMOUNT_FELL:
 #ifdef ZHLANG
-        You("%s off of %s!", verb, mon_nam(mtmp));
+        You(TR("%s off of %s!", "%s，从%s上摔了下来！"), verb, mon_nam(mtmp));
 #else
         You("%s off of %s!", verb, mon_nam(mtmp));
 #endif
@@ -777,7 +777,7 @@ dismount_steed(
         break;
     case DISMOUNT_POLY:
 #ifdef ZHLANG
-        You("can no longer ride %s.", mon_nam(u.usteed));
+        You(TR("can no longer ride %s.", "再也骑不了%s了。"), mon_nam(u.usteed));
 #else
         You("can no longer ride %s.", mon_nam(u.usteed));
 #endif
@@ -797,7 +797,7 @@ dismount_steed(
     default:
         if (otmp && otmp->cursed) {
 #ifdef ZHLANG
-            You("can't.  The saddle %s cursed.",
+            You(TR("can't.  The saddle %s cursed.", "做不到。马鞍%s被诅咒了。"),
                 otmp->bknown ? "is" : "seems to be");
 #else
             You("can't.  The saddle %s cursed.",
@@ -808,7 +808,7 @@ dismount_steed(
         }
         if (!have_spot) {
 #ifdef ZHLANG
-            You("can't.  There isn't anywhere for you to stand.");
+            You(TR("can't.  There isn't anywhere for you to stand.", "做不到。这里没有你能站的地方。"));
 #else
             You("can't.  There isn't anywhere for you to stand.");
 #endif
@@ -816,7 +816,7 @@ dismount_steed(
         }
         if (!has_mgivenname(mtmp)) {
 #ifdef ZHLANG
-            pline("You've been through the dungeon on %s with no name.",
+            pline(TR("You've been through the dungeon on %s with no name.", "你骑着%s走遍地牢，它却始终没有名字。"),
                   an(pmname(mtmp->data, Mgender(mtmp))));
 #else
             pline("You've been through the dungeon on %s with no name.",
@@ -824,13 +824,13 @@ dismount_steed(
 #endif
             if (Hallucination)
 #ifdef ZHLANG
-                pline("It felt good to get out of the rain.");
+                pline(TR("It felt good to get out of the rain.", "走出雨中感觉真好。"));
 #else
                 pline("It felt good to get out of the rain.");
 #endif
         } else
 #ifdef ZHLANG
-            You("dismount %s.", mon_nam(mtmp));
+            You(TR("dismount %s.", "从%s上下来。"), mon_nam(mtmp));
 #else
             You("dismount %s.", mon_nam(mtmp));
 #endif
@@ -849,7 +849,7 @@ dismount_steed(
         steed_vs_stealth();
         if (Stealth && !was_stealthy)
 #ifdef ZHLANG
-            You("seem less noisy now.");
+            You(TR("seem less noisy now.", "现在似乎没那么吵了。"));
 #else
             You("seem less noisy now.");
 #endif
@@ -915,7 +915,7 @@ dismount_steed(
                 if (is_pool(u.ux, u.uy)) {
                     if (!Underwater)
 #ifdef ZHLANG
-                        pline("%s falls into the %s!", Monnam(mtmp),
+                        pline(TR("%s falls into the %s!", "%s掉进了%s里！"), Monnam(mtmp),
                               surface(u.ux, u.uy));
 #else
                         pline("%s falls into the %s!", Monnam(mtmp),
@@ -927,7 +927,7 @@ dismount_steed(
                     }
                 } else if (is_lava(u.ux, u.uy)) {
 #ifdef ZHLANG
-                    pline("%s is pulled into the %s!", Monnam(mtmp),
+                    pline(TR("%s is pulled into the %s!", "%s被拖进了%s里！"), Monnam(mtmp),
                           hliquid("lava"));
 #else
                     pline("%s is pulled into the %s!", Monnam(mtmp),
@@ -1043,7 +1043,7 @@ maybewakesteed(struct monst *steed)
     }
     if (wasimmobile && !helpless(steed))
 #ifdef ZHLANG
-        pline("%s wakes up.", Monnam(steed));
+        pline(TR("%s wakes up.", "%s醒了过来。"), Monnam(steed));
 #else
         pline("%s wakes up.", Monnam(steed));
 #endif
@@ -1070,7 +1070,7 @@ poly_steed(
         if (oldshape != steed->data)
             (void) strsubst(buf, "your ", "your new ");
 #ifdef ZHLANG
-        You("adjust yourself in the saddle on %s.", buf);
+        You(TR("adjust yourself in the saddle on %s.", "在%s的马鞍上调整了一下坐姿。"), buf);
 #else
         You("adjust yourself in the saddle on %s.", buf);
 #endif
@@ -1091,7 +1091,7 @@ stucksteed(boolean checkfeeding)
         /* check whether steed can move */
         if (helpless(steed)) {
 #ifdef ZHLANG
-            pline("%s won't move!", YMonnam(steed));
+            pline(TR("%s won't move!", "%s不肯动！"), YMonnam(steed));
 #else
             pline("%s won't move!", YMonnam(steed));
 #endif
@@ -1100,7 +1100,7 @@ stucksteed(boolean checkfeeding)
         /* optionally check whether steed is in the midst of a meal */
         if (checkfeeding && steed->meating) {
 #ifdef ZHLANG
-            pline("%s is still eating.", YMonnam(steed));
+            pline(TR("%s is still eating.", "%s还在吃东西。"), YMonnam(steed));
 #else
             pline("%s is still eating.", YMonnam(steed));
 #endif

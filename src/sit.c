@@ -545,7 +545,7 @@ lay_an_egg(void)
     uegg->known = 1;
     observe_object(uegg);
     #ifdef ZHLANG
-    You("%s an egg.", eggs_in_water(gy.youmonst.data) ? "产卵" : "产下");
+    You(TR("%s an egg.", "%s了一枚蛋。"), eggs_in_water(gy.youmonst.data) ? "产卵" : "产下");
     #else
     You("%s an egg.", eggs_in_water(gy.youmonst.data) ? "spawn" : "lay");
     #endif

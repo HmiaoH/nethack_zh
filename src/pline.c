@@ -408,19 +408,77 @@ free_youbuf(void)
  * test.  Untranslated (ASCII) text keeps the old behaviour of getting no
  * prefix, so an English fallback sentence is not mangled.
  */
-staticfn const char *
-zh_you_prefix(const char *text, const char *prefix)
+/* does 'text' begin with any of the NUL-terminated strings in 'words'? */
+staticfn boolean
+zh_text_starts_with(const char *text, const char *const *words)
 {
+    int i;
+
+    for (i = 0; words[i]; ++i)
+        if (!strncmp(text, words[i], strlen(words[i])))
+            return TRUE;
+    return FALSE;
+}
+
+/*
+ * Choose the Chinese subject prefix for the You() family.
+ *
+ *  full  is the normal prefix ("你感到", "你不能", ...);
+ *  shortf is just the subject ("你"), used when the translated text
+ *        already starts with the verb that 'full' would supply, so that
+ *        "你感到" + "感到内疚" doesn't come out as "你感到感到内疚";
+ *  verbs selects the synonym list for that verb ('F' feel, 'C' can't,
+ *        'H' hear, 'S' see, 0 none).
+ */
+staticfn const char *
+zh_you_prefix(const char *text, const char *full, const char *shortf,
+              int verbs)
+{
+    static const char *const feel_verbs[] = {
+        "感到", "感觉", "觉得", "觉着", 0
+    };
+    static const char *const cant_verbs[] = {
+        "不能", "无法", "不会", "没法", "不可以", 0
+    };
+    static const char *const hear_verbs[] = {
+        "听到", "听见", "听闻", "耳闻", 0
+    };
+    static const char *const see_verbs[] = {
+        "看见", "看到", "见到", "注意到", "察觉", "感觉到", "感到", 0
+    };
+
     if (!text || !*text)
         return "";
+    /* the subject is already spelled out in the translation */
     if (!strncmp(text, "你", sizeof "你" - 1))
         return "";
+    /* the verb is already there: keep just the subject */
+    switch (verbs) {
+    case 'F':
+        if (zh_text_starts_with(text, feel_verbs))
+            return shortf;
+        break;
+    case 'C':
+        if (zh_text_starts_with(text, cant_verbs))
+            return shortf;
+        break;
+    case 'H':
+        if (zh_text_starts_with(text, hear_verbs))
+            return shortf;
+        break;
+    case 'S':
+        if (zh_text_starts_with(text, see_verbs))
+            return shortf;
+        break;
+    default:
+        break;
+    }
     if (!((unsigned char) *text & 0x80) && *text != '%')
         return ""; /* plain untranslated English: keep the old output */
-    return prefix;
+    return full;
 }
 #else
-#define zh_you_prefix(text, prefix) (prefix)
+#define zh_you_prefix(text, full, shortf, verbs) (full)
 #endif
 
 void
@@ -431,7 +489,8 @@ You(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, zh_you_prefix(line, "你"), line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你", "你", 0), line),
+           the_args);
 #else
     vpline(YouMessage(tmp, "You ", line), the_args);
 #endif
@@ -446,7 +505,8 @@ Your(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, zh_you_prefix(line, "你的"), line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你的", "你", 0), line),
+           the_args);
 #else
     vpline(YouMessage(tmp, "Your ", line), the_args);
 #endif
@@ -462,9 +522,11 @@ You_feel(const char *line, ...)
     va_start(the_args, line);
 #ifdef ZHLANG
     if (Unaware)
-        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己感到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己感到", "你梦见自己",
+                                     'F'),
+                      line);
     else
-        YouPrefix(tmp, zh_you_prefix(line, "你感到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你感到", "你", 'F'), line);
 #else
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
@@ -483,7 +545,8 @@ You_cant(const char *line, ...)
 
     va_start(the_args, line);
 #ifdef ZHLANG
-    vpline(YouMessage(tmp, zh_you_prefix(line, "你不能"), line), the_args);
+    vpline(YouMessage(tmp, zh_you_prefix(line, "你不能", "你", 'C'), line),
+           the_args);
 #else
     vpline(YouMessage(tmp, "You can't ", line), the_args);
 #endif
@@ -531,11 +594,14 @@ You_hear(const char *line, ...)
     va_start(the_args, line);
 #ifdef ZHLANG
     if (Underwater)
-        YouPrefix(tmp, zh_you_prefix(line, "你勉强听到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你勉强听到", "你勉强", 'H'),
+                      line);
     else if (Unaware)
-        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己听到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己听到", "你梦见自己",
+                                     'H'),
+                      line);
     else
-        YouPrefix(tmp, zh_you_prefix(line, "你听到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你听到", "你", 'H'), line);
 #else
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
@@ -557,11 +623,13 @@ You_see(const char *line, ...)
     va_start(the_args, line);
 #ifdef ZHLANG
     if (Unaware)
-        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己看见"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你梦见自己看见", "你梦见自己",
+                                     'S'),
+                      line);
     else if (Blind) /* caller should have caught this... */
-        YouPrefix(tmp, zh_you_prefix(line, "你感觉到"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你感觉到", "你", 'S'), line);
     else
-        YouPrefix(tmp, zh_you_prefix(line, "你看见"), line);
+        YouPrefix(tmp, zh_you_prefix(line, "你看见", "你", 'S'), line);
 #else
     if (Unaware)
         YouPrefix(tmp, "You dream that you see ", line);

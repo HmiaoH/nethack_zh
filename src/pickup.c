@@ -2799,7 +2799,7 @@ pline("%s cannot be confined in such trappings.", The(xname(obj)));
         return 0;
     } else if (obj->otyp == LEASH && obj->leashmon != 0) {
         #ifdef ZHLANG
-pline("%s拴在你的宠物身上。", Tobjnam(obj, "are"));
+pline("%s拴在你的宠物身上。", Tobjnam(obj, TR("are", "已经")));
 #else
 pline("%s attached to your pet.", Tobjnam(obj, "are"));
 #endif
@@ -3255,7 +3255,7 @@ use_container(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "opening a container";
+            gm.multi_reason = TR("opening a container", "正打开容器");
             gn.nomovemsg = "";
         }
         ga.abort_looting = TRUE;
@@ -4292,7 +4292,7 @@ tipcontainer_checks(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "tipping a container";
+            gm.multi_reason = TR("tipping a container", "正倾倒容器");
             gn.nomovemsg = "";
         }
         return TIPCHECK_TRAPPED;

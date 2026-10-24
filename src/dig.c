@@ -1468,7 +1468,7 @@ pline("%s entangled in the web.", Yobjnam2(obj, "become"));
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
-                gm.multi_reason = "stuck in a spider web";
+                gm.multi_reason = TR("stuck in a spider web", "被蜘蛛网困住");
                 #ifdef ZHLANG
 gn.nomovemsg = "你挣脱了。";
 #else

@@ -203,6 +203,236 @@ static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
                       " most recent first]" }
 };
 #endif
+
+#ifdef ZHLANG
+/*
+ * Display form of the option values shown by the options menus and the
+ * option-setting handlers (R7).  Option parsing and the config file written
+ * by #saveoptions keep using the English tokens from get_cnf_val; only the
+ * text the player sees goes through here.
+ */
+staticfn const char *
+zh_option_value(int optidx, const char *value)
+{
+    static char zbuf[BUFSZ];
+    const char *name = (optidx >= 0 && optidx < OPTCOUNT)
+                           ? allopt[optidx].name : "";
+    int i;
+
+    if (!value || !*value)
+        return "";
+    /* words shared by many options */
+    if (!strcmp(value, "none"))
+        return "无";
+    if (!strcmp(value, "unknown"))
+        return "未知";
+    if (!strcmp(value, "default"))
+        return "默认";
+    if (!strcmp(value, "all"))
+        return "全部";
+    if (!strcmp(value, "random"))
+        return "随机";
+    if (!strcmp(value, "normal"))
+        return "普通";
+    if (!strcmp(value, "debug"))
+        return "调试";
+    if (!strcmp(value, "explore"))
+        return "探索";
+    if (!strcmp(value, "tiles"))
+        return "图块";
+    /* window alignment */
+    if (!strcmp(name, "align_message") || !strcmp(name, "align_status")) {
+        if (!strcmp(value, "top"))
+            return "顶部";
+        if (!strcmp(value, "left"))
+            return "左侧";
+        if (!strcmp(value, "right"))
+            return "右侧";
+        if (!strcmp(value, "bottom"))
+            return "底部";
+        return value;
+    }
+    if (!strcmp(name, "autounlock")) {
+        if (!strcmp(value, "none"))
+            return "无";
+        Snprintf(zbuf, sizeof zbuf, "%s", value);
+        (void) strsubst(zbuf, "untrap", "解除陷阱");
+        (void) strsubst(zbuf, "apply-key", "使用钥匙");
+        (void) strsubst(zbuf, "kick", "踢开");
+        (void) strsubst(zbuf, "force", "撬开");
+        return zbuf;
+    }
+    if (!strcmp(name, "msg_window")) {
+        if (!strcmp(value, "single"))
+            return "单条";
+        if (!strcmp(value, "combination"))
+            return "组合";
+        if (!strcmp(value, "full"))
+            return "完整";
+        if (!strcmp(value, "reversed"))
+            return "倒序";
+        return value;
+    }
+    if (!strcmp(name, "number_pad")) {
+        static const struct {
+            const char *en, *zh;
+        } npmodes[] = {
+            { "0=off", "0=关闭" },
+            { "1=on", "1=开启" },
+            { "2=on, MSDOS compatible", "2=开启，兼容 MSDOS" },
+            { "3=on, phone-style layout", "3=开启，电话式布局" },
+            { "4=on, phone layout, MSDOS compatible",
+              "4=开启，电话布局，兼容 MSDOS" },
+            { "-1=off, y & z swapped", "-1=关闭，y 与 z 互换" },
+            { 0, 0 }
+        };
+
+        for (i = 0; npmodes[i].en; ++i)
+            if (!strcmp(value, npmodes[i].en))
+                return npmodes[i].zh;
+        return value;
+    }
+    if (!strcmp(name, "perm_invent") || !strcmp(name, "perminv_mode")) {
+        if (!strcmp(value, "none"))
+            return "不显示";
+        if (!strcmp(value, "all"))
+            return "除金币外全部";
+        if (!strcmp(value, "full"))
+            return "全部（含金币）";
+        if (!strcmp(value, "on+grid"))
+            return "除金币外全部+网格";
+        if (!strcmp(value, "gold+grid"))
+            return "全部+网格";
+        if (!strcmp(value, "in-use"))
+            return "仅使用中的物品";
+        if (strstr(value, "no permanent inventory"))
+            return "不显示持久物品栏窗口";
+        if (strstr(value, "all inventory except for gold"))
+            return "除金币外的全部物品";
+        if (strstr(value, "full inventory including gold"))
+            return "全部物品（含金币）";
+        if (strstr(value, "all except gold, plus unused letters"))
+            return "除金币外全部，并列出未用字母";
+        if (strstr(value, "full inventory, plus unused letters"))
+            return "全部物品，并列出未用字母";
+        if (strstr(value, "subset: items currently in use"))
+            return "仅当前使用中的物品";
+        return value;
+    }
+    if (!strcmp(name, "pettype")) {
+        if (!strcmp(value, "cat"))
+            return "猫";
+        if (!strcmp(value, "dog"))
+            return "狗";
+        if (!strcmp(value, "horse"))
+            return "马";
+        if (!strcmp(value, "random"))
+            return "随机";
+        return value;
+    }
+    if (!strcmp(name, "player_selection")) {
+        if (!strcmp(value, "prompts"))
+            return "提示";
+        if (!strcmp(value, "dialog"))
+            return "对话框";
+        return value;
+    }
+    if (!strcmp(name, "playmode")) {
+        if (!strcmp(value, "normal"))
+            return "普通";
+        if (!strcmp(value, "explore"))
+            return "探索";
+        if (!strcmp(value, "debug"))
+            return "调试";
+        return value;
+    }
+    if (!strcmp(name, "scores")) {
+        /* "<n> top/<n> around/own" combination, keep the numbers */
+        Snprintf(zbuf, sizeof zbuf, "%s", value);
+        (void) strsubst(zbuf, " top", " 名以内");
+        (void) strsubst(zbuf, " around", " 名附近");
+        (void) strsubst(zbuf, "own", "仅自己");
+        return zbuf;
+    }
+    if (!strcmp(name, "symset") || !strcmp(name, "roguesymset")) {
+        if (!strcmp(value, "default"))
+            return "默认";
+        Snprintf(zbuf, sizeof zbuf, "%s", value);
+        (void) strsubst(zbuf, ", active", "（已启用）");
+        (void) strsubst(zbuf, ", handler=", "（处理器：");
+        if (!strcmp(value, zbuf))
+            return value;
+        if (strstr(zbuf, "（处理器："))
+            Strcat(zbuf, "）");
+        return zbuf;
+    }
+    if (!strcmp(name, "whatis_coord")) {
+        if (!strcmp(value, "map"))
+            return "地图";
+        if (!strcmp(value, "compass"))
+            return "罗盘";
+        if (!strcmp(value, "full compass"))
+            return "全罗盘";
+        if (!strcmp(value, "screen"))
+            return "屏幕";
+        return value;
+    }
+    if (!strcmp(name, "whatis_filter")) {
+        if (!strcmp(value, "view"))
+            return "视野";
+        if (!strcmp(value, "area"))
+            return "区域";
+        return value;
+    }
+    if (!strcmp(name, "windowborders")) {
+        static const struct {
+            const char *en, *zh;
+        } borders[] = {
+            { "0=off", "0=关闭" },
+            { "1=on", "1=开启" },
+            { "2=auto", "2=自动" },
+            { "3=on, except off for perm_invent",
+              "3=开启，但持久物品栏关闭" },
+            { "4=auto, except off for perm_invent",
+              "4=自动，但持久物品栏关闭" },
+            { 0, 0 }
+        };
+
+        for (i = 0; borders[i].en; ++i)
+            if (!strcmp(value, borders[i].en))
+                return borders[i].zh;
+        return value;
+    }
+    if (!strcmp(name, "mouse_support")) {
+        Snprintf(zbuf, sizeof zbuf, "%s", value);
+        (void) strsubst(zbuf, "0=off", "0=关闭");
+        (void) strsubst(zbuf, "1=on", "1=开启");
+        (void) strsubst(zbuf, "2=on", "2=开启");
+        (void) strsubst(zbuf, ", QuickEdit off", "，快速编辑关闭");
+        (void) strsubst(zbuf, ", QuickEdit unchanged", "，快速编辑未变");
+        (void) strsubst(zbuf, ", O/S adjusted", "，操作系统已调整");
+        (void) strsubst(zbuf, ", O/S unchanged", "，操作系统未调整");
+        return zbuf;
+    }
+    if (!strcmp(name, "paranoid_confirmation")) {
+        /* space separated internal names like "bones die pray" */
+        Snprintf(zbuf, sizeof zbuf, "%s", value);
+        (void) strsubst(zbuf, "bones", "遗骨");
+        (void) strsubst(zbuf, "break-wand", "折断魔杖");
+        (void) strsubst(zbuf, "confirm", "确认");
+        (void) strsubst(zbuf, "die", "死亡");
+        (void) strsubst(zbuf, "attack", "攻击");
+        (void) strsubst(zbuf, "eat", "进食");
+        (void) strsubst(zbuf, "explore", "探索");
+        (void) strsubst(zbuf, "pray", "祈祷");
+        (void) strsubst(zbuf, "quit", "退出");
+        (void) strsubst(zbuf, "trap", "陷阱");
+        (void) strsubst(zbuf, "autoall", "全部自动");
+        return zbuf;
+    }
+    return value;
+}
+#endif /* ZHLANG */
 /* autounlock settings */
 static NEARDATA const char *unlocktypes[][2] = {
     { "untrap",    "(might fail)" },
@@ -467,9 +697,15 @@ ask_do_tutorial(void)
 
         rc = nh_basename(get_configfile(), TRUE);
         norc = !strcmp(get_configfile(), "/dev/null");
+#ifdef ZHLANG
+        Snprintf(buf, sizeof buf,
+                 "在 %s 中写入“OPTIONS=!tutorial”可跳过此询问。",
+                 (rc && *rc && !norc) ? rc : "你的配置文件");
+#else
         Snprintf(buf, sizeof buf,
                  "Put \"OPTIONS=!tutorial\" in %s to skip this query.",
                  (rc && *rc && !norc) ? rc : "your configuration file");
+#endif
         do {
             win = create_nhwindow(NHW_MENU);
             start_menu(win, MENU_BEHAVE_STANDARD);
@@ -5646,7 +5882,7 @@ handler_menustyle(void)
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
 #ifdef ZHLANG
-        pline("'menustyle'%s\"%s\"。", chngd ? "已改为" : "仍为",
+        pline(TR("'menustyle'%s\"%s\"。", "'menustyle'%s“%s”。"), chngd ? "已改为" : "仍为",
               menutype[(int) flags.menu_style][0]);
 #else
         pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
@@ -5738,6 +5974,14 @@ handler_autounlock(int optidx)
     chngd = (flags.autounlock != oldflags);
     if ((chngd || flags.verbose) && give_opt_msg) {
         optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
+#ifdef ZHLANG
+        {
+            const char *zhv = zh_option_value(optidx, buf);
+
+            if (zhv != buf)
+                Strcpy(buf, zhv);
+        }
+#endif
 #ifdef ZHLANG
         pline("'%s'%s'%s'。", optname,
               chngd ? "已改为" : "仍为", buf);
@@ -5958,7 +6202,15 @@ handler_msg_window(void)
             (void) optfn_msg_window(opt_msg_window, get_val,
                                     FALSE, buf, empty_optstr);
 #ifdef ZHLANG
-            pline("'msg_window'%.20s\"%.20s\"。",
+            {
+                const char *zhv = zh_option_value(opt_msg_window, buf);
+
+                if (zhv != buf)
+                    Strcpy(buf, zhv);
+            }
+#endif
+#ifdef ZHLANG
+            pline(TR("'msg_window'%.20s\"%.20s\"。", "'msg_window'%.20s“%.20s”。"),
                   chngd ? "已改为" : "仍为", buf);
 #else
             pline("'msg_window' %.20s \"%.20s\".",
@@ -6147,9 +6399,11 @@ handler_perminv_mode(void)
         buf[0] = '\0';
         (void) optfn_perminv_mode(opt_perm_invent, get_val, FALSE, buf, NULL);
 #ifdef ZHLANG
-        pline("'perminv_mode'%s'%s' (%s)。",
+        /* option name is a config token the user types; keep it English */
+        pline("'perminv_mode'%s'%s'（%s）。", /* NOTRANS */
               (new_pi != old_pi) ? "已改为" : "仍为",
-              perminv_modes[new_pi][0], buf);
+              zh_option_value(opt_perm_invent, perminv_modes[new_pi][0]),
+              zh_option_value(opt_perm_invent, buf));
 #else
         pline("'perminv_mode' %s '%s' (%s).",
               (new_pi != old_pi) ? "changed to" : "is still",
@@ -8762,9 +9016,16 @@ doset_simple_menu(void)
                     if (allopt[k].optfn)
                         reslt = (*allopt[k].optfn)(allopt[k].idx, get_val,
                                                    FALSE, buf2, empty_optstr);
+#ifdef ZHLANG
+                    Sprintf(buf, fmtstr, name,
+                            zh_option_value(k, ((reslt == optn_ok && buf2[0])
+                                                    ? (const char *) buf2
+                                                    : "unknown")));
+#else
                     Sprintf(buf, fmtstr, name,
                             ((reslt == optn_ok && buf2[0])
                              ? (const char *) buf2 : "unknown"));
+#endif
                 break;
             default:
                 Sprintf(buf, TR("ERROR", "错误"));
@@ -9207,6 +9468,9 @@ doset_add_menu(
 
     /* "    " replaces "a - " -- assumes menus follow that style */
     indent = !any.a_int ? "    " : "";
+#ifdef ZHLANG
+    value = zh_option_value(idx, value);
+#endif
     Sprintf(buf, fmtstr, indent, option, value);
     add_menu(win, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);

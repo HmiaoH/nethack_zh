@@ -40,7 +40,9 @@ const struct c_common_strings c_common_strings =
     { "Nothing happens.",
       "Nothing seems to happen.",
       "That's enough tries!",
-      "That is a silly thing to %s.",
+      /* R6: the argument is a verb; the Chinese sentence must not leave the
+         English frame around it ("That is a silly thing to 喝.") */
+      TR("That is a silly thing to %s.", "%s那个太荒唐了。"),
       "shudder for a moment.",
       "something",
       "Something",

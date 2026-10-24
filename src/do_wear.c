@@ -415,7 +415,7 @@ You("can %s!", See_invisible ? "no longer see through yourself"
         break;
     case OILSKIN_CLOAK:
         #ifdef ZHLANG
-pline("%s非常紧。", Tobjnam(uarmc, "fit"));
+pline("%s非常紧。", Tobjnam(uarmc, TR("fit", "戴起来")));
 #else
 pline("%s very tightly.", Tobjnam(uarmc, "fit"));
 #endif
@@ -1009,7 +1009,7 @@ Armor_off(void)
         end_burn(otmp, FALSE);
         if (!Blind)
             #ifdef ZHLANG
-pline("%s停止了发光。", Tobjnam(otmp, "stop"));
+pline("%s停止了发光。", Tobjnam(otmp, TR("stop", "已经")));
 #else
 pline("%s shining.", Tobjnam(otmp, "stop"));
 #endif
@@ -2125,7 +2125,7 @@ armoroff(struct obj *otmp)
        delays and which didn't; now both are handled for all types */
     if (delay) {
         nomul(delay);
-        gm.multi_reason = "disrobing";
+        gm.multi_reason = TR("disrobing", "正脱衣");
         switch (objects[otmp->otyp].oc_armcat) {
         case ARM_SUIT:
             what = suit_simple_name(otmp);
@@ -2711,7 +2711,7 @@ You_cant("wear that!");
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
-            gm.multi_reason = "dressing up";
+            gm.multi_reason = TR("dressing up", "正穿衣");
 #ifdef ZHLANG
             gn.nomovemsg = "你完成了穿戴动作。";
 #else

@@ -566,8 +566,8 @@ intemple(int roomno)
                 You("are frightened to death, and unable to move.");
                 #endif
             nomul(-3);
-            gm.multi_reason = "being terrified of a ghost";
-            gn.nomovemsg = "You regain your composure.";
+            gm.multi_reason = TR("being terrified of a ghost", "正被鬼魂吓坏");
+            gn.nomovemsg = TR("You regain your composure.", "你恢复了镇定。");
         }
     }
 }

@@ -1210,7 +1210,7 @@ polymon(int mntmp)
             && !(uptr == &mons[PM_GIANT_EEL]
                  || uptr == &mons[PM_ELECTRIC_EEL]))
 #ifdef ZHLANG
-            pline(use_thec, "sit",
+            pline(use_thec, TR("sit", "坐下"),
                   eggs_in_water(uptr) ? "在水中产卵" : "产蛋");
 #else
             pline(use_thec, "sit",
@@ -2120,7 +2120,7 @@ dogaze(void)
                                   ? -d((int) mtmp->m_lev + 1,
                                        (int) mtmp->data->mattk[0].damd)
                                   : -200);
-                        gm.multi_reason = "frozen by a monster's gaze";
+                        gm.multi_reason = TR("frozen by a monster's gaze", "被怪物的凝视冻住");
                         gn.nomovemsg = 0;
                         return ECMD_TIME;
                     } else

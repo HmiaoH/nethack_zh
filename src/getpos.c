@@ -115,6 +115,15 @@ getpos_getvalids_selection(
 }
 
 static const char *const gloc_descr[NUM_GLOCS][4] = {
+#ifdef ZHLANG
+    { "所有怪物", "怪物", "下一个/上一个怪物", "怪物们" },
+    { "所有物品", "物品", "下一个/上一个物品", "物品们" },
+    { "所有门", "门", "下一个/上一个门或门口", "门或门口" },
+    { "所有未探索区域", "未探索区域", "未探索的位置",
+      "未探索位置旁的地点" },
+    { "任何有趣的东西", "有趣的东西", "任何有趣的东西", "任何有趣的东西" },
+    { "所有有效位置", "有效位置", "有效位置", "有效位置" }
+#else
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
     { "any doors", "door", "next/previous door or doorway",
@@ -125,13 +134,53 @@ static const char *const gloc_descr[NUM_GLOCS][4] = {
       "anything interesting" },
     { "any valid locations", "valid location", "valid location",
       "valid locations" }
+#endif
 };
 
 static const char *const gloc_filtertxt[NUM_GFILTER] = {
     "",
+#ifdef ZHLANG
+    "（在视野内）",
+    "（在此区域）"
+#else
     " in view",
     " in this area"
+#endif
 };
+
+#ifdef ZHLANG
+/* Chinese form of the goal phrases passed in by the various callers; an
+   unknown phrase is left as it is. */
+staticfn const char *
+zh_getpos_goal(const char *goal)
+{
+    static const struct {
+        const char *en, *zh;
+    } goals[] = {
+        { "desired location", "期望的位置" },
+        { "the desired position", "期望的位置" },
+        { "the desired destination", "期望的目的地" },
+        { "the spot to hit", "要击打的位置" },
+        { "a monster", "一个怪物" },
+        { "a location", "一个位置" },
+        { "a door", "一扇门" },
+        { "an item", "一件物品" },
+        { "an object", "一件物品" },
+        { "a trap", "一个陷阱" },
+        { "a pit", "一个坑" },
+        { "the stairs", "楼梯" },
+        { 0, 0 }
+    };
+    int i;
+
+    if (!goal)
+        return "";
+    for (i = 0; goals[i].en; ++i)
+        if (!strcmp(goal, goals[i].en))
+            return goals[i].zh;
+    return goal;
+}
+#endif /* ZHLANG */
 
 staticfn void
 getpos_help_keyxhelp(
@@ -146,17 +195,28 @@ getpos_help_keyxhelp(
     if (gloc == GLOC_EXPLORE) {
         /* default of "move to unexplored location" is inaccurate
            because the position will be one spot short of that */
+#ifdef ZHLANG
+        move_cursor_to = "把光标移到";
+#else
         move_cursor_to = "move the cursor next to an ";
+#endif
         if (iflags.getloc_usemenu)
             /* default is too wide for basic 80-column tty so shorten it
                to avoid wrapping */
             filtertxt = strsubst(strcpy(fbuf, filtertxt),
-                                 "this area", "area");
+                                 TR("this area", "此区域"),
+                                 TR("area", "区域"));
     }
+#ifdef ZHLANG
+    Sprintf(sbuf, "用「%s」/「%s」来%s%s%s。", k1, k2,
+            iflags.getloc_usemenu ? "从菜单里选择" : move_cursor_to,
+            gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
+#else
     Sprintf(sbuf, TR("Use '%s'/'%s' to %s%s%s.", "用「%s」/「%s」来%s%s%s。"),
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of " : move_cursor_to,
             gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
+#endif
     putstr(tmpwin, 0, sbuf);
 }
 
@@ -166,19 +226,39 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 staticfn void
 getpos_help(boolean force, const char *goal)
 {
+#ifdef ZHLANG
+    static const char *const fastmovemode[2] = { "每次 8 格", "跳过相同符号" };
+#else
     static const char *const fastmovemode[2] = { "8 units at a time",
                                                  "skipping same glyphs" };
+#endif
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
+#ifdef ZHLANG
+    Sprintf(sbuf, "用「%s」「%s」「%s」「%s」把光标移到%s。", /* hjkl */
+            visctrl(cmd_from_func(do_move_west)),
+            visctrl(cmd_from_func(do_move_south)),
+            visctrl(cmd_from_func(do_move_north)),
+            visctrl(cmd_from_func(do_move_east)), zh_getpos_goal(goal));
+#else
     Sprintf(sbuf,
             "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
             visctrl(cmd_from_func(do_move_west)),
             visctrl(cmd_from_func(do_move_south)),
             visctrl(cmd_from_func(do_move_north)),
             visctrl(cmd_from_func(do_move_east)), goal);
+#endif
     putstr(tmpwin, 0, sbuf);
+#ifdef ZHLANG
+    Sprintf(sbuf, "用「%s」「%s」「%s」「%s」快速移动光标，%s。",
+            visctrl(cmd_from_func(do_run_west)),
+            visctrl(cmd_from_func(do_run_south)),
+            visctrl(cmd_from_func(do_run_north)),
+            visctrl(cmd_from_func(do_run_east)),
+            fastmovemode[iflags.getloc_moveskip]);
+#else
     Sprintf(sbuf,
             "Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s.",
             visctrl(cmd_from_func(do_run_west)),
@@ -186,6 +266,7 @@ getpos_help(boolean force, const char *goal)
             visctrl(cmd_from_func(do_run_north)),
             visctrl(cmd_from_func(do_run_east)),
             fastmovemode[iflags.getloc_moveskip]);
+#endif
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf, TR("(or prefix normal move with '%s' or '%s' to fast-move)", "（或在普通移动前加上「%s」或「%s」快速移动）"),
             visctrl(cmd_from_func(do_run)),
@@ -233,9 +314,14 @@ getpos_help(boolean force, const char *goal)
         Sprintf(sbuf, TR("Use '%s' to toggle menu listing for possible targets.", "用「%s」切换可能目标的菜单列表。"),
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
         putstr(tmpwin, 0, sbuf);
+#ifdef ZHLANG
+        Sprintf(sbuf, "用「%s」切换限制可能目标的方式。",
+                visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+#else
         Sprintf(sbuf,
                 "Use '%s' to change the mode of limiting possible targets.",
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+#endif
         putstr(tmpwin, 0, sbuf);
     }
     if (!iflags.terrainmode) {
@@ -256,11 +342,19 @@ getpos_help(boolean force, const char *goal)
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
+#ifdef ZHLANG
+            Sprintf(sbuf,
+                    (iflags.getpos_coords == GPCOORDS_NONE)
+ ? "（设置 whatis_coord 选项，以便在「%s」描述中带上坐标。）"
+ : "（重置 whatis_coord 选项，以便在「%s」描述中去掉坐标。）",
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+#else
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
         ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
         : "(Reset 'whatis_coord' option to omit coordinates from '%s' text.)",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+#endif
         }
  skip_non_mons:
         /* disgusting hack; the alternate selection characters work for any
@@ -276,10 +370,29 @@ getpos_help(boolean force, const char *goal)
         } else {
             Sprintf(kbuf, "'%s'", visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
+#ifdef ZHLANG
+        Snprintf(sbuf, sizeof(sbuf), "在选好位置后按 %s。", kbuf);
+#else
         Snprintf(sbuf, sizeof(sbuf),
                  "Type a %s when you are at the right place.", kbuf);
+#endif
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
+#ifdef ZHLANG
+            Sprintf(sbuf, "  「%s」描述当前位置、显示更多信息、移到别处。",
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+            putstr(tmpwin, 0, sbuf);
+            Sprintf(sbuf, "  「%s」描述当前位置，%s移到别处；",
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    flags.help && !force ? "询问是否显示更多信息，" : "");
+            putstr(tmpwin, 0, sbuf);
+            Sprintf(sbuf, "  「%s」描述当前位置，移到别处；",
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
+            putstr(tmpwin, 0, sbuf);
+            Sprintf(sbuf, "  「%s」描述当前位置，并停止观察；",
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
+            putstr(tmpwin, 0, sbuf);
+#else
             Sprintf(sbuf,
       "  '%s' describe current spot, show 'more info', move to another spot.",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
@@ -297,6 +410,7 @@ getpos_help(boolean force, const char *goal)
                     "  '%s' describe current spot, stop looking at things;",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
             putstr(tmpwin, 0, sbuf);
+#endif
         }
     }
     if (!force)
@@ -727,7 +841,9 @@ getpos_menu(coord *ccp, int gloc)
     Sprintf(tmpbuf, TR("Pick %s%s%s", "选择%s%s%s"),
             an(gloc_descr[gloc][1]),
             gloc_filtertxt[iflags.getloc_filter],
-            iflags.getloc_travelmode ? " for travel destination" : "");
+            iflags.getloc_travelmode
+                ? TR(" for travel destination", "作为旅行目的地")
+                : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
@@ -880,7 +996,7 @@ getpos(coord *ccp, boolean force, const char *goal)
     for (;;) {
         if (show_goal_msg) {
 #ifdef ZHLANG
-            pline("将光标移动到%s：", goal);
+            pline("将光标移动到%s：", zh_getpos_goal(goal));
 #else
             pline("Move cursor to %s:", goal);
 #endif
@@ -1000,9 +1116,15 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
+#ifdef ZHLANG
+                "不限制目标",
+                "只限制为视野内的目标",
+                "只限制为同一区域内的目标"
+#else
                 "Not limiting targets",
                 "Limiting targets to those in sight",
                 "Limiting targets to those in same area"
+#endif
             };
 
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;

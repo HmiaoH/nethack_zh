@@ -549,8 +549,8 @@ pline("As you open the bottle, an enormous %s emerges!",
     if (flags.verbose)
         You(TR("are frightened to death, and unable to move.", "被吓得魂飞魄散，动弹不得。"));
     nomul(-3);
-    gm.multi_reason = "being frightened to death";
-    gn.nomovemsg = "You regain your composure.";
+    gm.multi_reason = TR("being frightened to death", "正被吓死");
+    gn.nomovemsg = TR("You regain your composure.", "你恢复了镇定。");
 }
 
 /* getobj callback for object to drink from, which also does double duty as
@@ -908,7 +908,7 @@ You("昏过去了。");
 You("pass out.");
 #endif
         gm.multi = -rnd(15);
-        gn.nomovemsg = "You awake with a headache.";
+        gn.nomovemsg = TR("You awake with a headache.", "你醒来时头痛欲裂。");
     }
 }
 
@@ -1050,7 +1050,7 @@ Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
 #endif
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "frozen by a potion";
+        gm.multi_reason = TR("frozen by a potion", "被药剂冻住");
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -1963,7 +1963,7 @@ pline("Crash!");
     /* oil doesn't instantly evaporate; Neither does a saddle hit */
     if (obj->otyp != POT_OIL && !hit_saddle && cansee(tx, ty))
         #ifdef ZHLANG
-pline("你%s。", Tobjnam(obj, "evaporate"));
+pline("%s。", Tobjnam(obj, TR("evaporate", "蒸发")));
 #else
 pline("%s.", Tobjnam(obj, "evaporate"));
 #endif
@@ -2361,7 +2361,7 @@ You_feel("somewhat dizzy.");
         if (!Free_action) {
             pline(TR("%s seems to be holding you.", "%s似乎抓住了你。"), Something);
             nomul(-rnd(5));
-            gm.multi_reason = "frozen by a potion";
+            gm.multi_reason = TR("frozen by a potion", "被药剂冻住");
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2380,7 +2380,7 @@ You_feel("很疲倦。");
 You_feel("rather tired.");
 #endif
             nomul(-rnd(5));
-            gm.multi_reason = "sleeping off a magical draught";
+            gm.multi_reason = TR("sleeping off a magical draught", "正从魔法药水的药效中睡醒");
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {
@@ -2825,8 +2825,10 @@ You("can't fit your %s into the mouth of the bottle!",
 
             /* KMH, conduct */
             if (!u.uconduct.polypiles++)
-                livelog_printf(LL_CONDUCT, "polymorphed %s first item", /* NOTRANS */
-                               uhis());
+                livelog_printf(LL_CONDUCT,
+                               TR("polymorphed %s first item",
+                                  "%s首次变形了一件物品"),
+                               (flags.female ? "她" : "他"));
 
             obj = poly_obj(obj, STRANGE_OBJECT);
 

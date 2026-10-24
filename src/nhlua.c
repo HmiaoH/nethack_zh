@@ -967,7 +967,46 @@ nhl_text(lua_State *L)
 
         while (lua_gettop(L) > 0) {
             char *ostr = dupstr(luaL_checkstring(L, 1));
-            char *ptr, *str = ostr;
+            char *ptr, *str;
+#ifdef ZHLANG
+            /*
+             * The level scripts hand out shared English text windows (for
+             * example the farlook "Tip:" help); translate them line by line
+             * through dat/msgs_zh.lua before doing the width-based wrap.
+             */
+            {
+                const char *src = ostr;
+                size_t slen = strlen(src);
+                char *trans = (char *) alloc(4 * slen + 4);
+                char *tp = trans;
+                const char *sp = src;
+
+                while (*sp) {
+                    const char *nl = strchr(sp, '\n');
+                    size_t len = nl ? (size_t) (nl - sp) : strlen(sp);
+                    char *line = (char *) alloc(len + 1);
+                    const char *zh;
+                    size_t zl, room = (size_t) ((trans + 4 * slen + 3) - tp);
+
+                    (void) memcpy(line, sp, len);
+                    line[len] = '\0';
+                    zh = nhl_zh_msgs(line);
+                    zl = strlen(zh);
+                    if (zl + 2 > room)
+                        zl = (room > 2) ? room - 2 : 0; /* don't overflow */
+                    (void) memcpy(tp, zh, zl);
+                    tp += zl;
+                    free((genericptr_t) line);
+                    if (nl)
+                        *tp++ = '\n';
+                    sp = nl ? nl + 1 : sp + len;
+                }
+                *tp = '\0';
+                free((genericptr_t) ostr);
+                ostr = trans;
+            }
+#endif
+            str = ostr;
 #ifndef ZHLANG
             char *lstr = str + strlen(str) - 1;
 #endif

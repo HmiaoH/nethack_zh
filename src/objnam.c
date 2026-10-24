@@ -1165,7 +1165,18 @@ xname_flags(
  nameit:
         /*assert(has_oname(obj));*/
         obufp = eos(buf); /* remember where the name will start */
+#ifdef ZHLANG
+        /* R6/F5: an artifact's oname is its English canonical name (that is
+           what every internal lookup and the save file use); show the
+           Chinese name here instead.  An object with a player-given name
+           that isn't an artifact keeps that name. */
+        if (obj->oartifact)
+            Concat(buf, 0, artiname_zh(obj->oartifact));
+        else
+            Concat(buf, 0, ONAME(obj));
+#else
         Concat(buf, 0, ONAME(obj));
+#endif
         /* downcase "The" in "<quest-artifact-item> named The ..." */
         if (obj->oartifact && !strncmp(obufp, "The ", 4))
             *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
@@ -1572,7 +1583,7 @@ doname_base(
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
 #ifdef ZHLANG
-            Concat(bp, 0, " （已穿戴）");
+            Concat(bp, 0, "（已穿戴）");
 #else
             Concat(bp, 0, " (being worn)");
 #endif
@@ -1581,10 +1592,10 @@ doname_base(
         if (obj->owornmask & W_ARMOR) {
 #ifdef ZHLANG
             Concat(bp, 0,
-                   (obj == uskin) ? " （嵌入皮肤）"
-                   : doffing(obj) ? " （正在脱）"
-                     : donning(obj) ? " （正在穿）"
-                       : " （已穿戴）");
+                   (obj == uskin) ? "（嵌入皮肤）"
+                   : doffing(obj) ? "（正在脱）"
+                     : donning(obj) ? "（正在穿）"
+                       : "（已穿戴）");
 #else
             Concat(bp, 0,
                    (obj == uskin) ? " (embedded in your skin)"
@@ -1627,7 +1638,7 @@ doname_base(
     case TOOL_CLASS:
         if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
 #ifdef ZHLANG
-            Concat(bp, 0, " （已穿戴）");
+            Concat(bp, 0, "（已穿戴）");
 #else
             Concat(bp, 0, " (being worn)");
 #endif
@@ -1790,7 +1801,7 @@ doname_base(
                  : !is_weptool(obj)))
             && !twoweap_primary) {
 #ifdef ZHLANG
-            Concat(bp, 0, " （已挥舞）");
+            Concat(bp, 0, "（已挥舞）");
 #else
             Concat(bp, 0, " (wielded)");
 #endif
@@ -5798,7 +5809,8 @@ readobjnam(char *bp, struct obj *no_wish)
                 rn1cnt = 6 - d.gsize;
             if (d.cnt > rn1cnt
                 && (!wizard || program_state.wizkit_wishing
-                    || y_n("Override glob weight limit?") != 'y'))
+                    || y_n(TR("Override glob weight limit?",
+                                     "覆盖团块重量上限吗？")) != 'y'))
                 d.cnt = rn1cnt;
             d.otmp->owt *= (unsigned) d.cnt;
         }

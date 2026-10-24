@@ -428,7 +428,7 @@ book_cursed(struct obj *book)
     if (book->cursed && gm.multi >= 0
         && go.occupation == learn && svc.context.spbook.book == book) {
         #ifdef ZHLANG
-        pline("%s合上了！", Tobjnam(book, "slam"));
+        pline("%s合上了！", Tobjnam(book, TR("slam", "砰然")));
         #else
         pline("%s shut!", Tobjnam(book, "slam"));
         #endif
@@ -457,7 +457,7 @@ learn(void)
         svc.context.spbook.book = 0; /* no longer studying */
         svc.context.spbook.o_id = 0;
         nomul(svc.context.spbook.delay); /* remaining delay is uninterrupted */
-        gm.multi_reason = "reading a book";
+        gm.multi_reason = TR("reading a book", "正读书");
         gn.nomovemsg = 0;
         svc.context.spbook.delay = 0;
         return 0;
@@ -735,7 +735,7 @@ study_book(struct obj *spellbook)
             boolean gone = cursed_book(spellbook);
 
             nomul(svc.context.spbook.delay); /* study time */
-            gm.multi_reason = "reading a book";
+            gm.multi_reason = TR("reading a book", "正读书");
             gn.nomovemsg = 0;
             svc.context.spbook.delay = 0;
             if (gone || !rn2(3)) {
@@ -755,7 +755,7 @@ study_book(struct obj *spellbook)
                 spellbook->in_use = FALSE;
             }
             nomul(svc.context.spbook.delay);
-            gm.multi_reason = "reading a book";
+            gm.multi_reason = TR("reading a book", "正读书");
             gn.nomovemsg = 0;
             svc.context.spbook.delay = 0;
             return 1;

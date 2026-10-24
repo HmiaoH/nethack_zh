@@ -1268,7 +1268,7 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "pretending to be a pile of gold";
+            gm.multi_reason = TR("pretending to be a pile of gold", "正假装是一堆金子");
             Sprintf(buf,
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
@@ -1929,8 +1929,8 @@ rottenfood(struct obj *obj)
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
-        gm.multi_reason = "unconscious from rotten food";
-        gn.nomovemsg = "You are conscious again.";
+        gm.multi_reason = TR("unconscious from rotten food", "因腐坏食物而昏迷");
+        gn.nomovemsg = TR("You are conscious again.", "你恢复了意识。");
         ga.afternmv = Hear_again;
         return 1;
     }
@@ -2092,6 +2092,18 @@ eatcorpse(struct obj *otmp)
             /* veggies are always just "okay" */
             "Tokay", "Istringy", "Igamey", "Ifatty", "Itough"
         };
+#ifdef ZHLANG
+        /* R5: the Chinese taste adjectives; the English palatable_msgs[]
+           above is still used for the "is" vs "tastes" wording and by the
+           English build */
+        static const char *const palatable_msgs_zh[] = {
+            "还不错",   /* okay */
+            "筋多",     /* stringy */
+            "有野味",   /* gamey */
+            "太肥",     /* fatty */
+            "很韧"      /* tough */
+        };
+#endif
         int idx = vegetarian(&mons[mnum]) ? 0 : rn2(SIZE(palatable_msgs));
         const char *palat_msg = palatable_msgs[idx];
         boolean use_is = (Hallucination || (palatable && *palat_msg == 'I'));
@@ -2099,17 +2111,18 @@ eatcorpse(struct obj *otmp)
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
 #ifdef ZHLANG
+            /* whole Chinese sentence: 这只<食物>尝起来筋多。 / <食物>有野味。 */
             pline("%s%s%s%s%s",
                   type_is_pname(&mons[mnum])
                      ? "" : the_unique_pm(&mons[mnum]) ? "那只" : "这只",
                   pmxnam,
-                  use_is ? "是" : "尝起来",
+                  use_is ? "" : "尝起来",
                   Hallucination
                      ? (yummy ? ((u.umonnum == PM_TIGER) ? "棒极了" : "超棒")
                               : palatable ? "还行" : "怪怪的")
                   : (yummy ? "很美味" : palatable ?
-                     &palat_msg[1] : "很难吃"),
-                  (yummy || !palatable) ? "!" : ".");
+                     palatable_msgs_zh[idx] : "很难吃"),
+                  (yummy || !palatable) ? "！" : "。");
 #else
             pline("%s%s %s %s%c",
                   type_is_pname(&mons[mnum])
@@ -3288,8 +3301,9 @@ use_tin_opener(struct obj *obj)
         if (obj->cursed && obj->bknown) {
             char qbuf[QBUFSZ];
 
-            if (ynq(safe_qbuf(qbuf, TR("Really wield ", "真的要挥舞"), "?",
-                              obj, doname, thesimpleoname, "that")) != 'y')
+            if (ynq(safe_qbuf(qbuf, TR("Really wield ", "真的要挥舞"),
+                              TR("?", "？"), obj, doname, thesimpleoname,
+                              TR("that", "那个"))) != 'y')
                 return ECMD_OK;
         }
         if (!wield_tool(obj, "use"))
@@ -3491,7 +3505,7 @@ lesshungry(int num)
                 || (svc.context.victual.eating
                     && !svc.context.victual.fullwarn))) {
             pline(TR("You're having a hard time getting all of it down.", "你很难把它全部咽下去。"));
-            gn.nomovemsg = "You're finally finished.";
+            gn.nomovemsg = TR("You're finally finished.", "你终于吃完了。");
             if (!svc.context.victual.eating) {
                 gm.multi = -2;
             } else {
@@ -3500,7 +3514,7 @@ lesshungry(int num)
                     && (svc.context.victual.reqtime
                         - svc.context.victual.usedtime) > 1) {
                     /* food with one bite left will not survive a stop */
-                    if (!paranoid_query(ParanoidEating, "Continue eating?")) {
+                    if (!paranoid_query(ParanoidEating, TR("Continue eating?", "继续吃吗？"))) {
                         reset_eat();
                         gn.nomovemsg = (char *) 0;
                     }
@@ -3602,8 +3616,8 @@ newuhs(boolean incr)
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
                 nomul(-duration);
-                gm.multi_reason = "fainted from lack of food";
-                gn.nomovemsg = "You regain consciousness.";
+                gm.multi_reason = TR("fainted from lack of food", "因缺少食物而昏厥");
+                gn.nomovemsg = TR("You regain consciousness.", "你恢复了知觉。");
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
                 if (!Levitation)
@@ -3753,6 +3767,23 @@ tin_ok(struct obj *obj)
     return GETOBJ_SUGGEST;
 }
 
+#ifdef ZHLANG
+/* R5: Chinese form of the floorfood() request verb ("eat", "sacrifice" or
+   "tin"); the prompts built around it must be whole Chinese sentences, so
+   the verb cannot stay English.  Already-localized input is unchanged. */
+staticfn const char *
+zh_food_verb(const char *verb)
+{
+    if (!strcmp(verb, "eat"))
+        return "吃";
+    if (!strcmp(verb, "sacrifice"))
+        return "献祭";
+    if (!strcmp(verb, "tin"))
+        return "装罐";
+    return verb;
+}
+#endif /* ZHLANG */
+
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
  */
@@ -3791,7 +3822,8 @@ floorfood(
                be a chance to becoming trapped?  Probably not, because
                then the trap would just get eaten on the _next_ turn... */
             Sprintf(qbuf, TR("There is a bear trap here (%s); eat it?", "这里有一个捕熊夹（%s）；要吃掉它吗？"),
-                    u_in_beartrap ? "holding you" : "armed");
+                    u_in_beartrap ? TR("holding you", "夹住了你")
+                                  : TR("armed", "已触发"));
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
                 struct obj *beartrap;
 
@@ -3800,7 +3832,8 @@ floorfood(
                     reset_utrap(TRUE);
                 beartrap = mksobj(BEARTRAP, TRUE, FALSE);
                 Sprintf(qbuf,TR("You only manage to %s the bear trap.", "你只勉强%s捕熊夹。"),
-                        u_in_beartrap ? "free yourself from" : "disarm");
+                        u_in_beartrap ? TR("free yourself from", "挣脱")
+                                      : TR("disarm", "拆开"));
                 if (check_capacity(qbuf) && beartrap) {
                     obj_extract_self(beartrap);
                     dropy(beartrap);           /* put it on the floor */
@@ -3820,14 +3853,24 @@ floorfood(
             Strcpy(qbuf, TR("There are iron bars here", "这里有铁栏杆"));
             if (nodig || u.uhunger > 1500) {
                 pline(TR("%s but you %s eat them.", "%s，但你%s吃掉它们。"), qbuf,
-                      nodig ? "cannot" : "are too full to");
+                      nodig ? TR("cannot", "不能")
+                             : TR("are too full to", "太饱了，不能"));
             } else {
+#ifdef ZHLANG
+                Strcat(qbuf, (!svc.context.digging.chew
+                              || !u_at(svc.context.digging.pos.x,
+                                       svc.context.digging.pos.y)
+                              || !on_level(&svc.context.digging.level, &u.uz))
+                              ? "；要把它们吃掉吗？"
+                              : "；要继续吃它们吗？");
+#else
                 Strcat(qbuf, (!svc.context.digging.chew
                               || !u_at(svc.context.digging.pos.x,
                                        svc.context.digging.pos.y)
                               || !on_level(&svc.context.digging.level, &u.uz))
                               ? "; eat them?"
                               : "; resume eating them?");
+#endif
                 c = yn_function(qbuf, ynqchars, 'n', TRUE);
             }
             if (c == 'y')
@@ -3874,10 +3917,22 @@ floorfood(
             }
             /* "There is <an object> here; <verb> it?" or
                "There are <N objects> here; <verb> one?" */
+#ifdef ZHLANG
+            /* whole Chinese sentence: 这里有<物品>；要吃它吗？  the English
+               version spliced otense()'s "is"/"are" and the English verb
+               into the sentence, which cannot be done in Chinese (R5) */
+            Strcpy(qbuf, "这里有");
+            Sprintf(qsfx,
+                    one ? "；要%s它吗？" : "；要%s其中一个吗？",
+                    zh_food_verb(verb));
+            (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
+                             one ? "某物" : "一些东西");
+#else
             Sprintf(qbuf, TR("There %s ", "这里%s"), otense(otmp, "are"));
             Sprintf(qsfx, TR(" here; %s %s?", "；要%s%s吗？"), verb, one ? "it" : "one");
             (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
                              one ? something : (const char *) "things");
+#endif
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
             else if (c == 'q')
@@ -3901,7 +3956,11 @@ floorfood(
     }
     if (otmp && corpsecheck && !(offering && otmp->oclass == AMULET_CLASS)) {
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
+#ifdef ZHLANG
+            You_cant(TR("%s that!", "你无法%s那个！"), zh_food_verb(verb));
+#else
             You_cant(TR("%s that!", "你无法%s那个！"), verb);
+#endif
             otmp = (struct obj *) 0;
         }
     }
@@ -3939,7 +3998,7 @@ vomit(void) /* A good idea from David Neves */
        be immobilized for some other reason at the time vomit() is called */
     if (gm.multi >= -2) {
         nomul(-2);
-        gm.multi_reason = "vomiting";
+        gm.multi_reason = TR("vomiting", "正呕吐");
         gn.nomovemsg = You_can_move_again;
     }
 

@@ -28,13 +28,13 @@
 /* NUM_ROLES is defined in hack.h */
 
 const struct Role roles[NUM_ROLES+1] = {
-    { { "Archeologist", 0 },
 #ifdef ZHLANG
-      { { "考古学家", 0 },
+    { { "考古学家", 0 },
 #else
-      { { "Digger", 0 },
+    { { "Archeologist", 0 },
 #endif
 #ifdef ZHLANG
+      { { "挖掘工", 0 },
         { "田野工作者", 0 },
         { "调查员", 0 },
         { "发掘者", 0 },
@@ -44,6 +44,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "收藏家", 0 },
         { "馆长", 0 } },
 #else
+      { { "Digger", 0 },
         { "Field Worker", 0 },
         { "Investigator", 0 },
         { "Exhumer", 0 },
