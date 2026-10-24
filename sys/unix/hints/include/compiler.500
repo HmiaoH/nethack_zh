@@ -50,7 +50,6 @@ endif
 #CXX=clang++ -std=gnu++11
 
 CFLAGS=$(CCFLAGS) -I../include
-CFLAGS+=-DZHLANG
 CFLAGS+=-Wall -Wextra  \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic

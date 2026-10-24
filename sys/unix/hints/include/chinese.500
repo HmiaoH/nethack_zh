@@ -1,28 +1,18 @@
 #------------------------------------------------------------------------------
 # NetHack 5.0  chinese.500
 #
-# Chinese localization build flags. Include this from your hints file
-# (e.g. macos.500) or add to the include list in the hints file.
+# Chinese localization build flag.  Include it from a hints file's
+# HINTSINCLNAMES list (macOS.500 and linux.500 already do that); remove
+# "chinese" from that list to build the plain English version.
 #
-# Defines ZHLANG which enables Chinese text throughout the game:
+# ZHLANG enables Chinese text throughout the game:
 #   - item names/descriptions from objects_zh.h
 #   - monster names from monsters_zh.h
-#   - Chinese-translated source strings (via #ifdef ZHLANG guards)
+#   - Chinese-translated source strings (TR() macro / #ifdef ZHLANG guards)
+#   - the *_zh help and data files
 #
-# Usage: add to your hints file's HINTSINCLNAMES list, e.g.:
-#   HINTSINCLNAMES += chinese
+# This file is the only place that adds -DZHLANG.  Do not add it to
+# compiler.500: without this include the build must stay English.
 #
-
-ifdef MAKEFILE_SRC
-ifndef ZHLANG
-ZHLANG=1
-endif
-endif
-
-ifdef MAKEFILE_TOP
-ifndef ZHLANG
-ZHLANG=1
-endif
-endif
 
 CFLAGS += -DZHLANG

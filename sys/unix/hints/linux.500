@@ -45,8 +45,6 @@ endif
 #        it pulls in the contents of dirs-perms.500
 #-INCLUDE dirs-perms.500
 
-#-INCLUDE chinese.500
-
 #-INCLUDE linuxdistro.500
 
 ifndef LIBXPM
@@ -80,6 +78,11 @@ USE_NOSTATICFN = 1
 # to both linux and macOS
 
 #-INCLUDE compiler.500
+
+# Chinese localization.  It has to come after compiler.500 because that
+# file resets CFLAGS; remove this include (and "chinese" from
+# HINTSINCLNAMES above) to build the plain English version.
+#-INCLUDE chinese.500
 
 ifdef WANT_SYSTEM_LUA
 ifndef LUA_VERSION
