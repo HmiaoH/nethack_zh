@@ -1,0 +1,93 @@
+# NetHack 5.0  engrave.txt       $NHDT-Date: 1596498240 2020/08/03 23:44:00 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.5 $
+# Copyright (c) 2015 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+# Random engravings on the floor
+#
+Elbereth
+# trap engravings
+弗拉德到此一游
+前往国库
+
+# take-offs and other famous engravings
+猫头鹰之息
+凯兰崔尔
+基尔罗伊到此一游
+佛罗多永生
+
+# Journey to the Center of the Earth
+A.S. ->
+<- A.S.
+# Adventure
+你没法把它搬上台阶
+# Inferno
+入此门者，当舍弃一切希望。
+# Prisoner
+欢迎光临
+# God's Final Message to His Creation (from "So Long, and Thanks for All
+# the Fish" by Douglas Adams):
+我们为带来的不便深表歉意。
+# Thriller
+下周三见
+# Smokey Stover
+公证人索杰克
+
+想找乐子请拨 8?7-5309
+# Various zoos around the world
+请勿投喂动物。
+# A palindrome
+夫人，在伊甸园里，我就是亚当。
+# Siskel & Ebert
+两个大拇指！
+# The First C Program
+你好，世界！
+^?MAIL
+# AOL
+你有新邮件！
+^.
+# Clueless
+想得美！
+# 200x incarnation of Dr.Who
+坏狼
+
+# Gang tag
+嗷呜！伊尔多的狼人！
+
+# Strategy and pun
+在此挖掘以求胜利
+
+# Pompeii
+盖乌斯·尤利乌斯·普里米格尼乌斯到此一游。你怎么来晚了？
+
+# Helpful guiding
+别往这边走
+向左走 --->
+<--- 向右走
+X 标记此处
+X <--- 你在这里。
+此处有龙
+快存档，然后去做作业！
+这里曾经有个洞。现在没了。
+震动之方格
+这是个坑！
+这不是你要找的地牢。
+小心，那扇门后有个拿着死亡魔杖的侏儒！
+
+# Misc fun
+本格故意留白。
+
+# Viking graffiti
+哈蒙德·硬斧刻下了这些符文
+
+# Advertising
+需要照明吗？欢迎光临伊扎克灯具店的矿镇分店！
+星界之蛇——即将在你附近的地牢上映
+你是本处的第一百万位访客！请等待 200 回合领取你的许愿魔杖。
+
+# DnD
+警告：爆炸符文！
+
+# "Whispers Underground" Ben Aaronovitch
+如果你能读懂这些话，那你不仅是个书呆子，而且多半已经死了。
+
+# Portal
+蛋糕是个谎言

@@ -6,13 +6,13 @@
 	<!-- -o -->
     <Defs Include = "$(IncDir)onames.h"/>
 	<!-- -r -->
-    <Defs Include = "$(DatDir)rumors"/>
+    <Defs Include = "$(DatDir)rumors_zh"/>
 	<!-- -s -->
-    <Defs Include = "$(DatDir)engrave"/>
-    <Defs Include = "$(DatDir)epitaph"/>
-    <Defs Include = "$(DatDir)bogusmon"/>
+    <Defs Include = "$(DatDir)engrave_zh"/>
+    <Defs Include = "$(DatDir)epitaph_zh"/>
+    <Defs Include = "$(DatDir)bogusmon_zh"/>
 	<!-- -h -->
-    <Defs Include = "$(DatDir)oracles"/>
+    <Defs Include = "$(DatDir)oracles_zh"/>
   </ItemGroup>
   <ItemGroup>
     <Luafiles Include = "air.lua"/>
@@ -82,6 +82,7 @@
     <Luafiles Include = "minetn-6.lua"/>
     <Luafiles Include = "minetn-7.lua"/>
     <Luafiles Include = "Mon-fila.lua"/>
+    <Luafiles Include = "msgs_zh.lua"/>
     <Luafiles Include = "Mon-filb.lua"/>
     <Luafiles Include = "Mon-goal.lua"/>
     <Luafiles Include = "Mon-loca.lua"/>
@@ -96,6 +97,7 @@
     <Luafiles Include = "Pri-loca.lua"/>
     <Luafiles Include = "Pri-strt.lua"/>
     <Luafiles Include = "quest.lua"/>
+    <Luafiles Include = "quest_zh.lua"/>
     <Luafiles Include = "Ran-fila.lua"/>
     <Luafiles Include = "Ran-filb.lua"/>
     <Luafiles Include = "Ran-goal.lua"/>
@@ -236,24 +238,34 @@
   </ItemGroup>
   <ItemGroup>
     <DlbList Include = "$(DatDir)data"/>
-    <DlbList Include = "$(DatDir)oracles"/>
+    <DlbList Include = "$(DatDir)oracles_zh"/>
     <DlbList Include = "$(DatDir)options" Condition="Exists('$(DatDir)options')"/>
     <DlbList Include = "$(DatDir)ttyoptions" Condition="Exists('$(DatDir)ttyoptions')"/>
     <DlbList Include = "$(DatDir)guioptions" Condition="Exists('$(DatDir)guioptions')"/>
-    <DlbList Include = "$(DatDir)rumors"/>
-    <DlbList Include = "$(DatDir)engrave"/>
-    <DlbList Include = "$(DatDir)epitaph"/>
-    <DlbList Include = "$(DatDir)bogusmon"/>
+    <DlbList Include = "$(DatDir)rumors_zh"/>
+    <DlbList Include = "$(DatDir)engrave_zh"/>
+    <DlbList Include = "$(DatDir)epitaph_zh"/>
+    <DlbList Include = "$(DatDir)bogusmon_zh"/>
     <DlbList Include = "$(DatDir)tribute"/>
     <DlbList Include = "$(DatDir)help"/>
+    <DlbList Include = "$(DatDir)help_zh"/>
     <DlbList Include = "$(DatDir)porthelp"/>
     <DlbList Include = "$(DatDir)hh"/>
+    <DlbList Include = "$(DatDir)hh_zh"/>
     <DlbList Include = "$(DatDir)cmdhelp"/>
+    <DlbList Include = "$(DatDir)cmdhelp_zh"/>
     <DlbList Include = "$(DatDir)keyhelp"/>
+    <DlbList Include = "$(DatDir)keyhelp_zh"/>
     <DlbList Include = "$(DatDir)history"/>
+    <DlbList Include = "$(DatDir)history_zh"/>
     <DlbList Include = "$(DatDir)opthelp"/>
+    <DlbList Include = "$(DatDir)opthelp_zh"/>
     <DlbList Include = "$(DatDir)optmenu"/>
+    <DlbList Include = "$(DatDir)optmenu_zh"/>
+    <DlbList Include = "$(DatDir)usagehlp"/>
+    <DlbList Include = "$(DatDir)usagehlp_zh"/>
     <DlbList Include = "$(DatDir)wizhelp"/>
+    <DlbList Include = "$(DatDir)wizhelp_zh"/>
     <DlbList Include = "$(DatDir)license"/>
     <DlbList Include = "$(DatDir)*.lua"/>
   </ItemGroup>

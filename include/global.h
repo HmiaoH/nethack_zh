@@ -52,6 +52,32 @@
 #define OPTMENUHELP "optmenu_zh"
 #undef USAGEHELP
 #define USAGEHELP "usagehlp_zh"
+/* random-text data files; the Unix and Windows builds generate these
+   from the localized sources in dat/ (names ending in _zh) when ZHLANG
+   is enabled */
+#undef RUMORFILE
+#define RUMORFILE "rumors_zh"
+#undef ORACLEFILE
+#define ORACLEFILE "oracles_zh"
+#undef EPITAPHFILE
+#define EPITAPHFILE "epitaph_zh"
+#undef ENGRAVEFILE
+#define ENGRAVEFILE "engrave_zh"
+#undef BOGUSMONFILE
+#define BOGUSMONFILE "bogusmon_zh"
+#endif
+
+/*
+ * TR(en, zh) picks the Chinese text for the ZHLANG build and the original
+ * English text otherwise.  Use it whenever both strings have exactly the
+ * same printf conversions in the same order; if the argument order has to
+ * differ, use a full #ifdef ZHLANG / #else / #endif block around the whole
+ * statement instead (never inside a macro call; see doc/zh/TASKS.md E0).
+ */
+#ifdef ZHLANG
+#define TR(en, zh) zh
+#else
+#define TR(en, zh) en
 #endif
 
 /* padding amounts for files that have lines chosen by fseek to random spot,

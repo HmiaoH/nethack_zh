@@ -2,6 +2,16 @@
 
 NetHack 5.0 — a roguelike dungeon crawler. This document is for agents working on a Chinese localization plugin/patch.
 
+## Current Work: Fix & Completion Tasks
+
+Read these before changing anything:
+
+- `doc/zh/TASKS.md` — the task list (IDs A1…F7), red lines, and commit rules
+- `doc/zh/ACCEPTANCE.md` — acceptance gates and manual checklist
+- `python3 test/zh/zh_accept.py --interim` — run before every hand-off
+
+`test/zh/` and `doc/zh/ACCEPTANCE.md` are owned by the reviewer: do not edit them to make checks pass.
+
 ## Build & Dev Setup
 
 ```bash

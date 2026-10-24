@@ -48,10 +48,12 @@
 #define rewind(fp) fseek((fp), 0L, SEEK_SET) /* guarantee a return value */
 #endif
 
-/* names of files to be generated */
-#define ORACLE_FILE "oracles"
+/* names of files to be generated; the rumor and oracle names are shared
+   with the game, which reads them from global.h (and switches to the
+   *_zh variants in a ZHLANG build) */
+#define ORACLE_FILE ORACLEFILE
 #define DATA_FILE "data"
-#define RUMOR_FILE "rumors"
+#define RUMOR_FILE RUMORFILE
 
 /* These are affiliated with outdated options
    but we define them for us in messages */

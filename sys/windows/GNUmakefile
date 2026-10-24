@@ -494,7 +494,7 @@ LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
 	Tou-strt tower1 tower2 tower3 Val-fila Val-filb \
 	Val-goal Val-loca Val-strt valley water Wiz-fila \
 	Wiz-filb Wiz-goal Wiz-loca Wiz-strt wizard1 wizard2 \
-	wizard3 tut-1 tut-2
+	wizard3 tut-1 tut-2 msgs_zh quest_zh
 
 LUAFILES = $(addprefix $(DAT)/, $(addsuffix .lua, $(LUALIST)))
 
@@ -975,9 +975,12 @@ CLEAN_FILE += $(SFCTARGETS) $(SFCTOOLOBJS) $(U)sf.tags $(U)sfdata.c $(INCL)/sfpr
 #==========================================
 ODLB = $(O)dlb
 DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
-DAT_CLEAN = $(addprefix $(DAT)/, data oracles options porthelp rumors engrave epitaph bogusmon)
-DAT_NOCLEAN = $(addprefix $(DAT)/, help hh cmdhelp keyhelp history opthelp optmenu \
-	      wizhelp license engrave epitaph bogusmon tribute)
+DAT_CLEAN = $(addprefix $(DAT)/, data oracles_zh options porthelp rumors_zh \
+	      engrave_zh epitaph_zh bogusmon_zh)
+DAT_NOCLEAN = $(addprefix $(DAT)/, help help_zh hh hh_zh cmdhelp cmdhelp_zh \
+	      keyhelp keyhelp_zh history history_zh opthelp opthelp_zh \
+	      optmenu optmenu_zh usagehlp usagehlp_zh wizhelp wizhelp_zh \
+	      license engrave_zh epitaph_zh bogusmon_zh tribute)
 DLBLST = $(DAT)/dlb.lst
 DLB = $(GAMEDIR)/nhdat$(NHV)
 DTARGETS = $(U)dlb.exe $(DAT_CLEAN) $(DLBLST) $(DLB)
@@ -999,7 +1002,7 @@ $(ODLB):
 $(DAT)/data: $(U)makedefs.exe $(DAT)/data.base
 	$< -d
 
-$(DAT)/oracles: $(U)makedefs.exe $(DAT)/oracles.txt
+$(DAT)/oracles_zh: $(U)makedefs.exe $(DAT)/oracles_zh.txt
 	$< -h
 
 $(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
@@ -1008,36 +1011,46 @@ $(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
 $(DAT)/porthelp: $(MSWSYS)/porthelp
 	cp $< $@
 
-$(DAT)/rumors: $(U)makedefs.exe $(DAT)/rumors.tru $(DAT)/rumors.fal
+$(DAT)/rumors_zh: $(U)makedefs.exe $(DAT)/rumors_zh.tru $(DAT)/rumors_zh.fal
 	$< -r
 
-$(DAT)/engrave: $(DAT)/bogusmon
+$(DAT)/engrave_zh: $(DAT)/bogusmon_zh
 
-$(DAT)/epitaph: $(DAT)/bogusmon
+$(DAT)/epitaph_zh: $(DAT)/bogusmon_zh
 
-$(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/epitaph.txt
+$(DAT)/bogusmon_zh: $(U)makedefs.exe $(DAT)/bogusmon_zh.txt $(DAT)/engrave_zh.txt $(DAT)/epitaph_zh.txt
 	$< -s
 
 $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo data > $(DLBLST)
-	echo oracles >> $(DLBLST)
+	echo oracles_zh >> $(DLBLST)
 	echo options >> $(DLBLST)
 	if [ -f $(DAT)/ttyoptions ] ; then echo ttyoptions >> $(DLBLST) ; fi
 	if [ -f $(DAT)/guioptions ] ; then echo guioptions >> $(DLBLST) ; fi
 	echo porthelp >> $(DLBLST)
-	echo rumors >> $(DLBLST)
+	echo rumors_zh >> $(DLBLST)
 	echo help >> $(DLBLST)
+	echo help_zh >> $(DLBLST)
 	echo hh >> $(DLBLST)
+	echo hh_zh >> $(DLBLST)
 	echo cmdhelp >> $(DLBLST)
+	echo cmdhelp_zh >> $(DLBLST)
 	echo keyhelp >> $(DLBLST)
+	echo keyhelp_zh >> $(DLBLST)
 	echo history >> $(DLBLST)
+	echo history_zh >> $(DLBLST)
 	echo opthelp >> $(DLBLST)
+	echo opthelp_zh >> $(DLBLST)
 	echo optmenu >> $(DLBLST)
+	echo optmenu_zh >> $(DLBLST)
+	echo usagehlp >> $(DLBLST)
+	echo usagehlp_zh >> $(DLBLST)
 	echo wizhelp >> $(DLBLST)
+	echo wizhelp_zh >> $(DLBLST)
 	echo license >> $(DLBLST)
-	echo engrave >> $(DLBLST)
-	echo epitaph >> $(DLBLST)
-	echo bogusmon >> $(DLBLST)
+	echo engrave_zh >> $(DLBLST)
+	echo epitaph_zh >> $(DLBLST)
+	echo bogusmon_zh >> $(DLBLST)
 	echo tribute >> $(DLBLST)
 	cd $(DAT) ; ls -1 *.lua >> $(DLBLST)
 
@@ -1478,7 +1491,7 @@ all: package
 TO_BINARY = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
 	     $(addprefix $(GAMEDIR)/, \
 	     $(addsuffix .template, sysconf nethackrc symbols) \
-	     Guidebook.txt NetHack.txt license opthelp record)
+	     Guidebook.txt NetHack.txt license opthelp_zh record)
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
 TO_BINARY += $(addprefix $(GAMEDIR)/, $(addsuffix .wav, $(WAVLIST)))

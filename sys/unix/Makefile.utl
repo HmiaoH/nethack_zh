@@ -244,7 +244,8 @@ makedefs:	$(HACKLIB) $(MAKEOBJS) mdgrep.h
 #	for makedefs (but not for nethack's core), mdlib.c gets included
 #	rather than be compiled separately
 makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) \
-		../include/permonst.h ../include/objclass.h \
+		../include/global.h ../include/permonst.h \
+		../include/objclass.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/monsters.h ../include/objects.h \
 		../include/you.h ../include/context.h ../include/flag.h \

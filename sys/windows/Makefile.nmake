@@ -770,7 +770,7 @@ LUA_FILES = $(DAT)asmodeus.lua $(DAT)baalz.lua $(DAT)bigrm-1.lua \
 	$(DAT)Mon-strt.lua $(DAT)Pri-strt.lua $(DAT)Ran-strt.lua \
 	$(DAT)Rog-strt.lua $(DAT)Sam-strt.lua $(DAT)Tou-strt.lua \
 	$(DAT)Val-strt.lua $(DAT)Wiz-strt.lua $(DAT)dungeon.lua \
-	$(DAT)quest.lua
+	$(DAT)quest.lua $(DAT)quest_zh.lua $(DAT)msgs_zh.lua
 
 luawildcards = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
@@ -778,7 +778,7 @@ luawildcards = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua astral.lua \
 	air.lua earth.lua fire.lua water.lua hellfill.lua tut-?.lua \
 	???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua \
-	dungeon.lua quest.lua
+	dungeon.lua quest.lua quest_zh.lua msgs_zh.lua
 
 #
 # - Utility
@@ -1740,7 +1740,7 @@ $(GAMEDIR)NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 # install
 #--------
 #
-binary.tag: 	$(DAT)data $(DAT)rumors $(DAT)oracles $(DLB) \
+binary.tag: 	$(DAT)data $(DAT)rumors_zh $(DAT)oracles_zh $(DLB) \
 		$(HACKCSRC) $(SOUNDSRCS)
 	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)license       $(GAMEDIR)
@@ -1757,27 +1757,38 @@ binary.tag: 	$(DAT)data $(DAT)rumors $(DAT)oracles $(DLB) \
 ! IF ("$(USE_DLB)" == "Y")
 	copy /Y nhdat$(NHV) $(GAMEDIR)
 ! ELSE
-	copy $(DAT)bogusmon $(GAMEDIR)
+	copy $(DAT)bogusmon_zh $(GAMEDIR)
 	copy $(DAT)cmdhelp $(GAMEDIR)
+	copy $(DAT)cmdhelp_zh $(GAMEDIR)
 	copy $(DAT)data $(GAMEDIR)
-	copy $(DAT)engrave $(GAMEDIR)
-	copy $(DAT)epitaph $(GAMEDIR)
+	copy $(DAT)engrave_zh $(GAMEDIR)
+	copy $(DAT)epitaph_zh $(GAMEDIR)
 	copy $(DAT)help $(GAMEDIR)
+	copy $(DAT)help_zh $(GAMEDIR)
 	copy $(DAT)hh $(GAMEDIR)
+	copy $(DAT)hh_zh $(GAMEDIR)
 	copy $(DAT)history $(GAMEDIR)
+	copy $(DAT)history_zh $(GAMEDIR)
 	copy $(DAT)license $(GAMEDIR)
 	copy $(DAT)optmenu $(GAMEDIR)
-	copy $(DAT)oracles $(GAMEDIR)
-	copy $(DAT)rumors $(GAMEDIR)
+	copy $(DAT)optmenu_zh $(GAMEDIR)
+	copy $(DAT)oracles_zh $(GAMEDIR)
+	copy $(DAT)rumors_zh $(GAMEDIR)
 	copy $(DAT)symbols $(GAMEDIR)
 	copy $(DAT)tribute $(GAMEDIR)
 	copy $(DAT)wizhelp $(GAMEDIR)
+	copy $(DAT)wizhelp_zh $(GAMEDIR)
 	copy /Y $(DAT)*.lua $(GAMEDIR)
 	if exist $(DAT)guioptions copy $(DAT)guioptions $(GAMEDIR)
 	if exist $(DAT)keyhelp copy $(DAT)keyhelp $(GAMEDIR)
+	if exist $(DAT)keyhelp_zh copy $(DAT)keyhelp_zh $(GAMEDIR)
+	if exist $(DAT)opthelp copy $(DAT)opthelp $(GAMEDIR)
+	if exist $(DAT)opthelp_zh copy $(DAT)opthelp_zh $(GAMEDIR)
 	if exist $(DAT)options copy $(DAT)options $(GAMEDIR)
 	if exist $(DAT)porthelp copy $(DAT)porthelp $(GAMEDIR)
 	if exist $(DAT)ttyoptions copy $(DAT)ttyoptions $(GAMEDIR)
+	if exist $(DAT)usagehlp copy $(DAT)usagehlp $(GAMEDIR)
+	if exist $(DAT)usagehlp_zh copy $(DAT)usagehlp_zh $(GAMEDIR)
 ! ENDIF
 	echo binary built > $@
 
@@ -2169,31 +2180,45 @@ $(DAT)porthelp: $(MSWSYS)porthelp
 	@copy $(MSWSYS)porthelp $@ >nul
 
 !IF ("$(USE_DLB)"=="Y")
-nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles $(OPTIONS_FILE) $(LUA_FILES) \
-	$(DAT)rumors $(DAT)help $(DAT)hh $(DAT)cmdhelp $(DAT)keyhelp \
-	$(DAT)history $(DAT)opthelp $(DAT)optmenu $(DAT)wizhelp $(DAT)porthelp \
-	$(DAT)license $(DAT)engrave $(DAT)epitaph $(DAT)bogusmon $(DAT)tribute
+nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles_zh $(OPTIONS_FILE) $(LUA_FILES) \
+	$(DAT)rumors_zh $(DAT)help $(DAT)help_zh $(DAT)hh $(DAT)hh_zh \
+	$(DAT)cmdhelp $(DAT)cmdhelp_zh $(DAT)keyhelp $(DAT)keyhelp_zh \
+	$(DAT)history $(DAT)history_zh $(DAT)opthelp $(DAT)opthelp_zh \
+	$(DAT)optmenu $(DAT)optmenu_zh $(DAT)usagehlp $(DAT)usagehlp_zh \
+	$(DAT)wizhelp $(DAT)wizhelp_zh $(DAT)porthelp \
+	$(DAT)license $(DAT)engrave_zh $(DAT)epitaph_zh $(DAT)bogusmon_zh \
+	$(DAT)tribute
 	@echo Building $@
 	@cd $(DAT)
 	@echo data >dlb.lst
-	@echo oracles >>dlb.lst
+	@echo oracles_zh >>dlb.lst
 	@if exist options @echo options >>dlb.lst
 	@if exist ttyoptions @echo ttyoptions >>dlb.lst
 	@if exist guioptions @echo guioptions >>dlb.lst
 	@if exist porthelp @echo porthelp >>dlb.lst
-	@echo rumors >>dlb.lst
+	@echo rumors_zh >>dlb.lst
 	@echo help >>dlb.lst
+	@echo help_zh >>dlb.lst
 	@echo hh >>dlb.lst
+	@echo hh_zh >>dlb.lst
 	@echo cmdhelp >>dlb.lst
+	@echo cmdhelp_zh >>dlb.lst
 	@echo keyhelp >>dlb.lst
+	@echo keyhelp_zh >>dlb.lst
 	@echo history >>dlb.lst
+	@echo history_zh >>dlb.lst
 	@echo opthelp >>dlb.lst
+	@echo opthelp_zh >>dlb.lst
 	@echo optmenu >>dlb.lst
+	@echo optmenu_zh >>dlb.lst
+	@echo usagehlp >>dlb.lst
+	@echo usagehlp_zh >>dlb.lst
 	@echo wizhelp >>dlb.lst
+	@echo wizhelp_zh >>dlb.lst
 	@echo license >>dlb.lst
-	@echo engrave >>dlb.lst
-	@echo epitaph >>dlb.lst
-	@echo bogusmon >>dlb.lst
+	@echo engrave_zh >>dlb.lst
+	@echo epitaph_zh >>dlb.lst
+	@echo bogusmon_zh >>dlb.lst
 	@echo tribute >>dlb.lst
 #	@for %%N in ($(luawildcards)) do dir /b %%N >>dlb.lst
 	@for %%N in (*.lua) do @echo %%N >>dlb.lst
@@ -2530,19 +2555,19 @@ $(OUTL)alloc.o: alloc.c $(CONFIG_H)
 $(DAT)data: $(U)makedefs.exe $(DATABASE)
 	$(U)makedefs -d
 
-$(DAT)rumors: $(U)makedefs.exe $(DAT)rumors.tru   $(DAT)rumors.fal
+$(DAT)rumors_zh: $(U)makedefs.exe $(DAT)rumors_zh.tru   $(DAT)rumors_zh.fal
 	$(U)makedefs -r
 
-$(DAT)oracles: $(U)makedefs.exe $(DAT)oracles.txt
+$(DAT)oracles_zh: $(U)makedefs.exe $(DAT)oracles_zh.txt
 	$(U)makedefs -h
 
-$(DAT)engrave: $(U)makedefs.exe $(DAT)engrave.txt
+$(DAT)engrave_zh: $(U)makedefs.exe $(DAT)engrave_zh.txt
 	$(U)makedefs -2
 
-$(DAT)epitaph: $(U)makedefs.exe $(DAT)epitaph.txt
+$(DAT)epitaph_zh: $(U)makedefs.exe $(DAT)epitaph_zh.txt
 	$(U)makedefs -1
 
-$(DAT)bogusmon: $(U)makedefs.exe $(DAT)bogusmon.txt
+$(DAT)bogusmon_zh: $(U)makedefs.exe $(DAT)bogusmon_zh.txt
 	$(U)makedefs -3
 
 # This is the universal ctags utility which produces the tags in the
@@ -2826,8 +2851,8 @@ binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 		opdctxtdir$(TARGET_CPU).tag opdcguidir$(TARGET_CPU).tag \
 		$(LUASRC)lua.h $(PDCDEP) \
 		$(INCL)nhlua.h $(OUTL)utility.tag \
-		$(DAT)data $(DAT)rumors $(DAT)oracles $(DAT)engrave \
-		$(DAT)epitaph $(DAT)bogusmon $(GAMEDIR)NetHack.exe \
+		$(DAT)data $(DAT)rumors_zh $(DAT)oracles_zh $(DAT)engrave_zh \
+		$(DAT)epitaph_zh $(DAT)bogusmon_zh $(GAMEDIR)NetHack.exe \
 		$(GAMEDIR)NetHackW.exe $(SFCTOOLPKG) $(GAMEDIRDLLS) binary.tag
 	@echo NetHack is up to date.
 
@@ -2846,10 +2871,10 @@ spotless: clean
 	if exist $(U)*.lnk              del $(U)*.lnk
 	if exist $(U)*.map              del $(U)*.map
 	if exist $(DAT)data             del $(DAT)data
-	if exist $(DAT)rumors           del $(DAT)rumors
-	if exist $(DAT)engrave          del $(DAT)engrave
-	if exist $(DAT)epitaph          del $(DAT)epitaph
-	if exist $(DAT)bogusmon         del $(DAT)bogusmon
+	if exist $(DAT)rumors_zh        del $(DAT)rumors_zh
+	if exist $(DAT)engrave_zh       del $(DAT)engrave_zh
+	if exist $(DAT)epitaph_zh       del $(DAT)epitaph_zh
+	if exist $(DAT)bogusmon_zh      del $(DAT)bogusmon_zh
 	if exist $(DAT)porthelp	        del $(DAT)porthelp
 	if exist nhdat$(NHV).	        del nhdat$(NHV).
 	if exist outldirx86.tag         del outldirx86.tag
@@ -2894,8 +2919,8 @@ spotless: clean
 	if exist $(LIBDIR)$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib del $(LIBDIR)$(PDCDIST)-wingui-$(TARGET_CPU)-static.lib
 !ENDIF
         if exist $(LUALIB)              del $(LUALIB)
-	if exist $(DAT)oracles		del $(DAT)oracles
-	if exist $(DAT)rumors		del $(DAT)rumors
+	if exist $(DAT)oracles_zh	del $(DAT)oracles_zh
+	if exist $(DAT)rumors_zh	del $(DAT)rumors_zh
 	if exist $(DAT)options		del $(DAT)options
 	if exist $(DAT)ttyoptions	del $(DAT)ttyoptions
 	if exist $(DAT)guioptions	del $(DAT)guioptions

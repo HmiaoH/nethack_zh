@@ -1148,7 +1148,8 @@ $(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 $(TARGETPFX)allmain.o: allmain.c $(HACK_H)
 $(TARGETPFX)alloc.o: alloc.c $(CONFIG_H) ../include/nhlua.h
 $(TARGETPFX)apply.o: apply.c $(HACK_H)
-$(TARGETPFX)artifact.o: artifact.c $(HACK_H) ../include/artifact.h
+$(TARGETPFX)artifact.o: artifact.c $(HACK_H) ../include/artifact.h \
+		../include/artilist_zh.h
 $(TARGETPFX)attrib.o: attrib.c $(HACK_H)
 $(TARGETPFX)ball.o: ball.c $(HACK_H)
 $(TARGETPFX)bones.o: bones.c $(HACK_H)

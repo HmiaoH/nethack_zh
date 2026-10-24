@@ -11,6 +11,24 @@ NHSROOT=..
 
 VARDAT = bogusmon data engrave epitaph rumors oracles
 
+#	In a Chinese build (hints/include/chinese.500 adds -DZHLANG to CFLAGS)
+#	makedefs reads the dat/*_zh.* sources and writes the *_zh data files
+#	that the ZHLANG runtime looks for.  The make target names stay the
+#	same so the top-level Makefile doesn't need conditional recipes.
+ifneq ($(findstring -DZHLANG,$(CFLAGS)),)
+ZHRUMORFILE = rumors_zh
+ZHORACLEFILE = oracles_zh
+ZHENGRAVEFILE = engrave_zh
+ZHEPITAPHFILE = epitaph_zh
+ZHBOGUSMONFILE = bogusmon_zh
+else
+ZHRUMORFILE = rumors
+ZHORACLEFILE = oracles
+ZHENGRAVEFILE = engrave
+ZHEPITAPHFILE = epitaph
+ZHBOGUSMONFILE = bogusmon
+endif
+
 all:	$(VARDAT) spec_levs quest_levs
 
 ../util/makedefs:
@@ -97,19 +115,19 @@ GEM_RSC.RSC:
 data:	data.base ../util/makedefs
 	../util/makedefs -d
 
-rumors:	rumors.tru rumors.fal ../util/makedefs
+rumors:	$(ZHRUMORFILE).tru $(ZHRUMORFILE).fal ../util/makedefs
 	../util/makedefs -r
 
-oracles:	oracles.txt ../util/makedefs
+oracles:	$(ZHORACLEFILE).txt ../util/makedefs
 	../util/makedefs -h
 
-engrave:	engrave.txt ../util/makedefs
+engrave:	$(ZHENGRAVEFILE).txt ../util/makedefs
 	../util/makedefs -2
 
-epitaph:	epitaph.txt ../util/makedefs
+epitaph:	$(ZHEPITAPHFILE).txt ../util/makedefs
 	../util/makedefs -1
 
-bogusmon:	bogusmon.txt ../util/makedefs
+bogusmon:	$(ZHBOGUSMONFILE).txt ../util/makedefs
 	../util/makedefs -3
 
 options:	../util/makedefs
@@ -127,7 +145,8 @@ clean:
 	-rm -f spec_levs quest_levs gitinfo.txt
 
 spotless: clean
-	-rm -f nhdat $(VARDAT) \
+	-rm -f nhdat $(VARDAT) $(ZHRUMORFILE) $(ZHORACLEFILE) \
+		$(ZHENGRAVEFILE) $(ZHEPITAPHFILE) $(ZHBOGUSMONFILE) \
 		x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm \
 		rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad \
 		nhsplash.xpm nhtiles.bmp beostiles

@@ -1,0 +1,562 @@
+# NetHack 5.0  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $
+# Copyright (c) 2016 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+#
+# Hallucinatory monsters
+#
+#
+# prefix codes:
+# dash          -  female, personal name
+# underscore    _  female, general name
+# plus          +  male, personal name
+# vertical bar  |  male, general name
+# equals        =  gender not specified, personal name
+
+# misc.
+巨型小虾
+巨人侏儒
+牛羚
+杀手企鹅
+巨型蟑螂
+巨型鼻涕虫
+蛆虫
+翼手龙
+霸王龙
+蛇怪
+眼魔
+梦魇
+火巨灵
+水巨灵
+腐尸蛆
+书虫
+地衣大师
+阴影
+全息影像
+弄臣
+律师
+无赖
+杀手番茄
+亚马逊女战士
+机器人
+战斗机甲
+鼻病毒
+鹰身女妖
+狮犬
+鼠蚁
+千年虫
+愤怒的流浪乐队
+头号学究
+幸福蓝鸟
+纸板魔像
+胶带魔像
+斜向移动的网格虫
+邪恶霸主
+新闻组喷子
+忍者海盗僵尸机器人
+八色龙
+格子独角兽
+荒诞记者
+延迟怪兽
+放贷鲨鱼
+着魔华夫饼机
+家禽幽灵
+浣熊玩偶
+维京人
+小小绿色黏团
+狼鸭嘴兽
+加粗老巫婆
+牛奶冻
+狂暴书呆子
+拼字蜂
+陆地章鱼
+青蛙王子
+猪飞马
+_半蛇发女妖
+展会常客
+大型微型蝙蝠
+小型巨型蝙蝠
+超级绿巨人
+豆腐火鸡
++达德利
+含羞草
+浅薄者
+球形奶牛
+电长颈鹿
+蒸汽龙
+公共马车
+弹簧玩具
+大牛头人
+千牛头人
+八面体
+地牢核心
+感受质
+霍洛韦
+交错配列
+巨型四足兽
+拱石
+吠叫蜘蛛
+青蛙云
+牙语者
+第三只眼
+猫头鹰巴哥
+巴哥飞马
+橡果
+红点
+机器鸡
+杜泽
+毒笑者
+卢尔格夫
+费尔达狮鹫
+提塔利克鱼
+狼胡须
+刺剑貘
+排骨仔
+剑柄虫
+任务嫩芽
+
+# Quendor (Zork, &c.)
+黑暗怪
+圣诞树怪
+吸运者
+帕斯卡尔德
+布罗格莫伊德
+多恩兽
+
+# Moria
+远古多色龙
++邪恶伊基
+
+# Rogue V5 http://rogue.rogueforge.net/vade-mecum/
+响尾蛇
+冰怪
+幻影
+斑驴
+水元素
+狮鹫
+鸸鹋
+红隼
+泽罗克
+捕蝇草
+
+# Wizardry
+爬行钱币
+
+# Greek legend
+九头蛇
+塞壬
+
+# Monty Python
+杀手兔
+
+# The Princess Bride
+超大老鼠
+
+# Wallace & Gromit
+狼兔
+
+# "Only you can prevent forest fires!
++斯莫基熊
+
+# Discworld
+行李箱
+吸血西瓜
+
+# Lord of the Rings
+树人
+
+# Xanth
+缠结树
+镍币蜈蚣
+扭扭虫
+
+# Lewis Carroll
+白兔
+蛇鲨
+
+# Dr. Dolittle
+推拉兽
+
+# The Smurfs
+蓝精灵
+
+# Star Trek
+毛球
+克林贡人
+博格人
+
+# Star Wars
+伊沃克人
+
+# Tonari no Totoro
+龙猫
+
+# Nausicaa
+王虫
+
+# Sailor Moon
+妖魔
+
+# Pokemon (Meowth)
+喵喵
+
+# monster movies
+-哥斯拉
++金刚
+
+# old L of SH
+地震兽
+
+# Robotech
+因维德人
+
+# The Terminator
+终结者
+
+# Bubblegum Crisis
+布玛
+
+# Dr. Who ("Exterminate!")
+戴立克
+
+# HGttG
+微观太空舰队
+特拉尔贪吃布格拉兽
+
+# The Tough Guide to Fantasyland
+皮革翼鸟
+
+# TMNT
+少年变异忍者龟
+
+# Usagi Yojimbo
+武士兔
+
+# Cerebus
+土豚
+
+# Little Shop of Horrors
+=奥黛丽二世
+
+# 50's rock 'n' roll
+巫医
+独眼独角飞天紫色食人兽
+
+# saccharine kiddy TV
++恐龙巴尼
+
+# Angband
++魔苟斯
+
+# Babylon 5
+沃隆人
+
+# King Arthur
+寻水兽
+
+# Movie
+铁血战士
+
+# Harry Potter
+摄魂怪
+
+# common pest
+岳母
+
+# Actual creatures
+螳螂
+白鲸
+鸡
+腔棘鱼
+星鼻鼹
+肺鱼
+懒猴
+海参
+绦虫
+狮虎兽
+伶盗龙
+肥胖鼠海豚
+短尾矮袋鼠
+林鸱
+旅鼠
+豺
+
+# european cryptids
+沃尔珀丁格
+埃尔韦德里奇
+斯克瓦德
++尼斯
+塔策尔蠕虫
+达胡
+
+# fictitious beasts
+落熊
+野生哈吉斯
+鹿角兔
+飞猴
+飞猪
+海马兽
+骏鹰
+凯尔派
+卡托布莱帕斯
+凤凰
+双头蛇
+
+# Unusually animate body parts
+弹跳眼
+漂浮鼻
+游荡眼
+
+# Computerese
+缓冲区溢出
+悬空指针
+行走磁盘驱动器
+浮点数
+正则引擎
+网络分裂
+维基
+对等节点
+COBOL 语言
+线鲨
+游离制表符
+
+# bugs
+玻尔虫
+曼德博虫
+薛定谔虫
+海森堡虫
+
+# DooM
+恶魔怪
+瘦怪
+
+# MST3K
++机器人克劳
+
+# Items and stuff
+国际象棋兵
+巧克力布丁
+奥布里克
+兵马俑
+灵车
+扫地机器人
+微型飞艇
+尘埃
+
+# DnD monster
+凉亭
+
+# SciFi elements
+灰色黏质
+磁单极子
+第一类永动机
+大笨物体
+
+# Ultima
++不列颠王
+
+# They Might Be Giants
+粒子人
+
+# Robot Finds Kitten
+寻猫机器人
+
+# Typography
+法式引号
+斜线
+除号
+装饰字符
+粗体
+牛耕式书写
+连字
+画谜
+分隔星标
+
+# Their actual character
+撇号魔像
+撩人 & 符号
+
+# Web comics and animation
++愤怒花鲍勃
++强壮坏蛋
++魔法特雷弗
+
+# Girl Genius
+斯马肯
+米莫斯
+
+# KoL
+单翼去翼刺蝠
+
+# deities
+隐形粉红独角兽
+飞天面条怪物
+
+# Monkey Island
+三头猴
++恶魔鸡
+
+# modern folklore
+小绿人
+
+# Portal
+加重同伴方块
+
+# South Park
+人熊猪
+
+# internet memes
+盆栽小猫
+领带图鲁
++多摩君
+超——长猫
+彩虹猫
+
+# the Internet is made for cat pix
+天花板猫
+地下室猫
+单轨猫
+
+# POWDER
+三合一兄
+
+# Radomir Dopieralski
+宇宙奥库斯
+
+# Angband
+伊克
+奎尔瑟格
+高等地狱兽
+
+# Souljazz
++伊扎德小贩
+
+# Dungeon Crawl Stone Soup
++西格蒙德
+勒拿九头蛇
+-伊吉布
+=格鲁克斯·弗洛克
++兽人布洛克
+
+# Wil Wheaton, John Scalzi
+独角兽飞马小猫
+
+# Minecraft
+末影人
+
+# Pun
+尸妖至上主义者
+
+# Starcraft 2
+跳虫
+
+# Feelings
+存在主义焦虑
+你想象出来的东西
+灵光一闪
+
+# Fish
+鱼（ghoti）
+
+# Roald Dahl
+恶毒克尼德
+
+# Carcassonne
+米宝
+
+# The Wombles
+温布尔
+
+# Fraggle Rock
+弗拉格
+
+# Harry Harrison
+不锈钢老鼠
+
+# The Culture
+敌对十一弦琴
+
+# Spoonerism
+嘲弄角色
+
+# Truly scary things
+小丑
+哑剧演员
+小贩
+讨价还价者
+
+# soundex and typos of monsters
+得意眼
+冲水魔像
+殉道兽人
+砂浆兽人
+酸液博客
+急性黏团
+咏叹调元素
+混叠祭司
+对齐寄生虫
+对齐拼花地板
+对齐监考
+幼年倔龙
+幼年蓝调龙
+幼年漫画
+幼年钩针
+幼年颗粒龙
+幼年水烟虫
+幼年长词
+幼年寓言虫
+呕吐魔鬼
+啤酒尸妖
+粗鲁尸妖
+肌肉霉菌
+狂欢蜘蛛
+线索魔像
+半身像漩涡
+勘误元素
+弹性鳗
+心电图鳗
+冷杉元素
+轮胎元素
+火烈鸟球
+谬误魔像
+卷发半人马
+森林中间页
+凶猛球
+糖霜巨人
+老年蛇
+蚋蚁
+巨型浴缸
+补助甲虫
+高等蛇
+磨削虫
+巨型芒果
+光亮魔像
+桂冠侏儒
+假侏儒
+更黏的软泥
+绿色滑梯
+守护玉米片
+地狱犬双关
+高尚纯粹者
+发网魔鬼
+冰抹刀
+杀手甜菜
+羽毛魔像
+沙发虫
+山淋巴
+寻呼机魔像
+馅饼恶魔
+避孕虫
+袜子鼹鼠
+盗贼穿刺者
+跷跷板球
+明喻拟形怪
+更霉的蚂蚁
+污渍漩涡
+司康巨人
+雨伞巨汉
+吸血鬼钉头锤
+言语贾巴沃克
+水柠檬
+水瓜
+有翼灰熊
+黄色尸妖
