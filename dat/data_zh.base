@@ -4704,8 +4704,7 @@ yumi
 	行走、行动、活动，仿佛仍然活着的死尸。
 		[ W.B. Seabrook ]
 zruty
-	The zruty are wild and gigantic beings, living in the
-	wildernesses of the Tatra mountains.
+	兹鲁提是生活在塔特拉山脉荒野中的巨型野生生物。
 ##
 # Rank titles for the various roles.  Some of these keys won't reach here
 # because they'll have matched entries above.  The usual three letter role
@@ -4722,17 +4721,17 @@ spelunker
 speleologist
 collector
 curator
-	Archeologist ranks
-	  title            level
-	Digger            1 to 2
-	Field Worker      3 to 5
-	Investigator      6 to 9
-	Exhumer          10 to 13
-	Excavator        14 to 17
-	Spelunker        18 to 21
-	Speleologist     22 to 25
-	Collector        26 to 29
-	Curator             30
+	考古学家等级
+	  头衔           等级
+	挖掘工                1 至 2
+	田野工作者            3 至 5
+	调查员                6 至 9
+	发掘者                10 至 13
+	挖掘者                14 至 17
+	洞穴探险家            18 至 21
+	洞穴学家              22 至 25
+	收藏家                26 至 29
+	馆长                  30
 bar* ranks
 barbarian
 plunder?*
@@ -4744,20 +4743,20 @@ reaver
 slayer
 chieftain*
 conquer*
-	Barbarian ranks
-	  title            level
-	Plunderer,
-	 Plunderess       1 to 2
-	Pillager          3 to 5
-	Bandit            6 to 9
-	Brigand          10 to 13
-	Raider           14 to 17
-	Reaver           18 to 21
-	Slayer           22 to 25
-	Chieftain,
-	 Chieftainess    26 to 29
-	Conqueror,
-	 Conqueress         30
+	野蛮人等级
+	  头衔           等级
+	掠夺者、
+	女掠夺者              1 至 2
+	劫掠者                3 至 5
+	强盗                  6 至 9
+	匪徒                  10 至 13
+	袭击者                14 至 17
+	掠夺者                18 至 21
+	屠戮者                22 至 25
+	酋长、
+	女酋长                26 至 29
+	征服者、
+	女征服者              30
 cav* ranks
 caveman
 cavewoman
@@ -4771,17 +4770,17 @@ roamer
 nomad
 rover
 pioneer
-	Caveman/Cavewoman/Cave Dweller ranks
-	  title            level
-	Troglodyte        1 to 2
-	Aborigine         3 to 5
-	Wanderer          6 to 9
-	Vagrant          10 to 13
-	Wayfarer         14 to 17
-	Roamer           18 to 21
-	Nomad            22 to 25
-	Rover            26 to 29
-	Pioneer             30
+	穴居人／穴居女／穴居者等级
+	  头衔           等级
+	穴居人                1 至 2
+	原住民                3 至 5
+	流浪者                6 至 9
+	漂泊者                10 至 13
+	旅人                  14 至 17
+	漫游者                18 至 21
+	游牧者                22 至 25
+	游荡者                26 至 29
+	开拓者                30
 hea* ranks
 healer
 rhizotomist
@@ -4794,19 +4793,19 @@ magister
 magistra
 physician
 chirurgeon
-	Healer ranks
-	  title            level
-	Rhizotomist       1 to 2
-	Empiric           3 to 5
-	Embalmer          6 to 9
-	Dresser          10 to 13
-	Medicus ossium,
-	 Medica ossium   14 to 17
-	Herbalist        18 to 21
-	Magister,
-	 Magistra        22 to 25
-	Physician        26 to 29
-	Chirurgeon          30
+	治疗师等级
+	  头衔           等级
+	草药师                1 至 2
+	经验医者              3 至 5
+	入殓师                6 至 9
+	包扎师                10 至 13
+	骨科医、
+	女骨科医              14 至 17
+	草药医                18 至 21
+	医师、
+	女医师                22 至 25
+	内科医生              26 至 29
+	外科医生              30
 kni* ranks
 knight
 gallant
@@ -4819,19 +4818,19 @@ chevalier*
 seignieur
 dame
 paladin
-	Knight ranks
-	  title            level
-	Gallant           1 to 2
-	Esquire           3 to 5
-	Bachelor          6 to 9
-	Sergeant         10 to 13
-	Knight           14 to 17
-	Banneret         18 to 21
-	Chevalier,
-	 Chevaliere      22 to 25
-	Seignieur,
-	 Dame            26 to 29
-	Paladin             30
+	骑士等级
+	  头衔           等级
+	豪侠                  1 至 2
+	随从                  3 至 5
+	单身骑士              6 至 9
+	中士                  10 至 13
+	骑士                  14 至 17
+	方旗骑士              18 至 21
+	骑士、
+	女骑士                22 至 25
+	领主、
+	夫人                  26 至 29
+	圣骑士                30
 mon* ranks
 monk
 candidate
@@ -4843,18 +4842,17 @@ student of metals
 student of winds
 student of fire
 master
-	Monk ranks
-	  title            level
-	Candidate         1 to 2
-	Novice            3 to 5
-	Initiate          6 to 9
-	Student
-	  of Stones      10 to 13
-	  of Waters      14 to 17
-	  of Metals      18 to 21
-	  of Winds       22 to 25
-	  of Fire        26 to 29
-	Master              30
+	武僧等级
+	  头衔           等级
+	见习                  1 至 2
+	新手                  3 至 5
+	入门                  6 至 9
+	石之学徒              10 至 13
+	水之学徒              14 至 17
+	金之学徒              18 至 21
+	风之学徒              22 至 25
+	火之学徒              26 至 29
+	大师                  30
 pri* ranks
 priest*
 aspirant
@@ -4866,21 +4864,21 @@ canon*
 lama
 ?atriarch
 high priest*
-	Priest/Priestess/Cleric ranks
-	  title            level
-	Aspirant          1 to 2
-	Acolyte           3 to 5
-	Adept             6 to 9
-	Priest,
-	 Priestess       10 to 13
-	Curate           14 to 17
-	Canon,
-	 Canoness        18 to 21
-	Lama             22 to 25
-	Patriarch,
-	 Matriarch       26 to 29
-	High Priest,
-	 High Priestess     30
+	祭司／女祭司／神职者等级
+	  头衔           等级
+	见习                  1 至 2
+	侍僧                  3 至 5
+	能手                  6 至 9
+	祭司、
+	女祭司                10 至 13
+	副牧师                14 至 17
+	教士、
+	女教士                18 至 21
+	喇嘛                  22 至 25
+	主教、
+	女主教                26 至 29
+	大祭司、
+	女大祭司              30
 ran* ranks
 ranger
 tenderfoot
@@ -4892,19 +4890,19 @@ arbalester
 archer
 sharpshooter
 marks*man
-	Ranger ranks
-	  title            level
-	Tenderfoot        1 to 2
-	Lookout           3 to 5
-	Trailblazer       6 to 9
-	Reconnoiterer,
-	 Reconnoiteress  10 to 13
-	Scout            14 to 17
-	Arbalester       18 to 21
-	Archer           22 to 25
-	Sharpshooter     26 to 29
-	Marksman,
-	 Markswoman         30
+	游侠等级
+	  头衔           等级
+	新手                  1 至 2
+	瞭望者                3 至 5
+	开路先锋              6 至 9
+	侦察兵、
+	女侦察兵              10 至 13
+	斥候                  14 至 17
+	弩手                  18 至 21
+	弓箭手                22 至 25
+	神射手                26 至 29
+	神枪手、
+	女神枪手              30
 rog* ranks
 rogue
 footpad
@@ -4916,18 +4914,18 @@ burglar
 filcher
 mags*man
 thief
-	Rogue ranks
-	  title            level
-	Footpad           1 to 2
-	Cutpurse          3 to 5
-	Rogue             6 to 9
-	Pilferer         10 to 13
-	Robber           14 to 17
-	Burglar          18 to 21
-	Filcher          22 to 25
-	Magsman,
-	 Magswoman       26 to 29
-	Thief               30
+	游荡者等级
+	  头衔           等级
+	拦路贼                1 至 2
+	扒手                  3 至 5
+	游荡者                6 至 9
+	小偷                  10 至 13
+	强盗                  14 至 17
+	夜贼                  18 至 21
+	窃贼                  22 至 25
+	惯偷、
+	女惯偷                26 至 29
+	大盗                  30
 sam* ranks
 samurai
 hatamoto
@@ -4940,18 +4938,18 @@ kokushu
 daimyo
 kuge
 shogun
-	Samurai ranks
-	  title            level
-	Hatamoto          1 to 2
-	Ronin             3 to 5
-	Ninja,
-	 Kunoichi         6 to 9
-	Joshu            10 to 13
-	Ryoshu           14 to 17
-	Kokushu          18 to 21
-	Daimyo           22 to 25
-	Kuge             26 to 29
-	Shogun              30
+	武士等级
+	  头衔           等级
+	旗本                  1 至 2
+	浪人                  3 至 5
+	忍者、
+	女忍                  6 至 9
+	城主                  10 至 13
+	领主                  14 至 17
+	国主                  18 至 21
+	大名                  22 至 25
+	公卿                  26 至 29
+	将军                  30
 tou* ranks
 tourist
 rambler
@@ -4963,18 +4961,18 @@ journeyer
 voyager
 explorer
 adventurer
-	Tourist ranks
-	  title            level
-	Rambler           1 to 2
-	Sightseer         3 to 5
-	Excursionist      6 to 9
-	Peregrinator,
-	 Peregrinatrix   10 to 13
-	Traveler         14 to 17
-	Journeyer        18 to 21
-	Voyager          22 to 25
-	Explorer         26 to 29
-	Adventurer          30
+	游客等级
+	  头衔           等级
+	漫步者                1 至 2
+	观光客                3 至 5
+	远足者                6 至 9
+	旅行者、
+	女旅行者              10 至 13
+	旅客                  14 至 17
+	旅途者                18 至 21
+	航海者                22 至 25
+	探险家                26 至 29
+	冒险家                30
 val* ranks
 valkyrie
 stripling
@@ -4988,20 +4986,20 @@ heroine
 champion
 lord
 lady
-	Valkyrie ranks
-	  title            level
-	Stripling         1 to 2
-	Skirmisher        3 to 5
-	Fighter           6 to 9
-	Man-at-arms,
-	 Woman-at-arms   10 to 13
-	Warrior          14 to 17
-	Swashbuckler     18 to 21
-	Hero,
-	 Heroine         22 to 25
-	Champion         26 to 29
-	Lord,
-	 Lady               30
+	女武神等级
+	  头衔           等级
+	见习                  1 至 2
+	散兵                  3 至 5
+	斗士                  6 至 9
+	士兵、
+	女兵                  10 至 13
+	战士                  14 至 17
+	剑客                  18 至 21
+	英雄、
+	女英雄                22 至 25
+	冠军                  26 至 29
+	领主、
+	女领主                30
 wiz* ranks
 wizard
 evoker
@@ -5014,19 +5012,19 @@ sorcerer
 sorceress
 necromancer
 mage
-	Wizard ranks
-	  title            level
-	Evoker            1 to 2
-	Conjurer          3 to 5
-	Thaumaturge       6 to 9
-	Magician         10 to 13
-	Enchanter,
-	 Enchantress     14 to 17
-	Sorcerer,
-	 Sorceress       18 to 21
-	Necromancer      22 to 25
-	Wizard           26 to 29
-	Mage                30
+	大法师等级
+	  头衔           等级
+	召唤师                1 至 2
+	咒术师                3 至 5
+	奇术师                6 至 9
+	魔术师                10 至 13
+	附魔师、
+	女附魔师              14 至 17
+	术士、
+	女术士                18 至 21
+	死灵法师              22 至 25
+	大法师                26 至 29
+	贤者                  30
 ##
 # list the titles for all the Discworld novels (3.6 tribute);
 # the extra leading spaces are intentional--tty displays the whole list
@@ -5036,47 +5034,47 @@ mage
 novel
 paperback book
 discworld novel*
-	  Discworld novel titles
-	    by Sir Terry Pratchett
-	  The Colour of Magic
-	  The Light Fantastic
-	  Equal Rites
-	  Mort
-	  Sourcery
-	  Wyrd Sisters
-	  Pyramids
-	  Guards! Guards!
-	  Eric
-	  Moving Pictures
-	  Reaper Man
-	  Witches Abroad
-	  Small Gods
-	  Lords and Ladies
-	  Men at Arms
-	  Soul Music
-	  Interesting Times
-	  Maskerade
-	  Feet of Clay
-	  Hogfather
-	  Jingo
-	  The Last Continent
-	  Carpe Jugulum
-	  The Fifth Elephant
-	  The Truth
-	  Thief of Time
-	  The Last Hero
-	  The Amazing Maurice and His Educated Rodents
-	  Night Watch
-	  The Wee Free Men
-	  Monstrous Regiment
-	  A Hat Full of Sky
-	  Going Postal
-	  Thud!
-	  Wintersmith
-	  Making Money
-	  Unseen Academicals
-	  I Shall Wear Midnight
-	  Snuff
-	  Raising Steam
-	  The Shepherd's Crown
+	  碟形世界小说书目
+	    作者：特里·普拉切特爵士
+	  《魔法的颜色》
+	  《异光》
+	  《平等权利》
+	  《死神学徒》
+	  《魔法之源》
+	  《女巫姐妹》
+	  《金字塔》
+	  《卫兵！卫兵！》
+	  《埃里克》
+	  《电影风云》
+	  《死神打工》
+	  《女巫出游》
+	  《小神》
+	  《领主与女士》
+	  《武装卫队》
+	  《灵魂音乐》
+	  《有趣的时代》
+	  《假面舞会》
+	  《泥足巨人》
+	  《圣猪老爹》
+	  《沙文主义》
+	  《最后的大陆》
+	  《及时咬喉》
+	  《第五头大象》
+	  《真相》
+	  《时间小偷》
+	  《最后的英雄》
+	  《了不起的莫里斯和他的神奇老鼠》
+	  《守夜人》
+	  《小小自由人》
+	  《怪兽军团》
+	  《满帽天空》
+	  《邮政风云》
+	  《砰！》
+	  《冬匠》
+	  《赚钱》
+	  《看不见的大学士》
+	  《我将穿上午夜》
+	  《鼻烟》
+	  《蒸汽升腾》
+	  《牧羊人的王冠》
 #
