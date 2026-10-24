@@ -2,10 +2,11 @@
 """Count user-visible English message literals in src/*.c that are not
 covered by a ZHLANG translation.
 
-A call site counts as "untranslated" when a message-emitting call with an
-English string literal sits outside both the `#ifdef ZHLANG` branch and its
-`#else` branch.  Strings wrapped in the translation macro (see
-doc/zh/TASKS.md, task E-0) are treated as translated.
+Rule v3: a message-emitting statement (the whole statement, across
+continuation lines) counts as "untranslated" when any of its string
+literals is English prose, unless it sits in the English (#else) branch
+of a ZHLANG conditional.  The English half of TR("en", "中文") is ignored;
+a NOTRANS comment anywhere in the statement exempts it.
 
 Usage:
     scan_untranslated.py [--root DIR] [--json] [--list FILE]
@@ -41,13 +42,33 @@ SKIP_FILES = {
 }
 # lines that intentionally stay English
 SKIP_MARK = "NOTRANS"
-TR_RE = re.compile(r'\bTR\s*\(')
+
+
+
+LIT_RE = re.compile(r'"((?:[^"\\]|\\.)*)"')
+# drop the English half of TR("english" ["more"], "中文")
+TR_EN_RE = re.compile(r'\bTR\s*\(\s*"(?:[^"\\]|\\.)*"(?:\s*"(?:[^"\\]|\\.)*")*\s*,')
+START_RE = re.compile(r'\b(' + CALLS + r')\s*\(|\b(nomovemsg|multi_reason)\s*=')
+# yn_function choice strings and the like are not prose
+CHOICES_RE = re.compile(r'[ynaq#\\0-9]+')
+MAX_STMT_LINES = 15
+
+
+def check_statement(stmt, lineno, call, hits):
+    """v3: every English literal anywhere in the statement counts, so
+    continuation lines and %s arguments ("liquid fire") are seen too."""
+    for lit in LIT_RE.findall(TR_EN_RE.sub("TR(", stmt)):
+        if (ENGLISH_RE.search(lit) and not CJK_RE.search(lit)
+                and not CHOICES_RE.fullmatch(lit)):
+            hits.append((lineno, call, lit))
+            return
 
 
 def scan_file(path):
     hits = []
     stack = []  # 'Z' = in #ifdef ZHLANG, 'E' = in its #else, 'O' = other
     in_comment = False
+    stmt = None  # [first line number, call name, text so far]
     with open(path, encoding="utf-8", errors="replace") as fh:
         for lineno, line in enumerate(fh, 1):
             s = line.strip()
@@ -60,6 +81,9 @@ def scan_file(path):
                 continue
             m = re.match(r'#\s*(ifdef|ifndef|if|elif|else|endif)\b(.*)', s)
             if m:
+                if stmt:  # a conditional inside a call ends what we can see
+                    check_statement(stmt[2], stmt[0], stmt[1], hits)
+                    stmt = None
                 kw, rest = m.group(1), m.group(2)
                 if kw in ("ifdef", "if"):
                     stack.append("Z" if re.search(r'\bZHLANG\b', rest)
@@ -78,15 +102,25 @@ def scan_file(path):
             # a "translation" that is still English counts as untranslated
             if "E" in stack:
                 continue
-            if s.startswith(("*", "//")) or SKIP_MARK in line:
+            if s.startswith(("*", "//")):
                 continue
-            if TR_RE.search(line):  # TR("english", "中文") counts as done
-                continue
-            for cm in list(CALL_RE.finditer(line)) + list(ASSIGN_RE.finditer(line)):
-                lit = cm.group(2)
-                if ENGLISH_RE.search(lit) and not CJK_RE.search(lit):
-                    hits.append((lineno, cm.group(1), lit))
-                    break
+            code = re.sub(r'/\*.*?\*/', '', line)
+            if stmt is None:
+                sm = START_RE.search(code)
+                if not sm:
+                    continue
+                stmt = [lineno, sm.group(1) or sm.group(2),
+                        code[sm.start():]]
+            else:
+                stmt[2] += " " + code.strip()
+            if SKIP_MARK in line:
+                stmt[2] = ""  # a NOTRANS anywhere exempts the statement
+            if (";" in LIT_RE.sub('""', code)
+                    or lineno - stmt[0] >= MAX_STMT_LINES):
+                check_statement(stmt[2], stmt[0], stmt[1], hits)
+                stmt = None
+    if stmt:
+        check_statement(stmt[2], stmt[0], stmt[1], hits)
     return hits
 
 

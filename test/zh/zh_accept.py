@@ -361,6 +361,9 @@ def play(playground, zh, rep, outdir):
             g.send("\x1b")
         g.command("wizloadlua", "testwish")
         g.send("\x1b")
+        if not zh:
+            g.send("i")  # class headings must match upstream (task A7)
+            g.send("\x1b")
         if zh:
             g.command("overview")
             g.send("\x1b")
@@ -388,6 +391,13 @@ def play(playground, zh, rep, outdir):
     if not zh:
         rep.add("C", "C2-en-build-testwish", "testwish: OK" in text,
                 "英文版 test/testwish.lua")
+        # a Valkyrie starts with weapons, armor and food; the headings
+        # must be the real class names, in that order
+        heads = re.findall(r"\b(Illegal objects|Weapons|Armor|Comestibles|"
+                           r"Tools|Rings)\b", text[text.rfind("testwish"):])
+        rep.add("A", "A7-en-inventory-headers",
+                heads[:3] == ["Weapons", "Armor", "Comestibles"],
+                "英文版物品栏分类标题为: " + ", ".join(heads[:4]))
         return
 
     found = {}
@@ -555,6 +565,83 @@ def untranslated(rep, final):
                 "超过 15 条: " + ", ".join(big))
 
 
+
+# ---------------------------------------------------------------- English
+
+CPP_FLAGS = ["-I../include", "-I../lib/lua-5.4.8/src", "-DDLB",
+             '-DHACKDIR="x"', '-DDEFAULT_WINDOW_SYS="tty"', "-DSYSCF",
+             '-DSYSCF_FILE="x"', "-DSECURE", "-DTIMED_DELAY", "-DNOMAIL",
+             "-DTTY_GRAPHICS", "-DCURSES_GRAPHICS"]
+TOKEN_RE = re.compile(r"'(?:[^'\\]|\\.)+'|" r'"(?:[^"\\]|\\.)*"')
+# English text changes that are intended (file -> literals)
+EN_ALLOWED = {
+    "read.c": {'"something"'},
+}
+
+
+def string_literals(tree, name):
+    """Multiset of the English string literals the preprocessed file has."""
+    from collections import Counter
+    r = subprocess.run(["cc", "-E", "-P"] + CPP_FLAGS + [name],
+                       cwd=os.path.join(tree, "src"), capture_output=True,
+                       text=True, errors="replace")
+    if r.returncode:
+        return None
+    # adjacent literals are one string to the compiler ("a" "b" == "ab")
+    lits, last_end = [], -1
+    for m in TOKEN_RE.finditer(r.stdout):
+        t = m.group(0)
+        if (t.startswith('"') and lits and lits[-1].startswith('"')
+                and not r.stdout[last_end:m.start()].strip()):
+            lits[-1] = lits[-1][:-1] + t[1:]
+        else:
+            lits.append(t)
+        last_end = m.end()
+    return Counter(t for t in lits
+                   if t.startswith('"') and re.search(r"[A-Za-z]{2,}", t))
+
+
+def english_regression(rep, work):
+    """A8: the English build must print exactly upstream's English text.
+    Compare the string literals of every preprocessed src/*.c in the
+    English tree with upstream (TR() expands to its English half)."""
+    en = os.path.join(work, "en")
+    up = os.path.join(work, "upstream")
+    if not os.path.isdir(os.path.join(en, "lib", LUA_DIRS[0])):
+        rep.add("A", "A8-en-text-matches-upstream", False, "英文版未构建")
+        return
+    if os.path.exists(up):
+        shutil.rmtree(up)
+    os.makedirs(up)
+    tar = subprocess.Popen(["git", "archive", UPSTREAM_BASE], cwd=REPO,
+                           stdout=subprocess.PIPE)
+    subprocess.check_call(["tar", "-x", "-C", up], stdin=tar.stdout)
+    tar.wait()
+    shutil.copytree(os.path.join(en, "lib"), os.path.join(up, "lib"),
+                    symlinks=True, dirs_exist_ok=True)
+    for h in ("date.h", "nhlua.h"):
+        if os.path.exists(os.path.join(en, "include", h)):
+            shutil.copy(os.path.join(en, "include", h),
+                        os.path.join(up, "include", h))
+    problems = []
+    for name in sorted(os.listdir(os.path.join(up, "src"))):
+        if not name.endswith(".c") or not os.path.exists(
+                os.path.join(en, "src", name)):
+            continue
+        u, e = string_literals(up, name), string_literals(en, name)
+        if u is None or e is None:
+            problems.append(f"{name}: 预处理失败")
+            continue
+        allowed = EN_ALLOWED.get(name, set())
+        gone = [t for t in u if e[t] < u[t] and t not in allowed]
+        new = [t for t in e if u[t] < e[t] and t not in allowed]
+        for t in gone:
+            problems.append(f"{name}: 缺少 {t[:60]}")
+        for t in new:
+            problems.append(f"{name}: 新增 {t[:60]}")
+    rep.add("A", "A8-en-text-matches-upstream", not problems,
+            f"{len(problems)} 处: " + "<br>".join(problems[:15]))
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -618,6 +705,8 @@ def main():
             play(os.path.join(trees[tag], "playground"), tag == "zh", rep,
                  args.work)
 
+    if built.get("en"):
+        english_regression(rep, args.work)
     static_checks(rep)
     untranslated(rep, final=not args.interim)
 

@@ -41,6 +41,8 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
 | | `A4-wintty-glyph-path` | `process_text_window` 保留上游的 `end_glyphout()` 分支 |
 | | `A5-en-build-is-english` | 英文版编译日志里没有 `-DZHLANG` |
 | | `A6-no-impossible` | 整个会话没有 impossible()，也没有 Lua 报错 |
+| | `A7-en-inventory-headers` | 英文版物品栏的分类标题依次是 `Weapons`、`Armor`、`Comestibles`（女武神开局） |
+| | `A8-en-text-matches-upstream` | 英文版每个 `src/*.c` 预处理后的英文字符串集合与上游 `c2a332168` 完全一致（相邻字面量合并后比较；有意的改动写进 `zh_accept.py` 的 `EN_ALLOWED` 白名单，由验收方批准） |
 | **B** 语法层 | `B1-*` | 见 `zh_accept.lua`：中文的复数、单数、所有格、冠词正确，英文行为不变 |
 | | `B2-no-mixed-grammar` | 终端输出里没有"汉字+`'s`/`s`/`es`"，也没有"`the`/`a`/`an`+汉字" |
 | | `B3-questpgr` | `convert_arg` 有 `ZHLANG` 处理。这只是存在性检查，具体输出看 §3 的人工抽查 |
@@ -54,7 +56,7 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
 | | `D2-status-line` | 按 80×24、汉字占 2 列渲染后，状态栏每个字段都带数值（`敏:12`、`生命:16(16)`、`防御:6`…） |
 | | `D4-getlin-echo` | 在许愿提示里输入中文，回显的字节流是合法 UTF-8 |
 | **E** 字符串 | `E0-TR-macro` | 存在 `TR(en, zh)` 宏 |
-| | `E1-untranslated-total` | 最终：≤ 基线的 10%（3305 → **≤330**，按 v2 规则，见下）。`--interim` 下：≤ 基线 |
+| | `E1-untranslated-total` | 最终：≤ 基线的 10%（3986 → **≤398**，按 v3 规则，见下）。`--interim` 下：≤ 基线 |
 | | `E2-untranslated-per-file` | 最终：每个文件 ≤ 15 处 |
 | **F** 数据 | `F1-dungeon-zh-not-copy` | 不存在和 `dungeon.lua` 一模一样的 `dungeon_zh.lua` |
 | | `F2-overview-dungeon-names` | `#overview` 里不出现 `Dungeons of Doom` |
@@ -69,7 +71,12 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
   - `ZHLANG` 分支照常扫描，里面仍是英文的字符串计为未翻译；
   - 新增 `paranoid_query()` 和 `nomovemsg` / `multi_reason` 赋值。
   
-  用 v2 重算 `b3072466c`，基线为 **3305 处**。修订原因：首轮验收时，`sounds.c` 等文件里大量"中英分支内容完全相同"的假翻译，以及祈祷确认等提示，都没有被 v1 统计到。
+  用 v2 重算 `b3072466c`，基线为 3305 处。修订原因：首轮验收时，`sounds.c` 等文件里大量"中英分支内容完全相同"的假翻译，以及祈祷确认等提示，都没有被 v1 统计到。
+- **v3**（第二轮验收后修订）：按**整条语句**扫描，不再只看调用名所在的那一行。
+  - 语句里任何一个英文字面量都计入：续行上的整句，以及作为 `%s` 参数、三元表达式分支、`hliquid()` 参数传进中文句子的英文片段；
+  - `TR()` 的英文参数不计入；语句里任意一行带 `NOTRANS` 即整条豁免。
+  
+  用 v3 重算 `b3072466c`，基线为 **3986 处**。修订原因：第二轮验收时，游戏里实测到 `As you read the scroll, it disappears.`、`feel a momentary chill.`（获得火焰抗性）、`这尝起来像liquid fire`、`你mispronounce了咒语`、`冷的water水龙头` 等，v2 都统计为 0。
 
 ### 2.1 基线（`b3072466c`，2026-10-24 实测）
 
