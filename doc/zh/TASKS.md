@@ -501,6 +501,50 @@ v3 规则下还剩 **1237 处**（基线 3986，上限 398）。主要有三类�
 - 提示语末尾还有半角 `?`，如 `你希望得到什么?`；
 - 物品显示为 `长剑名为埃克斯卡利伯`，建议改为"名为埃克斯卡利伯的长剑"，或者已识别的神器直接显示神器名。
 
+## 第四轮整改（2026-10-24 第三轮验收后新增）
+
+第三轮验收结论是**不通过，但只剩小范围问题**：
+- 英文版回归（R8）已全部修好，英文字符串与上游完全一致；
+- 语句级扫描从 1237 处降到 0（v3）。
+
+验收工具在第三轮验收中的修订：
+- 扫描规则升级到 v4（加入 `safe_qbuf`）；
+- 新增 `E3-notrans-not-visible`，自动检查 `NOTRANS` 有没有被拿来豁免玩家能看到的英文。
+
+### R11 用 `NOTRANS` 掩盖可见英文（阻塞）　`E3-notrans-not-visible`
+
+TASKS §E 规定"玩家正常游戏能看到的字符串不得豁免"。本轮新增的 85 处 `NOTRANS` 里，有 22 处违反了这条。下面几处已在游戏里实测或从代码确认：
+
+| 位置 | 游戏里显示为 |
+|---|---|
+| `potion.c:1592` 等 7 处 `Hallucination ? "normal" : "strange"` | 喝变形药水："你感到有点strange。"（已实测） |
+| `timeout.c:1009` | 变形结束："你又恢复成normal的自己了。" |
+| `potion.c:328/362/450/693` | 视觉变化消息里的 `sadder` / `happier` / `normal` / `peculiar` |
+| `sounds.c:1421/1608` | "up边的人听不到你。" |
+| `zap.c:3589` | "血boils，pool你的…"（中文模板 `"血%ss，%s你的%s"` 本身也要重写） |
+| `zap.c:5146` | "…吸收了致命的ray！" |
+| `pager.c:826/878`、`hack.c:2357` | 水下查看地形时的 `unknown`、`nothing` |
+| `options.c:3521/3522/5082` | 选项菜单里显示的 `none` / `random` / `view`。只是显示值（`get_val`），写回配置用的是 `get_cnf_val`，可以放心翻译 |
+| `spell.c:645` | `#chronicle` 里的 "became literate by reading %s"。R7 已经要求过翻译 livelog，这里是回退 |
+
+**要求：** `E3` 为 0 处。真正只写给程序读的字符串可以保留 `NOTRANS`。
+
+### R12 `safe_qbuf` 拼接的提示（建议）
+
+v4 规则下还剩 15 处，在阈值以内，不阻塞。但其中几条非常常见，建议一并修掉：
+- `do_name.c:735`：每次使用未鉴定物品后的 `Call 暗浊色药水:`（已实测）；
+- `pickup.c`：`Pick up ...?`、`... is empty.  Do what with it?`、`Do what with ...`；
+- `trap.c` / `lock.c`：`There is a box here.  Check it for traps?`、`Disarm this ...`；
+- `apply.c`：`Attach ...`；
+- `mhitu.c`：`"That ring looks pretty.  May I have it?"`。
+
+### R13 小问题（不阻塞）
+
+- `#chronicle`：`her的首次许愿`。livelog 里用了英文代词 `uhis()`，中文应写成"她的首次许愿"或省略代词；
+- 卷轴名：`卷轴 标签为THARR`，多一个空格，建议写成"标签为 THARR 的卷轴"；
+- `options.c:5885/6213`：`TR` 宏嵌套使用，是批量替换留下的，请清理成单层；
+- 提交里误带了 `test/zh/__pycache__/*.pyc`，请删除，并把 `__pycache__/` 加进 `.gitignore`。
+
 ## 附：README 同步
 
 全部完成后，按实际情况改写 `README.md` 的"汉化范围"一节，删掉"全部 130+ C 源文件"这类和实际不符的说法；构建说明里切换英文版的方法要与 A5 一致。

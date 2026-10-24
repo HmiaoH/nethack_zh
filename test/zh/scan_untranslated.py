@@ -2,7 +2,7 @@
 """Count user-visible English message literals in src/*.c that are not
 covered by a ZHLANG translation.
 
-Rule v3: a message-emitting statement (the whole statement, across
+Rule v4 (v3 + safe_qbuf prompts): a message-emitting statement (the whole statement, across
 continuation lines) counts as "untranslated" when any of its string
 literals is English prose, unless it sits in the English (#else) branch
 of a ZHLANG conditional.  The English half of TR("en", "中文") is ignored;
@@ -26,7 +26,7 @@ CALLS = (
     "verbalize|Norep|urgent_pline|custompline|Strcpy|Strcat|Sprintf|Snprintf|"
     "yn_function|ynq|getlin|add_menu|add_menu_str|end_menu|putstr|"
     "livelog_printf|com_pager|Tobjnam|The|enlght_out|you_are|you_have|"
-    "you_have_X|you_can|you_have_been|enl_msg|paranoid_query"
+    "you_have_X|you_can|you_have_been|enl_msg|paranoid_query|safe_qbuf"
 )
 CALL_RE = re.compile(r'\b(' + CALLS + r')\s*\([^;]*?"([^"\\]*(?:\\.[^"\\]*)*)"')
 # message pointers assigned for later display ("You finish your prayer.")

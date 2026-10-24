@@ -545,6 +545,46 @@ def static_checks(rep):
     rep.add("C", "C5-unique-zh-names", not dup, "重名: " + "、".join(dup))
 
 
+def notrans_audit(rep):
+    """E3: NOTRANS may exempt machine-read text (config tokens, file
+    names, debug dumps), never words the player reads.  A NOTRANS
+    statement that prints a Chinese template with English arguments
+    ("你感到有点%s。", "strange") is hiding visible English."""
+    lit_re = re.compile(r'"((?:[^"\\]|\\.)*)"')
+    tr_en = re.compile(r'\bTR\s*\(\s*"(?:[^"\\]|\\.)*"\s*,')
+    bad = []
+    # wizard-mode-only commands and the worn-mask sanity check are not
+    # seen in normal play
+    skip_files = {"wizcmds.c"}
+    skip_lines = {"worn.c": ("uwep", "uswapwep")}
+    for name in sorted(os.listdir(os.path.join(REPO, "src"))):
+        if not name.endswith(".c") or name in skip_files:
+            continue
+        lines = read("src/" + name).split("\n")
+        for i, line in enumerate(lines):
+            if "NOTRANS" not in line or any(
+                    f'"{w}"' in line for w in skip_lines.get(name, ())):
+                continue
+            j = i  # back up to the start of the statement
+            while (j > 0 and i - j < 12 and not re.search(
+                    r"[;{}]\s*(/\*.*\*/)?\s*$", lines[j - 1])):
+                j -= 1
+            stmt = tr_en.sub("TR(", " ".join(l.strip() for l in lines[j:i + 1]))
+            # literals only compared against are tokens, not output
+            stmt = re.sub(r'\bstrn?cmpi?\s*\([^()]*(?:\([^()]*\)[^()]*)*\)',
+                          "0", stmt)
+            lits = lit_re.findall(stmt)
+            zh = [t for t in lits if re.search(f"[{CJK}]", t)]
+            en = [t for t in lits if re.search(r"[A-Za-z]{3,}", t)
+                  and not re.search(f"[{CJK}]", t)
+                  and not re.fullmatch(r"[ynaq#\\0-9 m]+", t)]
+            if (zh and en) or ("livelog_printf" in stmt and en
+                               and "LL_DEBUG" not in stmt):
+                bad.append(f"{name}:{i + 1} {en[0][:30]}")
+    rep.add("E", "E3-notrans-not-visible", not bad,
+            f"{len(bad)} 处: " + "、".join(bad[:40]))
+
+
 def untranslated(rep, final):
     out = subprocess.check_output([sys.executable,
                                    os.path.join(HERE, "scan_untranslated.py"),
@@ -709,6 +749,7 @@ def main():
         english_regression(rep, args.work)
     static_checks(rep)
     untranslated(rep, final=not args.interim)
+    notrans_audit(rep)
 
     text = rep.render()
     print(text)

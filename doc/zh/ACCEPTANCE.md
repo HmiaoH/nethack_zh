@@ -56,7 +56,8 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
 | | `D2-status-line` | 按 80×24、汉字占 2 列渲染后，状态栏每个字段都带数值（`敏:12`、`生命:16(16)`、`防御:6`…） |
 | | `D4-getlin-echo` | 在许愿提示里输入中文，回显的字节流是合法 UTF-8 |
 | **E** 字符串 | `E0-TR-macro` | 存在 `TR(en, zh)` 宏 |
-| | `E1-untranslated-total` | 最终：≤ 基线的 10%（3986 → **≤398**，按 v3 规则，见下）。`--interim` 下：≤ 基线 |
+| | `E1-untranslated-total` | 最终：≤ 基线的 10%（4005 → **≤400**，按 v4 规则，见下）。`--interim` 下：≤ 基线 |
+| | `E3-notrans-not-visible` | 带 `NOTRANS` 的语句里不能同时出现中文格式串和英文实参（如 `"你感到有点%s。", "strange"`）；`livelog_printf` 除 `LL_DEBUG` 外不得豁免。`wizcmds.c` 不检查 |
 | | `E2-untranslated-per-file` | 最终：每个文件 ≤ 15 处 |
 | **F** 数据 | `F1-dungeon-zh-not-copy` | 不存在和 `dungeon.lua` 一模一样的 `dungeon_zh.lua` |
 | | `F2-overview-dungeon-names` | `#overview` 里不出现 `Dungeons of Doom` |
@@ -76,7 +77,8 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
   - 语句里任何一个英文字面量都计入：续行上的整句，以及作为 `%s` 参数、三元表达式分支、`hliquid()` 参数传进中文句子的英文片段；
   - `TR()` 的英文参数不计入；语句里任意一行带 `NOTRANS` 即整条豁免。
   
-  用 v3 重算 `b3072466c`，基线为 **3986 处**。修订原因：第二轮验收时，游戏里实测到 `As you read the scroll, it disappears.`、`feel a momentary chill.`（获得火焰抗性）、`这尝起来像liquid fire`、`你mispronounce了咒语`、`冷的water水龙头` 等，v2 都统计为 0。
+  用 v3 重算 `b3072466c`，基线为 3986 处。
+- **v4**（第三轮验收后修订）：调用列表加入 `safe_qbuf()`（`Call X:`、`Pick up X?` 等用片段拼出的提示）。用 v4 重算 `b3072466c`，基线为 **4005 处**。修订原因：第二轮验收时，游戏里实测到 `As you read the scroll, it disappears.`、`feel a momentary chill.`（获得火焰抗性）、`这尝起来像liquid fire`、`你mispronounce了咒语`、`冷的water水龙头` 等，v2 都统计为 0。
 
 ### 2.1 基线（`b3072466c`，2026-10-24 实测）
 
