@@ -541,7 +541,7 @@ invault(void)
         trycount = 5;
         do {
             getlin(Deaf ? TR("You are required to supply your name. -", "你必须提供你的名字。 -")
-                        : "\"Hello stranger, who are you?\" -", buf);
+                        : TR("\"Hello stranger, who are you?\" -", "“你好，陌生人，你是谁？” -"), buf);
             (void) mungspaces(buf);
         } while (!buf[0] && --trycount > 0);
 
@@ -565,7 +565,7 @@ invault(void)
                     SetVoice(guard, 0, 80, 0);
                     #ifdef ZHLANG
                     verbalize(
-                         "Oh, yes, of course.  Sorry to have disturbed you.");
+                         TR("Oh, yes, of course.  Sorry to have disturbed you.", "哦，当然。抱歉打扰了你。"));
                     #else
                     verbalize(
                          "Oh, yes, of course.  Sorry to have disturbed you.");
@@ -587,7 +587,7 @@ invault(void)
                    SetVoice(guard, 0, 80, 0);
                    #ifdef ZHLANG
                    verbalize(
-                           "Back from the dead, are you?  I'll remedy that!");
+                           TR("Back from the dead, are you?  I'll remedy that!", "你从死里复活了，是吗？我来解决这个问题！"));
                    #else
                    verbalize(
                            "Back from the dead, are you?  I'll remedy that!");
@@ -604,7 +604,7 @@ invault(void)
         if (Deaf) {
             #ifdef ZHLANG
             pline(TR("%s doesn't %srecognize you.", "%s并不%s认出你。"), noit_Monnam(guard),
-                    (Blind) ? "" : "appear to ");
+                    (Blind) ? "" : TR("appear to ", "像是"));
             #else
             pline("%s doesn't %srecognize you.", noit_Monnam(guard),
                     (Blind) ? "" : "appear to ");
@@ -622,7 +622,7 @@ invault(void)
             if (Deaf) {
                 #ifdef ZHLANG
                 pline(TR("%s stomps%s.", "%s跺了跺脚%s。"), noit_Monnam(guard),
-                      (Blind) ? "" : " and beckons");
+                      (Blind) ? "" : TR(" and beckons", "并招了招手"));
                 #else
                 pline("%s stomps%s.", noit_Monnam(guard),
                       (Blind) ? "" : " and beckons");
@@ -641,7 +641,7 @@ invault(void)
                     if (!Blind)
                         #ifdef ZHLANG
                         pline(TR("%s glares at you%s.", "%s瞪着你%s。"), noit_Monnam(guard),
-                              gi.invent ? "r stuff" : "");
+                              gi.invent ? TR("r stuff", "身上的东西") : "");
                         #else
                         pline("%s glares at you%s.", noit_Monnam(guard),
                               gi.invent ? "r stuff" : "");
@@ -659,7 +659,7 @@ invault(void)
                 if (!Blind)
                     #ifdef ZHLANG
                     pline(
-                       "%s holds out %s palm and beckons with %s other hand.",
+                       TR("%s holds out %s palm and beckons with %s other hand.", "%s伸出%s手掌，用%s另一只手招了招。"),
                           noit_Monnam(guard), noit_mhis(guard),
                           noit_mhis(guard));
                     #else
@@ -672,7 +672,7 @@ invault(void)
                 SetVoice(guard, 0, 80, 0);
                 #ifdef ZHLANG
                 verbalize(
-                    "Most likely all your gold was stolen from this vault.");
+                    TR("Most likely all your gold was stolen from this vault.", "你的金币多半都是从这座金库偷来的。"));
                 #else
                 verbalize(
                     "Most likely all your gold was stolen from this vault.");
@@ -936,8 +936,8 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
         #ifdef ZHLANG
         pline(TR("%s%s picks up the gold%s.", "%s%s捡起了金币%s。"), Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
-                 ? " calms down and" : "",
-              under_u ? " from beneath you" : "");
+                 ? TR(" calms down and", "冷静下来，并") : "",
+              under_u ? TR(" from beneath you", "（从你身下）") : "");
         #else
         pline("%s%s picks up the gold%s.", Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
@@ -1002,8 +1002,8 @@ gd_letknow(struct monst *grd)
         #ifdef ZHLANG
         You_hear("%s.",
                     m_carrying(grd, TIN_WHISTLE)
-                        ? "the shrill sound of a guard's whistle"
-                        : "angry shouting");
+                        ? TR("the shrill sound of a guard's whistle", "看守尖锐的哨声")
+                        : TR("angry shouting", "愤怒的喊叫声"));
         #else
         You_hear("%s.",
                     m_carrying(grd, TIN_WHISTLE)
@@ -1013,10 +1013,10 @@ gd_letknow(struct monst *grd)
     else
         #ifdef ZHLANG
         You(um_dist(grd->mx, grd->my, 2)
-                ? "see %s approaching."
-                : "are confronted by %s.",
+                ? TR("see %s approaching.", "看见%s正在靠近。")
+                : TR("are confronted by %s.", "迎面遇上了%s。"),
             /* "an angry guard" */
-            x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+            x_monnam(grd, ARTICLE_A, TR("angry", "愤怒的"), 0, FALSE));
         #else
         You(um_dist(grd->mx, grd->my, 2)
                 ? "see %s approaching."
@@ -1080,7 +1080,7 @@ gd_move(struct monst *grd)
             SetVoice(grd, 0, 80, 0);
             #ifdef ZHLANG
             verbalize(TR("How dare you %s that gold, scoundrel!", "你竟敢%s那笔金币，恶棍！"),
-                      (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+                      (egrd->witness & GD_EATGOLD) ? TR("consume", "吃掉") : TR("destroy", "摧毁"));
             #else
             verbalize("How dare you %s that gold, scoundrel!",
                       (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
@@ -1099,8 +1099,8 @@ gd_move(struct monst *grd)
                 char buf[BUFSZ];
 
                 Sprintf(buf, TR("%sfollow me!", "%s跟我来！"),
-                        u_carry_gold ? (!umoney ? "drop that hidden gold and "
-                                                : "drop that gold and ")
+                        u_carry_gold ? (!umoney ? TR("drop that hidden gold and ", "放下藏起来的金币，")
+                                                : TR("drop that gold and ", "放下金币，"))
                                      : "");
                 SetVoice(grd, 0, 80, 0);
                 if (egrd->dropgoldcnt || !u_carry_gold)

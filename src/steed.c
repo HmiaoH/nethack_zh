@@ -403,7 +403,7 @@ mount_steed(
         newsym(mtmp->mx, mtmp->my);
 #ifdef ZHLANG
         pline(TR("%s resists%s!", "%s反抗了%s！"), Monnam(mtmp),
-              mtmp->mleashed ? " and its leash comes off" : "");
+              mtmp->mleashed ? TR(" and its leash comes off", "，同时挣脱了拴绳") : "");
 #else
         pline("%s resists%s!", Monnam(mtmp),
               mtmp->mleashed ? " and its leash comes off" : "");
@@ -415,7 +415,7 @@ mount_steed(
     if (!force && Underwater && !is_swimmer(ptr)) {
 #ifdef ZHLANG
         You_cant(TR("ride that creature while under %s.", "在%s下骑那种生物。"),
-                 hliquid("water"));
+                 hliquid(TR("water", "水")));
 #else
         You_cant("ride that creature while under %s.",
                  hliquid("water"));
@@ -444,7 +444,7 @@ mount_steed(
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
 #ifdef ZHLANG
         Your(TR("%s armor is too stiff to be able to mount %s.", "%s护甲太僵硬，骑不上%s。"),
-             uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
+             uarm->oeroded ? TR("rusty", "生锈") : TR("corroded", "腐蚀"), mon_nam(mtmp));
 #else
         Your("%s armor is too stiff to be able to mount %s.",
              uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
@@ -571,7 +571,7 @@ kick_steed(void)
                 /* if hallucinating, might yield "He rouses herself" or
                    "She rouses himself" */
 #ifdef ZHLANG
-                pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
+                pline("%s!", monverbself(u.usteed, He, TR("rouse", "起身"), (char *) 0));
 #else
                 pline("%s!", monverbself(u.usteed, He, "rouse", (char *) 0));
 #endif
@@ -798,7 +798,7 @@ dismount_steed(
         if (otmp && otmp->cursed) {
 #ifdef ZHLANG
             You(TR("can't.  The saddle %s cursed.", "做不到。马鞍%s被诅咒了。"),
-                otmp->bknown ? "is" : "seems to be");
+                otmp->bknown ? "is" : TR("seems to be", "似乎"));
 #else
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
@@ -928,7 +928,7 @@ dismount_steed(
                 } else if (is_lava(u.ux, u.uy)) {
 #ifdef ZHLANG
                     pline(TR("%s is pulled into the %s!", "%s被拖进了%s里！"), Monnam(mtmp),
-                          hliquid("lava"));
+                          hliquid(TR("lava", "岩浆")));
 #else
                     pline("%s is pulled into the %s!", Monnam(mtmp),
                           hliquid("lava"));

@@ -637,11 +637,11 @@ choose_disco_sort(
            chosen sort will stick and also apply to '\' usage */
         add_menu_str(tmpwin, "");
         add_menu_str(tmpwin,
-                     "Note: full alphabetical and alphabetical within class");
+                     TR("Note: full alphabetical and alphabetical within class", "注意：完全按字母排序与类别内按字母排序"));
         add_menu_str(tmpwin,
-                     "      are equivalent for single class discovery, but");
+                     TR("      are equivalent for single class discovery, but", "      在只发现单一类别时效果相同，但"));
         add_menu_str(tmpwin,
-                    "      will matter for future use of total discoveries.");
+                    TR("      will matter for future use of total discoveries.", "      会影响日后全部发现物的排序。"));
     }
     end_menu(tmpwin, TR("Ordering of discoveries", "发现物的排序方式"));
 
@@ -806,7 +806,7 @@ dodiscovered(void) /* free after Robert Viduya */
             || (objects[uidx].oc_encountered && uidx != AMULET_OF_YENDOR)) {
             if (!dis++)
                 putstr(tmpwin, iflags.menu_headings.attr,
-                       "Unique items or Relics");
+                       TR("Unique items or Relics", "独特物品或遗物"));
             ++uniq_ct;
             disco_fmt_uniq(uidx, buf);
             putstr(tmpwin, 0, buf);
@@ -1108,9 +1108,9 @@ doclassdisco(void)
         if (oclass == MAXOCLASSES)
             impossible("doclassdisco: invalid object class '%s'", visctrl(c));
         Sprintf(buf, TR("Discovered %s in %s", "发现了%s，按%s排列"), let_to_name(oclass, FALSE, FALSE),
-                (flags.discosort == 'o') ? "order of discovery"
-                : (flags.discosort == 's') ? "'sortloot' order"
-                  : "alphabetical order");
+                (flags.discosort == 'o') ? TR("order of discovery", "发现顺序")
+                : (flags.discosort == 's') ? TR("'sortloot' order", "拣选顺序")
+                  : TR("alphabetical order", "字母顺序"));
         putstr(tmpwin, 0, buf); /* skip iflags.menu_headings */
         sorted_ct = 0;
         for (i = svb.bases[(int) oclass]; i <= svb.bases[oclass + 1] - 1;

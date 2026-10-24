@@ -1717,7 +1717,7 @@ choose_classes_menu(const char *prompt,
         add_menu_str(win, "");
         any = cg.zeroany;
         any.a_int = (int) ' ';
-        Sprintf(buf, "%c  %s", (char) any.a_int, "All classes of objects");
+        Sprintf(buf, "%c  %s", (char) any.a_int, TR("All classes of objects", "所有物品类别"));
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
@@ -1725,12 +1725,12 @@ choose_classes_menu(const char *prompt,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_SKIPINVERT);
         if (!strcmp(prompt, "Autopickup what?")) {
             add_menu_str(win,
-                   "Note: when no choices are selected, \"all\" is implied.");
+                   TR("Note: when no choices are selected, \"all\" is implied.", "注意：未选择任何项时，默认为「全部」。"));
             /* for 'O', "toggle" should be intuitive; for 'm O', it would
                probably be better to say "Set 'autopickup' to true|false" */
             add_menu_str(win, flags.pickup
-                        ? "Toggle off 'autopickup' to not pick up anything."
-           : "Toggle on 'autopickup' to automatically pick these things up.");
+                        ? TR("Toggle off 'autopickup' to not pick up anything.", "关闭「自动拾取」即可不拾取任何东西。")
+           : TR("Toggle on 'autopickup' to automatically pick these things up.", "开启「自动拾取」即可自动拾取这些东西。"));
         }
     }
     end_menu(win, prompt);
@@ -1796,7 +1796,7 @@ add_menu(
 {
     if (!str) {
         /* if 'str' is Null, just return without adding any menu entry */
-        debugpline0("add_menu(Null)");
+        debugpline0("add_menu(Null)"); /* NOTRANS */
         return;
     }
 

@@ -1044,7 +1044,7 @@ enter_explore_mode(void)
             } else {
                 #ifdef ZHLANG
                 pline(
-                 "Note: normally you wouldn't be allowed into explore mode.");
+                 TR("Note: normally you wouldn't be allowed into explore mode.", "注意：通常你不被允许进入探索模式。"));
                 #else
                 pline(
                  "Note: normally you wouldn't be allowed into explore mode.");
@@ -1060,7 +1060,7 @@ enter_explore_mode(void)
               oldmode);
         #endif
         if (paranoid_query(ParanoidQuit,
-                           "Do you want to enter explore mode?")) {
+                           TR("Do you want to enter explore mode?", "你想进入探索模式吗？"))) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
@@ -1446,10 +1446,10 @@ lookaround_known_room(coordxy x, coordxy y)
 
         #ifdef ZHLANG
         You("%s %s %s.",
-            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
-            : (u_at(x, y)) ? "remember this as" : "remember that as",
+            u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? TR("are in", "正位于")
+            : (u_at(x, y)) ? TR("remember this as", "把这记作") : TR("remember that as", "把那记作"),
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? TR("room", "房间") : TR("area", "区域"));
         #else
         You("%s %s %s.",
             u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? "are in"
@@ -1460,9 +1460,9 @@ lookaround_known_room(coordxy x, coordxy y)
     } else if (u_have_seen_bounds_selection(sel)) {
         #ifdef ZHLANG
         You(TR("guess %s to be %s %s.", "猜%s是%s%s。"),
-            u_at(x, y) ? "this" : "that",
+            u_at(x, y) ? TR("this", "这个") : TR("that", "那个"),
             an(selection_size_description(sel, qbuf)),
-            rmno >= 0 ? "room" : "area");
+            rmno >= 0 ? TR("room", "房间") : TR("area", "区域"));
         #else
         You("guess %s to be %s %s.",
             u_at(x, y) ? "this" : "that",
@@ -1472,7 +1472,7 @@ lookaround_known_room(coordxy x, coordxy y)
     } else {
         #ifdef ZHLANG
         You(TR("can't guess the size of %s area.", "无法猜出%s区域的大小。"),
-            u_at(x, y) ? "this" : "that");
+            u_at(x, y) ? TR("this", "这个") : TR("that", "那个"));
         #else
         You("can't guess the size of %s area.",
             u_at(x, y) ? "this" : "that");
@@ -3346,7 +3346,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
     any.a_int = -1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "nothing: unbind the key",
+             TR("nothing: unbind the key", "不绑定：解除该键的绑定"),
              MENU_ITEMFLAGS_NONE);
 
     add_menu_str(win, "");
@@ -3456,14 +3456,14 @@ handler_rebind_keys(void)
 
     any.a_int = 1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "bind key to a command", MENU_ITEMFLAGS_NONE);
+             TR("bind key to a command", "把按键绑定到命令"), MENU_ITEMFLAGS_NONE);
     any.a_int = 2;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-             "bind command to a key", MENU_ITEMFLAGS_NONE);
+             TR("bind command to a key", "把命令绑定到按键"), MENU_ITEMFLAGS_NONE);
     if (count_bind_keys()) {
         any.a_int = 3;
         add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
-                 "view changed key binds", MENU_ITEMFLAGS_NONE);
+                 TR("view changed key binds", "查看已更改的按键绑定"), MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, TR("Do what?", "要做什么？"));
     npick = select_menu(win, PICK_ONE, &picks);
@@ -3619,7 +3619,7 @@ key2extcmddesc(uchar key)
             Strcpy(key2cmdbuf, TR("start of, or continuation of, a count", "计数的开头或延续"));
         else if (key == '5' || key == M_5)
             Sprintf(key2cmdbuf, TR("%s prefix", "%s前缀"),
-                    (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? "run" : "rush");
+                    (!!gc.Cmd.pcHack_compat ^ (key == M_5)) ? TR("run", "奔跑") : TR("rush", "疾行"));
         else if (key == '0' || (gc.Cmd.pcHack_compat && key == M_0))
             Strcpy(key2cmdbuf, TR("synonym for 'i'", "「i」的同义词"));
         if (*key2cmdbuf)
@@ -3940,12 +3940,12 @@ dokeylist(void)
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
-    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
+    Sprintf(buf, "%7s %s", "", TR("    Full Current Key Bindings List", "    完整当前按键绑定列表"));
     putstr(datawin, 0, buf);
     for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
         if (spkey_gap || !keylist_func_has_key(extcmd, keys_used)) {
             Sprintf(buf, "%7s %s", "",
-                               "(also commands with no key assignment)");
+                               TR("(also commands with no key assignment)", "（以及没有分配按键的命令）"));
             putstr(datawin, 0, buf);
             break;
         }
@@ -3958,8 +3958,8 @@ dokeylist(void)
     if (!iflags.num_pad) {
         putstr(datawin, 0, "");
         putstr(datawin, 0,
-     "Ctrl+<direction> will run in specified direction until something very");
-        Sprintf(buf, "%7s %s", "", "interesting is seen.");
+     TR("Ctrl+<direction> will run in specified direction until something very", "Ctrl+<方向> 会在指定方向上奔跑，直到看到非常"));
+        Sprintf(buf, "%7s %s", "", TR("interesting is seen.", "有趣的东西为止。"));
         putstr(datawin, 0, buf);
         Strcpy(buf, TR("Shift", "Shift 键")); /* append the rest below */
     } else {
@@ -3968,9 +3968,9 @@ dokeylist(void)
         Strcpy(buf, TR("Meta", "Meta 键")); /* append the rest next */
     }
     Strcat(buf,
-          "+<direction> will run in specified direction until you encounter");
+          TR("+<direction> will run in specified direction until you encounter", "+<方向> 会在指定方向上奔跑，直到遇到"));
     putstr(datawin, 0, buf);
-    Sprintf(buf, "%7s %s", "", "an obstacle.");
+    Sprintf(buf, "%7s %s", "", TR("an obstacle.", "障碍物为止。"));
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
@@ -4266,7 +4266,7 @@ key2txt(uchar c, char *txt) /* sufficiently long buffer */
     if (c == ' ')
         Sprintf(txt, TR("<space>", "<空格>"));
     else if (c == '\033')
-        Sprintf(txt, TR("<esc>", "<Esc>")); /* "<escape>" won't fit */
+        Sprintf(txt, TR("<esc>", "<Esc>")); /* NOTRANS */
     else if (c == '\n')
         Sprintf(txt, TR("<enter>", "<回车>")); /* "<return>" won't fit */
     else if (c == '\177')
@@ -4745,7 +4745,7 @@ rhack(int key)
                 if (was_m_prefix) {
                     #ifdef ZHLANG
                     custompline(SUPPRESS_HISTORY,
-                          "The %s command does not accept '%s' prefix.",
+                          TR("The %s command does not accept '%s' prefix.", "%s命令不接受“%s”前缀。"),
                           tlist->ef_txt, which);
                     #else
                     custompline(SUPPRESS_HISTORY,
@@ -4759,9 +4759,9 @@ rhack(int key)
 
                     #ifdef ZHLANG
                     pline(
-                "The '%s' prefix should be followed by a movement command%s.",
+                TR("The '%s' prefix should be followed by a movement command%s.", "“%s”前缀后应跟一个移动命令%s。"),
                           which,
-                          (up || down) ? " other than up or down" : "");
+                          (up || down) ? TR(" other than up or down", "（向上或向下除外）") : "");
                     #else
                     pline(
                 "The '%s' prefix should be followed by a movement command%s.",
@@ -5111,7 +5111,7 @@ getdir(const char *s)
          * "," being left of ".".)
          */
         Sprintf(qbuf,
-            "desired location, then type '%s' for left click, '%s' for right",
+            TR("desired location, then type '%s' for left click, '%s' for right", "目标位置，然后按“%s”表示左键、“%s”表示右键"),
                 /* visctrl() cycles through several static buffers for its
                    return value so using two in the same expression is ok */
                 visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]), /* ',' */
@@ -5279,8 +5279,8 @@ help_dir(
     } else if (prefixhandling && (sym == '<' || sym == '>')) {
         Sprintf(buf, TR("You can't %s %s.", "你不能%s%s。"), dothat,
                 /* was "upwards" and "downwards", but they're considered
-                   to be variants of canonical "upward" and "downward" */
-                (sym == '<') ? "upward" : "downward");
+                   to be variants of canonical TR("upward", "向上") and TR("downward", "向下") */
+                (sym == '<') ? TR("upward", "向上") : TR("downward", "向下"));
     }
 
     /* if '!cmdassist', display via pline() and we're done (note: asking
@@ -5326,13 +5326,13 @@ help_dir(
             && (!strchr(wiz_only_list, sym) || wizard)) {
             Sprintf(buf, TR("Are you trying to use ^%c%s?", "你是想使用^%c%s吗？"), sym,
                     strchr(wiz_only_list, sym) ? ""
-                        : " as specified in the Guidebook");
+                        : TR(" as specified in the Guidebook", "（如《指南》所述）"));
             putstr(win, 0, buf);
             putstr(win, 0, "");
             putstr(win, 0, explain);
             putstr(win, 0, "");
             putstr(win, 0,
-                  "To use that command, hold down the <Ctrl> key as a shift");
+                  TR("To use that command, hold down the <Ctrl> key as a shift", "要使用该命令，请按住 <Ctrl> 键作为上档键，"));
             Sprintf(buf, TR("and press the <%c> key.", "然后按<%c>键。"), sym);
             putstr(win, 0, buf);
             putstr(win, 0, "");
@@ -5341,7 +5341,7 @@ help_dir(
 
     Sprintf(buf, TR("Valid direction keys%s%s%s are:", "有效的方向键%s%s%s是："),
             prefixhandling ? " to " : "", prefixhandling ? dothat : "",
-            NODIAG(u.umonnum) ? " in your current form" : "");
+            NODIAG(u.umonnum) ? TR(" in your current form", "（以你当前形态）") : "");
     putstr(win, 0, buf);
     show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));
 
@@ -5366,7 +5366,7 @@ help_dir(
         /* non-null msg means that this wasn't an explicit user request */
         putstr(win, 0, "");
         putstr(win, 0,
-               "(Suppress this message with !cmdassist in config file.)");
+               TR("(Suppress this message with !cmdassist in config file.)", "（想关闭此提示，请在配置文件中设置 !cmdassist。）"));
     }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
@@ -5540,12 +5540,12 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 
     if (stway && stway->up) {
         Sprintf(buf, TR("Go up the %s", "沿%s向上"),
-                stway->isladder ? "ladder" : "stairs");
+                stway->isladder ? TR("ladder", "梯子") : TR("stairs", "楼梯"));
         mcmd_addmenu(win, MCMD_UP, buf), ++K;
     }
     if (stway && !stway->up) {
         Sprintf(buf, TR("Go down the %s", "沿%s向下"),
-                stway->isladder ? "ladder" : "stairs");
+                stway->isladder ? TR("ladder", "梯子") : TR("stairs", "楼梯"));
         mcmd_addmenu(win, MCMD_DOWN, buf), ++K;
     }
     if (u.usteed) { /* another movement choice */
@@ -5566,7 +5566,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     if (OBJ_AT(x, y)) {
         struct obj *otmp = svl.level.objects[x][y];
 
-        Sprintf(buf, TR("Pick up %s", "拾起%s"), otmp->nexthere ? "items" : doname(otmp));
+        Sprintf(buf, TR("Pick up %s", "拾起%s"), otmp->nexthere ? TR("items", "物品") : doname(otmp));
         mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
 
         if (Is_container(otmp)) {
@@ -5638,7 +5638,7 @@ there_cmd_menu_next2u(
             card = (carrying(CREDIT_CARD) != 0);
             if (key_or_pick || card) {
                 Sprintf(buf, TR("%sunlock the door", "%s打开门锁"),
-                        key_or_pick ? "lock or " : "");
+                        key_or_pick ? TR("lock or ", "用钥匙或工具") : "");
                 mcmd_addmenu(win, MCMD_LOCK_DOOR, upstart(buf)), ++K;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
@@ -5693,14 +5693,14 @@ there_cmd_menu_next2u(
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
 
         Sprintf(buf, "%s %s",
-                !has_mgivenname(mtmp) ? "Name" : "Rename",
+                !has_mgivenname(mtmp) ? TR("Name", "命名") : TR("Rename", "改名"),
                 mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
 
     if ((mtmp && !(mtmp->mpeaceful || mtmp->mtame))
         || glyph_is_invisible(glyph_at(x, y))) {
-        Sprintf(buf, TR("Attack %s", "攻击%s"), mtmp ? mon_nam(mtmp) : "unseen creature");
+        Sprintf(buf, TR("Attack %s", "攻击%s"), mtmp ? mon_nam(mtmp) : TR("unseen creature", "看不见的生物"));
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;

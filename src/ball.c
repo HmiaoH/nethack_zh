@@ -256,8 +256,8 @@ lift_covet_and_placebc(int pin)
         char panicbuf[BUFSZ];
 
         Sprintf(panicbuf, TR("lift_covet_and_placebc denied, %s", "lift_covet_and_placebc 被拒绝：%s"),
-                (pin != bcrestriction) ? "pin mismatch"
-                                       : "restriction in effect");
+                (pin != bcrestriction) ? TR("pin mismatch", "引脚不匹配")
+                                       : TR("restriction in effect", "限制生效中"));
         paniclog("placebc", panicbuf);
 #endif
         return;
@@ -347,7 +347,7 @@ Lift_covet_and_placebc(int pin, char *funcnm, int linenum)
         char panicbuf[BUFSZ];
 
         Sprintf(panicbuf,
-                "Lift_covet_and_placebc denied to %s:%d, restricted by %s:%d",
+                TR("Lift_covet_and_placebc denied to %s:%d, restricted by %s:%d", "Lift_covet_and_placebc 在 %s:%d 被拒绝，受 %s:%d 限制"),
                 funcnm, linenum,
                 bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
         paniclog("Lift_covet_and_placebc", panicbuf);
@@ -952,7 +952,7 @@ drop_ball(coordxy x, coordxy y)
                 break;
             case TT_LAVA:
 #ifdef ZHLANG
-                pline("铁球把你从%s中拽了出来！", hliquid("lava"));
+                pline("铁球把你从%s中拽了出来！", hliquid(TR("lava", "岩浆")));
 #else
                 pline("%s%s!", pullmsg, hliquid("lava"));
 #endif

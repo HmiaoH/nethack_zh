@@ -410,7 +410,7 @@ You("can %s!", See_invisible ? "no longer see through yourself"
             makeknown(uarmc->otyp);
             newsym(u.ux, u.uy);
             pline(TR("Suddenly you can%s yourself.", "突然你%s了自己。"),
-                  See_invisible ? " see through" : "not see");
+                  See_invisible ? TR(" see through", "看穿") : TR("not see", "看不见"));
         }
         break;
     case OILSKIN_CLOAK:
@@ -462,8 +462,8 @@ Cloak_off(void)
     case MUMMY_WRAPPING:
         if (Invis && !Blind) {
             newsym(u.ux, u.uy);
-            You(TR("can %s.", "能%s。"), See_invisible ? "see through yourself"
-                                         : "no longer see yourself");
+            You(TR("can %s.", "能%s。"), See_invisible ? TR("see through yourself", "看穿自己")
+                                         : TR("no longer see yourself", "再也看不见自己"));
         }
         break;
     case CLOAK_OF_INVISIBILITY:
@@ -536,9 +536,9 @@ Helmet_on(void)
     case DUNCE_CAP:
         if (uarmh && !uarmh->cursed) {
             if (Blind)
-                pline(TR("%s for a moment.", "%s了片刻。"), Tobjnam(uarmh, "vibrate"));
+                pline(TR("%s for a moment.", "%s了片刻。"), Tobjnam(uarmh, TR("vibrate", "振动")));
             else
-                pline(TR("%s %s for a moment.", "%s，呈%s，持续了片刻。"), Tobjnam(uarmh, "glow"),
+                pline(TR("%s %s for a moment.", "%s，呈%s，持续了片刻。"), Tobjnam(uarmh, TR("glow", "正")),
                       hcolor(NH_BLACK));
             curse(uarmh);
             /* curse() doesn't touch bknown so doesn't update persistent
@@ -561,8 +561,8 @@ pline("My brain hurts!");
             You_feel("%s.", /* track INT change; ignore WIS */
                      ACURR(A_INT)
                              <= (ABASE(A_INT) + ABON(A_INT) + ATEMP(A_INT))
-                         ? "like sitting in a corner"
-                         : "giddy");
+                         ? TR("like sitting in a corner", "像坐在角落里一样")
+                         : TR("giddy", "头晕目眩"));
         } else {
             /* [message formerly given here moved to uchangealign()] */
             makeknown(HELM_OF_OPPOSITE_ALIGNMENT);
@@ -699,9 +699,9 @@ You("%s %s in your bare %s.",
         /* "removing" ought to be "taking off" but that makes the
            tombstone text more likely to be truncated */
         if (how)
-            Sprintf(hbuf, "%s %s", voluntary ? "removing" : "losing",
+            Sprintf(hbuf, "%s %s", voluntary ? TR("removing", "取下") : TR("losing", "失去"),
                     is_gloves(how) ? gloves_simple_name(how)
-                    : strsubst(simpleonames(how), "set of ", ""));
+                    : strsubst(simpleonames(how), TR("set of ", "一套"), ""));
         else
             Strcpy(hbuf, TR("resistance timing out", "抗性失效"));
         Snprintf(kbuf, sizeof kbuf, TR("%s while wielding %s", "%s，当时正握着%s"),
@@ -980,7 +980,7 @@ Armor_on(void)
         if (!Blind)
             #ifdef ZHLANG
 pline("%s%s发出%s的光芒！",
-                  Yname2(uarm), otense(uarm, "begin"),
+                  Yname2(uarm), otense(uarm, TR("begin", "开始")),
                   arti_light_description(uarm));
 #else
 pline("%s %s to shine %s!",
@@ -1042,7 +1042,7 @@ Armor_gone(void)
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
-            pline(TR("%s shining.", "%s发光。"), Tobjnam(otmp, "stop"));
+            pline(TR("%s shining.", "%s发光。"), Tobjnam(otmp, TR("stop", "已经")));
     }
     dragon_armor_handling(otmp, FALSE, FALSE);
 
@@ -1236,7 +1236,7 @@ Amulet_off(void)
             if (!cant_drown(gy.youmonst.data) && !Swimming) {
                 #ifdef ZHLANG
 You("突然吸入了一大口%s！",
-                    hliquid("water"));
+                    hliquid(TR("water", "水")));
 #else
 You("suddenly inhale an unhealthy amount of %s!",
                     hliquid("water"));
@@ -1885,7 +1885,7 @@ stop_donning(
     ga.afternmv = (int (*)(void)) 0;
     if (putting_on || otmp != stolenobj) {
         Sprintf(buf, TR("You stop %s %s.", "你停止%s%s。"),
-                putting_on ? "putting on" : "taking off",
+                putting_on ? TR("putting on", "穿上") : TR("taking off", "脱下"),
                 thesimpleoname(otmp));
     } else {
         buf[0] = '\0';   /* silently stop doffing stolenobj */
@@ -2024,8 +2024,8 @@ dotakeoff(void)
         if (uskin)
             pline_The(TR("%s merged with your skin!", "%s与你的皮肤融为一体了！"),
                       uskin->otyp >= GRAY_DRAGON_SCALES
-                          ? "dragon scales are"
-                          : "dragon scale mail is");
+                          ? TR("dragon scales are", "龙鳞")
+                          : TR("dragon scale mail is", "龙鳞甲"));
         else
             #ifdef ZHLANG
 pline("没有穿着任何盔甲或饰品。");
@@ -2556,7 +2556,7 @@ There("are no more %s%s to fill.",
             } else {
                 do {
                     Sprintf(qbuf, TR("Which %s%s, Right or Left?", "哪根%s%s，右还是左？"),
-                            humanoid(gy.youmonst.data) ? "ring-" : "",
+                            humanoid(gy.youmonst.data) ? TR("ring-", "戴戒指的") : "",
                             body_part(FINGER));
                     answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
                     switch (answer) {
@@ -2787,9 +2787,9 @@ doputon(void)
         && uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf) {
         /* 'P' message doesn't mention armor */
         Your(TR("%s%s are full, and you're already wearing an amulet and %s.", "%s%s都戴满了，而且你已经戴着护身符和%s。"),
-             humanoid(gy.youmonst.data) ? "ring-" : "",
+             humanoid(gy.youmonst.data) ? TR("ring-", "戴戒指的") : "",
              fingers_or_gloves(FALSE),
-             (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
+             (ublindf->otyp == LENSES) ? TR("some lenses", "镜片") : TR("a blindfold", "眼罩"));
         return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
@@ -2912,8 +2912,8 @@ Your("%s off your %s.",
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
         which = URIGHTY ? "left " : "right ";  /* text for the off hand */
-        Your(TR("%s %s%s from your %s%s.", "%s%s%s从你的%s%s滑落。"), otherwep, xfl ? "also " : "",
-             otense(otmp, "slip"), which, hand);
+        Your(TR("%s %s%s from your %s%s.", "%s%s%s从你的%s%s滑落。"), otherwep, xfl ? TR("also ", "也") : "",
+             otense(otmp, TR("slip", "突然")), which, hand);
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */
@@ -3062,7 +3062,7 @@ pline_The("ring is stuck.");
             why = uwep;
         } else if (uarmg && (uarmg->cursed || Glib)) {
             Sprintf(buf, TR("take off your %s%s", "脱下你的%s%s"),
-                    Glib ? "slippery " : "", gloves_simple_name(uarmg));
+                    Glib ? TR("slippery ", "黏滑的") : "", gloves_simple_name(uarmg));
             why = !Glib ? uarmg : &glibdummy;
         }
         if (why) {
@@ -3089,7 +3089,7 @@ You("are unable to take off your %s while wielding that %s.",
             return 0;
         } else if (Glib) {
             pline(TR("%s %s are too slippery to take off.", "%s%s太滑了，脱不下来。"),
-                  uarmg->unpaid ? "The" : "Your", /* simplified Shk_Your() */
+                  uarmg->unpaid ? TR("The", "这") : TR("Your", "你"), /* simplified Shk_Your() */
                   gloves_simple_name(uarmg));
             return 0;
         }
@@ -3392,7 +3392,7 @@ better_not_take_that_off(struct obj *otmp)
     if (corpse
         && !u_safe_from_fatal_corpse(corpse, st_corpse | st_petrifies)) {
         Snprintf(buf, sizeof buf,
-            "Take off your %s despite carrying a dead %s?",
+            TR("Take off your %s despite carrying a dead %s?", "脱掉你的%s，即使你正带着一只死的%s？"),
                  gloves_simple_name(otmp), obj_pmname(corpse));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
@@ -3623,7 +3623,7 @@ disintegrate_arm(struct obj *atmp)
             end_burn(otmp, FALSE);
         urgent_pline(TR("Your %s %s to dust and %s to the %s!", "你的%s%s成灰，并%s到%s上！"),
                      /* suit might be "dragon scales" so vtense() is needed */
-                     suit, vtense(suit, "turn"), vtense(suit, "fall"),
+                     suit, vtense(suit, TR("turn", "已经")), vtense(suit, TR("fall", "坠落")),
                      surface(u.ux, u.uy));
     } else if (!resistedc && !resistedsuit
              && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {

@@ -301,7 +301,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
                      : obj_descr[i].oc_descr;
         Snprintf(buf, bufsz, "G_%s%s%s",
                  (glyph_is_normal_piletop_obj(glyph)
-                  || glyph_is_piletop_generic_obj(glyph)) ? "piletop_" : "",
+                  || glyph_is_piletop_generic_obj(glyph)) ? "piletop_" : "", /* NOTRANS */
                  buf2, buf3);
     } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
                || glyph_is_swallow(glyph) || glyph_is_explosion(glyph)) {
@@ -399,7 +399,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
             Snprintf(tmpbuf[2], sizeof tmpbuf[2], "%s ",
                      expl_type_texts[expl]);
             buf2 = tmpbuf[2];
-            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "%s%s", "expl_",
+            Snprintf(tmpbuf[3], sizeof tmpbuf[3], "%s%s", "expl_", /* NOTRANS */
                      expl_texts[i]);
             buf3 = tmpbuf[3];
             skip_base = TRUE;
@@ -417,7 +417,7 @@ compose_glyph_name(int glyph, char *buf, size_t bufsz)
         Snprintf(buf, bufsz, "G_unexplored"); /* NOTRANS */
     } else if (glyph_is_warning(glyph)) {
         j = glyph - GLYPH_WARNING_OFF;
-        Snprintf(buf, bufsz, "G_%s%d", "warning", j);
+        Snprintf(buf, bufsz, "G_%s%d", "warning", j); /* NOTRANS */
     }
 
     if (buf[0] == '\0')

@@ -257,7 +257,7 @@ vomiting_dialogue(void)
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
 #ifdef ZHLANG
-                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+                You("%s!", !Hallucination ? TR("vomit", "呕吐") : TR("hurl chunks", "喷出呕吐物"));
 #else
                 You("%s!", !Hallucination ? "vomit" : "hurl chunks");
 #endif
@@ -362,7 +362,7 @@ sickness_dialogue(void)
             Sprintf(eos(buf), TR("  %s %s inviting you in.", "  %s %s邀请你进去。"),
                     /* upstart() modifies its argument but vtense() doesn't
                        care whether or not that has already happened */
-                    upstart(pronounbuf), vtense(pronounbuf, "are"));
+                    upstart(pronounbuf), vtense(pronounbuf, TR("are", "已经")));
         }
 #ifdef ZHLANG
         urgent_pline("%s", buf);
@@ -400,7 +400,7 @@ levitation_dialogue(void)
 
 #ifdef ZHLANG
             urgent_pline(s, danger ? TR("over", "上方") : "in",
-                         danger ? surface(u.ux, u.uy) : "air");
+                         danger ? surface(u.ux, u.uy) : TR("air", "空气"));
 #else
             urgent_pline(s, danger ? "over" : "in",
                          danger ? surface(u.ux, u.uy) : "air");
@@ -457,7 +457,7 @@ slime_dialogue(void)
             } else {
 #ifdef ZHLANG
                 urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
-                                                   : "green slime"));
+                                                   : TR("green slime", "绿色黏液")));
 #else
                 urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
                                                    : "green slime"));
@@ -725,7 +725,7 @@ nh_timeout(void)
             if (!Blind)
 #ifdef ZHLANG
                 Norep(TR("The %s haze around you %s.", "%s色的雾气在你周围%s。"), hcolor(NH_GOLDEN),
-                      u.uspellprot ? "becomes less dense" : "disappears");
+                      u.uspellprot ? TR("becomes less dense", "变得稀薄") : TR("disappears", "消失了"));
 #else
                 Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
                       u.uspellprot ? "becomes less dense" : "disappears");
@@ -810,7 +810,7 @@ nh_timeout(void)
                 if (!Very_fast)
 #ifdef ZHLANG
                     You_feel(TR("yourself slow down%s.", "自己慢了下来%s。"),
-                             Fast ? " a bit" : "");
+                             Fast ? TR(" a bit", "一点") : "");
 #else
                     You_feel("yourself slow down%s.",
                              Fast ? " a bit" : "");
@@ -850,8 +850,8 @@ nh_timeout(void)
                 if (!Invis && !BInvis && !Blind) {
 #ifdef ZHLANG
                     You(!See_invisible
-                            ? "are no longer invisible."
-                            : "can no longer see through yourself.");
+                            ? TR("are no longer invisible.", "不再隐形了。")
+                            : TR("can no longer see through yourself.", "再也看不见自己了。"));
 #else
                     You(!See_invisible
                             ? "are no longer invisible."
@@ -1006,7 +1006,7 @@ nh_timeout(void)
                     else
 #ifdef ZHLANG
                         pline(TR("You're back to your %s self again.", "你又恢复成%s的自己了。"),
-                              !Upolyd ? "normal" : "unusual");
+                              !Upolyd ? "normal" : "unusual"); /* NOTRANS */
 #else
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");
@@ -1018,7 +1018,7 @@ nh_timeout(void)
                     if (region_danger())
 #ifdef ZHLANG
                         You(TR("cough%s", "咳嗽%s"),
-                            Poison_resistance ? "." : " and spit blood!");
+                            Poison_resistance ? "." : TR(" and spit blood!", "，还吐出血来！"));
 #else
                         You("cough%s",
                             Poison_resistance ? "." : " and spit blood!");
@@ -1028,7 +1028,7 @@ nh_timeout(void)
             case STRANGLED:
                 svk.killer.format = KILLED_BY;
                 Strcpy(svk.killer.name,
-                       (u.uburied) ? "suffocation" : "strangulation");
+                       (u.uburied) ? TR("suffocation", "窒息") : TR("strangulation", "勒毙"));
                 done_timeout(DIED, STRANGLED);
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
@@ -1116,7 +1116,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
 #endif
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = svm.moves;
-    gn.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
+    gn.nomovemsg = wakeup_msg ? TR("You wake up.", "你醒了过来。") : You_can_move_again;
 }
 
 /* Attach an egg hatch timeout to the given egg.
@@ -1243,7 +1243,7 @@ hatch_egg(anything *arg, long timeout)
         if (cansee_hatchspot) {
             /* [bug?  m_monnam() yields accurate monster type
                regardless of hallucination] */
-            Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
+            Sprintf(monnambuf, "%s%s", siblings ? TR("some ", "一些") : "",
                     siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
             /* we don't learn the egg type here because learning
                an egg type requires either seeing the egg hatch
@@ -1258,7 +1258,7 @@ hatch_egg(anything *arg, long timeout)
             if (!cansee_hatchspot)
 #ifdef ZHLANG
                 You_feel(TR("%s %s from your pack!", "感到有%s从你的背包里%s！"), something,
-                         locomotion(mon->data, "drop"));
+                         locomotion(mon->data, TR("drop", "掉落")));
 #else
                 You_feel("%s %s from your pack!", something,
                          locomotion(mon->data, "drop"));
@@ -1266,7 +1266,7 @@ hatch_egg(anything *arg, long timeout)
             else
 #ifdef ZHLANG
                 You_see(TR("%s %s out of your pack!", "%s%s从你的背包里出来！"), monnambuf,
-                        locomotion(mon->data, "drop"));
+                        locomotion(mon->data, TR("drop", "掉落")));
 #else
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
@@ -1274,10 +1274,10 @@ hatch_egg(anything *arg, long timeout)
             if (yours) {
 #ifdef ZHLANG
                 pline(TR("%s %s %s like \"%s%s\"", "%s%s%s像「%s%s」"),
-                      siblings ? "Their" : "Its",
+                      siblings ? TR("Their", "它们的") : TR("Its", "它的"),
                       ing_suffix(cry_sound(mon)),
-                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
-                      flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
+                      (is_silent(mon->data) || Deaf) ? TR("seems", "似乎") : TR("sounds", "听起来"),
+                      flags.female ? TR("mommy", "妈妈") : TR("daddy", "爸爸"), egg->spe ? "." : "?");
 #else
                 pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
@@ -1323,7 +1323,7 @@ hatch_egg(anything *arg, long timeout)
                 }
 #ifdef ZHLANG
                 You_see(TR("%s %s out of %s!", "%s%s从%s出来！"), monnambuf,
-                        locomotion(mon->data, "drop"), carriedby);
+                        locomotion(mon->data, TR("drop", "掉落")), carriedby);
 #else
                 You_see("%s %s out of %s!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
@@ -1453,14 +1453,14 @@ slip_or_trip(void)
         pline(TR("%s %s %s the ice.", "%s%s%s冰面。"),
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                                           SUPPRESS_SADDLE, FALSE))
-                       : "You",
-              /* "steed": arbitrary value that will use third person verb
+                       : TR("You", "你"),
+              /* TR("steed", "坐骑"): arbitrary value that will use third person verb
                  regardless of what u.usteed might be named, as opposed to
-                 "you" (second person, which won't have final 's' added) */
-              vtense(u.usteed ? "steed" : "you", rn2(2) ? "slip" : "slide"),
+                 TR("you", "你") (second person, which won't have final 's' added) */
+              vtense(u.usteed ? TR("steed", "坐骑") : TR("you", "你"), rn2(2) ? TR("slip", "突然") : TR("slide", "滑倒")),
               /* sometimes slipping due to ice occurs during turn that hero
                  has just moved off the ice; phrase things differently then */
-              is_ice(u.ux, u.uy) ? "on" : "off");
+              is_ice(u.ux, u.uy) ? "on" : TR("off", "关闭"));
 #else
         pline("%s %s %s the ice.",
               u.usteed ? upstart(x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
@@ -1507,7 +1507,7 @@ slip_or_trip(void)
             case 1:
 #ifdef ZHLANG
                 You(TR("trip over your own %s.", "被自己的%s绊倒了。"),
-                    Hallucination ? "elbow" : makeplural(body_part(FOOT)));
+                    Hallucination ? TR("elbow", "手肘") : makeplural(body_part(FOOT)));
 #else
                 You("trip over your own %s.",
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
@@ -1516,7 +1516,7 @@ slip_or_trip(void)
             case 2:
 #ifdef ZHLANG
                 You(TR("slip %s.", "滑了一跤%s。"),
-                    Hallucination ? "on a banana peel" : "and nearly fall");
+                    Hallucination ? TR("on a banana peel", "踩到香蕉皮") : TR("and nearly fall", "差点摔倒"));
 #else
                 You("slip %s.",
                     Hallucination ? "on a banana peel" : "and nearly fall");
@@ -1849,8 +1849,8 @@ burn_object(anything *arg, long timeout)
                 case OBJ_MINVENT:
 #ifdef ZHLANG
                     pline(TR("%s%scandle%s getting short.", "%s%s蜡烛%s快烧完了。"), whose,
-                          menorah ? "candelabrum's " : "",
-                          many ? "s are" : " is");
+                          menorah ? TR("candelabrum's ", "烛台的") : "",
+                          many ? TR("s are", "都") : " is");
 #else
                     pline("%s%scandle%s getting short.", whose,
                           menorah ? "candelabrum's " : "",
@@ -1860,7 +1860,7 @@ burn_object(anything *arg, long timeout)
                 case OBJ_FLOOR:
 #ifdef ZHLANG
                     You_see(TR("%scandle%s getting short.", "%s蜡烛%s快烧完了。"),
-                            menorah ? "a candelabrum's " : many ? "some "
+                            menorah ? TR("a candelabrum's ", "烛台的") : many ? TR("some ", "一些")
                                                                 : "a ",
                             many ? "s" : "");
 #else
@@ -1880,7 +1880,7 @@ burn_object(anything *arg, long timeout)
                 case OBJ_MINVENT:
 #ifdef ZHLANG
                     pline(TR("%s%scandle%s flame%s flicker%s low!", "%s%s蜡烛%s火焰%s摇曳%s！"), whose,
-                          menorah ? "candelabrum's " : "", many ? "s'" : "'s",
+                          menorah ? TR("candelabrum's ", "烛台的") : "", many ? "s'" : "'s",
                           many ? "s" : "", many ? "" : "s");
 #else
                     pline("%s%scandle%s flame%s flicker%s low!", whose,
@@ -1891,7 +1891,7 @@ burn_object(anything *arg, long timeout)
                 case OBJ_FLOOR:
 #ifdef ZHLANG
                     You_see(TR("%scandle%s flame%s flicker low!", "%s蜡烛%s火焰%s摇曳！"),
-                            menorah ? "a candelabrum's " : many ? "some "
+                            menorah ? TR("a candelabrum's ", "烛台的") : many ? TR("some ", "一些")
                                                                 : "a ",
                             many ? "s'" : "'s", many ? "s" : "");
 #else
@@ -1916,7 +1916,7 @@ burn_object(anything *arg, long timeout)
                     case OBJ_MINVENT:
 #ifdef ZHLANG
                         pline(TR("%scandelabrum's flame%s.", "%s烛台的火焰%s。"), whose,
-                              many ? "s die" : " dies");
+                              many ? TR("s die", "熄灭了") : TR(" dies", "熄灭了"));
 #else
                         pline("%scandelabrum's flame%s.", whose,
                               many ? "s die" : " dies");
@@ -1942,7 +1942,7 @@ burn_object(anything *arg, long timeout)
                     case OBJ_MINVENT:
 #ifdef ZHLANG
                         pline(TR("%s %s consumed!", "%s%s被烧尽了！"), Yname2(obj),
-                              many ? "are" : "is");
+                              many ? TR("are", "已经") : "is");
 #else
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
@@ -1954,7 +1954,7 @@ burn_object(anything *arg, long timeout)
                           You see a wax candle consumed!
                          */
 #ifdef ZHLANG
-                        You_see(TR("%s%s consumed!", "%s%s被烧尽了！"), many ? "some " : "",
+                        You_see(TR("%s%s consumed!", "%s%s被烧尽了！"), many ? TR("some ", "一些") : "",
                                 many ? xname(obj) : an(xname(obj)));
 #else
                         You_see("%s%s consumed!", many ? "some " : "",
@@ -1967,9 +1967,9 @@ burn_object(anything *arg, long timeout)
                     /* post message */
 #ifdef ZHLANG
                     pline(Hallucination
-                              ? (many ? "They shriek!" : "It shrieks!")
-                              : Blind ? "" : (many ? "Their flames die."
-                                                   : "Its flame dies."));
+                              ? (many ? TR("They shriek!", "它们尖声鸣叫！") : TR("It shrieks!", "它尖声鸣叫！"))
+                              : Blind ? "" : (many ? TR("Their flames die.", "它们的火焰熄灭了。")
+                                                   : TR("Its flame dies.", "它的火焰熄灭了。")));
 #else
                     pline(Hallucination
                               ? (many ? "They shriek!" : "It shrieks!")
@@ -2477,7 +2477,7 @@ wiz_timeout_queue(void)
         Sprintf(buf, TR("Level is no-teleport for %ld %s.", "本层在%ld%s内禁止传送。"),
                 svl.level.flags.stasis_until - svm.moves + 1L,
                 (svl.level.flags.stasis_until - svm.moves > 0L)
-                  ? "turns" : "more turn");
+                  ? TR("turns", "回合") : TR("more turn", "回合"));
         putstr(win, 0, buf);
     }
     display_nhwindow(win, FALSE);

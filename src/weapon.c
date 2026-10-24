@@ -82,9 +82,9 @@ give_may_advance_msg(int skill)
     #ifdef ZHLANG
     You_feel("对自己的%s技能更加自信。",
              (skill == P_NONE) ? ""
-                 : (skill <= P_LAST_WEAPON) ? "weapon "
-                     : (skill <= P_LAST_SPELL) ? "spell casting "
-                         : "fighting ");
+                 : (skill <= P_LAST_WEAPON) ? TR("weapon ", "武器")
+                     : (skill <= P_LAST_SPELL) ? TR("spell casting ", "法术施放")
+                         : TR("fighting ", "格斗"));
     #else
     You_feel("more confident in your %sskills.",
              (skill == P_NONE) ? ""
@@ -948,7 +948,7 @@ mon_wield_item(struct monst *mon)
                     mon_hand = makeplural(mon_hand);
                 #ifdef ZHLANG
                 pline("%s%s在%s的%s上！", Tobjnam(obj, TR("weld", "焊牢")),
-                      is_plural(obj) ? "themselves" : "itself",
+                      is_plural(obj) ? TR("themselves", "他们自己") : TR("itself", "它自己"),
                       s_suffix(mon_nam(mon)), mon_hand);
                 #else
                 pline("%s %s to %s %s!", Tobjnam(obj, "weld"),
@@ -974,7 +974,7 @@ mon_wield_item(struct monst *mon)
             else if (cansee(mon->mx, mon->my))
                 #ifdef ZHLANG
                 pline("光芒开始%s闪耀。",
-                      (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
+                      (mdistu(mon) <= 5 * 5) ? TR("nearby", "在附近") : TR("in the distance", "在远处"));
                 #else
                 pline("Light begins shining %s.",
                       (mdistu(mon) <= 5 * 5) ? "nearby" : "in the distance");
@@ -1130,10 +1130,10 @@ dry_a_towel(
         if (verbose) {
             if (carried(obj))
                 pline(TR("%s dries%s.", "%s变干了%s。"), Yobjnam2(obj, (const char *) 0),
-                      !newspe ? " out" : "");
+                      !newspe ? TR(" out", "，完全干透") : "");
             else if (mcarried(obj) && canseemon(obj->ocarry))
                 pline(TR("%s %s dries%s.", "%s的%s变干了%s。"), s_suffix(Monnam(obj->ocarry)),
-                      xname(obj), !newspe ? " out" : "");
+                      xname(obj), !newspe ? TR(" out", "，完全干透") : "");
         }
     }
 
@@ -1257,7 +1257,7 @@ skill_advance(int skill)
     /* subtly change the advance message to indicate no more advancement */
     #ifdef ZHLANG
     You("现在在%s方面%s熟练了。",
-        P_SKILL(skill) >= P_MAX_SKILL(skill) ? "most" : "more",
+        P_SKILL(skill) >= P_MAX_SKILL(skill) ? TR("most", "最") : TR("more", "更高"),
         P_NAME(skill));
     #else
     You("are now %s skilled in %s.",
@@ -1428,13 +1428,13 @@ enhance_weapon_skill(void)
                 Sprintf(buf, TR("(Skill%s flagged by \"*\" may be enhanced %s.)", "（标有「*」的技能%s可以%s提升。）"),
                         plur(eventually_advance),
                         (u.ulevel < MAXULEV)
-                            ? "when you're more experienced"
-                            : "if skill slots become available");
+                            ? TR("when you're more experienced", "在你更有经验时")
+                            : TR("if skill slots become available", "在获得技能点时"));
                 add_menu_str(win, buf);
             }
             if (maxxed_cnt > 0) {
                 Sprintf(buf,
-                 "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
+                 TR("(Skill%s flagged by \"#\" cannot be enhanced any further.)", "（标有「#」的技能%s无法再提升。）"),
                         plur(maxxed_cnt));
                 add_menu_str(win, buf);
             }
@@ -1445,7 +1445,7 @@ enhance_weapon_skill(void)
             win, to_advance + eventually_advance + maxxed_cnt > 0, speedy);
 
         Strcpy(buf, (to_advance > 0) ? TR("Pick a skill to advance:", "选择要提升的技能：")
-                                     : "Current skills:");
+                                     : TR("Current skills:", "当前技能："));
         if (wizard && !speedy)
             Sprintf(eos(buf), TR("  (%d slot%s available)", "  （可用技能点 %d%s）"), u.weapon_slots,
                     plur(u.weapon_slots));
@@ -1578,7 +1578,7 @@ drain_weapon_skill(int n) /* number of skills to drain */
         if (tmpskills[skill]) {
             #ifdef ZHLANG
             You("忘记了在%s方面的%s训练。",
-                P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
+                P_SKILL(skill) >= P_BASIC ? TR("some of ", "其中一些") : "", P_NAME(skill));
             #else
             You("forget %syour training in %s.",
                 P_SKILL(skill) >= P_BASIC ? "some of " : "", P_NAME(skill));
@@ -1894,7 +1894,7 @@ setmnotwielded(struct monst *mon, struct obj *obj)
             #ifdef ZHLANG
             pline("%s在%s%s中%s发光。", The(xname(obj)),
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
-                  otense(obj, "stop"));
+                  otense(obj, TR("stop", "已经")));
             #else
             pline("%s in %s %s %s shining.", The(xname(obj)),
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),

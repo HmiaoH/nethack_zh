@@ -122,7 +122,7 @@ dynamic_multi_reason(struct monst *mon, const char *verb, boolean by_gaze)
     p = eos(p);
     Sprintf(p, "%s by %s%s", verb,
             !by_gaze ? who : s_suffix(who),
-            !by_gaze ? "" : " gaze");
+            !by_gaze ? "" : TR(" gaze", "凝视"));
     gm.multi_reason = p;
 }
 
@@ -292,9 +292,9 @@ attack_checks(
             notseen = !strcmp(lmonbuf, "it"); /* note: not strcmpi() */
             if (!Blind && Hallucination)
                 #ifdef ZHLANG
-                pline("一只%s%s%s！", mtmp->mtame ? "tame" : "wild",
-                      notseen ? "creature" : (const char *) lmonbuf,
-                      notseen ? "is present" : "appears");
+                pline("一只%s%s%s！", mtmp->mtame ? TR("tame", "驯服的") : TR("wild", "野生的"),
+                      notseen ? TR("creature", "生物") : (const char *) lmonbuf,
+                      notseen ? TR("is present", "就在那里") : TR("appears", "出现了"));
 #else
                 pline("A %s %s %s!", mtmp->mtame ? "tame" : "wild",
                       notseen ? "creature" : (const char *) lmonbuf,
@@ -592,8 +592,8 @@ do_attack(struct monst *mtmp)
             else if (!cantwield(gy.youmonst.data))
                 #ifdef ZHLANG
                 You("开始用你的%s%s%s怪物。",
-                    ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
-                    uarmg ? "gloved" : "bare", /* Del Lamb */
+                    ing_suffix(Role_if(PM_MONK) ? TR("strike", "打击") : TR("bash", "猛击")),
+                    uarmg ? TR("gloved", "戴着手套") : TR("bare", "裸露"), /* Del Lamb */
                     makeplural(body_part(HAND)));
 #else
                 You("begin %s monsters with your %s %s.",
@@ -963,7 +963,7 @@ hmon_hitmon_weapon_ranged(
 
         #ifdef ZHLANG
         pline("当你击中%s时，%s%s碎裂了。",
-              mon_nam(mon), more_than_1 ? "one of " : "",
+              mon_nam(mon), more_than_1 ? TR("one of ", "其中一具") : "",
               yname(obj));
 #else
         pline("As you hit %s, %s%s breaks into splinters.",
@@ -1070,7 +1070,7 @@ hmon_hitmon_weapon_melee(
                is wielding a shop-owned weapon; telepathy or extended
                monster detection will name mon but not its weapon */
             Sprintf(buf, TR("%s weapon%s %s", "%s武器%s%s"), s_suffix(Monnam(mon)),
-                    plur(monwep->quan), otense(monwep, "shatter"));
+                    plur(monwep->quan), otense(monwep, TR("shatter", "碎裂")));
         buf[sizeof buf - sizeof from_your_blow] = '\0';
         pline("%s%s", buf, from_your_blow);
         m_useupall(mon, monwep);
@@ -1291,9 +1291,9 @@ hmon_hitmon_misc_obj(
             #ifdef ZHLANG
             pline("啪！你用%s%s鸡蛋%s击中了%s！",
                   mon_nam(mon),
-                  obj->known ? "the" : cnt > 1L ? "some" : "a",
+                  obj->known ? TR("the", "那个") : cnt > 1L ? TR("some", "几枚") : "a",
                   obj->known ? mons[obj->corpsenm].pmnames[NEUTRAL]
-                  : "petrifying",
+                  : TR("petrifying", "石化"),
                   plur(cnt));
 #else
             pline("Splat!  You hit %s with %s %s egg%s!",
@@ -1329,7 +1329,7 @@ hmon_hitmon_misc_obj(
 #endif
             if (touch_petrifies(hmd->mdat) && !stale_egg(obj)) {
                 pline_The(TR("egg%s %s alive any more...", "蛋%s%s再有生命了……"), plur(cnt),
-                          (cnt == 1L) ? "isn't" : "aren't");
+                          (cnt == 1L) ? TR("isn't", "不会") : TR("aren't", "不会"));
                 if (obj->timed)
                     obj_stop_timers(obj);
                 obj->otyp = ROCK;
@@ -1383,7 +1383,7 @@ hmon_hitmon_misc_obj(
 #endif
             } else if (obj->otyp == BLINDING_VENOM) {
                 pline_The(TR("venom blinds %s%s!", "毒液使%s失明%s！"), mon_nam(mon),
-                          mon->mcansee ? "" : " further");
+                          mon->mcansee ? "" : TR(" further", "更甚"));
             } else {
                 char *whom = mon_nam(mon);
                 char *what = The(xname(obj));
@@ -1397,7 +1397,7 @@ hmon_hitmon_misc_obj(
                                   mbodypart(mon, FACE));
                 #ifdef ZHLANG
                 pline("%s%s在%s上！", what,
-                      vtense(what, "splash"), whom);
+                      vtense(what, TR("splash", "溅")), whom);
 #else
                 pline("%s %s over %s!", what,
                       vtense(what, "splash"), whom);
@@ -1711,7 +1711,7 @@ hmon_hitmon_stagger(
         if (canspotmon(mon))
             #ifdef ZHLANG
             pline("%s被你强力一击打得%s！", Monnam(mon),
-                  makeplural(stagger(mon->data, "stagger")));
+                  makeplural(stagger(mon->data, TR("stagger", "蹒跚"))));
 #else
             pline("%s %s from your powerful strike!", Monnam(mon),
                   makeplural(stagger(mon->data, "stagger")));
@@ -1797,11 +1797,11 @@ hmon_hitmon_msg_hit(
             #ifdef ZHLANG
             You("%s%s%s",
                 (obj && (is_shield(obj)
-                         || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
+                         || obj->otyp == HEAVY_IRON_BALL)) ? TR("bash", "猛击")
                 : (obj && (objects[obj->otyp].oc_skill == P_WHIP
-                           || is_wet_towel(obj))) ? "lash"
-                  : Role_if(PM_BARBARIAN) ? "smite"
-                    : "hit",
+                           || is_wet_towel(obj))) ? TR("lash", "抽打")
+                  : Role_if(PM_BARBARIAN) ? TR("smite", "痛击")
+                    : TR("hit", "击中"),
                 mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
 #else
             You("%s %s%s",
@@ -1835,8 +1835,8 @@ hmon_hitmon_msg_silver(
             /* guard constructed format string against '%' in
                saved_oname[] from xname(via cxname()) */
             Snprintf(silverobjbuf, sizeof(silverobjbuf), TR("Your %s%s %s", "你的%s%s%s"),
-                     strstri(hmd->saved_oname, "silver") ? "" : "silver ",
-                     hmd->saved_oname, vtense(hmd->saved_oname, "sear"));
+                     strstri(hmd->saved_oname, TR("silver", "银")) ? "" : TR("silver ", "银"),
+                     hmd->saved_oname, vtense(hmd->saved_oname, TR("sear", "灼烧")));
             (void) strNsubst(silverobjbuf, "%", "%%", 0);
             strncat(silverobjbuf, " %s!",
                     sizeof(silverobjbuf) - (strlen(silverobjbuf) + 1));
@@ -1868,7 +1868,7 @@ hmon_hitmon_msg_lightobj(
     if (canspotmon(mon)) {
         if (hmd->saved_oname[0]) {
             Sprintf(emitlightobjbuf,
-                    "%s radiance penetrates deep into",
+                    TR("%s radiance penetrates deep into", "%s的强光深深穿透"),
                     s_suffix(hmd->saved_oname));
             Strcat(emitlightobjbuf, " %s!");
             fmt = emitlightobjbuf;
@@ -2079,7 +2079,7 @@ hmon_hitmon(
     }
     if (hmd.unpoisonmsg)
         Your(TR("%s %s no longer poisoned.", "%s%s不再有毒了。"), hmd.saved_oname,
-             vtense(hmd.saved_oname, "are"));
+             vtense(hmd.saved_oname, TR("are", "已经")));
 
     if (!hmd.destroyed && !hmd.offmap) {
         int hitflags = M_ATTK_HIT;
@@ -2146,7 +2146,7 @@ first_weapon_hit(struct obj *weapon)
          N : hit with a wielded weapon for the first time
        reported on the same turn (N) looks "suboptimal" */
     livelog_printf(LL_CONDUCT,
-                   "hit with a wielded weapon (%s) for the first time", buf);
+                   TR("hit with a wielded weapon (%s) for the first time", "首次用挥舞的武器击中（%s）"), buf);
 }
 
 staticfn boolean
@@ -2198,11 +2198,11 @@ shade_miss(
         if (!thrown) {
             whose = youagr ? "Your" : s_suffix(Monnam(magr));
             pline("%s %s %s%s%s.", whose, what,
-                  vtense(what, "pass"), harmlessly_thru, target);
+                  vtense(what, TR("pass", "硬生生")), harmlessly_thru, target);
         } else {
             #ifdef ZHLANG
             pline("%s%s%s%s。", The(what), /* note: not pline_The() */
-                  vtense(what, "pass"), harmlessly_thru, target);
+                  vtense(what, TR("pass", "硬生生")), harmlessly_thru, target);
 #else
             pline("%s %s%s%s.", The(what), /* note: not pline_The() */
                   vtense(what, "pass"), harmlessly_thru, target);
@@ -2240,9 +2240,9 @@ m_slips_free(struct monst *mdef, struct attack *mattk)
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
         You("%s %s %s %s!",
-            (mattk->adtyp == AD_WRAP) ? "slip off of"
-                                      : "grab, but cannot hold onto",
-            s_suffix(mon_nam(mdef)), obj->greased ? "greased" : "slippery",
+            (mattk->adtyp == AD_WRAP) ? TR("slip off of", "滑离")
+                                      : TR("grab, but cannot hold onto", "抓住了，却握不住"),
+            s_suffix(mon_nam(mdef)), obj->greased ? TR("greased", "涂了油的") : TR("slippery", "滑腻的"),
             /* avoid "slippery slippery cloak"
                for undiscovered oilskin cloak */
             (obj->greased || objects[obj->otyp].oc_name_known)
@@ -2380,7 +2380,7 @@ steal_it(struct monst *mdef, struct attack *mattk)
             #ifdef ZHLANG
             You("魅惑了%s。%s高兴地交出了%s%s的财物。",
                 mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),
-                !gold ? "" : "most of ", mhis(mdef));
+                !gold ? "" : TR("most of ", "大部分"), mhis(mdef));
 #else
             You("charm %s.  %s gladly hands over %s%s possessions.",
                 mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),
@@ -2477,7 +2477,7 @@ mhitm_ad_rust(
                life-saving doesn't work for golems */
             #ifdef ZHLANG
             pline("%s%s成了碎片！", Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+                  !mlifesaver(mdef) ? TR("falls", "碎") : TR("starts to fall", "开始崩碎"));
 #else
             pline("%s %s to pieces!", Monnam(mdef),
                   !mlifesaver(mdef) ? "falls" : "starts to fall");
@@ -2566,7 +2566,7 @@ mhitm_ad_dcay(
         if (completelyrots(pd)) { /* wood golem or leather golem */
             #ifdef ZHLANG
             pline("%s%s成了碎片！", Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+                  !mlifesaver(mdef) ? TR("falls", "碎") : TR("starts to fall", "开始崩碎"));
 #else
             pline("%s %s to pieces!", Monnam(mdef),
                   !mlifesaver(mdef) ? "falls" : "starts to fall");
@@ -2676,7 +2676,7 @@ mhitm_ad_drli(
             if (DEADMONSTER(mdef) || !mdef->m_lev) {
                 #ifdef ZHLANG
                 pline("%s%s！", Monnam(mdef),
-                      nonliving(mdef->data) ? "expires" : "dies");
+                      nonliving(mdef->data) ? TR("expires", "消散了") : TR("dies", "死了"));
 #else
                 pline("%s %s!", Monnam(mdef),
                       nonliving(mdef->data) ? "expires" : "dies");
@@ -2756,8 +2756,8 @@ mhitm_ad_fire(
                    life-saving doesn't work for golems */
                 #ifdef ZHLANG
                 pline("%s%s！", Monnam(mdef),
-                      !mlifesaver(mdef) ? "burns completely"
-                                        : "is totally engulfed in flames");
+                      !mlifesaver(mdef) ? TR("burns completely", "烧光了")
+                                        : TR("is totally engulfed in flames", "完全陷入火焰中"));
 #else
                 pline("%s %s!", Monnam(mdef),
                       !mlifesaver(mdef) ? "burns completely"
@@ -2766,8 +2766,8 @@ mhitm_ad_fire(
             else
                 #ifdef ZHLANG
                 You("闻到了%s烧焦味。",
-                    (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
-                      : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
+                    (pd == &mons[PM_PAPER_GOLEM]) ? TR(" paper", "纸")
+                      : (pd == &mons[PM_STRAW_GOLEM]) ? TR(" straw", "草") : "");
 #else
                 You("smell burning%s.",
                     (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
@@ -3007,7 +3007,7 @@ mhitm_ad_acid(
             if (Acid_resistance) {
                 #ifdef ZHLANG
                 pline("你被%s覆盖了，但似乎无害。",
-                      hliquid("acid"));
+                      hliquid(TR("acid", "酸液")));
 #else
                 pline("You're covered in %s, but it seems harmless.",
                       hliquid("acid"));
@@ -3016,7 +3016,7 @@ mhitm_ad_acid(
                 mhm->damage = 0;
             } else {
                 #ifdef ZHLANG
-                pline("你被%s覆盖了！它在灼烧！", hliquid("acid"));
+                pline("你被%s覆盖了！它在灼烧！", hliquid(TR("acid", "酸液")));
 #else
                 pline("You're covered in %s!  It burns!", hliquid("acid"));
 #endif
@@ -3035,7 +3035,7 @@ mhitm_ad_acid(
             if (gv.vis && canseemon(mdef))
                 #ifdef ZHLANG
                 pline("%s被%s覆盖了，但似乎无害。",
-                      Monnam(mdef), hliquid("acid"));
+                      Monnam(mdef), hliquid(TR("acid", "酸液")));
 #else
                 pline("%s is covered in %s, but it seems harmless.",
                       Monnam(mdef), hliquid("acid"));
@@ -3188,7 +3188,7 @@ mhitm_ad_tlpt(
             if (flags.verbose)
                 Your(TR("position suddenly seems %suncertain!", "你的位置突然显得%s不确定！"),
                      (Teleport_control && !Stunned && !unconscious()) ? ""
-                     : "very ");
+                     : TR("very ", "非常"));
             tele();
             /* As of 3.6.2:  make sure damage isn't fatal; previously, it
                was possible to be teleported and then drop dead at
@@ -3304,7 +3304,7 @@ mhitm_ad_blnd(
                 Snprintf(buf, sizeof buf, TR("%s is blinded", "%s失明了"), Monnam(mdef));
                 if (mdef->data == &mons[PM_ARCHON] && canseemon(mdef))
                     Snprintf(eos(buf), sizeof buf - strlen(buf),
-                             " by %s radiance", s_suffix(mon_nam(magr)));
+                             TR(" by %s radiance", "，原因是%s的强光"), s_suffix(mon_nam(magr)));
                 #ifdef ZHLANG
                 pline("%s。", buf);
 #else
@@ -3714,7 +3714,7 @@ mhitm_ad_wrap(
                 } else {
                     #ifdef ZHLANG
                     You("把自己%s在了%s身上！",
-                        coil ? "coil" : "swing", mon_nam(mdef));
+                        coil ? TR("coil", "盘绕") : TR("swing", "甩"), mon_nam(mdef));
 #else
                     You("%s yourself around %s!",
                         coil ? "coil" : "swing", mon_nam(mdef));
@@ -3748,7 +3748,7 @@ mhitm_ad_wrap(
                     else
                         #ifdef ZHLANG
                         You("擦过了%s的%s。", s_suffix(mon_nam(mdef)),
-                            tailmiss ? "tail" : mbodypart(mdef, LEG));
+                            tailmiss ? TR("tail", "尾巴") : mbodypart(mdef, LEG));
 #else
                         You("brush against %s %s.", s_suffix(mon_nam(mdef)),
                             tailmiss ? "tail" : mbodypart(mdef, LEG));
@@ -3767,7 +3767,7 @@ mhitm_ad_wrap(
                     set_ustuck(magr); /* before message, for botl update */
                     urgent_pline(TR("%s %s itself around you!", "%s%s，缠住了你！"),
                                  Some_Monnam(magr),
-                                 coil ? "coils" : "swings");
+                                 coil ? TR("coils", "盘绕") : TR("swings", "甩动"));
                 }
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious
@@ -3780,7 +3780,7 @@ mhitm_ad_wrap(
                     urgent_pline(TR("%s drowns you...", "%s把你淹死了……"), Monnam(magr));
                     svk.killer.format = KILLED_BY_AN;
                     Sprintf(svk.killer.name, "%s by %s",
-                            moat ? "moat" : "pool of water",
+                            moat ? TR("moat", "护城河") : TR("pool of water", "水池"),
                             an(pmname(magr->data, Mgender(magr))));
                     done(DROWNING);
                 } else if (mattk->aatyp == AT_HUGS) {
@@ -4089,7 +4089,7 @@ mhitm_ad_ench(
             }
             if (obj && drain_item(obj, FALSE)) {
                 #ifdef ZHLANG
-                pline("%s效果减弱了。", Yobjnam2(obj, "seem"));
+                pline("%s效果减弱了。", Yobjnam2(obj, TR("seem", "现在")));
 #else
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
 #endif
@@ -4523,7 +4523,7 @@ mhitm_ad_phys(
                 exercise(A_STR, FALSE);
                 #ifdef ZHLANG
                 You("正在被%s。",
-                    (pa == &mons[PM_ROPE_GOLEM]) ? "choked" : "crushed");
+                    (pa == &mons[PM_ROPE_GOLEM]) ? TR("choked", "勒住") : TR("crushed", "压碎"));
 #else
                 You("are being %s.",
                     (pa == &mons[PM_ROPE_GOLEM]) ? "choked" : "crushed");
@@ -4907,7 +4907,7 @@ mhitm_ad_stun(
         if (!Blind)
             #ifdef ZHLANG
             pline("%s短暂地%s。", Monnam(mdef),
-                  makeplural(stagger(pd, "stagger")));
+                  makeplural(stagger(pd, TR("stagger", "蹒跚"))));
 #else
             pline("%s %s for a moment.", Monnam(mdef),
                   makeplural(stagger(pd, "stagger")));
@@ -5201,9 +5201,9 @@ mhitm_ad_sedu(
             if (!Blind)
                 #ifdef ZHLANG
                 pline("%s试图%s你，但你似乎%s。",
-                      Adjmonnam(magr, "plain"),
-                      flags.female ? "charm" : "seduce",
-                      flags.female ? "unaffected" : "uninterested");
+                      Adjmonnam(magr, TR("plain", "姿色平平的")),
+                      flags.female ? TR("charm", "迷惑") : TR("seduce", "勾引"),
+                      flags.female ? TR("unaffected", "不受影响") : TR("uninterested", "不感兴趣"));
 #else
                 pline("%s tries to %s you, but you seem %s.",
                       Adjmonnam(magr, "plain"),
@@ -5514,8 +5514,8 @@ start_engulf(struct monst *mdef)
     }
     #ifdef ZHLANG
     You("%s%s%s！",
-        u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
-        mon_nam(mdef), u_digest ? " whole" : "");
+        u_digest ? TR("swallow", "吞下") : u_enfold ? TR("enclose", "裹住") : TR("engulf", "吞没"),
+        mon_nam(mdef), u_digest ? TR(" whole", "整个") : "");
 #else
     You("%s %s%s!",
         u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
@@ -5572,7 +5572,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
             #ifdef ZHLANG
             You("先%s了它，然后%s了它。",
-                u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
+                u_digest ? TR("swallow", "吞下") : u_enfold ? TR("enclose", "裹住") : TR("engulf", "吞没"),
                 expel_verb);
 #else
             You("%s it, then %s it.",
@@ -5616,15 +5616,15 @@ gulpum(struct monst *mdef, struct attack *mattk)
             if (!type_is_pname(pd))
                 mnam = an(mnam);
             #ifdef ZHLANG
-            You("%s%s。", u_digest ? "englut" : "engulf", mon_nam(mdef));
+            You("%s%s。", u_digest ? TR("englut", "囫囵吞下") : TR("engulf", "吞没"), mon_nam(mdef));
 #else
             You("%s %s.", u_digest ? "englut" : "engulf", mon_nam(mdef));
 #endif
             Sprintf(kbuf, "%s %s%s",
-                    u_digest ? "swallowing"
-                    : u_enfold ? "enclosing"
-                      : "engulfing",
-                    mnam, u_digest ? " whole" : "");
+                    u_digest ? TR("swallowing", "吞下")
+                    : u_enfold ? TR("enclosing", "包裹住")
+                      : TR("engulfing", "吞没"),
+                    mnam, u_digest ? TR(" whole", "整个") : "");
             instapetrify(kbuf);
         } else {
             start_engulf(mdef);
@@ -5732,8 +5732,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 } else {
                     #ifdef ZHLANG
                     pline("%s%s了！", Monnam(mdef),
-                          enfolds(gy.youmonst.data) ? "being squashed"
-                            : "pummeled with your debris");
+                          enfolds(gy.youmonst.data) ? TR("being squashed", "压扁")
+                            : TR("pummeled with your debris", "被你的碎片砸中"));
 #else
                     pline("%s is %s!", Monnam(mdef),
                           enfolds(gy.youmonst.data) ? "being squashed"
@@ -6044,7 +6044,7 @@ mhitm_knockback(
         Strcpy(mdefbuf, (u_def || was_u) ? TR("you", "你") : y_monnam(mdef));
         if (was_u)
             Snprintf(eos(mdefbuf), sizeof mdefbuf - strlen(mdefbuf),
-                     " and %s", y_monnam(u.usteed));
+                     TR(" and %s", "和%s"), y_monnam(u.usteed));
         /*
          * uhitm: You knock the gnome back with a powerful blow!
          * mhitu: The red dragon knocks you back with a forceful blow!
@@ -6052,8 +6052,8 @@ mhitm_knockback(
          */
         #ifdef ZHLANG
         pline("%s用%s%s把%s%s%s！",
-              magrbuf, vtense(magrbuf, "knock"), mdefbuf, knockedhow,
-              rn2(2) ? "forceful" : "powerful", rn2(2) ? "blow" : "strike");
+              magrbuf, vtense(magrbuf, TR("knock", "击退")), mdefbuf, knockedhow,
+              rn2(2) ? TR("forceful", "有力") : TR("powerful", "强劲"), rn2(2) ? TR("blow", "一击") : TR("strike", "打击"));
 #else
         pline("%s %s %s %s with a %s %s!",
               magrbuf, vtense(magrbuf, "knock"), mdefbuf, knockedhow,
@@ -6271,10 +6271,10 @@ hmonas(struct monst *mon)
                        != 0) {
                     #ifdef ZHLANG
                     You("%s%s%s。",
-                        (mon->mcansee && haseyes(mon->data)) ? "smile at"
-                                                             : "talk to",
+                        (mon->mcansee && haseyes(mon->data)) ? TR("smile at", "微笑面对")
+                                                             : TR("talk to", "开口搭话"),
                         mon_nam(mon),
-                        (compat == 2) ? "engagingly" : "seductively");
+                        (compat == 2) ? TR("engagingly", "迷人") : TR("seductively", "诱惑"));
 #else
                     You("%s %s %s.",
                         (mon->mcansee && haseyes(mon->data)) ? "smile at"
@@ -6344,7 +6344,7 @@ hmonas(struct monst *mon)
                         || (mattk->aatyp == AT_CLAW && humanoid(mon->data)))
                         verb = "attack";
                     Your(TR("%s %s harmlessly through %s.", "%s%s，却无害地穿过了%s。"),
-                         verb, vtense(verb, "pass"), mon_nam(mon));
+                         verb, vtense(verb, TR("pass", "硬生生")), mon_nam(mon));
                 } else {
                     /* either not a shade or no special silver/blessed damage,
                        other unsolid monsters are immune to AT_TUCH+AD_WRAP */
@@ -6445,9 +6445,9 @@ hmonas(struct monst *mon)
             if (mon == u.ustuck) {
                 #ifdef ZHLANG
                 pline("%s正在被%s%s。", Monnam(mon),
-                      byhand ? "throttled" : "crushed",
+                      byhand ? TR("throttled", "掐住") : TR("crushed", "压碎"),
                       /* extra feedback for non-breather being choked */
-                      unconcerned ? " but doesn't seem concerned" : "");
+                      unconcerned ? TR(" but doesn't seem concerned", "，但它似乎不以为意") : "");
 #else
                 pline("%s is being %s%s.", Monnam(mon),
                       byhand ? "throttled" : "crushed",
@@ -6507,7 +6507,7 @@ hmonas(struct monst *mon)
                             || mon->data->mlet == S_MUMMY)
                         && rn2(5) && !Sick_resistance) {
                         #ifdef ZHLANG
-                        You_feel("感到%s恶心。", (Sick) ? "very " : "");
+                        You_feel("感到%s恶心。", (Sick) ? TR("very ", "非常") : "");
 #else
                         You_feel("%ssick.", (Sick) ? "very " : "");
 #endif
@@ -6640,7 +6640,7 @@ passive(
             else
                 #ifdef ZHLANG
                 You("被%s的%s溅到了！", s_suffix(mon_nam(mon)),
-                    hliquid("acid"));
+                    hliquid(TR("acid", "酸液")));
 #else
                 You("are splashed by %s %s!", s_suffix(mon_nam(mon)),
                     hliquid("acid"));
@@ -6776,8 +6776,8 @@ passive(
                            reaction rather than the hero's escape] */
                         #ifdef ZHLANG
                         pline("%s看起来%s%s。", Monnam(mon),
-                              !rn2(2) ? "" : "rather ",
-                              !rn2(2) ? "numb" : "stupefied");
+                              !rn2(2) ? "" : TR("rather ", "有点"),
+                              !rn2(2) ? TR("numb", "麻木") : TR("stupefied", "发呆"));
 #else
                         pline("%s looks %s%s.", Monnam(mon),
                               !rn2(2) ? "" : "rather ",
@@ -6806,7 +6806,7 @@ passive(
                 } else {
                     #ifdef ZHLANG
                     pline("%s无法自卫。",
-                          Adjmonnam(mon, "blind"));
+                          Adjmonnam(mon, TR("blind", "失明的")));
 #else
                     pline("%s cannot defend itself.",
                           Adjmonnam(mon, "blind"));
@@ -6976,7 +6976,7 @@ passive_obj(
             if (drain_item(obj, TRUE) && carried(obj)
                 && (obj->known || obj->oclass == ARMOR_CLASS)) {
                 #ifdef ZHLANG
-                pline("%s效果减弱了。", Yobjnam2(obj, "seem"));
+                pline("%s效果减弱了。", Yobjnam2(obj, TR("seem", "现在")));
 #else
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
 #endif
@@ -7033,8 +7033,8 @@ that_is_a_mimic(
             otmp_name = (otmp && otmp->otyp != STRANGE_OBJECT)
                         ? simpleonames(otmp) : "strange object";
             Snprintf(fmtbuf, sizeof fmtbuf, "%s %s %s %%s!",
-                     (otmp && is_plural(otmp)) ? "Those" : "That",
-                     otmp_name, otmp ? otense(otmp, "are") : "is");
+                     (otmp && is_plural(otmp)) ? TR("Those", "那些") : TR("That", "那个"),
+                     otmp_name, otmp ? otense(otmp, TR("are", "已经")) : "is");
             if (fakeobj && otmp) {
                 otmp->where = OBJ_FREE; /* object_from_map set to OBJ_FLOOR */
                 dealloc_obj(otmp);
@@ -7046,7 +7046,7 @@ that_is_a_mimic(
             assert(mndx >= LOW_PM && mndx <= HIGH_PM);
             mtmp_name = pmname(&mons[mndx], Mgender(mtmp));
             Snprintf(fmtbuf, sizeof fmtbuf,
-                     "Wait!  That %s is really %%s!", mtmp_name);
+                     TR("Wait!  That %s is really %%s!", "等等！那个%s其实是%%s！"), mtmp_name);
         }
 
         /* cloned Wiz starts out mimicking some other monster and

@@ -334,7 +334,7 @@ livelog_newform(boolean viapoly, int oldgend, int newgend)
             newrank = rank_of(u.ulevel, Role_switch, newgend);
             Sprintf(buf, "%.10s %.30s", genders[flags.female].adj, newrank);
             livelog_printf(LL_MINORAC, TR("%s into %s", "%s，变成了%s"),
-                           viapoly ? "polymorphed" : "transformed",
+                           viapoly ? TR("polymorphed", "变形") : TR("transformed", "已变形"),
                            an(strcmp(newrole, oldrole) ? newrole
                               : strcmp(newrank, oldrank) ? newrank
                                 : buf));
@@ -433,7 +433,7 @@ newman(void)
         } else {
  dead:      /* we come directly here if experience level went to 0 or less */
             urgent_pline(
-                     "Your new form doesn't seem healthy enough to survive.");
+                     TR("Your new form doesn't seem healthy enough to survive.", "你的新形态似乎不够健康，无法存活。"));
             svk.killer.format = KILLED_BY_AN;
             Strcpy(svk.killer.name, TR("unsuccessful polymorph", "失败的变形"));
             done(DIED);
@@ -793,7 +793,7 @@ polymon(int mntmp)
     /* KMH, conduct */
     if (!u.uconduct.polyselfs++)
         livelog_printf(LL_CONDUCT,
-                       "changed form for the first time, becoming %s",
+                       TR("changed form for the first time, becoming %s", "首次改变形态，变成了%s"),
                        an(pmname(&mons[mntmp], flags.female ? FEMALE : MALE)));
 
     /* exercise used to be at the very end but only Wis was affected
@@ -838,11 +838,11 @@ polymon(int mntmp)
 
     Strcpy(ustuckNam, u.ustuck ? Some_Monnam(u.ustuck) : "");
 
-    Strcpy(buf, (u.umonnum != mntmp) ? "" : "new ");
+    Strcpy(buf, (u.umonnum != mntmp) ? "" : TR("new ", "新的"));
     if (dochange) {
         flags.female = !flags.female;
         Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
-                       ? "" : flags.female ? "female " : "male ");
+                       ? "" : flags.female ? TR("female ", "雌性") : TR("male ", "雄性"));
     }
     Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
 #ifdef ZHLANG
@@ -1057,7 +1057,7 @@ polymon(int mntmp)
     } else if (likes_lava(gy.youmonst.data) && u.utrap
                && u.utraptype == TT_LAVA) {
 #ifdef ZHLANG
-        pline_The("%s现在感觉舒适。", hliquid("lava"));
+        pline_The("%s现在感觉舒适。", hliquid(TR("lava", "岩浆")));
 #else
         pline_The("%s now feels soothing.", hliquid("lava"));
 #endif
@@ -1556,7 +1556,7 @@ drop_weapon(int alone)
 
 #ifdef ZHLANG
                 You("发现你必须%s%s%s！", what,
-                    the_your[!!strncmp(which, "corpse", 6)], which);
+                    the_your[!!strncmp(which, "corpse", 6)], which); /* NOTRANS */
 #else
                 You("find you must %s %s %s!", what,
                     the_your[!!strncmp(which, "corpse", 6)], which);
@@ -2046,7 +2046,7 @@ dogaze(void)
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
                     Sprintf(qbuf, TR("Really %s %s?", "真的要%s%s吗？"),
-                            (adtyp == AD_CONF) ? "confuse" : "attack",
+                            (adtyp == AD_CONF) ? TR("confuse", "迷惑") : TR("attack", "攻击"),
                             mon_nam(mtmp));
                     if (y_n(qbuf) != 'y')
                         continue;
@@ -2153,7 +2153,7 @@ dogaze(void)
 #endif
                     svk.killer.format = KILLED_BY;
                     Strcpy(svk.killer.name,
-                           "deliberately meeting Medusa's gaze");
+                           TR("deliberately meeting Medusa's gaze", "故意迎上美杜莎的目光"));
                     done(STONING);
                 }
             }
@@ -2213,7 +2213,7 @@ dohide(void)
 #endif
         else
 #ifdef ZHLANG
-            There("这里没有可以藏身的%s。", hliquid("water"));
+            There("这里没有可以藏身的%s。", hliquid(TR("water", "水")));
 #else
             There("is no %s to hide in here.", hliquid("water"));
 #endif

@@ -1034,13 +1034,13 @@ touch_artifact(struct obj *obj, struct monst *mon)
         if (yours) {
             if (!carried(obj))
 #ifdef ZHLANG
-                pline(TR("%s your grasp!", "%s，从你手中挣脱！"), Tobjnam(obj, "evade"));
+                pline(TR("%s your grasp!", "%s，从你手中挣脱！"), Tobjnam(obj, TR("evade", "滑脱")));
 #else
                 pline("%s your grasp!", Tobjnam(obj, "evade"));
 #endif
             else
 #ifdef ZHLANG
-                pline(TR("%s beyond your control!", "%s，不再受你控制！"), Tobjnam(obj, "are"));
+                pline(TR("%s beyond your control!", "%s，不再受你控制！"), Tobjnam(obj, TR("are", "已经")));
 #else
                 pline("%s beyond your control!", Tobjnam(obj, "are"));
 #endif
@@ -1268,17 +1268,17 @@ dump_artifact_info(winid tmpwin)
     for (m = 1; m <= NROFARTIFACTS; ++m) {
         Snprintf(buf2, sizeof buf2,
                 "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
-                artiexist[m].exists ? "exists;" : "",
-                artiexist[m].found  ? " hero knows;" : "",
+                artiexist[m].exists ? TR("exists;", "存在；") : "",
+                artiexist[m].found  ? TR(" hero knows;", " 玩家已知；") : "",
                 /* .exists and .found have different punctuation because
                    they're expected to be combined with one of these */
-                artiexist[m].gift   ? " gift"   : "",
-                artiexist[m].wish   ? " wish"   : "",
-                artiexist[m].named  ? " named"  : "",
-                artiexist[m].viadip ? " viadip" : "",
-                artiexist[m].lvldef ? " lvldef" : "",
-                artiexist[m].bones  ? " bones"  : "",
-                artiexist[m].rndm   ? " random" : "");
+                artiexist[m].gift   ? TR(" gift", " 赠予")   : "",
+                artiexist[m].wish   ? TR(" wish", " 许愿")   : "",
+                artiexist[m].named  ? TR(" named", " 命名")  : "",
+                artiexist[m].viadip ? TR(" viadip", " 蘸取") : "",
+                artiexist[m].lvldef ? TR(" lvldef", " 关卡定义") : "",
+                artiexist[m].bones  ? TR(" bones", " 遗骨")  : "",
+                artiexist[m].rndm   ? TR(" random", " 随机") : "");
 #if 0   /* 'tmpwin' here is a text window, not a menu */
         if (iflags.menu_tab_sep)
             Sprintf(buf, "  %s\t%s", artiname(m), buf2);
@@ -1517,7 +1517,7 @@ Mb_hit(struct monst *magr, /* attacker */
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
 #ifdef ZHLANG
-            pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
+            pline("%s %s!", hittee, vtense(fakename[fakeidx], TR("resist", "抵抗")));
 #else
             pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
 #endif
@@ -1535,7 +1535,7 @@ Mb_hit(struct monst *magr, /* attacker */
             if (do_confuse)
                 Strcat(buf, TR("confused", "混乱"));
 #ifdef ZHLANG
-            pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
+            pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], TR("are", "已经")), buf,
                   (do_stun && do_confuse) ? '!' : '.');
 #else
             pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
@@ -1598,10 +1598,10 @@ artifact_hit(
 #ifdef ZHLANG
             pline_The(TR("fiery blade %s %s%c", "炽热之刃%s%s%c"),
                       !gs.spec_dbon_applies
-                          ? "hits"
+                          ? TR("hits", "击中")
                           : (mdef->data == &mons[PM_WATER_ELEMENTAL])
-                                ? "vaporizes part of"
-                                : "burns",
+                                ? TR("vaporizes part of", "蒸发了部分")
+                                : TR("burns", "灼烧"),
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
 #else
             pline_The("fiery blade %s %s%c",
@@ -1626,7 +1626,7 @@ artifact_hit(
         if (realizes_damage)
 #ifdef ZHLANG
             pline_The(TR("ice-cold blade %s %s%c", "冰冷之刃%s%s%c"),
-                      !gs.spec_dbon_applies ? "hits" : "freezes", hittee,
+                      !gs.spec_dbon_applies ? TR("hits", "击中") : TR("freezes", "冰封"), hittee,
                       !gs.spec_dbon_applies ? '.' : '!');
 #else
             pline_The("ice-cold blade %s %s%c",
@@ -1644,7 +1644,7 @@ artifact_hit(
         if (realizes_damage)
 #ifdef ZHLANG
             pline_The(TR("massive hammer hits%s %s%c", "巨锤砸中%s%s%c"),
-                      !gs.spec_dbon_applies ? "" : "!  Lightning strikes",
+                      !gs.spec_dbon_applies ? "" : TR("!  Lightning strikes", "！闪电劈下"),
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
 #else
             pline_The("massive hammer hits%s %s%c",
@@ -1666,7 +1666,7 @@ artifact_hit(
             pline_The(TR("imaginary widget hits%s %s%c", "虚幻之物砸中%s%s%c"),
                       !gs.spec_dbon_applies
                           ? ""
-                          : "!  A hail of magic missiles strikes",
+                          : TR("!  A hail of magic missiles strikes", "！一阵魔法飞弹袭来"),
                       hittee, !gs.spec_dbon_applies ? '.' : '!');
 #else
             pline_The("imaginary widget hits%s %s%c",
@@ -1913,8 +1913,8 @@ artifact_hit(
 #ifdef ZHLANG
                 You_feel(TR("an %s drain your %s!", "有%s在吸取你的%s！"),
                          is_art(otmp, ART_STORMBRINGER)
-                            ? "unholy blade"
-                            : "object",
+                            ? TR("unholy blade", "邪恶之刃")
+                            : TR("object", "物体"),
                          life);
 #else
                 You_feel("an %s drain your %s!",
@@ -2035,7 +2035,7 @@ invoke_healing(struct obj *obj)
                      goop covering face), might still be blind
                      due to PermaBlind or eyeless polymorph;
                      vary the message in that situation */
-                  && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
+                  && (HBlinded & ~TIMEOUT) != 0L) ? TR("slightly ", "轻微") : "");
 #else
         You_feel("%sbetter.",
                  (!healamt && !Sick && !Slimed
@@ -2278,10 +2278,10 @@ invoke_banish(struct obj *obj UNUSED)
 #ifdef ZHLANG
         pline(TR("%s %s %s in a cloud of brimstone!", "%s%s%s，消失在一团硫磺云雾中！"),
               nstayed ? ((nvanished > nstayed)
-                         ? "Most of the"
-                         : "Some of the")
-              : "The",
-              subject, vtense(subject, "disappear"));
+                         ? TR("Most of the", "大部分")
+                         : TR("Some of the", "一部分"))
+              : TR("The", "这"),
+              subject, vtense(subject, TR("disappear", "消失")));
 #else
         pline("%s %s %s in a cloud of brimstone!",
               nstayed ? ((nvanished > nstayed)
@@ -2344,7 +2344,7 @@ invoke_blinding_ray(struct obj *obj)
 #ifdef ZHLANG
             pline("%s", ((!Blind && levl[u.ux][u.uy].lit
                           && !levl[u.ux][u.uy].waslit)
-                         ? "It is lit here now."
+                         ? TR("It is lit here now.", "这里现在变亮了。")
                          : nothing_seems_to_happen));
 #else
             pline("%s", ((!Blind && levl[u.ux][u.uy].lit
@@ -2407,7 +2407,7 @@ arti_invoke_cost(struct obj *obj)
             /* the artifact is tired :-) */
 #ifdef ZHLANG
             You_feel(TR("that %s %s ignoring you.", "那个%s%s在无视你。"), the(xname(obj)),
-                     otense(obj, "are"));
+                     otense(obj, TR("are", "已经")));
 #else
             You_feel("that %s %s ignoring you.", the(xname(obj)),
                      otense(obj, "are"));
@@ -2493,7 +2493,7 @@ arti_invoke(struct obj *obj)
             u.uprops[oart->inv_prop].extrinsic ^= W_ARTI;
 #ifdef ZHLANG
             You_feel(TR("that %s %s ignoring you.", "那个%s%s在无视你。"), the(xname(obj)),
-                     otense(obj, "are"));
+                     otense(obj, TR("are", "已经")));
 #else
             You_feel("that %s %s ignoring you.", the(xname(obj)),
                      otense(obj, "are"));
@@ -2543,7 +2543,7 @@ arti_invoke(struct obj *obj)
             if (on)
 #ifdef ZHLANG
                 Your(TR("body takes on a %s transparency...", "身体呈现出%s的透明感……"),
-                     Hallucination ? "normal" : "strange");
+                     Hallucination ? "normal" : "strange"); /* NOTRANS */
 #else
                 Your("body takes on a %s transparency...",
                      Hallucination ? "normal" : "strange");
@@ -2891,7 +2891,7 @@ retouch_object(
            "<obj> evades your grasp|control" message; give an alternate one */
 #ifdef ZHLANG
         You_cant(TR("handle %s%s!", "驾驭%s%s！"), yname(obj),
-                 obj->owornmask ? " anymore" : "");
+                 obj->owornmask ? TR(" anymore", "了") : "");
 #else
         You_cant("handle %s%s!", yname(obj),
                  obj->owornmask ? " anymore" : "");
@@ -2947,7 +2947,7 @@ retouch_object(
                we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
 #ifdef ZHLANG
-                pline(TR("%s to the %s.", "%s，落到了%s上。"), Tobjnam(obj, "fall"),
+                pline(TR("%s to the %s.", "%s，落到了%s上。"), Tobjnam(obj, TR("fall", "坠落")),
                       surface(u.ux, u.uy));
 #else
                 pline("%s to the %s.", Tobjnam(obj, "fall"),

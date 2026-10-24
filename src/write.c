@@ -301,7 +301,7 @@ dowrite(struct obj *pen)
     /* KMH, conduct */
     if (!u.uconduct.literate++)
         livelog_printf(LL_CONDUCT,
-                       "became literate by writing %s", an(typeword));
+                       TR("became literate by writing %s", "通过书写%s学会了识字"), an(typeword));
 
     new_obj = mksobj(i, FALSE, FALSE);
     new_obj->bknown = (paper->bknown && pen->bknown);
@@ -507,7 +507,7 @@ new_book_description(int booktype, char *outbuf)
         if (!strcmpi(descr, *comp_p))
             break;
 
-    Sprintf(outbuf, "%s%s", *comp_p ? "into " : "", descr);
+    Sprintf(outbuf, "%s%s", *comp_p ? TR("into ", "变成了") : "", descr);
     return outbuf;
 }
 

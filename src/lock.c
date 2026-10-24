@@ -562,7 +562,7 @@ pick_lock(
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_pool(u.ux, u.uy) && !Underwater) {
 #ifdef ZHLANG
-            pline_The("%s没有锁。", hliquid("water"));
+            pline_The("%s没有锁。", hliquid(TR("water", "水")));
 #else
             pline_The("%s has no lock.", hliquid("water"));
 #endif
@@ -600,8 +600,8 @@ pick_lock(
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
                     && (c = otmp->tknown ? (otmp->otrapped ? 'y' : 'n')
-                            : ynq(safe_qbuf(qbuf, TR("Check ", "要检查"), " for a trap?",
-                                          otmp, yname, ysimple_name, "this")))
+                            : ynq(safe_qbuf(qbuf, TR("Check ", "要检查"), TR(" for a trap?", "有没有陷阱？"),
+                                          otmp, yname, ysimple_name, TR("this", "这个"))))
                        != 'n') {
                     if (c == 'q')
                         return PICKLOCK_DID_NOTHING; /* c == 'q' */
@@ -620,7 +620,7 @@ pick_lock(
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
                     Sprintf(qsfx, TR(" here; %s %s?", "；要%s%s吗？"),
-                            verb, it ? "it" : "its lock");
+                            verb, it ? "it" : TR("its lock", "它的锁"));
                     (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
                                      ansimpleoname, "a box");
                     otmp->lknown = 1;
@@ -798,8 +798,8 @@ pick_lock(
             }
 
             Sprintf(qbuf, "%s it%s%s?",
-                    (door->doormask & D_LOCKED) ? "Unlock" : "Lock",
-                    autounlock ? " with " : "",
+                    (door->doormask & D_LOCKED) ? TR("Unlock", "解锁") : TR("Lock", "上锁"),
+                    autounlock ? TR(" with ", "用") : "",
                     autounlock ? yname(pick) : "");
             c = ynq(qbuf);
             if (c != 'y')

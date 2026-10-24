@@ -324,7 +324,7 @@ digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
         break;
     case DIGCHECK_FAIL_WATERLEVEL:
 #ifdef ZHLANG
-        pline_The("%s溅起水花，然后平息了。", hliquid("water"));
+        pline_The("%s溅起水花，然后平息了。", hliquid(TR("water", "水")));
 #else
         pline_The("%s splashes and subsides.", hliquid("water"));
 #endif
@@ -396,7 +396,7 @@ dig(void)
             } else {
                 if (u.usteed)
 #ifdef ZHLANG
-                    pline("%s弹了回来，击中了%s！", Yobjnam2(uwep, "bounce"),
+                    pline("%s弹了回来，击中了%s！", Yobjnam2(uwep, TR("bounce", "反")),
                           mon_nam(u.usteed));
 #else
                     pline("%s and %s %s!", Yobjnam2(uwep, "bounce"),
@@ -404,7 +404,7 @@ dig(void)
 #endif
                 else
 #ifdef ZHLANG
-                    pline("好痛！%s弹了回来，击中了你！", Yobjnam2(uwep, "bounce"));
+                    pline("好痛！%s弹了回来，击中了你！", Yobjnam2(uwep, TR("bounce", "反")));
 #else
                     pline("Ouch!  %s and %s you!", Yobjnam2(uwep, "bounce"),
                           otense(uwep, "hit"));
@@ -1028,7 +1028,7 @@ liquid_flow(
     unearth_objs(x, y);
 
     if (fillmsg)
-        pline(fillmsg, hliquid(typ == LAVAPOOL ? TR("lava", "岩浆") : "water"));
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? TR("lava", "岩浆") : TR("water", "水")));
     /* handle object damage before hero damage; affects potential bones */
     if ((objchain = svl.level.objects[x][y]) != 0) {
         if (typ == LAVAPOOL)
@@ -1092,7 +1092,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     } else if (is_pool_or_lava(dig_x, dig_y)) {
 #ifdef ZHLANG
         pline_The("%s猛烈地晃动了片刻，然后平息了。",
-                  hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
+                  hliquid(is_lava(dig_x, dig_y) ? TR("lava", "岩浆") : TR("water", "水")));
 #else
         pline_The("%s sloshes furiously for a moment, then subsides.",
                   hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
@@ -1122,7 +1122,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
         if (ttmp && is_pit(ttmp->ttyp)
             && rn2(2)) {
             pline_The(TR("boulder settles into the %spit.", "巨石陷进了%s坑里。"),
-                      (dig_x != u.ux || dig_y != u.uy) ? "adjacent " : "");
+                      (dig_x != u.ux || dig_y != u.uy) ? TR("adjacent ", "旁边的") : "");
             ttmp->ttyp = PIT; /* crush spikes */
         } else {
             /*
@@ -1461,7 +1461,7 @@ There("is a spider web there!");
 #endif
                 }
                 #ifdef ZHLANG
-pline("%s被缠在了蛛网里。", Yobjnam2(obj, "become"));
+pline("%s被缠在了蛛网里。", Yobjnam2(obj, TR("become", "突然")));
 #else
 pline("%s entangled in the web.", Yobjnam2(obj, "become"));
 #endif
@@ -2575,8 +2575,8 @@ rot_corpse(anything *arg, long timeout)
         if (flags.verbose) {
             char *cname = corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
-            Your(TR("%s%s %s away%c", "你的%s%s%s掉了%c"), obj == uwep ? "wielded " : "", cname,
-                 otense(obj, "rot"), obj == uwep ? '!' : '.');
+            Your(TR("%s%s %s away%c", "你的%s%s%s掉了%c"), obj == uwep ? TR("wielded ", "已装备的") : "", cname,
+                 otense(obj, TR("rot", "腐烂")), obj == uwep ? '!' : '.');
         }
         if (obj->owornmask) {
             remove_worn_item(obj, TRUE);
@@ -2673,10 +2673,10 @@ escape_tomb(void)
             || (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))) {
             You(TR("%s up through the %s.", "你%s，向上穿过%s。"),
                 (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
-                   ? "try to tunnel"
+                   ? TR("try to tunnel", "试图挖穿")
                    : (amorphous(gy.youmonst.data))
-                      ? "ooze"
-                      : "phase",
+                      ? TR("ooze", "像黏液一样渗出")
+                      : TR("phase", "虚化穿行"),
                 surface(u.ux, u.uy));
 
             good = (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))

@@ -183,7 +183,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
         else
             newsym(x, y);
         There(TR("is %s here.", "这里有%s。"),
-              canspotmon(mon) ? a_monnam(mon) : "something hidden");
+              canspotmon(mon) ? a_monnam(mon) : TR("something hidden", "某个隐藏的东西"));
     }
 
     /* Kick attacks by kicking monsters are normal attacks, not special.
@@ -367,7 +367,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
             pline(TR("%s %scatches the gold.", "%s %s抓住了金币。"), Monnam(mtmp),
-                  was_sleeping ? "awakens and " : "");
+                  was_sleeping ? TR("awakens and ", "醒来并 ") : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
         if (mtmp->isshk) {
@@ -487,7 +487,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
                 SetVoice(mtmp, 0, 80, 0);
                 #ifdef ZHLANG
                 verbalize("谢谢小费，%s。",
-                          flags.female ? "lady" : "buddy");
+                          flags.female ? TR("lady", "女士") : TR("buddy", "老兄"));
                 #else
                 verbalize("Thanks for the tip, %s.",
                           flags.female ? "lady" : "buddy");
@@ -628,9 +628,9 @@ really_kick_object(coordxy x, coordxy y)
             if (!trap->tseen)
                 find_trap(trap);
             You_cant(TR("kick %s that's in a %s!", "你无法踢%s，它陷在%s里！"), something,
-                     Hallucination ? "tizzy"
-                         : (trap->ttyp == WEB) ? "web"
-                             : "pit");
+                     Hallucination ? TR("tizzy", "怪地方")
+                         : (trap->ttyp == WEB) ? TR("web", "蛛网")
+                             : TR("pit", "坑"));
             return 1;
         }
         if (trap->ttyp == STATUE_TRAP) {
@@ -1283,7 +1283,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             kick_dumb(x, y);
             return ECMD_TIME;
         }
-        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : "the altar"));
+        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : TR("the altar", "祭坛")));
         altar_wrath(x, y);
         if (!rn2(3)) {
             kick_ouch(x, y, "");
@@ -1297,7 +1297,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
             kick_dumb(x, y);
             return ECMD_TIME;
         }
-        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : "the fountain"));
+        You(TR("kick %s.", "你踢了%s。"), (Blind ? something : TR("the fountain", "喷泉")));
         if (!rn2(3)) {
             kick_ouch(x, y, "");
             return ECMD_TIME;
@@ -1484,7 +1484,7 @@ kick_nondoor(coordxy x, coordxy y, int avrg_attrib)
         } else if (!(gm.maploc->looted & S_LDWASHER) && !rn2(3)
                    && !(svm.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
             /* can't resist... */
-            pline(TR("%s returns!", "%s回来了！"), (Blind ? Something : "The dish washer"));
+            pline(TR("%s returns!", "%s回来了！"), (Blind ? Something : TR("The dish washer", "洗碗机")));
             if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
                         MM_NOMSG | ((gend == 1 || (gend == 2 && rn2(2)))
                                     ? MM_MALE : MM_FEMALE)))
@@ -1753,7 +1753,7 @@ dokick(void)
         /* objects normally can't be removed from water by kicking */
 #ifdef ZHLANG
         You("溅起了一些%s。",
-            hliquid(is_pool(x, y) ? "water" : "lava"));
+            hliquid(is_pool(x, y) ? TR("water", "水") : TR("lava", "岩浆")));
 #else
         You("splash some %s around.",
             hliquid(is_pool(x, y) ? "water" : "lava"));
@@ -1911,18 +1911,18 @@ impact_drop(
         if (missile)
             #ifdef ZHLANG
             pline(TR("From the impact, %sother %s.", "受冲击影响，%s另一个%s。"),
-                  dct == oct ? "the " : dct == 1L ? "一个" : "", what);
+                  dct == oct ? TR("the ", "这个 ") : dct == 1L ? "一个" : "", what);
             #else
             pline("From the impact, %sother %s.",
                   dct == oct ? "the " : dct == 1L ? "an" : "", what);
             #endif
         else if (oct == dct)
-            pline(TR("%s adjacent %s %s.", "%s旁边的%s%s。"), dct == 1L ? "The" : "All the", what,
+            pline(TR("%s adjacent %s %s.", "%s旁边的%s%s。"), dct == 1L ? TR("The", "这") : TR("All the", "所有"), what,
                   gg.gate_str);
         else
             pline(TR("%s adjacent %s %s.", "%s旁边的%s%s。"),
-                  dct == 1L ? "One of the" : "Some of the",
-                  dct == 1L ? "objects falls" : what, gg.gate_str);
+                  dct == 1L ? TR("One of the", "其中一个") : TR("Some of the", "一部分"),
+                  dct == 1L ? TR("objects falls", "物体掉落") : what, gg.gate_str);
     }
 
     if (costly && shkp && price) {
@@ -2258,19 +2258,19 @@ otransit_msg(struct obj *otmp, boolean nodrop, boolean chainthere, long num)
         /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
         if (num) { /* means: other objects are impacted */
-            Sprintf(xbuf, TR(" %s %s object%s", " %s %s物体%s"), otense(otmp, "hit"),
-                    (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");
+            Sprintf(xbuf, TR(" %s %s object%s", " %s %s物体%s"), otense(otmp, TR("hit", "击中")),
+                    (num == 1L) ? TR("another", "另一只") : TR("other", "其它的"), (num > 1L) ? "s" : "");
         } else { /* chain-only msg */
-            Sprintf(xbuf, TR(" %s your chain", " %s你的铁链"), otense(otmp, "rattle"));
+            Sprintf(xbuf, TR(" %s your chain", " %s你的铁链"), otense(otmp, TR("rattle", "摇响")));
         }
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
             Sprintf(eos(xbuf), TR(" and %s %s.", "，%s %s。"),
-                    otense(otmp, "fall"), gg.gate_str);
+                    otense(otmp, TR("fall", "坠落")), gg.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
-        pline("%s %s %s.", obuf, otense(otmp, "fall"), gg.gate_str);
+        pline("%s %s %s.", obuf, otense(otmp, TR("fall", "坠落")), gg.gate_str);
 }
 
 /* migration destination for objects which fall down to next level */

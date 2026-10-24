@@ -217,13 +217,13 @@ rumor_check(void)
          * reveal the values.
          */
         Sprintf(rumor_buf,
-               "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+               TR("T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)", "真实传闻 起始=%06ld (%06lx)，结束=%06ld (%06lx)，大小=%06ld (%06lx)"),
             (long) gt.true_rumor_start, gt.true_rumor_start,
             gt.true_rumor_end, (unsigned long) gt.true_rumor_end,
             gt.true_rumor_size,(unsigned long) gt.true_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
         Sprintf(rumor_buf,
-               "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+               TR("F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)", "虚假传闻 起始=%06ld (%06lx)，结束=%06ld (%06lx)，大小=%06ld (%06lx)"),
             (long) gf.false_rumor_start, gf.false_rumor_start,
             gf.false_rumor_end, (unsigned long) gf.false_rumor_end,
             gf.false_rumor_size, (unsigned long) gf.false_rumor_size);
@@ -341,7 +341,7 @@ others_check(
         }
         if (*line != '#') {
             Sprintf(xbuf, errfmt, fname,
-                    "malformed; first line is not a comment line:");
+                    TR("malformed; first line is not a comment line:", "格式错误；第一行不是注释行："));
             putstr(tmpwin, 0, xbuf);
             /* show the bad line; we don't know whether it has been
                encrypted via xcrypt() so show it both ways */
@@ -359,8 +359,8 @@ others_check(
         *line = '\0';
         if (!dlb_fgets(line, sizeof line, fh) || *line == '\n') {
             Sprintf(xbuf, errfmt, fname,
-                    !*line ? "can't read first non-comment line"
-                           : "first non-comment line is empty");
+                    !*line ? TR("can't read first non-comment line", "无法读取第一条非注释行")
+                           : TR("first non-comment line is empty", "第一条非注释行为空"));
             putstr(tmpwin, 0, xbuf);
             goto closeit;
         }
@@ -692,8 +692,8 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
-                     : "The Oracle meditates for a moment and then intones:");
+                     ? TR("The Oracle scornfully takes all your gold and says:", "神谕者轻蔑地收下你所有的金币，说道：")
+                     : TR("The Oracle meditates for a moment and then intones:", "神谕者沉思片刻，然后吟诵道："));
         else
             putstr(tmpwin, 0, TR("The message reads:", "这段信息写道："));
         putstr(tmpwin, 0, "");
@@ -959,7 +959,7 @@ init_CapMons(void)
         winid tmpwin = create_nhwindow(NHW_TEXT);
 
         putstr(tmpwin, 0,
-              "Capitalized monster type names normally preceded by \"the\":");
+              TR("Capitalized monster type names normally preceded by \"the\":", "大写怪物类型名通常前面加「the」："));
         for (i = 0; i < CapMonSiz - 1; ++i) {
             Sprintf(buf, "  %.77s", CapMons[i]);
             putstr(tmpwin, 0, buf);

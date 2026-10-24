@@ -447,7 +447,7 @@ death_inflicted_by(
         if (!type_is_pname(champtr) && !the_unique_pm(mptr))
             realnm = an(realnm);
         Sprintf(eos(outbuf), TR(" inflicted by %s%s", "，由%s%s造成"),
-                the_unique_pm(mptr) ? "the " : "", realnm);
+                the_unique_pm(mptr) ? TR("the ", "这个 ") : "", realnm);
         if (champtr != mptr)
             Sprintf(eos(outbuf), TR(" imitating %s", "，冒充%s"), an(fakenm));
     }

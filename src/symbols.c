@@ -770,7 +770,7 @@ savedsym_strbuf(strbuf_t *sbuf)
     while (tmp) {
         Sprintf(buf, "%sSYMBOLS=%s:%s\n", /* NOTRANS */
                 (tmp->which_set == ROGUESET) ? "ROGUE" : "",
-                tmp->name, tmp->val);
+                tmp->name, tmp->val); /* NOTRANS */
         strbuf_append(sbuf, buf);
         tmp = tmp->next;
     }
@@ -1037,7 +1037,7 @@ do_symset(boolean rogueflag)
         }
         if (!setcount) {
             There(TR("are no appropriate %s symbol sets available.", "没有可用的合适%s符号集。"),
-                  rogueflag ? "rogue level" : "primary");
+                  rogueflag ? TR("rogue level", "盗贼层") : TR("primary", "主要"));
             return TRUE;
         }
 
@@ -1049,7 +1049,7 @@ do_symset(boolean rogueflag)
         if (!symset_name)
             defindx = any.a_int;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "Default Symbols",
+                 clr, TR("Default Symbols", "默认符号"),
                  (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
 
@@ -1080,7 +1080,7 @@ do_symset(boolean rogueflag)
             }
         }
         Sprintf(buf, TR("Select %ssymbol set:", "选择%s符号集："),
-                rogueflag ? "rogue level " : "");
+                rogueflag ? TR("rogue level ", "盗贼层的") : "");
         end_menu(tmpwin, buf);
         n = select_menu(tmpwin, PICK_ONE, &symset_pick);
         if (n > 0) {

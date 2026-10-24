@@ -1490,11 +1490,11 @@ makemon(
             if (what) {
                 set_msg_xy(mtmp->mx, mtmp->my);
                 Norep("%s%s %s%s%c", what,
-                      exclaim ? " suddenly" : "",
+                      exclaim ? TR(" suddenly", "突然") : "",
                       /* 'what' might be "gold pieces" so need plural verb */
-                      vtense(what, "appear"),
-                      next2u(x, y) ? " next to you"
-                      : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
+                      vtense(what, TR("appear", "出现")),
+                      next2u(x, y) ? TR(" next to you", "在你身旁")
+                      : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? TR(" close by", "在附近")
                         : "",
                       exclaim ? '!' : '.');
             }
@@ -2142,11 +2142,11 @@ grow_up(struct monst *mtmp, struct monst *victim)
              */
             Sprintf(buf, "%s%s",
                     /* deal with female gnome becoming a gnome lord */
-                    (mtmp->female && !fem) ? "male "
+                    (mtmp->female && !fem) ? TR("male ", "雄性")
                         /* or a male gnome becoming a gnome lady
                            (can't happen with 3.6.0 mons[], but perhaps
                            slightly less sexist if prepared for it...) */
-                      : (fem && !mtmp->female) ? "female " : "",
+                      : (fem && !mtmp->female) ? TR("female ", "雌性") : "",
                     pmname(ptr, fem));
             pline_mon(mtmp, "%s %s %s.", YMonnam(mtmp),
                       (fem != mtmp->female) ? "changes into"

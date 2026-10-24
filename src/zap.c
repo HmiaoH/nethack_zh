@@ -468,7 +468,7 @@ pline("A huge hole opens up...");
                         mimic_hit_msg(mtmp, otyp);
                 } else
                     pline(TR("%s looks%s better.", "%s看起来%s好多了。"), Monnam(mtmp),
-                          otyp == SPE_EXTRA_HEALING ? " much" : "");
+                          otyp == SPE_EXTRA_HEALING ? TR(" much", "精神") : "");
             }
             if (mtmp->mtame && Role_if(PM_HEALER) && (delta > 0)) {
                 more_experienced(min(delta, healamt), 0);
@@ -659,7 +659,7 @@ probe_monster(struct monst *mtmp)
                                   (char *) 0);
     } else {
         pline(TR("%s is not carrying anything%s.", "%s没有携带任何东西%s。"), noit_Monnam(mtmp),
-              engulfing_u(mtmp) ? " besides you" : "");
+              engulfing_u(mtmp) ? TR(" besides you", "（除了你）") : "");
     }
 }
 
@@ -1252,7 +1252,7 @@ unturn_dead(struct monst *mon)
             }
             if (youseeit)
                 pline(TR("%s%s suddenly %s%s%s!", "%s%s突然%s%s%s！"), owner, corpse,
-                      nonliving(mtmp2->data) ? "reanimates" : "comes alive",
+                      nonliving(mtmp2->data) ? TR("reanimates", "重新活动起来") : TR("comes alive", "活了过来"),
                       different_type ? " as " : "",
                       different_type ? an(mon_pmname(mtmp2)) : "");
             else if (canseemon(mtmp2))
@@ -1275,7 +1275,7 @@ unturn_you(void)
 
     if (is_undead(gy.youmonst.data)) {
         #ifdef ZHLANG
-You_feel("感到恐惧，%s被震慑。", Stunned ? "even more " : "");
+You_feel("感到恐惧，%s被震慑。", Stunned ? TR("even more ", "更加") : "");
 #else
 You_feel("frightened and %sstunned.", Stunned ? "even more " : "");
 #endif
@@ -2109,7 +2109,7 @@ stone_to_flesh_obj(struct obj *obj) /* nonnull */
                         delobj(obj);
                     if (cansee(mon->mx, mon->my))
                         pline_The(TR("figurine %sanimates!", "小雕像%s活了过来！"),
-                                  golem_xform ? "turns to flesh and " : "");
+                                  golem_xform ? TR("turns to flesh and ", "化为血肉然后") : "");
                 }
             }
             if (mon) {
@@ -2324,7 +2324,7 @@ You("你不确定%s里面是装了%s还是它的尸体。",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
                            picks a form which can't leave a corpse */
-                        an(Hallucination ? rndmonnam((char *) 0) : "cat"));
+                        an(Hallucination ? rndmonnam((char *) 0) : TR("cat", "猫")));
 #else
 You("aren't sure whether %s has %s or its corpse inside.",
                         the(xname(obj)),
@@ -3062,8 +3062,8 @@ You("fall asleep!");
     case SPE_FINGER_OF_DEATH:
         if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
             pline((obj->otyp == WAN_DEATH)
-                      ? "The wand shoots an apparently harmless beam at you."
-                      : "You seem no deader than before.");
+                      ? TR("The wand shoots an apparently harmless beam at you.", "魔杖向你射出一道看似无害的光束。")
+                      : TR("You seem no deader than before.", "你似乎并没有比以前更接近死亡。"));
             break;
         }
         learn_it = TRUE;
@@ -3096,7 +3096,7 @@ urgent_pline("You die.");
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
                (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
         #ifdef ZHLANG
-You_feel("%s好多了。", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
+You_feel("%s好多了。", obj->otyp == SPE_EXTRA_HEALING ? TR("much ", "许多") : "");
 #else
 You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
 #endif
@@ -3240,7 +3240,7 @@ pline("Ow, that light hurts%c", (dmg > 2 || u.mh <= 5) ? '!' : '.');
         how = (obj->oclass == SPBOOK_CLASS) ? "spell of light"
               : (!obj->oartifact) ? ansimpleoname(obj)
                 : bare_artifactname(obj);
-        Sprintf(buf, TR("%s %sself with %s", "%s，%s用%s击中了自己"), ordinary ? "zapped" : "blasted",
+        Sprintf(buf, TR("%s %sself with %s", "%s，%s用%s击中了自己"), ordinary ? TR("zapped", "被电击") : TR("blasted", "被轰击"),
                 uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
         losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
@@ -3379,7 +3379,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
                     pline(writing_vanishes, your);
                 else /* note: "dark" rather than "heavy" is intentional... */
                     #ifdef ZHLANG
-You_feel("头很%s。", Hallucination ? "dark" : "light");
+You_feel("头很%s。", Hallucination ? TR("dark", "沉") : TR("light", "轻"));
 #else
 You_feel("%s headed.", Hallucination ? "dark" : "light");
 #endif
@@ -3554,7 +3554,7 @@ pline("The trapdoor beneath you shatters.");
                 ttmp->ttyp = TRAPDOOR;
                 if (Blind || !ttmp->tseen) {
                     pline(TR("Some %s swirls beneath you.", "一些%s在你脚下卷动。"),
-                          is_ice(x, y) ? "frost" : "dust");
+                          is_ice(x, y) ? TR("frost", "霜") : TR("dust", "尘土"));
                 } else {
                     ttmp->tseen = 1;
                     newsym(x, y);
@@ -3586,8 +3586,8 @@ pline("A trapdoor appears beneath you.");
                     pline1(nothing_happens);
                 else
                     pline(TR("Blood %ss %s your %s.", "血%ss，%s你的%s。"),
-                          is_lava(u.ux, u.uy) ? "boil" : "pool",
-                          Levitation ? "beneath" : "at",
+                          is_lava(u.ux, u.uy) ? "boil" : "pool", /* NOTRANS */
+                          Levitation ? TR("beneath", "下方") : "at",
                           makeplural(body_part(FOOT)));
             }
         }
@@ -3889,8 +3889,8 @@ zap_map(
                 if (e->engr_type == ENGRAVE) {
                     /* only affects things in stone */
                     pline_The(Hallucination
-                                  ? "floor runs like butter!"
-                                  : "edges on the floor get smoother.");
+                                  ? TR("floor runs like butter!", "地板像黄油一样流动！")
+                                  : TR("edges on the floor get smoother.", "地板边缘变得更平滑了。"));
                     wipe_engr_at(x, y, d(2, 4), TRUE);
                 }
                 break;
@@ -4182,8 +4182,8 @@ bhit(
             if (is_pool(x, y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
-                    pline("%s %s%s.", Yname2(obj), otense(obj, "skip"),
-                          skipcount ? " again" : "");
+                    pline("%s %s%s.", Yname2(obj), otense(obj, TR("skip", "掠过水面")),
+                          skipcount ? TR(" again", "，又一次") : "");
                 else
                     You_hear(TR("%s skip.", "你听到%s掠过水面。"), yname(obj));
                 skipcount++;
@@ -4198,7 +4198,7 @@ bhit(
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
                 if (!Blind && canspotmon(mtmp))
-                    pline(TR("%s %s over %s.", "%s %s掠过%s上方。"), Yname2(obj), otense(obj, "pass"),
+                    pline(TR("%s %s over %s.", "%s %s掠过%s上方。"), Yname2(obj), otense(obj, TR("pass", "硬生生")),
                           mon_nam(mtmp));
                 mtmp = (struct monst *) 0;
             }
@@ -4766,11 +4766,11 @@ zhitu(
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The(TR("%s doesn't hurt.", "%s伤不到你。"), hliquid("acid"));
+            pline_The(TR("%s doesn't hurt.", "%s伤不到你。"), hliquid(TR("acid", "酸液")));
             monstseesu(M_SEEN_ACID);
             dam = 0;
         } else {
-            pline_The(TR("%s burns!", "%s灼烧起来！"), hliquid("acid"));
+            pline_The(TR("%s burns!", "%s灼烧起来！"), hliquid(TR("acid", "酸液")));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
             monstunseesu(M_SEEN_ACID);
@@ -5142,8 +5142,8 @@ dobuzz(
                         if (canseemon(mon)) {
                             hit(flash_str(fltyp, FALSE), mon, ".");
                             pline(TR("%s absorbs the deadly %s!", "%s吸收了致命的%s！"), Monnam(mon),
-                                  type == ZT_BREATH(ZT_DEATH) ? "blast"
-                                                              : "ray");
+                                  type == ZT_BREATH(ZT_DEATH) ? TR("blast", "冲击波")
+                                                              : "ray"); /* NOTRANS */
                             pline(TR("It seems even stronger than before.", "它似乎比之前更强了。"));
                         }
                         break; /* Out of while loop */
@@ -5485,7 +5485,7 @@ zap_over_floor(
                 Soundeffect(se_soft_crackling, 100);
                 if (see_it)
                     pline_The(TR("%s freezes for a moment.", "%s凝固了片刻。"),
-                              hliquid(lavawall ? "lava" : "water"));
+                              hliquid(lavawall ? TR("lava", "岩浆") : TR("water", "水")));
                 else
                     You_hear(TR("a soft crackling.", "你听到轻微的噼啪声。"));
                 rangemod -= 1000; /* stop */
@@ -5520,11 +5520,11 @@ zap_over_floor(
                 if (see_it) {
                     if (lava)
                         Norep(TR("The %s cools and solidifies.", "%s冷却并凝固了。"),
-                              hliquid("lava"));
+                              hliquid(TR("lava", "岩浆")));
                     else if (moat)
                         Norep(TR("The %s is bridged with ice!", "%s上架起了一座冰桥！"), buf);
                     else
-                        Norep(TR("The %s freezes.", "%s结冰了。"), hliquid("water"));
+                        Norep(TR("The %s freezes.", "%s结冰了。"), hliquid(TR("water", "水")));
                     newsym(x, y);
                 } else if (!lava) {
                     You_hear(TR("a crackling sound.", "你听到噼啪声。"));
@@ -5591,13 +5591,13 @@ zap_over_floor(
                 if (see_it)
                     Norep(TR("The %s %s somewhat but remain intact.", "%s %s了一些，但仍保持完整。"),
                           defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode" : "melt");
+                          (damgtype == ZT_ACID) ? TR("corrode", "腐蚀") : TR("melt", "熔化"));
                 /* but nothing actually happens... */
             } else {
                 rangemod -= 3;
                 if (see_it)
                     Norep(TR("The %s %s.", "%s %s了。"), defsyms[S_bars].explanation,
-                          (damgtype == ZT_ACID) ? "corrode away" : "melt");
+                          (damgtype == ZT_ACID) ? TR("corrode away", "腐蚀掉") : TR("melt", "熔化"));
                 dissolve_bars(x, y);
                 if (*in_rooms(x, y, SHOPBASE)) {
                     add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
@@ -5642,7 +5642,7 @@ zap_over_floor(
         newsym(x, y);
         if (see_it)
             pline(TR("%s %s reveals a secret door.", "%s %s显出了一扇暗门。"),
-                  yourzap ? "Your" : "The", zapverb);
+                  yourzap ? TR("Your", "你") : TR("The", "这"), zapverb);
         else if (Is_rogue_level(&u.uz))
             draft_message(FALSE); /* "You feel a draft." (open doorway) */
     }
@@ -5695,7 +5695,7 @@ zap_over_floor(
                 if (exploding_wand_typ)
                     pline_The(TR("door remains intact.", "门完好无损。"));
                 else
-                    pline_The(TR("door absorbs %s %s!", "门吸收了%s %s！"), yourzap ? "your" : "the",
+                    pline_The(TR("door absorbs %s %s!", "门吸收了%s %s！"), yourzap ? TR("your", "你的") : TR("the", "那个"),
                               zapverb);
             } else
                 You_feel(TR("vibrations.", "你感到一阵震动。"));
@@ -5728,7 +5728,7 @@ zap_over_floor(
     if (OBJ_AT(x, y) && damgtype == ZT_FIRE)
         if (burn_floor_objects(x, y, FALSE, type > 0) && couldsee(x, y)) {
             newsym(x, y);
-            You(TR("%s of smoke.", "你%s烟。"), !Blind ? "see a puff" : "smell a whiff");
+            You(TR("%s of smoke.", "你%s烟。"), !Blind ? TR("see a puff", "看到一缕") : TR("smell a whiff", "闻到一股"));
         }
     if (!ignoremon && (mon = m_at(x, y)) != 0)
         wakeup(mon, (type >= 0) ? TRUE : FALSE);
@@ -6070,7 +6070,7 @@ maybe_destroy_item(
             if (u_carry ? !Blind : vis) {
                 pline(TR("%s glows a strange %s, but remains intact.", "%s散发出奇异的%s光芒，但依然完好。"),
                       The(u_carry ? xname(obj) : distant_name(obj, xname)),
-                      hcolor("dark red"));
+                      hcolor(TR("dark red", "暗红色")));
             }
             break;
         }
@@ -6446,7 +6446,7 @@ wishcmdassist(int triesleft)
             (triesleft >= 0 && triesleft < SIZE(cardinals))
                ? cardinals[triesleft]
                : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "",
+            (triesleft < MAXWISHTRY) ? TR(" more", "更多") : "",
             plur(triesleft));
     putstr(win, 0, buf);
     putstr(win, 0, retry_too);
@@ -6628,10 +6628,10 @@ makewish(void)
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
         livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       "made %s first wish - %s", uhis(), wish);
+                       TR("made %s first wish - %s", "%s的首次许愿——%s"), uhis(), wish);
     else if (!oldwisharti && u.uconduct.wisharti)
         livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       "made %s first artifact wish - %s", uhis(), wish);
+                       TR("made %s first artifact wish - %s", "%s的首次神器许愿——%s"), uhis(), wish);
     else
         livelog_printf((LL_WISH | maybe_LL_arti), TR("wished for %s", "许愿得到了%s"), wish);
     /* TODO? maybe generate a second event describing what was received since

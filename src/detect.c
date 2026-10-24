@@ -2028,7 +2028,7 @@ findit(void)
         if (*buf) /* "doors, corrs, and traps" or "{doors|corrs} and traps"
                    * or "..., traps ..." */
             Strcat(buf, (k == 3 && !found.num_mons) ? TR(", and ", "，以及")
-                        : (k == 2) ? " and " : ", ");
+                        : (k == 2) ? TR(" and ", "且") : ", ");
         if (found.num_traps > 1)
             Sprintf(eos(buf), TR("%d traps", "%d个陷阱"), found.num_traps);
         else
@@ -2043,7 +2043,7 @@ findit(void)
 
     if (found.num_mons) {
         if (*buf)
-            Strcat(buf, (k > 2) ? TR(", and ", "，以及") : " and ");
+            Strcat(buf, (k > 2) ? TR(", and ", "，以及") : TR(" and ", "且"));
         if (found.num_mons > 1)
             Sprintf(eos(buf), TR("%d hidden monsters", "%d只隐藏的怪物"), found.num_mons);
         else
@@ -2060,10 +2060,10 @@ findit(void)
     if (found.num_invis) {
         if (found.num_invis > 1)
             Sprintf(buf, TR("%d%s unseen monsters", "%d只%s看不见的怪物"), found.num_invis,
-                    found.num_kept_invis ? " other" : "");
+                    found.num_kept_invis ? TR(" other", "其他") : "");
         else
             Sprintf(buf, TR("%s unseen monster", "%s看不见的怪物"),
-                    found.num_kept_invis ? "another" : "an");
+                    found.num_kept_invis ? TR("another", "另一只") : "an");
 #ifdef ZHLANG
         You("探测到%s！", buf);
 #else
@@ -2076,7 +2076,7 @@ findit(void)
         /* at least 1 "remembered, unseen monster" marker has been removed */
         if (!num)
             You_feel(TR("%sless paranoid.", "你感到%s没那么疑神疑鬼了。"),
-                     found.num_kept_invis ? "somewhat " : "");
+                     found.num_kept_invis ? TR("somewhat ", "稍微") : "");
         num += found.num_cleared_invis;
     }
     /* note: num_kept_invis is not included in the final result */
@@ -2196,7 +2196,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
             if (via_warning && found_something) {
                 set_msg_xy(x, y);
                 Your(TR("danger sense causes you to take a second %s.", "你的危险直觉让你再%s一遍。"),
-                     Blind ? "to check nearby" : "look close by");
+                     Blind ? TR("to check nearby", "仔细查看附近") : TR("look close by", "凑近看看"));
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
             mtmp->mundetected = 0;
@@ -2629,11 +2629,11 @@ reveal_terrain(
             Strcpy(buf, TR("known terrain", "已知地形"));
             if (keep_traps)
                 Sprintf(eos(buf), TR("%s traps", "%s陷阱"),
-                        (keep_objs || keep_mons) ? "," : " and");
+                        (keep_objs || keep_mons) ? "," : TR(" and", " 和"));
             if (keep_objs)
                 Sprintf(eos(buf), TR("%s%s objects", "%s%s物品"),
                         (keep_traps || keep_mons) ? "," : "",
-                        keep_mons ? "" : " and");
+                        keep_mons ? "" : TR(" and", " 和"));
             if (keep_mons)
                 Sprintf(eos(buf), TR("%s and monsters", "%s及怪物"),
                         (keep_traps || keep_objs) ? "," : "");

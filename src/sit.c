@@ -143,7 +143,7 @@ throne_sit_effect(void)
                 SetVoice((struct monst *) 0, 0, 80, voice_throne);
                 #ifdef ZHLANG
                 verbalize("你的听众已被召来，%s！",
-                          flags.female ? "Dame" : "Sire");
+                          flags.female ? TR("Dame", "女士") : TR("Sire", "陛下"));
                 #else
                 verbalize("Thine audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
@@ -162,7 +162,7 @@ throne_sit_effect(void)
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             #ifdef ZHLANG
             verbalize("遵照你的命令，%s...",
-                      flags.female ? "Dame" : "Sire");
+                      flags.female ? TR("Dame", "女士") : TR("Sire", "陛下"));
             #else
             verbalize("By thine Imperious order, %s...",
                       flags.female ? "Dame" : "Sire");
@@ -178,7 +178,7 @@ throne_sit_effect(void)
             #endif
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(
-                 "A curse upon thee for sitting upon this most holy throne!");
+                 TR("A curse upon thee for sitting upon this most holy throne!", "因坐上这至高无上的王座，诅咒降临于你！"));
             if (Luck > 0) {
                 make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
                 change_luck((Luck > 1) ? -rnd(2) : -1);
@@ -720,7 +720,7 @@ dosit(void)
             } else if (u.utraptype == TT_LAVA) {
                 /* Must have fire resistance or they'd be dead already */
                 #ifdef ZHLANG
-                You("坐在%s中！", hliquid("lava"));
+                You("坐在%s中！", hliquid(TR("lava", "岩浆")));
                 #else
                 You("sit in the %s!", hliquid("lava"));
                 #endif
@@ -766,7 +766,7 @@ dosit(void)
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {
  in_water:
         #ifdef ZHLANG
-        You("坐在%s中。", hliquid("water"));
+        You("坐在%s中。", hliquid(TR("water", "水")));
         #else
         You("sit in the %s.", hliquid("water"));
         #endif
@@ -790,7 +790,7 @@ dosit(void)
 #endif
         #ifdef ZHLANG
         Your("%s弄湿了。",
-             humanoid(gy.youmonst.data) ? "rump" : "underside");
+             humanoid(gy.youmonst.data) ? TR("rump", "臀部") : TR("underside", "底部"));
         #else
         Your("%s gets wet.",
              humanoid(gy.youmonst.data) ? "rump" : "underside");
@@ -818,14 +818,14 @@ dosit(void)
         burn_away_slime();
         if (likes_lava(gy.youmonst.data)) {
     #ifdef ZHLANG
-        pline_The("%s感觉温暖。", hliquid("lava"));
+        pline_The("%s感觉温暖。", hliquid(TR("lava", "岩浆")));
 #else
         pline_The("%s feels warm.", hliquid("lava"));
 #endif
             return ECMD_TIME;
         }
 #ifdef ZHLANG
-        pline_The("%s烧伤了你！", hliquid("lava"));
+        pline_The("%s烧伤了你！", hliquid(TR("lava", "岩浆")));
 #else
         pline_The("%s burns you!", hliquid("lava"));
 #endif

@@ -1044,7 +1044,7 @@ addinv_core2(struct obj *obj)
            scrolls */
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by deciphering a scroll label");
+                           TR("became literate by deciphering a scroll label", "通过辨认卷轴标签而学会了识字"));
     }
 }
 
@@ -2120,7 +2120,7 @@ getobj(
             if (cntgiven && cnt <= 0L) {
                 if (cnt < 0L)
                     pline_The(TR("LRS would be very interested to know", "LRS会非常有兴趣知道")
-                              " you have that much.");
+                              TR(" you have that much.", "你有那么多钱。"));
                 return (struct obj *) 0;
             }
         }
@@ -2138,7 +2138,7 @@ getobj(
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
                 if (cnt > otmp->quan)
                     You(TR("only have %ld%s%s.", "只有%ld%s%s。"), otmp->quan,
-                        (!coins && otmp->quan > 1L) ? " and " : "",
+                        (!coins && otmp->quan > 1L) ? TR(" and ", "且") : "",
                         (!coins && otmp->quan > 1L) ? only_one : "");
                 else
                     You("%s.", only_one);
@@ -2216,7 +2216,7 @@ silly_thing(const char *word,
     }
     if (s1)
         pline(TR("Use the '%s' command to %s %s%s.", "使用「%s」命令来%s%s%s。"), s1, s2,
-              !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
+              !(is_plural(otmp) || pair_of(otmp)) ? TR("that", "那个") : TR("those", "那些"), s3);
     else
 #endif
     /* see comment about Amulet of Yendor in objtyp_is_callable(do_name.c);
@@ -2692,7 +2692,7 @@ reroll_menu(void)
 
     any.a_char = 'n';
     add_menu(win, &nul_glyphinfo, &any, flags.lootabc ? 0 : 'p', 0,
-             ATR_NONE, NO_COLOR, "start the game with this character",
+             ATR_NONE, NO_COLOR, TR("start the game with this character", "以此角色开始游戏"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'y';
     Strcpy(buf, TR("reroll another character", "重新随机另一个角色"));
@@ -2737,7 +2737,7 @@ reroll_menu(void)
         /* user closed the menu without selecting; unclear what their choice
            is here so ask again; but (e.g. for hangup handling) stop asking if
            the user cancels out again */
-        option = y_n("Reroll this character?");
+        option = y_n(TR("Reroll this character?", "重新随机这个角色？"));
     }
     destroy_nhwindow(win);
 
@@ -2795,7 +2795,7 @@ menu_identify(int id_limit)
 
     while (id_limit) {
         Sprintf(buf, TR("What would you like to identify %s?", "你想%s鉴定什么？"),
-                first ? "first" : "next");
+                first ? TR("first", "先") : TR("next", "再"));
         n = query_objlist(buf, &gi.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
                                            | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
@@ -2892,7 +2892,7 @@ identify_pack(
 
     if (!unid_cnt) {
         You(TR("have already identified %s of your possessions.", "已经鉴定了你物品中的%s。"),
-            !learning_id ? "all" : "the rest");
+            !learning_id ? TR("all", "全部") : TR("the rest", "其余部分"));
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
         /* TODO:  use fully_identify_obj and cornline/menu/whatever here */
@@ -3013,7 +3013,7 @@ doperminv(void)
 
     } else if (!iflags.perm_invent) {
         pline(
-     "Persistent inventory ('perm_invent' option) is not presently enabled.");
+     TR("Persistent inventory ('perm_invent' option) is not presently enabled.", "持久化物品栏（「perm_invent」选项）目前尚未启用。"));
 
     } else if (!gi.invent) {
         /* [should this be left for the interface to decide?] */
@@ -3058,7 +3058,7 @@ prinv(const char *prefix, struct obj *obj, long quan)
     totalbuf[0] = '\0';
     if (total_of)
         Snprintf(totalbuf, sizeof totalbuf,
-                 " (%ld in total).", obj->quan);
+                 TR(" (%ld in total).", "（共 %ld）。"), obj->quan);
     pline("%s%s%s%s", prefix, *prefix ? " " : "",
           xprname(obj, (char *) 0, obj_to_let(obj), !total_of, 0L, quan),
           flags.verbose ? totalbuf : "");
@@ -3407,17 +3407,17 @@ display_pickinv(
         Sprintf(prompt, TR("Debug Identify", "调试鉴定")); /* 'title' rather than 'prompt' */
         if (unid_cnt)
             Sprintf(eos(prompt),
-                    " -- unidentified or partially identified item%s",
+                    TR(" -- unidentified or partially identified item%s", "——未鉴定或仅部分鉴定的物品%s"),
                     plur(unid_cnt));
         add_menu_str(win, prompt);
         if (!unid_cnt) {
             add_menu_str(win,
-                         "(all items are permanently identified already)");
+                         TR("(all items are permanently identified already)", "（所有物品都已被永久鉴定）"));
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
             Sprintf(prompt, TR("select %s to permanently identify", "选择%s以永久鉴定"),
-                    (unid_cnt == 1) ? "it": "any or all of them");
+                    (unid_cnt == 1) ? "it": TR("any or all of them", "它们中的任意或全部"));
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
@@ -3492,7 +3492,7 @@ display_pickinv(
                 /* like doname() below, makeplural() returns an obuf[] */
                 formattedobj = makeplural(body_part(HAND));
                 Sprintf(barehands, TR("%s %s (no weapon)", "%s%s（无武器）"),
-                        uarmg ? "gloved" : "bare", formattedobj);
+                        uarmg ? TR("gloved", "戴着手套") : TR("bare", "裸露"), formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
             } else {
@@ -3932,7 +3932,7 @@ dounpaid(
     if (count > 0) {
         putstr(win, 0, "");
         putstr(win, 0,
-               xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
+               xprname((struct obj *) 0, TR("Total:", "合计："), '*', FALSE, totcost, 0L));
     }
 
     /* an unpaid item can be on the floor if dropped on the shop boundary
@@ -4009,7 +4009,8 @@ int
 dotypeinv(void)
 {
     static const char
-        prompt[] = "What type of object do you want an inventory of?";
+        prompt[] = TR("What type of object do you want an inventory of?",
+                      "你想列出哪一类物品的清单？");
     char c = '\0';
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
@@ -4127,7 +4128,7 @@ dotypeinv(void)
             (void) doinvbill(1);
         else
             pline(TR("No used-up objects%s.", "没有已用掉的物品%s。"),
-                  any_unpaid ? " on your shopping bill" : "");
+                  any_unpaid ? TR(" on your shopping bill", "（记在你的购物账单上）") : "");
         goto doI_done;
     }
     if (c == 'u' || (c == 'U' && any_unpaid && !ucnt)) {
@@ -4256,7 +4257,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
         Sprintf(altbuf, TR("%saltar to %s (%s)", "%s祭坛，供奉%s（%s）"),
-                (lev->altarmask & AM_SANCTUM) ? "high " : "",
+                (lev->altarmask & AM_SANCTUM) ? TR("high ", "高级") : "",
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
@@ -4323,7 +4324,7 @@ look_here(
         Sprintf(fbuf, TR("Contents of %s %s", "%s%s里的物品"), s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
-        You(TR("%s to %s what is lying in %s.", "%s%s%s里有什么。"), Blind ? "try" : "look around",
+        You(TR("%s to %s what is lying in %s.", "%s%s%s里有什么。"), Blind ? TR("try", "试着") : TR("look around", "环顾"),
             verb, &fbuf[12]);
         otmp = mtmp->minvent;
         if (otmp) {
@@ -4353,14 +4354,14 @@ look_here(
         regbuf[0] = '\0';
         if ((reg = visible_region_at(u.ux, u.uy)) != 0)
             Sprintf(regbuf, TR("a %s cloud", "一团%s云"),
-                    reg_damg(reg) ? "poison gas" : "vapor");
+                    reg_damg(reg) ? TR("poison gas", "毒气") : TR("vapor", "雾气"));
         if ((trap = t_at(u.ux, u.uy)) != 0 && !trap->tseen)
             trap = (struct trap *) NULL;
 
         if (reg || trap)
             There(TR("is %s%s%s here.", "这里有%s%s%s。"),
                   reg ? regbuf : "",
-                  (reg && trap) ? " and " : "",
+                  (reg && trap) ? TR(" and ", "且") : "",
                   trap ? an(trapname(trap->ttyp, FALSE)) : "");
     }
 
@@ -4466,23 +4467,23 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There(TR("is %s object here.", "这里有一个%s物品。"), picked_some ? "another" : "an");
+            There(TR("is %s object here.", "这里有一个%s物品。"), picked_some ? TR("another", "另一只") : "an");
         else
             There(TR("are %s%s objects here.", "这里有%s%s物品。"),
-                  (obj_cnt == 2) ? "two"
-                  : (obj_cnt < 5) ? "a few"
-                    : (obj_cnt < 10) ? "several"
-                      : "many",
-                  picked_some ? " more" : "");
+                  (obj_cnt == 2) ? TR("two", "两个")
+                  : (obj_cnt < 5) ? TR("a few", "几个")
+                    : (obj_cnt < 10) ? TR("several", "好几个")
+                      : TR("many", "许多个"),
+                  picked_some ? TR(" more", "更多") : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 pline("%s %s%s.",
-                      (obj_cnt > 1) ? "Including"
-                      : (otmp->quan > 1L) ? "They're"
+                      (obj_cnt > 1) ? TR("Including", "其中包括")
+                      : (otmp->quan > 1L) ? TR("They're", "它们是")
                         : "It's",
                       corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                       poly_when_stoned(gy.youmonst.data) ? ""
-                      : ", unfortunately");
+                      : TR(", unfortunately", "，真不幸"));
                 feel_cockatrice(otmp, FALSE);
                 break;
             }
@@ -4746,9 +4747,9 @@ doprgold(void)
         }
         if (hmoney) {
             Sprintf(eos(buf),
-                    ", %s you have %ld %s stashed away in your pack",
-                    umoney ? "and" : "but", hmoney,
-                    umoney ? "more" : currency(hmoney));
+                    TR(", %s you have %ld %s stashed away in your pack", "，%s你包里还藏着 %ld %s"),
+                    umoney ? TR("and", "而且") : TR("but", "但"), hmoney,
+                    umoney ? TR("more", "更高") : currency(hmoney));
         }
         pline("%s.", buf);
     } else {
@@ -5018,7 +5019,7 @@ static NEARDATA const char *names[] = {
     "食物", "药水", "卷轴", "魔法书", "魔杖", "金币",
     "宝石/石头", "巨石/雕像", "铁球", "铁链", "毒液"
 #else
-    0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
+    "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
 #endif
@@ -5219,7 +5220,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     if (!gi.invent || (gi.invent->oclass == COIN_CLASS
                       && gi.invent->invlet == GOLD_SYM && !gi.invent->nobj)) {
         You(TR("aren't carrying anything %s.", "没有携带任何%s东西。"),
-            !gi.invent ? "to adjust" : "adjustable");
+            !gi.invent ? TR("to adjust", "可以调整的") : TR("adjustable", "可调整的"));
         return ECMD_OK;
     }
 
@@ -5371,7 +5372,7 @@ doorganize_core(struct obj *obj)
     else /* note: splitting->quan is the amount being left in original slot */
         Sprintf(qbuf, TR("Split %ld", "拆分%ld"), obj->quan);
     Sprintf(eos(qbuf), TR(" to what [%s]%s?", "到哪个[%s]%s？"), lets,
-            gi.invent ? " (? see used letters)" : "");
+            gi.invent ? TR(" (? see used letters)", "（? 查看已用字母）") : "");
     for (trycnt = 1; ; ++trycnt) {
         let = !isgold ? yn_function(qbuf, (char *) 0, '\0', TRUE) : GOLD_SYM;
         if (let == '?' || let == '*') {
@@ -5586,7 +5587,7 @@ display_minventory(
         pickings = (dflags & MINV_PICKMASK);
 
     Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
-            do_all ? "possessions" : "armament");
+            do_all ? TR("possessions", "物品") : TR("armament", "装备"));
 
     if (do_all ? have_any : (mon->misc_worn_check || MON_WEP(mon))) {
         /* Fool the 'weapon in hand' routine into
@@ -5746,7 +5747,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There(TR("%s %s under the %s here.", "%s %s在%s下面。"), more_than_1 ? "are" : "is",
+            There(TR("%s %s under the %s here.", "%s %s在%s下面。"), more_than_1 ? TR("are", "已经") : "is",
                   doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */

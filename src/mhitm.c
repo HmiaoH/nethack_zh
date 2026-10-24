@@ -738,7 +738,7 @@ hitmm(
         Strcpy(magr_name, Monnam(magr));
         if (compat) {
             Snprintf(buf, sizeof buf, "%s %s", magr_name,
-                    mdef->mcansee ? "smiles at" : "talks to");
+                    mdef->mcansee ? TR("smiles at", "对") : TR("talks to", "跟"));
 #ifdef ZHLANG
             pline("%s%s%s。", buf, mon_nam(mdef),
                   (compat == 2) ? "迷人地" : "挑逗地");
@@ -834,13 +834,16 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     mdef->mundetected = 0;
 
     if (gv.vis) {
+#ifdef ZHLANG
         Sprintf(buf, "%s%s",
                 altmesg ? Adjmonnam(magr, "盲了的") : Monnam(magr),
                 altmesg ? "看向" : "凝视着");
-#ifdef ZHLANG
         pline("%s%s……", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "某物");
 #else
+        Sprintf(buf, "%s gazes %s",
+                altmesg ? Adjmonnam(magr, "blinded") : Monnam(magr),
+                altmesg ? "toward" : "at");
         pline("%s %s...", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "something");
 #endif
@@ -1543,7 +1546,7 @@ passivemm(
             if (canseemon(magr))
 #ifdef ZHLANG
                 pline("%s被%s的%s溅到了！", buf,
-                      s_suffix(mon_nam(mdef)), hliquid("acid"));
+                      s_suffix(mon_nam(mdef)), hliquid(TR("acid", "酸液")));
 #else
                 pline("%s is splashed by %s %s!", buf,
                       s_suffix(mon_nam(mdef)), hliquid("acid"));

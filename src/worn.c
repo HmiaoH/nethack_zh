@@ -424,7 +424,7 @@ check_wornmask_slots(void)
                     what, o->owornmask);
         else if (!Is_dragon_scales(o))
             Sprintf(whybuf, TR("%s (%s) %s not dragon scales", "%s（%s）%s 不是龙鳞"),
-                    what, simpleonames(o), otense(o, "are"));
+                    what, simpleonames(o), otense(o, TR("are", "已经")));
         else if (Dragon_scales_to_pm(o) != &mons[u.umonnum])
             Sprintf(whybuf, TR("%s, hero is not %s", "%s，主角不是%s"),
                     what, an(mons[u.umonnum].pmnames[NEUTRAL]));
@@ -440,9 +440,9 @@ check_wornmask_slots(void)
 
         if (!uwep || !uswapwep) {
             Sprintf(whybuf, TR("without %s%s%s", "没有%s%s%s"),
-                    !uwep ? "uwep" : "",
-                    (!uwep && !uswapwep) ? " and without " : "",
-                    !uswapwep ? "uswapwep" : "");
+                    !uwep ? "uwep" : "", /* NOTRANS */
+                    (!uwep && !uswapwep) ? TR(" and without ", "，也没有") : "",
+                    !uswapwep ? "uswapwep" : ""); /* NOTRANS */
             why = whybuf;
         } else if (uarms)
             why = "while wearing shield";
@@ -969,7 +969,7 @@ m_dowear_type(
             if (autocurse)
 #ifdef ZHLANG
                 pline("%s的%s%s闪耀了片刻%s光芒。", s_suffix(Monnam(mon)),
-                      simpleonames(best), otense(best, "glow"),
+                      simpleonames(best), otense(best, TR("glow", "正")),
                       hcolor(NH_BLACK));
 #else
                 pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),

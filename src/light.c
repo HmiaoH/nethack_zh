@@ -953,12 +953,12 @@ wiz_light_sources(void)
             Sprintf(buf, "  %2d,%2d   %2d   0x%04x  %s  %s", ls->x, ls->y,
                     ls->range, ls->flags,
                     (ls->type == LS_OBJECT
-                       ? "obj"
+                       ? TR("obj", "物件")
                        : ls->type == LS_MONSTER
                           ? (mon_is_local(ls->id.a_monst)
-                             ? "mon"
+                             ? TR("mon", "怪物")
                              : (ls->id.a_monst == &gy.youmonst)
-                                ? "you"
+                                ? TR("you", "你")
                                 /* migrating monster */
                                 : "<m>")
                           : "???"),

@@ -996,8 +996,8 @@ enter_force_field(genericptr_t p1, genericptr_t p2)
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
             You(TR("bump into %s.  Ouch!", "撞上了%s。好痛！"),
-                Hallucination ? "an invisible tree"
-                              : "some kind of invisible wall");
+                Hallucination ? TR("an invisible tree", "一棵看不见的树")
+                              : TR("some kind of invisible wall", "某种看不见的墙"));
         else
             pline(TR("Ouch!", "好痛！"));
     } else {

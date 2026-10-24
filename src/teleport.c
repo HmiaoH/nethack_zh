@@ -545,7 +545,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     if (is_teleport && flags.verbose)
         #ifdef ZHLANG
         You("出现在%s位置！",
-            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
+            (nux == u.ux0 && nuy == u.uy0) ? TR("the same", "同一") : TR("a different", "另一个"));
         #else
         You("materialize in %s location!",
             (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
@@ -1097,7 +1097,7 @@ dotele(
             }
             if (trap)
                 #ifdef ZHLANG
-                You("%s上传送陷阱。", u_locomotion("jump"));
+                You("%s上传送陷阱。", u_locomotion(TR("jump", "跳跃")));
                 #else
                 You("%s onto the teleportation trap.", u_locomotion("jump"));
                 #endif
@@ -1331,7 +1331,7 @@ level_tele(void)
                 return;
             #ifdef ZHLANG
             You("%s痛苦地扭动，你的身体开始扭曲...",
-                is_silent(gy.youmonst.data) ? "writhe" : "scream");
+                is_silent(gy.youmonst.data) ? TR("writhe", "蜷身") : TR("scream", "尖叫"));
             #else
             You("%s in agony as your body begins to warp...",
                 is_silent(gy.youmonst.data) ? "writhe" : "scream");
@@ -1360,7 +1360,7 @@ level_tele(void)
             #endif
             #ifdef ZHLANG
             Your("身体重新实体化%s。",
-                 gi.invent ? ", and you gather up all your possessions" : "");
+                 gi.invent ? TR(", and you gather up all your possessions", "，并收拢起所有物品") : "");
             #else
             Your("body rematerializes%s.",
                  gi.invent ? ", and you gather up all your possessions" : "");
@@ -1478,7 +1478,7 @@ level_tele(void)
             You("plummet a few thousand feet to your death.");
             #endif
             Sprintf(svk.killer.name,
-                    "teleported out of the dungeon and fell to %s death",
+                    TR("teleported out of the dungeon and fell to %s death", "被传送出地牢后坠落，结束了%s的性命"),
                     uhis());
             svk.killer.format = NO_KILLER_PREFIX;
         }
@@ -1546,7 +1546,7 @@ level_tele(void)
 
         if (on_level(&newlevel, &u.uz) && newlev != depth(&u.uz)) {
             You_cant(get_there_from,
-                     (newlev > deepest) ? "anywhere" : "here");
+                     (newlev > deepest) ? TR("anywhere", "任何地方") : TR("here", "这里"));
             return;
         }
     }
@@ -1684,7 +1684,7 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
         Strcpy(verbbuf, TR("trigger", "触发")); /* follows "You sit down." */
         intentional = TRUE;
     } else
-        Sprintf(verbbuf, TR("%s onto", "%s上"), u_locomotion("step"));
+        Sprintf(verbbuf, TR("%s onto", "%s上"), u_locomotion(TR("step", "跨")));
     #ifdef ZHLANG
     You("%s了一个楼层传送陷阱！", verbbuf);
     #else
@@ -1708,13 +1708,13 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
 
     if (Hallucination || Teleport_control)
         #ifdef ZHLANG
-        You("短暂地感到%s。", Hallucination ? "oriented" : "centered");
+        You("短暂地感到%s。", Hallucination ? TR("oriented", "方向明确") : TR("centered", "心神安定"));
         #else
         You("briefly feel %s.", Hallucination ? "oriented" : "centered");
         #endif
     else
         #ifdef ZHLANG
-        You_feel("%s迷失方向。", Confusion ? "even more " : "");
+        You_feel("%s迷失方向。", Confusion ? TR("even more ", "更加") : "");
         #else
         You_feel("%sdisoriented.", Confusion ? "even more " : "");
         #endif
@@ -1880,8 +1880,8 @@ rloc_to_core(
                   next ? next
                   : nearu ? nearu
                     : ((olddu = distu(oldx, oldy)) == du) ? ""
-                      : (du < olddu) ? " closer to you"
-                        : " farther away");
+                      : (du < olddu) ? TR(" closer to you", "，离你更近了")
+                        : TR(" farther away", "，离你更远了"));
             #else
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),
@@ -1894,8 +1894,8 @@ rloc_to_core(
         } else {
             pline("%s %s%s%s!",
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
-                  appearmsg ? "suddenly " : "",
-                  !Blind ? "appears" : "arrives",
+                  appearmsg ? TR("suddenly ", "突然") : "",
+                  !Blind ? TR("appears", "出现了") : TR("arrives", "到来"),
                   next ? next : nearu ? nearu : "");
         }
         /* wand discovery only happens if a messaage is delivered (bug?);

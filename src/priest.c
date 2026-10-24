@@ -353,7 +353,7 @@ priestname(
 
     if (mon->ispriest || aligned_priest) {
         if (high_priest)
-            Strcat(pname, do_hallu ? TR("grand ", "大") : "high ");
+            Strcat(pname, do_hallu ? TR("grand ", "大") : TR("high ", "高级"));
     } else {
         if (mon->mtame && !strcmpi(what, "Angel"))
             Strcat(pname, TR("guardian ", "守护"));
@@ -469,7 +469,7 @@ intemple(int roomno)
             }
         } else if (svm.moves >= epri_p->enter_time) {
             Sprintf(buf, TR("Pilgrim, you enter a %s place!", "朝圣者，你进入了一处%s之地！"),
-                    !shrined ? "desecrated" : "sacred");
+                    !shrined ? TR("desecrated", "亵渎") : TR("sacred", "神圣"));
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
@@ -544,7 +544,7 @@ intemple(int roomno)
             if (canspotmon(mtmp))
                 #ifdef ZHLANG
                 pline("一个%s鬼魂出现在你旁边%c",
-                      ngen < 5 ? "n enormous" : "",
+                      ngen < 5 ? TR("n enormous", "巨大的") : "",
                       ngen < 10 ? '!' : '.');
                 #else
                 pline("A%s ghost appears next to you%c",
@@ -606,7 +606,7 @@ priest_talk(struct monst *priest)
     /* KMH, conduct */
     if (!u.uconduct.gnostic++)
         livelog_printf(LL_CONDUCT,
-                       "rejected atheism by consulting with %s",
+                       TR("rejected atheism by consulting with %s", "通过向%s求教而摒弃了无神论"),
                        mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {
@@ -668,7 +668,7 @@ priest_talk(struct monst *priest)
                 /* Note: two bits is actually 25 cents.  Hmm. */
                 #ifdef ZHLANG
                 pline("%s给了你%s%s买麦芽酒。", Monnam(priest),
-                      (pmoney == 1L) ? "one " : "two ", bits);
+                      (pmoney == 1L) ? TR("one ", "一") : TR("two ", "两"), bits);
                 #else
                 pline("%s gives you %s%s for an ale.", Monnam(priest),
                       (pmoney == 1L) ? "one " : "two ", bits);

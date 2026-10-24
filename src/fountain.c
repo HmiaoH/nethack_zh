@@ -501,7 +501,7 @@ drinkfountain(void)
         case 26: /* See Monsters */
             if (monster_detect((struct obj *) 0, 0))
 #ifdef ZHLANG
-                pline_The("%s尝起来什么味道都没有。", hliquid("water"));
+                pline_The("%s尝起来什么味道都没有。", hliquid(TR("water", "水")));
 #else
                 pline_The("%s tastes like nothing.", hliquid("water"));
 #endif
@@ -523,7 +523,7 @@ drinkfountain(void)
 
 #ifdef ZHLANG
             pline("这%s让你口臭！",
-                  hliquid("water"));
+                  hliquid(TR("water", "水")));
 #else
             pline("This %s gives you bad breath!",
                   hliquid("water"));
@@ -541,7 +541,7 @@ drinkfountain(void)
         default:
 #ifdef ZHLANG
             pline("这温热的%s淡而无味。",
-                  hliquid("water"));
+                  hliquid(TR("water", "水")));
 #else
             pline("This tepid %s is tasteless.",
                   hliquid("water"));
@@ -575,7 +575,7 @@ dipfountain(struct obj *obj)
             /* Ha!  Trying to cheat her. */
 #ifdef ZHLANG
             pline("一股冰冷的雾气从%s中升起，包裹住了剑。",
-                  hliquid("water"));
+                  hliquid(TR("water", "水")));
 #else
             pline("A freezing mist rises from the %s"
                   " and envelopes the sword.",
@@ -592,7 +592,7 @@ dipfountain(struct obj *obj)
             obj->oerodeproof = FALSE;
             exercise(A_WIS, FALSE);
             livelog_printf(LL_ARTIFACT,
-                           "was denied %s!  The %s has deemed %s unworthy",
+                           TR("was denied %s!  The %s has deemed %s unworthy", "求%s被拒绝！%s认为%s不配持有它"),
                            artiname(ART_EXCALIBUR), lady, uhim());
         } else {
             /* The lady of the lake acts! - Eric Backus */
@@ -645,7 +645,7 @@ dipfountain(struct obj *obj)
         if (!is_hands && obj->cursed) {
             if (!Blind)
 #ifdef ZHLANG
-                pline_The("%s发光了一会儿。", hliquid("water"));
+                pline_The("%s发光了一会儿。", hliquid(TR("water", "水")));
 #else
                 pline_The("%s glows for a moment.", hliquid("water"));
 #endif
@@ -742,7 +742,7 @@ dipfountain(struct obj *obj)
         if (!Blind)
 #ifdef ZHLANG
             pline("在你下方远处，你看到%s中闪闪发光的硬币。",
-                  hliquid("water"));
+                  hliquid(TR("water", "水")));
 #else
             pline("Far below you, you see coins glistening in the %s.",
                   hliquid("water"));
@@ -768,7 +768,7 @@ wash_hands(void)
     boolean was_glib = !!Glib;
 
 #ifdef ZHLANG
-    You("在%s中洗了洗你的%s。", hliquid("water"),
+    You("在%s中洗了洗你的%s。", hliquid(TR("water", "水")),
         uarmg ? "戴手套的手" : hands);
 #else
     You("wash your %s%s in the %s.", uarmg ? "gloved " : "", hands,
@@ -823,21 +823,21 @@ drinksink(void)
     switch (rn2(20)) {
     case 0:
 #ifdef ZHLANG
-        You("喝了一小口冰凉的%s。", hliquid("water"));
+        You("喝了一小口冰凉的%s。", hliquid(TR("water", "水")));
 #else
         You("take a sip of very cold %s.", hliquid("water"));
 #endif
         break;
     case 1:
 #ifdef ZHLANG
-        You("喝了一小口温热的%s。", hliquid("water"));
+        You("喝了一小口温热的%s。", hliquid(TR("water", "水")));
 #else
         You("take a sip of very warm %s.", hliquid("water"));
 #endif
         break;
     case 2:
 #ifdef ZHLANG
-        You("喝了一小口滚烫的%s。", hliquid("water"));
+        You("喝了一小口滚烫的%s。", hliquid(TR("water", "水")));
 #else
         You("take a sip of scalding hot %s.", hliquid("water"));
 #endif
@@ -911,7 +911,7 @@ drinksink(void)
             newsym(u.ux, u.uy);
         } else
 #ifdef ZHLANG
-            pline("一些脏兮兮的%s从排水管里涌了上来。", hliquid("water"));
+            pline("一些脏兮兮的%s从排水管里涌了上来。", hliquid(TR("water", "水")));
 #else
             pline("Some dirty %s backs up in the drain.", hliquid("water"));
 #endif
@@ -921,7 +921,7 @@ drinksink(void)
         break;
     case 7:
 #ifdef ZHLANG
-        pline_The("%s仿佛有自己的意志般移动着！", hliquid("water"));
+        pline_The("%s仿佛有自己的意志般移动着！", hliquid(TR("water", "水")));
 #else
         pline_The("%s moves as though of its own will!", hliquid("water"));
 #endif
@@ -935,7 +935,7 @@ drinksink(void)
         break;
     case 8:
 #ifdef ZHLANG
-        pline("呀，这%s尝起来太难喝了。", hliquid("water"));
+        pline("呀，这%s尝起来太难喝了。", hliquid(TR("water", "水")));
 #else
         pline("Yuk, this %s tastes awful.", hliquid("water"));
 #endif
@@ -953,7 +953,7 @@ drinksink(void)
         break;
     case 10:
 #ifdef ZHLANG
-        pline("这%s含有有毒废物！", hliquid("water"));
+        pline("这%s含有有毒废物！", hliquid(TR("water", "水")));
 #else
         pline("This %s contains toxic wastes!", hliquid("water"));
 #endif
@@ -1006,7 +1006,7 @@ drinksink(void)
 #ifdef ZHLANG
         You("喝了一小口%s的%s。",
             rn2(3) ? (rn2(2) ? "冰凉" : "温热") : "滚烫",
-            hliquid("water"));
+            hliquid(TR("water", "水")));
 #else
         You("take a sip of %s %s.",
             rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot",

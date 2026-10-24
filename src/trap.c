@@ -251,17 +251,17 @@ erode_obj(
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
         if (flags.verbose && print && (uvictim || vismon))
             pline(TR("%s %s %s not affected by %s.", "%s %s %s未受%s影响。"),
-                  uvictim ? "Your" : s_suffix(Monnam(victim)),
-                  ostr, vtense(ostr, "are"), bythe[type]);
+                  uvictim ? TR("Your", "你") : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, TR("are", "已经")), bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
         if (flags.verbose && (print || otmp->oerodeproof)
             && (uvictim || vismon || visobj))
             pline(TR("Somehow, %s %s %s not affected by the %s.", "奇怪的是，%s %s %s未受%s影响。"),
-                  uvictim ? "your"
-                  : !vismon ? "the" /* visobj */
+                  uvictim ? TR("your", "你的")
+                  : !vismon ? TR("the", "那个") /* visobj */
                     : s_suffix(mon_nam(victim)),
-                  ostr, vtense(ostr, "are"), bythe[type]);
+                  ostr, vtense(ostr, TR("are", "已经")), bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
          * the hero can distinguish this from an object that is
@@ -281,8 +281,8 @@ erode_obj(
 
         if (uvictim || vismon || visobj)
             pline("%s %s %s%s!",
-                  uvictim ? "Your"
-                  : !vismon ? "The" /* visobj */
+                  uvictim ? TR("Your", "你")
+                  : !vismon ? TR("The", "这") /* visobj */
                     : s_suffix(Monnam(victim)),
                   ostr, vtense(ostr, action[type]), adverb);
 
@@ -309,8 +309,8 @@ erode_obj(
                 Sprintf(actbuf, TR("shatters", "碎裂"));
             #ifdef ZHLANG
             pline("%s%s%s！",
-                  uvictim ? "Your"
-                  : !vismon ? "The" /* visobj */
+                  uvictim ? TR("Your", "你")
+                  : !vismon ? TR("The", "这") /* visobj */
                     : s_suffix(Monnam(victim)),
                   ostr, actbuf);
 #else
@@ -351,11 +351,11 @@ erode_obj(
         if (flags.verbose && print) {
             if (uvictim)
                 Your(TR("%s %s completely %s.", "你的%s %s，已经彻底%s。"),
-                     ostr, vtense(ostr, Blind ? "feel" : "look"), msg[type]);
+                     ostr, vtense(ostr, Blind ? TR("feel", "摸起来") : TR("look", "看上去")), msg[type]);
             else if (vismon || visobj)
                 pline(TR("%s %s %s completely %s.", "%s%s %s，已经彻底%s。"),
-                      !vismon ? "The" : s_suffix(Monnam(victim)),
-                      ostr, vtense(ostr, "look"), msg[type]);
+                      !vismon ? TR("The", "这") : s_suffix(Monnam(victim)),
+                      ostr, vtense(ostr, TR("look", "看上去")), msg[type]);
         }
         return ER_NOTHING;
     }
@@ -375,13 +375,13 @@ grease_protect(
 
     if (ostr) {
         if (victim == &gy.youmonst)
-            Your("%s %s %s", ostr, vtense(ostr, "are"), txt);
+            Your("%s %s %s", ostr, vtense(ostr, TR("are", "已经")), txt);
         else if (vismon)
             pline("%s's %s %s %s", Monnam(victim),
-                  ostr, vtense(ostr, "are"), txt);
+                  ostr, vtense(ostr, TR("are", "已经")), txt);
     } else if (victim == &gy.youmonst || vismon) {
         #ifdef ZHLANG
-        pline("%s%s", Yobjnam2(otmp, "are"), txt);
+        pline("%s%s", Yobjnam2(otmp, TR("are", "已经")), txt);
 #else
         pline("%s %s", Yobjnam2(otmp, "are"), txt);
 #endif
@@ -678,10 +678,10 @@ fall_through(
         if (Flying)
             controlled_flight = TRUE;
         You(TR("%s down %s!", "你%s %s！"),
-            Flying ? "swoop" : "deliberately drop",
+            Flying ? TR("swoop", "俯冲") : TR("deliberately drop", "故意坠入"),
             (t->ttyp == TRAPDOOR)
-                ? "through the trap door"
-                : "into the gaping hole");
+                ? TR("through the trap door", "穿过活板门")
+                : TR("into the gaping hole", "掉进张开的洞口"));
     }
 
     if (*u.ushops)
@@ -703,9 +703,9 @@ fall_through(
         dist = depth(&dtmp) - depth(&u.uz);
         if (dist > 1)
             You(TR("%s down a %s%sshaft!", "你%s，掉进了一个%s%s竖井！"),
-                controlled_flight ? "fly" : "fall",
-                dist > 3 ? "very " : "",
-                dist > 2 ? "deep " : "");
+                controlled_flight ? TR("fly", "飞") : TR("fall", "坠落"),
+                dist > 3 ? TR("very ", "非常") : "",
+                dist > 2 ? TR("deep ", "深") : "");
     }
     if (!td)
         Sprintf(msgbuf, TR("The hole in the %s above you closes up.", "你上方%s上的洞口合拢了。"),
@@ -850,7 +850,7 @@ animate_statue(
                     wasn't any living shk when statue was picked up) */
                  && (mon != shkp || carried(statue)))
                    ? xname(statue)
-                   : "statue");
+                   : TR("statue", "雕像"));
         #ifdef ZHLANG
         pline("%s%s！", upstart(statuename), comes_to_life);
 #else
@@ -1021,7 +1021,7 @@ mu_maybe_destroy_web(
                 if (isyou)
                     #ifdef ZHLANG
                     You("%s了%s蜘蛛网！",
-                        (flaming(mptr)) ? "burn" : "dissolve",
+                        (flaming(mptr)) ? TR("burn", "点燃") : TR("dissolve", "溶解"),
                         a_your[trap->madeby_u]);
 #else
                     You("%s %s spider web!",
@@ -1525,9 +1525,9 @@ trapeffect_sqky_board(
             }
             #ifdef ZHLANG
             pline("你脚下的木板%s%s%s。",
-                  Deaf ? "vibrates" : "squeaks ",
+                  Deaf ? TR("vibrates", "颤动") : TR("squeaks ", "吱吱作响"),
                   Deaf ? "" : trapnote(trap, FALSE),
-                  Deaf ? "" : " loudly");
+                  Deaf ? "" : TR(" loudly", "，声音很响"));
 #else
             pline("A board beneath you %s%s%s.",
                   Deaf ? "vibrates" : "squeaks ",
@@ -1568,7 +1568,7 @@ trapeffect_sqky_board(
             }
             You_hear(TR("%s squeak %s.", "%s在%s吱呀作响。"), trapnote(trap, FALSE),
                      (mdistu(mtmp) <= range * range)
-                        ? "nearby" : "in the distance");
+                        ? TR("nearby", "在附近") : TR("in the distance", "在远处"));
         }
         /* wake up nearby monsters */
         wake_nearto(mtmp->mx, mtmp->my, 40);
@@ -2022,11 +2022,11 @@ trapeffect_pit(
         if (!Sokoban && is_clinger(gy.youmonst.data) && !plunged) {
             if (already_known) {
                 You_see(TR("%s %spit below you.", "你看到脚下有一个%s %s坑。"), a_your[trap->madeby_u],
-                        ttype == SPIKED_PIT ? "spiked " : "");
+                        ttype == SPIKED_PIT ? TR("spiked ", "带刺") : "");
             } else {
                 #ifdef ZHLANG
                 pline("%s陷阱坑%s在你脚下打开！", A_Your[trap->madeby_u],
-                      ttype == SPIKED_PIT ? "full of spikes " : "");
+                      ttype == SPIKED_PIT ? TR("full of spikes ", "（布满尖刺）") : "");
 #else
                 pline("%s pit %sopens up under you!", A_Your[trap->madeby_u],
                       ttype == SPIKED_PIT ? "full of spikes " : "");
@@ -2050,12 +2050,12 @@ trapeffect_pit(
                                      SUPPRESS_SADDLE, FALSE));
                 else
                     Sprintf(verbbuf, TR("lead %s", "牵着%s"),
-                            x_monnam(u.usteed, steed_article, "poor",
+                            x_monnam(u.usteed, steed_article, TR("poor", "可怜的"),
                                      SUPPRESS_SADDLE, FALSE));
             } else if (iflags.menu_requested && already_known) {
                 #ifdef ZHLANG
                 You("小心翼翼地%s进陷阱坑。",
-                    u_locomotion("lower yourself"));
+                    u_locomotion(TR("lower yourself", "放低身子")));
 #else
                 You("carefully %s into the pit.",
                     u_locomotion("lower yourself"));
@@ -2070,14 +2070,14 @@ trapeffect_pit(
             } else if (adj_pit) {
                 #ifdef ZHLANG
                 You("被碎片绊倒了%s。",
-                    !rn2(5) ? " between the pits" : "");
+                    !rn2(5) ? TR(" between the pits", "（在坑与坑之间）") : "");
 #else
                 You("stumble over debris%s.",
                     !rn2(5) ? " between the pits" : "");
 #endif
             } else {
                 Strcpy(verbbuf,
-                       !plunged ? "fall" : (Flying ? "dive" : "plunge"));
+                       !plunged ? TR("fall", "坠落") : (Flying ? TR("dive", "俯冲") : TR("plunge", "跳下")));
             }
             if (*verbbuf)
                 #ifdef ZHLANG
@@ -2115,9 +2115,9 @@ trapeffect_pit(
             if (u.usteed) {
                 #ifdef ZHLANG
                 pline("%s%s%s！",
-                      upstart(x_monnam(u.usteed, steed_article, "poor",
+                      upstart(x_monnam(u.usteed, steed_article, TR("poor", "可怜的"),
                                        SUPPRESS_SADDLE, FALSE)),
-                      conj_pit ? "steps" : "lands", predicament);
+                      conj_pit ? TR("steps", "踩进") : TR("lands", "落进"), predicament);
 #else
                 pline("%s %s %s!",
                       upstart(x_monnam(u.usteed, steed_article, "poor",
@@ -2126,7 +2126,7 @@ trapeffect_pit(
 #endif
             } else
                 #ifdef ZHLANG
-                You("%s%s！", conj_pit ? "step" : "land", predicament);
+                You("%s%s！", conj_pit ? TR("step", "跨") : TR("land", "陆地"), predicament);
 #else
                 You("%s %s!", conj_pit ? "step" : "land", predicament);
 #endif
@@ -2364,10 +2364,10 @@ trapeffect_web(
                 Strcpy(verbbuf, TR("are caught by", "被粘住"));
             } else if (u.usteed) {
                 Sprintf(verbbuf, TR("lead %s into", "牵着%s闯进"),
-                        x_monnam(u.usteed, steed_article, "poor",
+                        x_monnam(u.usteed, steed_article, TR("poor", "可怜的"),
                                  SUPPRESS_SADDLE, FALSE));
             } else {
-                Sprintf(verbbuf, TR("%s into", "%s进"), u_locomotion("stumble"));
+                Sprintf(verbbuf, TR("%s into", "%s进"), u_locomotion(TR("stumble", "绊")));
             }
             #ifdef ZHLANG
             You("%s了%s蜘蛛网！", verbbuf, a_your[trap->madeby_u]);
@@ -2616,8 +2616,8 @@ trapeffect_anti_magic(
                 dmgval2 = (dmgval2 + 3) / 4;
 
             You_feel((dmgval2 >= hp) ? TR("unbearably torpid!", "你感到难以忍受的迟钝！")
-                     : (dmgval2 >= hp / 4) ? "very lethargic."
-                       : "sluggish.");
+                     : (dmgval2 >= hp / 4) ? TR("very lethargic.", "非常迟钝。")
+                       : TR("sluggish.", "有点发蔫。"));
             /* opposite of magical explosion */
             losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
@@ -2717,7 +2717,7 @@ trapeffect_poly_trap(
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
         else
-            Sprintf(verbbuf, TR("%s onto", "%s上"), u_locomotion("step"));
+            Sprintf(verbbuf, TR("%s onto", "%s上"), u_locomotion(TR("step", "跨")));
         #ifdef ZHLANG
         You("%s了变形陷阱！", verbbuf);
 #else
@@ -2810,17 +2810,17 @@ trapeffect_landmine(
                 return Trap_Effect_Finished;
             feeltrap(trap);
             pline(TR("%s %s in a pile of soil below you.", "%s%s，就在你下方的一堆土里。"),
-                  already_seen ? "There is" : "You discover",
-                  trap->madeby_u ? "the trigger of your mine" : "a trigger");
+                  already_seen ? TR("There is", "那里有") : TR("You discover", "你发现了"),
+                  trap->madeby_u ? TR("the trigger of your mine", "你地雷的引信") : TR("a trigger", "一个引信"));
             if (already_seen && rn2(3))
                 return Trap_Effect_Finished;
             Soundeffect(se_kaablamm_of_mine, 80);
             #ifdef ZHLANG
             pline("轰隆！！！%s%s%s引爆了！",
-                  forcebungle ? "Your inept attempt sets"
-                  : "The air currents set",
+                  forcebungle ? TR("Your inept attempt sets", "你笨拙的举动使")
+                  : TR("The air currents set", "气流使"),
                   already_seen ? a_your[trap->madeby_u] : "",
-                  already_seen ? " land mine" : "it");
+                  already_seen ? TR(" land mine", "地雷") : "it");
 #else
             pline("KAABLAMM!!!  %s %s%s off!",
                   forcebungle ? "Your inept attempt sets"
@@ -2892,7 +2892,7 @@ trapeffect_landmine(
             if (in_sight) {
                 newsym(mtmp->mx, mtmp->my);
                 pline_The(TR("air currents set %s off!", "气流引爆了%s！"),
-                          already_seen ? "a land mine" : "it");
+                          already_seen ? TR("a land mine", "一枚地雷") : "it");
             }
         } else if (in_sight) {
             newsym(mtmp->mx, mtmp->my);
@@ -2904,7 +2904,7 @@ trapeffect_landmine(
         if (!in_sight && !Deaf)
             #ifdef ZHLANG
             pline("轰！%s远处传来爆炸声！",
-                  "You hear");
+                  TR("You hear", "你听到"));
 #else
             pline("Kaablamm!  %s an explosion in the distance!",
                   "You hear");
@@ -2947,7 +2947,7 @@ trapeffect_rolling_boulder_trap(
         feeltrap(trap);
         #ifdef ZHLANG
         pline("%s你触发了滚石陷阱！",
-              !Deaf ? "Click!  " : "");
+              !Deaf ? TR("Click!  ", "咔哒！") : "");
 #else
         pline("%sYou trigger a rolling boulder trap!",
               !Deaf ? "Click!  " : "");
@@ -3047,7 +3047,7 @@ trapeffect_vibrating_square(
                    for 'nearby') */
                 You_see(TR("the ground vibrate %s.", "地面在%s震动。"),
                         (mdistu(mtmp) <= 2 * 2)
-                           ? "nearby" : "in the distance");
+                           ? TR("nearby", "在附近") : TR("in the distance", "在远处"));
             }
         }
     }
@@ -3323,7 +3323,7 @@ dotrap(struct trap *trap, unsigned trflags)
         if (floor_trigger(ttype) && check_in_air(&gy.youmonst, trflags)) {
             if (already_seen) {
                 #ifdef ZHLANG
-                You("%s%s%s。", u_locomotion("step"),
+                You("%s%s%s。", u_locomotion(TR("step", "跨")),
                     (ttype == ARROW_TRAP && !trap->madeby_u)
                     ? "an" : a_your[trap->madeby_u],
                     trapname(ttype, FALSE));
@@ -3633,8 +3633,8 @@ launch_obj(
                 You_hear(TR("someone bowling.", "你听到有人在打保龄球。"));
             } else {
                 Soundeffect(se_rumbling, 60);
-                You_hear(TR("rumbling %s.", "你听到%s传来轰隆声。"), (distu(x1, y1) <= 4 * 4) ? "nearby"
-                                           : "in the distance");
+                You_hear(TR("rumbling %s.", "你听到%s传来轰隆声。"), (distu(x1, y1) <= 4 * 4) ? TR("nearby", "在附近")
+                                           : TR("in the distance", "在远处"));
             }
         }
         style &= ~LAUNCH_UNSEEN;
@@ -3749,7 +3749,7 @@ launch_obj(
                         #ifdef ZHLANG
                         pline("轰隆！！！%s",
                               cansee(x, y)
-                               ? "  The rolling boulder triggers a land mine."
+                               ? TR("  The rolling boulder triggers a land mine.", "滚动的巨石触发了一枚地雷。")
                                : "");
 #else
                         pline("KAABLAMM!!!%s",
@@ -4083,7 +4083,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                     if (is_pit(trap->ttyp))
                         #ifdef ZHLANG
                         pline("%s%s爬出了陷阱坑。", Monnam(mtmp),
-                              m_easy_escape_pit(mtmp) ? "easily " : "");
+                              m_easy_escape_pit(mtmp) ? TR("easily ", "轻松地") : "");
 #else
                         pline("%s climbs %sout of the pit.", Monnam(mtmp),
                               m_easy_escape_pit(mtmp) ? "easily " : "");
@@ -4301,7 +4301,7 @@ float_up(void)
             #ifdef ZHLANG
             You("感觉轻了一些，但你的%s仍然被锁在%s上。",
                 body_part(LEG),
-                IS_ROOM(levl[cc.x][cc.y].typ) ? "floor" : "ground");
+                IS_ROOM(levl[cc.x][cc.y].typ) ? TR("floor", "地面") : TR("ground", "地面"));
 #else
             You("feel lighter, but your %s is still chained to the %s.",
                 body_part(LEG),
@@ -4437,11 +4437,11 @@ float_down(
         if (trapped && u.utrap) /* u.utrap => paranoia */
             #ifdef ZHLANG
             You("不再尝试从%s中飘出来。",
-                (u.utraptype == TT_BEARTRAP) ? "trap's jaws"
-                  : (u.utraptype == TT_WEB) ? "web"
-                      : (u.utraptype == TT_BURIEDBALL) ? "chain"
-                          : (u.utraptype == TT_LAVA) ? "lava"
-                              : "ground");
+                (u.utraptype == TT_BEARTRAP) ? TR("trap's jaws", "陷阱的夹口")
+                  : (u.utraptype == TT_WEB) ? TR("web", "蛛网")
+                      : (u.utraptype == TT_BURIEDBALL) ? TR("chain", "锁链")
+                          : (u.utraptype == TT_LAVA) ? TR("lava", "岩浆")
+                              : TR("ground", "地面"));
 #else
             You("are no longer trying to float up from the %s.",
                 (u.utraptype == TT_BEARTRAP) ? "trap's jaws"
@@ -4472,7 +4472,7 @@ float_down(
     if (u.uswallow) {
         #ifdef ZHLANG
         You("飘落下来，但仍然被%s。",
-            digests(u.ustuck->data) ? "swallowed" : "engulfed");
+            digests(u.ustuck->data) ? TR("swallowed", "吞下") : TR("engulfed", "包裹"));
 #else
         You("float down, but you are still %s.",
             digests(u.ustuck->data) ? "swallowed" : "engulfed");
@@ -4580,8 +4580,8 @@ float_down(
                     #ifdef ZHLANG
                     pline("糟了！你%s。",
                           is_pool(u.ux, u.uy)
-                             ? "splashed down"
-                             : "hit the ground");
+                             ? TR("splashed down", "扑通一声落进水里")
+                             : TR("hit the ground", "重重摔在地上"));
 #else
                     pline("Bummer!  You've %s.",
                           is_pool(u.ux, u.uy)
@@ -4663,7 +4663,7 @@ climb_pit(void)
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
         #ifdef ZHLANG
-        You("%s出了%s。", u_locomotion("climb"), pitname);
+        You("%s出了%s。", u_locomotion(TR("climb", "爬")), pitname);
 #else
         You("%s from the %s.", u_locomotion("climb"), pitname);
 #endif
@@ -4675,8 +4675,8 @@ climb_pit(void)
         #ifdef ZHLANG
         You("%s到了%s的边缘。",
             (Sokoban && Levitation)
-                ? "struggle against the air currents and float"
-                : u.usteed ? "ride" : "crawl",
+                ? TR("struggle against the air currents and float", "顶着气流飘")
+                : u.usteed ? TR("ride", "骑着") : TR("crawl", "爬"),
             pitname);
 #else
         You("%s to the edge of the %s.",
@@ -4702,7 +4702,7 @@ climb_pit(void)
             #ifdef ZHLANG
             Norep((Hallucination && !rn2(5))
                       ? "你摔倒了，爬不起来。"
-                      : "You are still in a pit.");
+                      : TR("You are still in a pit.", "你还困在坑里。"));
 #else
             Norep((Hallucination && !rn2(5))
                       ? "You've fallen, and you can't get up."
@@ -4742,7 +4742,7 @@ dofiretrap(
         return;
     }
     #ifdef ZHLANG
-    pline("一道%s从%s%s！", tower_of_flame, box ? "bursts" : "erupts",
+    pline("一道%s从%s%s！", tower_of_flame, box ? TR("bursts", "喷出") : TR("erupts", "涌出"),
           the(box ? xname(box) : surface(u.ux, u.uy)));
 #else
     pline("A %s %s from %s!", tower_of_flame, box ? "bursts" : "erupts",
@@ -4893,7 +4893,7 @@ domagictrap(void)
                 /* If we're invisible from another source */
                 #ifdef ZHLANG
                 You_feel("现在感觉稍微更%s了一些。",
-                         HInvis ? "obvious" : "hidden");
+                         HInvis ? TR("obvious", "显眼") : TR("hidden", "隐蔽"));
 #else
                 You_feel("a little more %s now.",
                          HInvis ? "obvious" : "hidden");
@@ -4916,23 +4916,23 @@ domagictrap(void)
             break;
         case 14:
             You_hear(Hallucination ? TR("the moon howling at you.", "你听到月亮在朝你嚎叫。")
-                                   : "distant howling.");
+                                   : TR("distant howling.", "远处的嚎叫声。"));
             break;
         case 15:
             if (on_level(&u.uz, &qstart_level))
                 You_feel(
-                    "%slike the prodigal son.",
+                    TR("%slike the prodigal son.", "%s像浪子一样。"),
                     (flags.female || (Upolyd && is_neuter(gy.youmonst.data)))
-                        ? "oddly "
+                        ? TR("oddly ", "莫名地")
                         : "");
             else
                 #ifdef ZHLANG
                 You("突然渴望%s。",
                     Hallucination
-                        ? "Cleveland"
-                        : (In_quest(&u.uz) || at_dgn_entrance("The Quest"))
-                              ? "your nearby homeland"
-                              : "your distant homeland");
+                        ? TR("Cleveland", "克利夫兰")
+                        : (In_quest(&u.uz) || at_dgn_entrance(TR("The Quest", "任务地牢")))
+                              ? TR("your nearby homeland", "附近的故乡")
+                              : TR("your distant homeland", "遥远的故乡"));
 #else
                 You("suddenly yearn for %s.",
                     Hallucination
@@ -5172,8 +5172,8 @@ lava_damage(struct obj *obj, coordxy x, coordxy y)
                flooreffects() */
             if (obj == gt.thrownobj || obj == gk.kickedobj)
                 #ifdef ZHLANG
-                pline("%s%s烧起来了！", is_plural(obj) ? "They" : "It",
-                      otense(obj, "burn"));
+                pline("%s%s烧起来了！", is_plural(obj) ? TR("They", "它们") : "It",
+                      otense(obj, TR("burn", "点燃")));
 #else
                 pline("%s %s up!", is_plural(obj) ? "They" : "It",
                       otense(obj, "burn"));
@@ -5217,11 +5217,11 @@ acid_damage(struct obj *obj)
             ) {
             if (!Blind) {
                 if (victim == &gy.youmonst)
-                    Your("%s.", aobjnam(obj, "fade"));
+                    Your("%s.", aobjnam(obj, TR("fade", "褪色")));
                 else if (vismon)
                     #ifdef ZHLANG
                     pline("%s%s。", s_suffix(Monnam(victim)),
-                          aobjnam(obj, "fade"));
+                          aobjnam(obj, TR("fade", "褪色")));
 #else
                     pline("%s %s.", s_suffix(Monnam(victim)),
                           aobjnam(obj, "fade"));
@@ -5258,7 +5258,7 @@ pot_acid_damage(
             don't re-describe potion here; if we used "It explodes!"
             then "it" might be misconstrued as applying to "grease" */
         pline_The(TR("potion%s %s!", "药剂%s %s！"),
-                    plur(obj->quan), otense(obj, "explode"));
+                    plur(obj->quan), otense(obj, TR("explode", "爆炸")));
     } else {
         /* First message is
             * "a [potion|<color> potion|potion of acid] explodes"
@@ -5272,9 +5272,9 @@ pot_acid_damage(
             */
         bufp = simpleonames(obj);
         pline("%s%s %s!", /* "A potion explodes!" */
-                !exploded ? (one ? "A " : "Some ")
-                        : (one ? "Another " : "More "),
-            bufp, vtense(bufp, "explode"));
+                !exploded ? (one ? "A " : TR("Some ", "一些"))
+                        : (one ? TR("Another ", "又一") : TR("More ", "更多")),
+            bufp, vtense(bufp, TR("explode", "爆炸")));
     }
     if (ga.acid_ctx.ctx_valid) {
         if (obj->dknown)
@@ -5333,14 +5333,14 @@ water_damage(
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (in_invent) {
-            pline(TR("Some %s gets into your %s!", "一些%s渗进了你的%s！"), hliquid("water"), ostr);
+            pline(TR("Some %s gets into your %s!", "一些%s渗进了你的%s！"), hliquid(TR("water", "水")), ostr);
             gm.mentioned_water = !Hallucination;
         }
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
         if (in_invent && !Blind && !Underwater) {
-            pline_The(TR("%s cannot get into your %s.", "%s进不了你的%s。"), hliquid("water"), ostr);
+            pline_The(TR("%s cannot get into your %s.", "%s进不了你的%s。"), hliquid(TR("water", "水")), ostr);
             gm.mentioned_water = !Hallucination;
             makeknown(obj->otyp); /* if an oilskin sack, discover it; doesn't
                                    * matter for chest, large box, ice box */
@@ -5364,7 +5364,7 @@ water_damage(
 #endif
            ) return 0;
         if (in_invent)
-            Your("%s %s.", ostr, vtense(ostr, "fade"));
+            Your("%s %s.", ostr, vtense(ostr, TR("fade", "褪色")));
 
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
@@ -5392,7 +5392,7 @@ water_damage(
             return 0;
         }
         if (in_invent)
-            Your("%s %s.", ostr, vtense(ostr, "fade"));
+            Your("%s %s.", ostr, vtense(ostr, TR("fade", "褪色")));
 
         obj->otyp = SPE_BLANK_PAPER;
         /* same re-init as over-reading or polymorph; matters if it gets
@@ -5413,7 +5413,7 @@ water_damage(
             return ER_DESTROYED;
         } else if (obj->odiluted) {
             if (in_invent)
-                Your(TR("%s %s further.", "你的%s进一步%s了。"), ostr, vtense(ostr, "dilute"));
+                Your(TR("%s %s further.", "你的%s进一步%s了。"), ostr, vtense(ostr, TR("dilute", "稀释")));
 
             obj->otyp = POT_WATER;
             obj->dknown = 0;
@@ -5424,7 +5424,7 @@ water_damage(
             return ER_DAMAGED;
         } else if (obj->otyp != POT_WATER) {
             if (in_invent)
-                Your("%s %s.", ostr, vtense(ostr, "dilute"));
+                Your("%s %s.", ostr, vtense(ostr, TR("dilute", "稀释")));
 
             obj->odiluted++;
             if (in_invent)
@@ -5612,12 +5612,12 @@ rescued_from_terrain(int how)
         if (is_pool(u.ux, u.uy)) {
             You("%s %s of %s.", find_yourself,
                 (Is_waterlevel(&u.uz) || IS_WATERWALL(lev->typ))
-                  ? "in the midst" : "on top",
-                hliquid("water"));
+                  ? TR("in the midst", "身处") : TR("on top", "浮在"),
+                hliquid(TR("water", "水")));
             mesggiven = TRUE;
         } else if (IS_AIR(lev->typ)) {
             You("%s in %s.", find_yourself,
-                Is_waterlevel(&u.uz) ? "an air bubble" : "mid air");
+                Is_waterlevel(&u.uz) ? TR("an air bubble", "一个空气泡") : TR("mid air", "半空"));
             mesggiven = TRUE;
         }
         break;
@@ -5626,14 +5626,14 @@ rescued_from_terrain(int how)
         if (is_pool(u.ux, u.uy)) {
             #ifdef ZHLANG
             You("%s%s%s。", find_yourself,
-                u.uinwater ? "in" : "on", hliquid("water"));
+                u.uinwater ? "in" : "on", hliquid(TR("water", "水")));
 #else
             You("%s %s %s.", find_yourself,
                 u.uinwater ? "in" : "on", hliquid("water"));
 #endif
             mesggiven = TRUE;
         } else if (is_lava(u.ux, u.uy)) {
-            You(TR("%s on top of %s.", "你%s，站在%s之上。"), find_yourself, hliquid("molten lava"));
+            You(TR("%s on top of %s.", "你%s，站在%s之上。"), find_yourself, hliquid(TR("molten lava", "熔岩")));
             mesggiven = TRUE;
         }
         break;
@@ -5671,12 +5671,12 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You(TR("%s into the %s%c", "你%s进了%s%c"), is_solid ? "plunge" : "fall",
+        You(TR("%s into the %s%c", "你%s进了%s%c"), is_solid ? TR("plunge", "跳下") : TR("fall", "坠落"),
             waterbody_name(u.ux, u.uy),
             (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
             #ifdef ZHLANG
-            You("像%s一样沉了下去。", Hallucination ? "the Titanic" : "a rock");
+            You("像%s一样沉了下去。", Hallucination ? TR("the Titanic", "泰坦尼克号") : TR("a rock", "石头"));
 #else
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
 #endif
@@ -5772,7 +5772,7 @@ drown(void)
         boolean succ = Is_waterlevel(&u.uz) ? TRUE : emergency_disrobe(&lost);
 
         #ifdef ZHLANG
-        You("试着从%s中爬出来。", hliquid("water"));
+        You("试着从%s中爬出来。", hliquid(TR("water", "水")));
 #else
         You("try to crawl out of the %s.", hliquid("water"));
 #endif
@@ -6068,7 +6068,7 @@ move_into_trap(struct trap *ttmp)
            moving, a followup message is needed */
         #ifdef ZHLANG
         pline("幸运的是，你没有%s。",
-              into_vs_onto(ttmp->ttyp) ? "into" : "onto");
+              into_vs_onto(ttmp->ttyp) ? TR("into", "进") : TR("onto", "上"));
 #else
         pline("Fortunately, you don't move %s it.",
               into_vs_onto(ttmp->ttyp) ? "into" : "onto");
@@ -6178,9 +6178,9 @@ try_disarm(
         } else {
             #ifdef ZHLANG
             pline("%s%s很难%s。",
-                  ttmp->madeby_u ? "Your" : under_u ? "This" : "That",
+                  ttmp->madeby_u ? TR("Your", "你") : under_u ? TR("This", "这个") : TR("That", "那个"),
                   trapname(ttype, FALSE),
-                  (ttype == WEB) ? "remove" : "disarm");
+                  (ttype == WEB) ? TR("remove", "移除") : TR("disarm", "解除"));
 #else
             pline("%s %s is difficult to %s.",
                   ttmp->madeby_u ? "Your" : under_u ? "This" : "That",
@@ -6242,7 +6242,7 @@ disarm_holdingtrap(struct trap *ttmp)
         mtmp->mtrapped = 0;
         #ifdef ZHLANG
         You("把%s从%s%s中救了出来。", mon_nam(mtmp),
-            which, (ttmp->ttyp == BEAR_TRAP) ? "bear trap" : "web");
+            which, (ttmp->ttyp == BEAR_TRAP) ? TR("bear trap", "捕熊夹") : TR("web", "蛛网"));
 #else
         You("extract %s from %s %s.", mon_nam(mtmp),
             which, (ttmp->ttyp == BEAR_TRAP) ? "bear trap" : "web");
@@ -6264,7 +6264,7 @@ disarm_holdingtrap(struct trap *ttmp)
             && (u_wield_art(ART_STING) || attacks(AD_FIRE, wep)))
             #ifdef ZHLANG
             pline("%s%s了%s网！", bare_artifactname(uwep),
-                  u_wield_art(ART_STING) ? "cuts" : "burns", which);
+                  u_wield_art(ART_STING) ? TR("cuts", "割破") : TR("burns", "灼烧"), which);
 #else
             pline("%s %s through %s web!", bare_artifactname(uwep),
                   u_wield_art(ART_STING) ? "cuts" : "burns", which);
@@ -6392,7 +6392,7 @@ try_lift(
     if (calc_capacity(xtra_wt) >= HVY_ENCUMBER) {
         #ifdef ZHLANG
         pline("%s%s你搬不动。", Monnam(mtmp),
-              stuff ? "carrying too much" : "too heavy");
+              stuff ? TR("carrying too much", "拿的东西太多") : TR("too heavy", "太重"));
 #else
         pline("%s is %s for you to lift.", Monnam(mtmp),
               stuff ? "carrying too much" : "too heavy");
@@ -6688,14 +6688,14 @@ untrap(
         if (ttmp && boxcnt)
             Strcat(the_trap, TR(" and ", "且"));
         if (boxcnt)
-            Strcat(the_trap, (boxcnt == 1) ? TR("a container", "一个容器") : "containers");
+            Strcat(the_trap, (boxcnt == 1) ? TR("a container", "一个容器") : TR("containers", "若干容器"));
         useplural = ((ttmp && boxcnt > 0) || boxcnt > 1);
         /* note: boxcnt and useplural will always be 0 for !here case */
         if (ttmp || boxcnt)
             There(TR("%s %s %s but you can't reach %s%s.", "%s%s%s，但你够不到%s%s。"),
-                  useplural ? "are" : "is", the_trap, here ? "here" : "there",
-                  useplural ? "them" : "it",
-                  u.usteed ? " while mounted" : "");
+                  useplural ? TR("are", "已经") : "is", the_trap, here ? TR("here", "这里") : TR("there", "那里"),
+                  useplural ? TR("them", "它们") : "it",
+                  u.usteed ? TR(" while mounted", "（因为你骑乘着）") : "");
         trap_skipped = (ttmp != 0);
     } else { /* deal_with_floor_trap */
 
@@ -6704,18 +6704,18 @@ untrap(
             if (boxcnt) {
                 if (is_pit(ttmp->ttyp)) {
                     You_cant(TR("do much about %s%s.", "你无法对%s%s做什么。"), the_trap,
-                             u.utrap ? " that you're stuck in"
-                                     : " while standing on the edge of it");
+                             u.utrap ? TR(" that you're stuck in", "（你正身处其中）")
+                                     : TR(" while standing on the edge of it", "（你正站在边缘）"));
                     trap_skipped = TRUE;
                     deal_with_floor_trap = FALSE;
                 } else {
                     Snprintf(qbuf, sizeof(qbuf),
-                             "There %s and %s here.  %s %s?",
-                             (boxcnt == 1) ? "is a container"
-                                           : "are containers",
+                             TR("There %s and %s here.  %s %s?", "这里%s和%s。要%s%s吗？"),
+                             (boxcnt == 1) ? TR("is a container", "有一个容器")
+                                           : TR("are containers", "有一些容器"),
                              an(trapdescr),
-                             (ttmp->ttyp == WEB) ? "Remove"
-                                                 : "Disarm",
+                             (ttmp->ttyp == WEB) ? TR("Remove", "移除")
+                                                 : TR("Disarm", "解除"),
                              the_trap);
                     switch (ynq(qbuf)) {
                     case 'q':
@@ -6777,7 +6777,7 @@ untrap(
                     return help_monster_out(mtmp, ttmp);
                 default:
                     #ifdef ZHLANG
-                    You("无法拆除%s陷阱。", !here ? "that" : "this");
+                    You("无法拆除%s陷阱。", !here ? TR("that", "那个") : TR("this", "这个"));
 #else
                     You("cannot disable %s trap.", !here ? "that" : "this");
 #endif
@@ -6849,7 +6849,7 @@ untrap(
     switch (levl[x][y].doormask) {
     case D_NODOOR:
         #ifdef ZHLANG
-        You("那里%s没有门。", Blind ? "feel" : "see");
+        You("那里%s没有门。", Blind ? TR("feel", "摸起来") : TR("see", "看见"));
 #else
         You("%s no door there.", Blind ? "feel" : "see");
 #endif
@@ -7378,10 +7378,10 @@ chest_trap(
                     pline("What a groovy feeling!");
 #endif
                 else
-                    You("%s%s...", stagger(gy.youmonst.data, "stagger"),
+                    You("%s%s...", stagger(gy.youmonst.data, TR("stagger", "蹒跚")),
                         Halluc_resistance ? ""
-                                          : Blind ? " and get dizzy"
-                                                  : " and your vision blurs");
+                                          : Blind ? TR(" and get dizzy", "，还会头晕眼花")
+                                                  : TR(" and your vision blurs", "，视野也变模糊了"));
             }
             make_stunned((HStun & TIMEOUT) + (long) rn1(7, 16), FALSE);
             (void) make_hallucinated(
@@ -7763,7 +7763,7 @@ lava_effects(void)
                   || (is_organic(uarmf) && !uarmf->oerodeproof))) {
         obj = uarmf;
         #ifdef ZHLANG
-        pline("%s烧了起来！", Yobjnam2(obj, "burst"));
+        pline("%s烧了起来！", Yobjnam2(obj, TR("burst", "猛")));
 #else
         pline("%s into flame!", Yobjnam2(obj, "burst"));
 #endif
@@ -7778,7 +7778,7 @@ lava_effects(void)
 
     if (!Fire_resistance) {
         if (Wwalking) {
-            pline_The(TR("%s here burns you!", "这里的%s灼伤了你！"), hliquid("lava"));
+            pline_The(TR("%s here burns you!", "这里的%s灼伤了你！"), hliquid(TR("lava", "岩浆")));
             if (usurvive) {
                 losehp(dmg, lava_killer, KILLED_BY); /* lava damage */
                 goto burn_stuff;
@@ -7819,7 +7819,7 @@ lava_effects(void)
                 if (obj->owornmask) {
                     if (usurvive) {
                         #ifdef ZHLANG
-                        pline("%s烧了起来！", Yobjnam2(obj, "burst"));
+                        pline("%s烧了起来！", Yobjnam2(obj, TR("burst", "猛")));
 #else
                         pline("%s into flame!", Yobjnam2(obj, "burst"));
 #endif
@@ -7835,10 +7835,10 @@ lava_effects(void)
             #ifdef ZHLANG
             pline("你背包中有%s物品%s，%s被摧毁了。",
                   (burnmesgcount > 0)
-                    ? ((burncount - burnmesgcount == 1) ? "Another" : "Other")
-                    : ((burncount == 1) ? "An" : "Some"),
+                    ? ((burncount - burnmesgcount == 1) ? TR("Another", "又一件") : TR("Other", "其他"))
+                    : ((burncount == 1) ? "An" : TR("Some", "一些")),
                   plur(burncount - burnmesgcount),
-                  (burncount - burnmesgcount == 1) ? "has" : "have");
+                  (burncount - burnmesgcount == 1) ? TR("has", "已经") : TR("have", "已经"));
 #else
             pline("%s item%s in your inventory %s been destroyed.",
                   (burnmesgcount > 0)
@@ -7860,8 +7860,8 @@ lava_effects(void)
                because lifesaving resets them */
             svk.killer.format = KILLED_BY;
             Strcpy(svk.killer.name, lava_killer);
-            urgent_pline(TR("You %s...", "你%s了……"), boil_away ? "boil away"
-                                                : "burn to a crisp");
+            urgent_pline(TR("You %s...", "你%s了……"), boil_away ? TR("boil away", "被煮沸")
+                                                : TR("burn to a crisp", "被烧成焦炭"));
             done(BURNING);
             if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
@@ -7904,8 +7904,8 @@ lava_effects(void)
                   TT_LAVA);
         #ifdef ZHLANG
         You("沉入了%s%s！", waterbody_name(u.ux, u.uy),
-            !boil_away ? ", but it only burns slightly"
-                       : " and are about to be immolated");
+            !boil_away ? TR(", but it only burns slightly", "，但只是轻微烧伤")
+                       : TR(" and are about to be immolated", "，而且即将被烧成灰"));
 #else
         You("sink into the %s%s!", waterbody_name(u.ux, u.uy),
             !boil_away ? ", but it only burns slightly"
@@ -8028,7 +8028,7 @@ maybe_finish_sokoban(void)
             /* log the completion event regardless of whether or not
                any normal in-game feedback has just been given */
             livelog_printf(LL_MINORAC | LL_DUMP,
-                           "completed %d%s Sokoban level",
+                           TR("completed %d%s Sokoban level", "完成了索科班第%d%s层"),
                            sokonum, ordin(sokonum));
         }
     }

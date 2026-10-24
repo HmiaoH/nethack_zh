@@ -654,7 +654,7 @@ create_levelfile(int lev, char errbuf[])
             svl.level_info[lev].flags |= LFILE_EXISTS;
         else if (errbuf) /* failure explanation */
             Sprintf(errbuf,
-                    "Cannot create file \"%s\" for level %d (errno %d).",
+                    TR("Cannot create file \"%s\" for level %d (errno %d).", "无法创建文件「%s」用于关卡 %d（errno %d）。"),
                     gl.lock, lev, errno);
 #if defined(MSDOS) || defined(WIN32)
         if (nhfp->fd >= 0)
@@ -700,7 +700,7 @@ open_levelfile(int lev, char errbuf[])
            might end up being too big for nethack's BUFSZ */
         if (nhfp->fd < 0 && errbuf)
             Sprintf(errbuf,
-                    "Cannot open file \"%s\" for level %d (errno %d).",
+                    TR("Cannot open file \"%s\" for level %d (errno %d).", "无法打开文件「%s」用于关卡 %d（errno %d）。"),
                     gl.lock, lev, errno);
 #if defined(MSDOS) || defined(WIN32)
         if (nhfp->fd >= 0)
@@ -2164,7 +2164,7 @@ make_converted_name(const char *filename)
             size_t sz = strlen(folderbuf);
 
             Snprintf(eos(folderbuf), sizeof folderbuf - sz,
-                     "\\AppData\\Local\\NetHack\\5.0\\");
+                     "\\AppData\\Local\\NetHack\\5.0\\"); /* NOTRANS */
             dir = (const char *) folderbuf;
         }
 #endif /* UNIX || WIN32 */
@@ -2549,7 +2549,7 @@ fopen_wizkit_file(void)
     if (envp)
         Sprintf(tmp_wizkit, "%s%s", envp, gw.wizkit);
     else
-        Sprintf(tmp_wizkit, "%s%s", "sys$login:", gw.wizkit);
+        Sprintf(tmp_wizkit, "%s%s", "sys$login:", gw.wizkit); /* NOTRANS */
     if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
         return fp;
 #else /* should be only UNIX left */

@@ -245,7 +245,7 @@ done_in_by(struct monst *mtmp, int how)
     /* flag the death message for the tty top line; it must not be
        concatenated to an earlier message and must not be suppressed */
     gd.done_dying = TRUE;
-    You((how == STONING) ? TR("turn to stone...", "变成了石头……") : "die...");
+    You((how == STONING) ? TR("turn to stone...", "变成了石头……") : TR("die...", "死了……"));
     mark_synch(); /* flush buffered screen output */
     buf[0] = '\0';
     svk.killer.format = KILLED_BY_AN;
@@ -301,9 +301,9 @@ done_in_by(struct monst *mtmp, int how)
             Strcpy(shape, an(fakenm));
         /* omit "called" to avoid excessive verbosity */
         Sprintf(eos(buf),
-                alt ? "%s in %s form"
-                    : mimicker ? "%s disguised as %s"
-                               : "%s imitating %s",
+                alt ? TR("%s in %s form", "%s以%s形态出现")
+                    : mimicker ? TR("%s disguised as %s", "%s伪装成了%s")
+                               : TR("%s imitating %s", "%s正在模仿%s"),
                 realnm, shape);
         mptr = mtmp->data; /* reset for mimicker case */
 #if 0  /* hardfought */
@@ -329,7 +329,7 @@ done_in_by(struct monst *mtmp, int how)
         Strcat(buf, pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
             Sprintf(eos(buf), " %s %s",
-                    has_ebones(mtmp) ? "of" : "called",
+                    has_ebones(mtmp) ? "of" : TR("called", "名叫"),
                     MGIVENNAME(mtmp));
         }
     }
@@ -1101,7 +1101,7 @@ artifact_score(
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, TR("%s%s (worth %ld %s and %ld points)", "%s%s（价值 %ld %s，%ld 分）"),
-                        the_unique_obj(otmp) ? "The " : "",
+                        the_unique_obj(otmp) ? TR("The ", "此") : "",
                         otmp->oartifact ? artiname(otmp->oartifact)
                                         : OBJ_NAME(objects[otmp->otyp]),
                         value, currency(value), points);
@@ -1768,9 +1768,15 @@ really_done(int how)
                     if (has_oname(otmp))
                         free_oname(otmp);
                     otmp->quan = count;
+#ifdef ZHLANG
                     Sprintf(pbuf, "%8ld %s (价值%ld %s)，", count,
                             xname(otmp), count * (long) objects[typ].oc_cost,
                             currency(2L));
+#else
+                    Sprintf(pbuf, "%8ld %s (worth %ld %s),", count,
+                            xname(otmp), count * (long) objects[typ].oc_cost,
+                            currency(2L));
+#endif
                     obfree(otmp, (struct obj *) 0);
                 } else {
 #ifdef ZHLANG

@@ -2225,11 +2225,11 @@ role_selection_prolog(int which, winid where)
     /* [g and a don't constrain anything sufficiently
        to narrow something done to a single choice] */
 
-    Sprintf(buf, "%12s ", "name:");
+    Sprintf(buf, "%12s ", TR("name:", "姓名："));
     Strcat(buf, (which == RS_NAME) ? choosing
                 : !*svp.plname ? not_yet : svp.plname);
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "role:");
+    Sprintf(buf, "%12s ", TR("role:", "职业："));
     assert(which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM
            || IndexOkT(r, roles));
     Strcat(buf, (which == RS_ROLE) ? choosing
@@ -2246,7 +2246,7 @@ role_selection_prolog(int which, winid where)
             Sprintf(eos(buf), "/%s", roles[r].name.f);
     }
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "race:");
+    Sprintf(buf, "%12s ", TR("race:", "种族："));
     assert(which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM
            || IndexOkT(c, races));
     Strcat(buf, (which == RS_RACE) ? choosing
@@ -2254,13 +2254,13 @@ role_selection_prolog(int which, winid where)
                   : (c == ROLE_RANDOM) ? rand_choice
                     : races[c].noun);
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "gender:");
+    Sprintf(buf, "%12s ", TR("gender:", "性别："));
     Strcat(buf, (which == RS_GENDER) ? choosing
                 : (gend == ROLE_NONE) ? not_yet
                   : (gend == ROLE_RANDOM) ? rand_choice
                     : genders[gend].adj);
     putstr(where, 0, buf);
-    Sprintf(buf, "%12s ", "alignment:");
+    Sprintf(buf, "%12s ", TR("alignment:", "阵营："));
     Strcat(buf, (which == RS_ALGNMNT) ? choosing
                 : (a == ROLE_NONE) ? not_yet
                   : (a == ROLE_RANDOM) ? rand_choice

@@ -1088,7 +1088,7 @@ wiz_intrinsic(void)
         if (iflags.cmdassist) {
             /* start menu with a subtitle */
             Sprintf(buf,
-        "[Precede any selection with a count to increment by other than %d.]",
+        TR("[Precede any selection with a count to increment by other than %d.]", "［在任意选项前加上数量，即可按 %d 以外的步长增加。］"),
                     DEFAULT_TIMEOUT_INCR);
             add_menu_str(win, buf);
         }
@@ -1891,7 +1891,7 @@ wiz_display_macros(void)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_is_cmap() / glyph_to_cmap(glyph=%d)" /* NOTRANS */
                              " sync failure, returned NO_GLYPH (%d)",
-                        glyph, test);
+                        glyph, test); /* NOTRANS */
                  putstr(win, 0, buf);
             }
             if (glyph_is_cmap_zap(glyph)
@@ -1899,7 +1899,7 @@ wiz_display_macros(void)
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf,
-                        "glyph_is_cmap_zap(glyph=%d) returned non-zap cmap %d",
+                        TR("glyph_is_cmap_zap(glyph=%d) returned non-zap cmap %d", "glyph_is_cmap_zap(glyph=%d) 返回了非 zap 的 cmap %d"),
                         glyph, test);
                  putstr(win, 0, buf);
             }
@@ -1909,7 +1909,7 @@ wiz_display_macros(void)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_cmap(glyph=%d) returns %d" /* NOTRANS */
                              " exceeds defsyms[%d] bounds (MAX_GLYPH = %d)",
-                        glyph, test, SIZE(defsyms), max_glyph);
+                        glyph, test, SIZE(defsyms), max_glyph); /* NOTRANS */
                 putstr(win, 0, buf);
             }
         }
@@ -1922,7 +1922,7 @@ wiz_display_macros(void)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_mon(glyph=%d) returns %d" /* NOTRANS */
                              " exceeds mons[%d] bounds",
-                        glyph, test, NUMMONS);
+                        glyph, test, NUMMONS); /* NOTRANS */
                 putstr(win, 0, buf);
             }
         }
@@ -1935,7 +1935,7 @@ wiz_display_macros(void)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_obj(glyph=%d) returns %d" /* NOTRANS */
                              " exceeds objects[%d] bounds",
-                        glyph, test, NUM_OBJECTS);
+                        glyph, test, NUM_OBJECTS); /* NOTRANS */
                 putstr(win, 0, buf);
             }
         }
@@ -1988,7 +1988,7 @@ wiz_mon_diff(void)
             if (mlev > 50) /* hack for named demons */
                 mlev = 50;
             Snprintf(buf, sizeof buf,
-                     "%-18s [%3d:%2d]: calculated: %2d, hardcoded: %2d (%+d)",
+                     TR("%-18s [%3d:%2d]: calculated: %2d, hardcoded: %2d (%+d)", "%-18s ［%3d：%2d］：计算值 %2d，硬编码 %2d（%+d）"),
                      ptr->pmnames[NEUTRAL], cnt, mlev,
                      mcalculated, mhardcoded, mdiff);
             putstr(win, 0, buf);
@@ -2139,7 +2139,7 @@ wiz_custom(void)
         Sprintf(bufa, TR("%s: colorcount=%ld %s", "%s：颜色数=%ld %s"), wizcustom,
                 (long) iflags.colorcount,
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
-                                          : "default");
+                                          : "default"); /* NOTRANS */
         if (gc.currentgraphics == PRIMARYSET && gs.symset[PRIMARYSET].name)
             Strcat(bufa, ", active"); /* NOTRANS */
         if (gs.symset[PRIMARYSET].handling) {

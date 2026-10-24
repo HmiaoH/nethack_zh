@@ -236,7 +236,7 @@ confused_book(struct obj *spellbook)
     } else {
         #ifdef ZHLANG
         You("发现自己一遍又一遍地读着第%s行。",
-            spellbook == svc.context.spbook.book ? "next" : "first");
+            spellbook == svc.context.spbook.book ? TR("next", "再") : TR("first", "先"));
         #else
         You("find yourself reading the %s line over and over again.",
             spellbook == svc.context.spbook.book ? "next" : "first");
@@ -288,8 +288,8 @@ deadbook(struct obj *book2)
 
         if (book2->cursed) {
             pline_The("%s!",
-                      Blind ? "Book seems to be ignoring you"
-                            : "runes appear scrambled.  You can't read them");
+                      Blind ? TR("Book seems to be ignoring you", "书本似乎在无视你")
+                            : TR("runes appear scrambled.  You can't read them", "符文显得杂乱无章。你读不懂它们"));
             return;
         }
 
@@ -475,7 +475,7 @@ learn(void)
     }
 
     Sprintf(splname,
-            objects[booktype].oc_name_known ? "\"%s\"" : "the \"%s\" spell",
+            objects[booktype].oc_name_known ? "\"%s\"" : TR("the \"%s\" spell", "“%s”法术"),
             OBJ_NAME(objects[booktype]));
     for (i = 0; i < MAXSPELL; i++)
         if (spellid(i) == booktype || spellid(i) == NO_SPELL)
@@ -642,7 +642,7 @@ study_book(struct obj *spellbook)
                              spellbook->o_id)) {
                 if (!u.uconduct.literate++)
                     livelog_printf(LL_CONDUCT,
-                                   "became literate by reading %s",
+                                   "became literate by reading %s", /* NOTRANS */
                                    tribtitle);
 
                 check_unpaid(spellbook);
@@ -717,8 +717,8 @@ study_book(struct obj *spellbook)
                     char qbuf[QBUFSZ];
 
                     Sprintf(qbuf,
-                    "This spellbook is %sdifficult to comprehend.  Continue?",
-                            (read_ability < 12 ? "very " : ""));
+                    TR("This spellbook is %sdifficult to comprehend.  Continue?", "这本法术书%s难以理解。要继续吗？"),
+                            (read_ability < 12 ? TR("very ", "非常") : ""));
                     if (y_n(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
                         return 1;
@@ -1534,8 +1534,8 @@ spelleffects_check(int spell, int *res, int *energy)
         #ifdef ZHLANG
         You("没有足够的能量来施放那个法术%s。",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
-            : (*energy > u.uenpeak) ? " yet" /* haven't ever had enough */
-              : " anymore");
+            : (*energy > u.uenpeak) ? TR(" yet", "，现在还不行") /* haven't ever had enough */
+              : TR(" anymore", "了"));
         #else
         You("don't have enough energy to cast that spell%s.",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
@@ -1796,7 +1796,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
          */
         if (was_sick || !was_slimed)
             #ifdef ZHLANG
-            You("%s生病。", was_sick ? "no longer" : "not");
+            You("%s生病。", was_sick ? TR("no longer", "不再") : TR("not", "不"));
             #else
             You("are %s ill.", was_sick ? "no longer" : "not");
             #endif
@@ -2380,8 +2380,8 @@ dospellmenu(
     if (!iflags.menu_tab_sep) {
         Sprintf(buf, TR("%s%-20s Level %-12s Fail Retention", "%s%-20s 等级 %-12s 失败率 记忆率"),
                 splaction == SPELLMENU_DUMP ? "" : "    ",
-                "Name",
-                "Category");
+                TR("Name", "命名"),
+                TR("Category", "类别"));
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
         sep = ' ';
     } else {
@@ -2390,7 +2390,7 @@ dospellmenu(
         sep = '\t';
     }
     if (wizard)
-        Sprintf(eos(buf), "%c%6s", sep, "turns");
+        Sprintf(eos(buf), "%c%6s", sep, TR("turns", "回合"));
 
     add_menu_heading(tmpwin, buf);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
@@ -2417,7 +2417,7 @@ dospellmenu(
             /* more than 1 spell, add an extra menu entry */
             any.a_int = SPELLMENU_SORT + 1;
             add_menu(tmpwin, &nul_glyphinfo, &any, '+', 0,
-                     ATR_NONE, clr, "[sort spells]", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, TR("[sort spells]", "[排序法术]"), MENU_ITEMFLAGS_NONE);
         }
     }
     end_menu(tmpwin, prompt);

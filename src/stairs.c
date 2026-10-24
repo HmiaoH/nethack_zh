@@ -214,16 +214,16 @@ stairs_description(
            the game by coming down them, but the remote side varies
            depending on whether the Amulet is being carried */
         Sprintf(outbuf, "%s%s %s %s",
-                !u.uhave.amulet ? "" : "branch ",
+                !u.uhave.amulet ? "" : TR("branch ", "支线 "),
                 stairs, updown,
-                !u.uhave.amulet ? "out of the dungeon"
+                !u.uhave.amulet ? TR("out of the dungeon", "通往地牢外")
                 /* minimize our expectations about what comes next */
                 : (on_level(&tolev, &earth_level)
                    || on_level(&tolev, &air_level)
                    || on_level(&tolev, &fire_level)
                    || on_level(&tolev, &water_level))
-                  ? "to the Elemental Planes"
-                  : "to the end game");
+                  ? TR("to the Elemental Planes", "通往元素位面")
+                  : TR("to the end game", "通往终局"));
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
         Sprintf(outbuf, TR("branch %s %s to %s", "%s%s通往%s"),

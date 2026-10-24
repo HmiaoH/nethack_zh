@@ -364,7 +364,7 @@ chat_with_leader(struct monst *mtmp)
                 /* being expelled is hardly an achievement but none of the
                    other livelog classifications fit */
                 livelog_printf(LL_ACHIEVE,
-                               "%s has expelled you from the quest",
+                               TR("%s has expelled you from the quest", "%s把你逐出了任务"),
                                noit_mon_nam(mtmp));
             }
         } else if (purity == 0) {
@@ -382,7 +382,7 @@ chat_with_leader(struct monst *mtmp)
                matters most for Home 1 that has stairs down which aren't
                easily found */
             livelog_printf(LL_ACHIEVE,
-                     "%s has granted access to proceed deeper into the quest",
+                     TR("%s has granted access to proceed deeper into the quest", "%s已准许你深入任务"),
                            noit_mon_nam(mtmp));
         }
     }

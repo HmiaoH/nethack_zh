@@ -581,7 +581,7 @@ do_entity(struct entity *etmp)
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm->typ)))
 #ifdef ZHLANG
             pline_The("%s穿过了%s！",
-                      at_portcullis ? "portcullis" : "drawbridge",
+                      at_portcullis ? TR("portcullis", "闸门") : TR("drawbridge", "吊桥"),
                       e_nam(etmp));
 #else
             pline_The("%s passes through %s!",
@@ -616,11 +616,11 @@ do_entity(struct entity *etmp)
             if (is_u(etmp)) {
                 svk.killer.format = NO_KILLER_PREFIX;
                 Strcpy(svk.killer.name,
-                       "crushed to death underneath a drawbridge");
+                       TR("crushed to death underneath a drawbridge", "被吊桥压死"));
             }
 #ifdef ZHLANG
             pline("%s被吊桥压在了下面。",
-                  E_phrase(etmp, "are"));             /* no jump */
+                  E_phrase(etmp, TR("are", "已经")));             /* no jump */
 #else
             pline("%s crushed underneath the drawbridge.",
                   E_phrase(etmp, "are"));             /* no jump */
@@ -641,7 +641,7 @@ do_entity(struct entity *etmp)
                 if (e_inview) {
 #ifdef ZHLANG
                     pline("%s被落下的闸门压扁了！",
-                          E_phrase(etmp, "are"));
+                          E_phrase(etmp, TR("are", "已经")));
 #else
                     pline("%s crushed by the falling portcullis!",
                           E_phrase(etmp, "are"));
@@ -758,7 +758,7 @@ do_entity(struct entity *etmp)
             } else
 #ifdef ZHLANG
                 pline("%s消失在吊桥后面。",
-                      E_phrase(etmp, "disappear"));
+                      E_phrase(etmp, TR("disappear", "消失")));
 #else
                 pline("%s behind the drawbridge.",
                       E_phrase(etmp, "disappear"));
@@ -786,7 +786,7 @@ do_entity(struct entity *etmp)
             if (e_inview && !is_flyer(etmp->edata)
                 && !is_floater(etmp->edata))
 #ifdef ZHLANG
-                pline("%s从桥上掉了下来。", E_phrase(etmp, "fall"));
+                pline("%s从桥上掉了下来。", E_phrase(etmp, TR("fall", "坠落")));
 #else
                 pline("%s from the bridge.", E_phrase(etmp, "fall"));
 #endif
@@ -802,15 +802,15 @@ do_entity(struct entity *etmp)
                 if (Hallucination)
 #ifdef ZHLANG
                     pline("%s喝了一口%s然后消失了。",
-                          E_phrase(etmp, "drink"), lava ? "lava" : "moat");
+                          E_phrase(etmp, TR("drink", "也")), lava ? TR("lava", "岩浆") : TR("moat", "护城河"));
 #else
                     pline("%s the %s and disappears.",
                           E_phrase(etmp, "drink"), lava ? "lava" : "moat");
 #endif
                 else
 #ifdef ZHLANG
-                    pline("%s掉进了%s。", E_phrase(etmp, "fall"),
-                          lava ? hliquid("lava") : "moat");
+                    pline("%s掉进了%s。", E_phrase(etmp, TR("fall", "坠落")),
+                          lava ? hliquid(TR("lava", "岩浆")) : TR("moat", "护城河"));
 #else
                     pline("%s into the %s.", E_phrase(etmp, "fall"),
                           lava ? hliquid("lava") : "moat");
@@ -1006,7 +1006,7 @@ destroy_drawbridge(coordxy x, coordxy y)
             if (cansee(x2, y2) || u_at(x2, y2))
 #ifdef ZHLANG
                 pline_The("吊桥的闸门掉进了%s！",
-                          lava ? hliquid("lava") : "moat");
+                          lava ? hliquid(TR("lava", "岩浆")) : TR("moat", "护城河"));
 #else
                 pline_The("portcullis of the drawbridge falls into the %s!",
                           lava ? hliquid("lava") : "moat");
@@ -1021,7 +1021,7 @@ destroy_drawbridge(coordxy x, coordxy y)
             if (cansee(x, y) || u_at(x, y))
 #ifdef ZHLANG
                 pline_The("吊桥坍塌进了%s！",
-                          lava ? hliquid("lava") : "moat");
+                          lava ? hliquid(TR("lava", "岩浆")) : TR("moat", "护城河"));
 #else
                 pline_The("drawbridge collapses into the %s!",
                           lava ? hliquid("lava") : "moat");
@@ -1091,7 +1091,7 @@ destroy_drawbridge(coordxy x, coordxy y)
             if (e_inview)
 #ifdef ZHLANG
                 pline("%s被飞溅的碎片炸飞了。",
-                      E_phrase(etmp2, "are"));
+                      E_phrase(etmp2, TR("are", "已经")));
 #else
                 pline("%s blown apart by flying debris.",
                       E_phrase(etmp2, "are"));
@@ -1118,7 +1118,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 if (!is_u(etmp1) && Hallucination)
 #ifdef ZHLANG
                     pline("%s撞上了重金属！",
-                          E_phrase(etmp1, "get"));
+                          E_phrase(etmp1, TR("get", "猛地")));
 #else
                     pline("%s into some heavy metal!",
                           E_phrase(etmp1, "get"));
@@ -1126,7 +1126,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                 else
 #ifdef ZHLANG
                     pline("%s被一大块金属击中！",
-                          E_phrase(etmp1, "are"));
+                          E_phrase(etmp1, TR("are", "已经")));
 #else
                     pline("%s hit by a huge chunk of metal!",
                           E_phrase(etmp1, "are"));

@@ -1124,7 +1124,7 @@ You("drown %s.", mon_nam(mtmp));
                    flying steed while you are over water. */
                 #ifdef ZHLANG
 pline("%s沉了下去，%s涌入把你冲了出来。",
-                      Monnam(mtmp), hliquid("water"));
+                      Monnam(mtmp), hliquid(TR("water", "水")));
 #else
 pline("%s sinks as %s rushes in and flushes you out.",
                       Monnam(mtmp), hliquid("water"));
@@ -1724,7 +1724,7 @@ You_hear("a slurping sound.");
             pline1(buf);
         else if (flags.verbose)
             You_hear(TR("%s slurping sound%s.", "传来%s的吸溜声%s。"),
-                     (ecount == 1) ? "a" : "several", plur(ecount));
+                     (ecount == 1) ? "a" : TR("several", "好几个"), plur(ecount));
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
@@ -3013,12 +3013,12 @@ vamprises(struct monst *mtmp)
         /* construct a 'before' argument to pass to pline(); this used
            to construct a dynamic format string but that's overkill */
         Snprintf(action, sizeof action, TR("%s%s %s%s and rises as", "%s%s%s%s，并复活为"),
-                 Unaware ? "you dream that " : "",
+                 Unaware ? TR("you dream that ", "你梦见") : "",
                  x_monnam(mtmp, ARTICLE_THE,
-                          spec_mon ? (char *) 0 : "seemingly dead",
+                          spec_mon ? (char *) 0 : TR("seemingly dead", "看似已死的"),
                           (SUPPRESS_INVISIBLE | AUGMENT_IT), FALSE),
-                 Unaware ? "" : "suddenly ",
-                 spec_death ? "reconstitutes" : "transforms");
+                 Unaware ? "" : TR("suddenly ", "突然"),
+                 spec_death ? TR("reconstitutes", "重新凝聚成形") : TR("transforms", "变形"));
         mtmp->mcanmove = 1;
         mtmp->mfrozen = 0;
         set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
@@ -3058,12 +3058,12 @@ vamprises(struct monst *mtmp)
 
             set_msg_xy(x, y); /* You()/pline() will reset this */
             if (!seeit)
-                You_hear("%s.", trapped ? "an explosion" : door_smashed);
+                You_hear("%s.", trapped ? TR("an explosion", "一声爆炸") : door_smashed);
             else if (!canspotmon(mtmp))
                 You_see("%s.", trapped ? door_go_boom : door_smashed);
             else if (!Unaware)
                 pline_The(TR("door is smashed%s", "门被砸碎了%s"),
-                          trapped ? " and it explodes!" : ".");
+                          trapped ? TR(" and it explodes!", "，随即爆炸了！") : ".");
             set_msg_xy(0, 0); /* in case none of the messages was delivered */
 
             door->doormask = D_NODOOR;
@@ -3127,7 +3127,7 @@ logdeadmon(struct monst *mtmp, int mndx)
             Snprintf(shkdetail, sizeof shkdetail, TR(", the %s %s%s", "，这位%s%s%s"),
                      shtypes[ESHK(mtmp)->shoptype - SHOPBASE].name,
                      /* in case shk name doesn't include Mr or Ms honorific */
-                     mtmp->female ? "proprietrix" : "proprietor",
+                     mtmp->female ? TR("proprietrix", "女老板") : TR("proprietor", "老板"),
                      herodidit ? "" : ",");
         } else if (mndx == PM_HIGH_CLERIC) {
             /* the high priest[ess] monster is not unique; we know that
@@ -3469,7 +3469,7 @@ monstone(struct monst *mdef)
     if (wasinside) {
         if (digests(mdef->data))
             You(TR("%s through an opening in the new %s.", "%s穿过了新%s上的开口。"),
-                u_locomotion("jump"), xname(otmp));
+                u_locomotion(TR("jump", "跳跃")), xname(otmp));
     }
     return;
 }
@@ -3608,11 +3608,11 @@ xkilled(
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
 
         You("%s %s!",
-            nonliving(mtmp->data) ? "destroy" : "kill",
+            nonliving(mtmp->data) ? TR("destroy", "摧毁") : TR("kill", "杀死"),
             !(wasinside || canspotmon(mtmp)) ? "it"
               : !mtmp->mtame ? mon_nam(mtmp)
                 : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
-                           "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
+                           TR("poor", "可怜的"), namedpet ? SUPPRESS_SADDLE : 0, FALSE));
     }
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0 && is_pit(t->ttyp)) {
@@ -3783,7 +3783,7 @@ xkilled(
         u.ugangr += 7; /* instantly become "extremely" angry */
         change_luck(-20);
         pline(TR("That was %sa bad idea...", "那%s是个糟糕的主意……"),
-              u.uevent.qcompleted ? "probably " : "");
+              u.uevent.qcompleted ? TR("probably ", "也许") : "");
         if (!svc.context.mon_moving)
             iter_mons(anger_quest_guardians);
     } else if (mdat->msound == MS_NEMESIS) { /* Real good! */
@@ -3833,7 +3833,7 @@ xkilled(
     if (has_ebones(mtmp)) {
         livelog_printf(LL_UMONST, TR("destroyed %s, %s former %s", "摧毁了%s，%s从前的%s"),
                        livelog_mon_nam(mtmp),
-                       (mtmp->data == &mons[PM_GHOST]) ? "the" : "and",
+                       (mtmp->data == &mons[PM_GHOST]) ? TR("the", "那个") : TR("and", "而且"),
                        rank_of(EBONES(mtmp)->deathlevel,
                                EBONES(mtmp)->mnum,
                                EBONES(mtmp)->female));
@@ -3883,9 +3883,9 @@ vamp_stone(struct monst *mtmp)
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
                              (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
                               | SUPPRESS_INVISIBLE | SUPPRESS_IT), FALSE),
-                    amorphous(mtmp->data) ? "coalesces on the"
-                       : is_flyer(mtmp->data) ? "drops to the"
-                          : "writhes on the",
+                    amorphous(mtmp->data) ? TR("coalesces on the", "凝聚在")
+                       : is_flyer(mtmp->data) ? TR("drops to the", "落在")
+                          : TR("writhes on the", "紧贴着"),
                     surface(x, y));
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
@@ -4258,7 +4258,7 @@ qst_guardians_respond(void)
         if (got_mad > 1)
             who = makeplural(who);
         pline_The(TR("%s %s to be angry too...", "%s%s也生气了……"),
-                  who, vtense(who, "appear"));
+                  who, vtense(who, TR("appear", "出现")));
     }
 }
 
@@ -5531,7 +5531,7 @@ newcham(
                     /* Do this even if msg is FALSE */
                     You("%s %s%s!",
                         (amorphous(olddata) || is_whirly(olddata))
-                            ? "emerge from" : "break out of",
+                            ? TR("emerge from", "钻出了") : TR("break out of", "挣脱出"),
                         l_oldname, msgtrail);
                     msg = FALSE; /* message has been given */
                     mtmp->mhp = 1; /* almost dead */
@@ -5841,19 +5841,19 @@ angry_guards(boolean silent)
 
             if (slct) { /* sleeping guard(s) */
                 Sprintf(buf, TR("guard%s", "守卫%s"), plur(slct));
-                pline_The("%s %s up.", buf, vtense(buf, "wake"));
+                pline_The("%s %s up.", buf, vtense(buf, TR("wake", "醒来")));
             }
 
             if (nct) { /* seen/sensed adjacent guard(s) */
                 Sprintf(buf, TR("guard%s", "守卫%s"), plur(nct));
-                pline_The(TR("%s %s angry!", "%s%s生气了！"), buf, vtense(buf, "get"));
+                pline_The(TR("%s %s angry!", "%s%s生气了！"), buf, vtense(buf, TR("get", "猛地")));
             } else if (sct) { /* seen/sensed non-adjacent guard(s) */
                 Sprintf(buf, TR("guard%s", "守卫%s"), plur(sct));
                 pline(TR("%s %s %s approaching!", "%s%s%s正在逼近！"),
-                      (sct == 1) ? "An angry" : "Angry",
-                      buf, vtense(buf, "are"));
+                      (sct == 1) ? TR("An angry", "一名愤怒的") : TR("Angry", "愤怒的"),
+                      buf, vtense(buf, TR("are", "已经")));
             } else {
-                Strcpy(buf, (ct == 1) ? TR("a guard's", "一名守卫的") : "guards'");
+                Strcpy(buf, (ct == 1) ? TR("a guard's", "一名守卫的") : TR("guards'", "守卫们"));
                 Soundeffect(se_shrill_whistle, 100);
                 You_hear(TR("the shrill sound of %s whistle%s.", "传来%s哨子的尖利声音%s。"), buf, plur(ct));
             }
@@ -5987,7 +5987,7 @@ usmellmon(struct permonst *mdat)
                 break;
             case S_UNICORN:
                 You(TR("detect a%s odor reminiscent of a stable.", "你闻到一股%s马厩般的气味。"),
-                    (mndx == PM_PONY) ? "n" : " strong");
+                    (mndx == PM_PONY) ? "n" : TR(" strong", "强烈的"));
                 msg_given = TRUE;
                 break;
             case S_ZOMBIE:

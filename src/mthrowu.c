@@ -516,7 +516,7 @@ ohitmon(
             } else {
                 if (vis)
 #ifdef ZHLANG
-                    pline_The("%s灼烧了%s！", hliquid("acid"), mon_nam(mtmp));
+                    pline_The("%s灼烧了%s！", hliquid(TR("acid", "酸液")), mon_nam(mtmp));
 #else
                     pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
 #endif

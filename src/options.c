@@ -1144,7 +1144,7 @@ petname_optfn(
     } else if (req == get_val || req == get_cnf_val) {
         failsafe[0] = '\0';
         Sprintf(opts, "%s", *petname ? petname
-                            : (req == get_cnf_val) ? "none" : none);
+                            : (req == get_cnf_val) ? "none" : none); /* NOTRANS */
     }
     return optn_ok;
 }
@@ -1232,10 +1232,10 @@ optfn_align_message(
 
         which = iflags.wc_align_message;
         Sprintf(opts, "%s",
-                (which == ALIGN_TOP) ? "top"
-                : (which == ALIGN_LEFT) ? "left"
-                  : (which == ALIGN_BOTTOM) ? "bottom"
-                    : (which == ALIGN_RIGHT) ? "right"
+                (which == ALIGN_TOP) ? TR("top", "顶部")
+                : (which == ALIGN_LEFT) ? TR("left", "左侧")
+                  : (which == ALIGN_BOTTOM) ? TR("bottom", "底部")
+                    : (which == ALIGN_RIGHT) ? TR("right", "右侧")
                       : defopt);
         return optn_ok;
     }
@@ -1281,10 +1281,10 @@ optfn_align_status(
 
         which = iflags.wc_align_status;
         Sprintf(opts, "%s",
-                (which == ALIGN_TOP) ? "top"
-                : (which == ALIGN_LEFT) ? "left"
-                  : (which == ALIGN_BOTTOM) ? "bottom"
-                    : (which == ALIGN_RIGHT) ? "right"
+                (which == ALIGN_TOP) ? TR("top", "顶部")
+                : (which == ALIGN_LEFT) ? TR("left", "左侧")
+                  : (which == ALIGN_BOTTOM) ? TR("bottom", "底部")
+                    : (which == ALIGN_RIGHT) ? TR("right", "右侧")
                       : defopt);
         return optn_ok;
     }
@@ -1325,8 +1325,8 @@ optfn_altkeyhandling(
                 (iflags.key_handling == nh340_keyhandling)
                     ? "340"
                     : (iflags.key_handling == ray_keyhandling)
-                        ? "ray"
-                        : "default");
+                        ? "ray" /* NOTRANS */
+                        : "default"); /* NOTRANS */
 #endif
         return optn_ok;
     }
@@ -2165,8 +2165,8 @@ optfn_hilite_status(
 #ifdef STATUS_HILITES
         if (req == get_val)
             Strcpy(opts, count_status_hilites()
-                     ? "(see \"status highlight rules\" below)"
-                     : "(none)");
+                     ? TR("(see \"status highlight rules\" below)", "（见下方「状态高亮规则」）")
+                     : TR("(none)", "（无）"));
 #endif
         return optn_ok;
     }
@@ -2308,19 +2308,19 @@ optfn_map_mode(
     if (req == get_val || req == get_cnf_val) {
         i = iflags.wc_map_mode;
         Sprintf(opts, "%s",
-                (i == MAP_MODE_TILES) ? "tiles"
-                : (i == MAP_MODE_ASCII4x6) ? "ascii4x6"
-                  : (i == MAP_MODE_ASCII6x8) ? "ascii6x8"
-                    : (i == MAP_MODE_ASCII8x8) ? "ascii8x8"
-                      : (i == MAP_MODE_ASCII16x8) ? "ascii16x8"
-                        : (i == MAP_MODE_ASCII7x12) ? "ascii7x12"
+                (i == MAP_MODE_TILES) ? "tiles" /* NOTRANS */
+                : (i == MAP_MODE_ASCII4x6) ? "ascii4x6" /* NOTRANS */
+                  : (i == MAP_MODE_ASCII6x8) ? "ascii6x8" /* NOTRANS */
+                    : (i == MAP_MODE_ASCII8x8) ? "ascii8x8" /* NOTRANS */
+                      : (i == MAP_MODE_ASCII16x8) ? "ascii16x8" /* NOTRANS */
+                        : (i == MAP_MODE_ASCII7x12) ? "ascii7x12" /* NOTRANS */
                           : (i == MAP_MODE_ASCII8x12) ? "ascii8x12"
                             : (i == MAP_MODE_ASCII16x12) ? "ascii16x12"
                               : (i == MAP_MODE_ASCII12x16) ? "ascii12x16"
                                 : (i == MAP_MODE_ASCII10x18) ? "ascii10x18"
                                   : (i == MAP_MODE_ASCII_FIT_TO_SCREEN)
                                     ? "fit_to_screen"
-                                    : defopt);
+                                    : defopt); /* NOTRANS */
         return optn_ok;
     }
     return optn_ok;
@@ -2786,10 +2786,10 @@ optfn_msg_window(
             if (tmp == 's' || tmp == 'c')
                 tmp = iflags.prevmsg_window = 'r';
         }
-        Sprintf(opts, "%s", (tmp == 's') ? "single"
-                            : (tmp == 'c') ? "combination"
-                              : (tmp == 'f') ? "full"
-                                : "reversed");
+        Sprintf(opts, "%s", (tmp == 's') ? "single" /* NOTRANS */
+                            : (tmp == 'c') ? "combination" /* NOTRANS */
+                              : (tmp == 'f') ? "full" /* NOTRANS */
+                                : "reversed"); /* NOTRANS */
 #endif
         return optn_ok;
     }
@@ -3313,7 +3313,7 @@ optfn_paranoid_confirmation(
         }
         /* note: always leaves enough room for caller to tack on '\n' */
         Snprintf(opts, BUFSZ - 1, "%s",
-                 tmpbuf[0] ? &tmpbuf[1] : "none");
+                 tmpbuf[0] ? &tmpbuf[1] : "none"); /* NOTRANS */
         return optn_ok;
     }
     if (req == do_handler) {
@@ -3406,7 +3406,7 @@ optfn_perminv_mode(
             else
                 (void) strsubst(opts, " inventory", " invent");
             Strcat(opts, (((iflags.perminv_mode & InvSparse) != 0) ? TR(" (Off)", " （关闭）")
-                          : " ('perm_invent' is Off)"));
+                          : TR(" ('perm_invent' is Off)", "（'perm_invent' 已关闭）")));
         }
     } else if (req == get_cnf_val) {
         Sprintf(opts, "%s", perminv_modes[iflags.perminv_mode][0]);
@@ -3515,11 +3515,11 @@ optfn_pettype(
         return optn_ok;
     }
     if (req == get_val) {
-        Sprintf(opts, "%s", (gp.preferred_pet == 'c') ? "cat"
-                           : (gp.preferred_pet == 'd') ? "dog"
-                             : (gp.preferred_pet == 'h') ? "horse"
-                               : (gp.preferred_pet == 'n') ? "none"
-                                 : "random");
+        Sprintf(opts, "%s", (gp.preferred_pet == 'c') ? TR("cat", "猫")
+                           : (gp.preferred_pet == 'd') ? TR("dog", "狗")
+                             : (gp.preferred_pet == 'h') ? TR("horse", "马")
+                               : (gp.preferred_pet == 'n') ? "none" /* NOTRANS */
+                                 : "random"); /* NOTRANS */
         return optn_ok;
     }
     if (req == get_cnf_val) {
@@ -3620,7 +3620,7 @@ optfn_pickup_types(
 
                 use_menu = FALSE;
                 Sprintf(qbuf, TR("New %s: [%s am] (%s)", "新的%s：[%s am]（%s）"), allopt[optidx].name,
-                        ocl, *tbuf ? tbuf : "all");
+                        ocl, *tbuf ? tbuf : TR("all", "全部"));
                 abuf[0] = '\0';
                 getlin(qbuf, abuf);
                 wasspace = (abuf[0] == ' '); /* before mungspaces */
@@ -3671,7 +3671,7 @@ optfn_pickup_types(
     }
     if (req == get_val || req == get_cnf_val) {
         oc_to_str(flags.pickup_types, ocl);
-        Sprintf(opts, "%s", ocl[0] ? ocl : "all");
+        Sprintf(opts, "%s", ocl[0] ? ocl : TR("all", "全部"));
         return optn_ok;
     }
     if (req == do_handler) {
@@ -3741,7 +3741,7 @@ optfn_player_selection(
     }
     if (req == get_val || req == get_cnf_val) {
         Sprintf(opts, "%s",
-                iflags.wc_player_selection ? "prompts" : "dialog");
+                iflags.wc_player_selection ? "prompts" : "dialog"); /* NOTRANS */
         return optn_ok;
     }
     return optn_ok;
@@ -3854,7 +3854,7 @@ optfn_roguesymset(
     if (req == get_val || req == get_cnf_val) {
         Sprintf(opts, "%s",
                 gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name
-                                         : "default");
+                                         : "default"); /* NOTRANS */
         if (gc.currentgraphics == ROGUESET && gs.symset[ROGUESET].name)
             Strcat(opts, ", active"); /* NOTRANS */
         return optn_ok;
@@ -4494,7 +4494,7 @@ optfn_symset(
     if (req == get_val) {
         Sprintf(opts, "%s",
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
-                                          : "default");
+                                          : "default"); /* NOTRANS */
         if (gc.currentgraphics == PRIMARYSET && gs.symset[PRIMARYSET].name)
             Strcat(opts, ", active"); /* NOTRANS */
         if (gs.symset[PRIMARYSET].handling) {
@@ -4506,7 +4506,7 @@ optfn_symset(
     if (req == get_cnf_val) {
         Sprintf(opts, "%s",
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
-                                          : "default");
+                                          : "default"); /* NOTRANS */
         return optn_ok;
     }
     if (req == do_handler) {
@@ -4816,8 +4816,8 @@ optfn_versinfo(
                 n = (vi & VI_NUMBER) != 0;
 
         Sprintf(opts, "%u: %s%s%s%s%s (%.99s)", flags.versinfo,
-                g ? "name" : "", (b && g) ? "+" : "", b ? "branch" : "",
-                (n && (b || g)) ? "+" : "", n ? "number" : "",
+                g ? TR("name", "名称") : "", (b && g) ? "+" : "", b ? TR("branch", "分支") : "",
+                (n && (b || g)) ? "+" : "", n ? TR("number", "编号") : "",
                 status_version(vbuf, sizeof vbuf, FALSE));
     } else if (req == get_cnf_val) {
         Sprintf(opts, "%u", flags.versinfo);
@@ -5026,11 +5026,11 @@ optfn_whatis_coord(
     }
     if (req == get_val || req == get_cnf_val) {
         Sprintf(opts, "%s",
-                (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
-                : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
-                : (iflags.getpos_coords == GPCOORDS_COMFULL) ? "full compass"
-                : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen"
-                : "none");
+                (iflags.getpos_coords == GPCOORDS_MAP) ? "map" /* NOTRANS */
+                : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass" /* NOTRANS */
+                : (iflags.getpos_coords == GPCOORDS_COMFULL) ? "full compass" /* NOTRANS */
+                : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen" /* NOTRANS */
+                : "none"); /* NOTRANS */
         return optn_ok;
     }
     if (req == do_handler) {
@@ -5077,9 +5077,9 @@ optfn_whatis_filter(
     }
     if (req == get_val || req == get_cnf_val) {
         Sprintf(opts, "%s",
-                (iflags.getloc_filter == GFILTER_VIEW) ? "view"
-                : (iflags.getloc_filter == GFILTER_AREA) ? "area"
-                : "none");
+                (iflags.getloc_filter == GFILTER_VIEW) ? "view" /* NOTRANS */
+                : (iflags.getloc_filter == GFILTER_AREA) ? TR("area", "区域")
+                : "none"); /* NOTRANS */
         return optn_ok;
     }
     if (req == do_handler) {
@@ -5127,13 +5127,13 @@ optfn_windowborders(
     }
     if (req == get_val) {
         Sprintf(opts, "%s",
-                (iflags.wc2_windowborders == 0) ? "0=off"
+                (iflags.wc2_windowborders == 0) ? TR("0=off", "0=关闭")
                 : (iflags.wc2_windowborders == 1) ? "1=on"
-                  : (iflags.wc2_windowborders == 2) ? "2=auto"
+                  : (iflags.wc2_windowborders == 2) ? TR("2=auto", "2=自动")
                     : (iflags.wc2_windowborders == 3)
-                      ? "3=on, except off for perm_invent"
+                      ? TR("3=on, except off for perm_invent", "3=开启，但持久物品栏关闭")
                       : (iflags.wc2_windowborders == 4)
-                        ? "4=auto, except off for perm_invent"
+                        ? TR("4=auto, except off for perm_invent", "4=自动，但持久物品栏关闭")
                         : defopt);
         return optn_ok;
     }
@@ -5882,7 +5882,7 @@ handler_menustyle(void)
     chngd = (flags.menu_style != old_menu_style);
     if (chngd || flags.verbose)
 #ifdef ZHLANG
-        pline(TR("'menustyle'%s\"%s\"。", "'menustyle'%s“%s”。"), chngd ? "已改为" : "仍为",
+        pline(TR("'menustyle'%s\"%s\"。", TR("'menustyle'%s“%s”。", "'menustyle'%s为「%s」。")), chngd ? "已改为" : "仍为",
               menutype[(int) flags.menu_style][0]);
 #else
         pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
@@ -5916,7 +5916,7 @@ handler_align_misc(int optidx)
     add_menu(tmpwin, &nul_glyphinfo, &any, 'r', 0, ATR_NONE, clr, TR("right", "右侧"),
              MENU_ITEMFLAGS_NONE);
     Sprintf(abuf, TR("Select %s window placement relative to the map:", "选择%s窗口相对于地图的位置："),
-            (optidx == opt_align_message) ? "message" : "status");
+            (optidx == opt_align_message) ? TR("message", "消息") : TR("status", "状态"));
     end_menu(tmpwin, abuf);
     if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
         if (optidx == opt_align_message)
@@ -6047,40 +6047,40 @@ handler_disclose(void)
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Never disclose, without prompting",
+                     TR("Never disclose, without prompting", "从不披露，也不询问"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Always disclose, without prompting",
+                     TR("Always disclose, without prompting", "总是披露，不询问"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                         "Always disclose, pick sort order from menu",
+                         TR("Always disclose, pick sort order from menu", "总是披露，从菜单中选择排序方式"),
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"No\"",
+                     TR("Prompt, with default answer of \"No\"", "询问，默认回答为「否」"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                      any.a_char, ATR_NONE, clr,
-                     "Prompt, with default answer of \"Yes\"",
+                     TR("Prompt, with default answer of \"Yes\"", "询问，默认回答为「是」"),
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-                "Prompt, with default answer of \"Ask\" to request sort menu",
+                TR("Prompt, with default answer of \"Ask\" to request sort menu", "询问，默认回答为「询问」，以调出排序菜单"),
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
@@ -6210,7 +6210,7 @@ handler_msg_window(void)
             }
 #endif
 #ifdef ZHLANG
-            pline(TR("'msg_window'%.20s\"%.20s\"。", "'msg_window'%.20s“%.20s”。"),
+            pline(TR("'msg_window'%.20s\"%.20s\"。", TR("'msg_window'%.20s“%.20s”。", "'msg_window'%.20s为「%.20s」。")),
                   chngd ? "已改为" : "仍为", buf);
 #else
             pline("'msg_window' %.20s \"%.20s\".",
@@ -6567,38 +6567,38 @@ handler_whatis_coord(void)
     any.a_char = GPCOORDS_COMPASS;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMPASS,
              0, ATR_NONE, clr,
-             "compass ('east' or '3s' or '2n,4w')",
+             TR("compass ('east' or '3s' or '2n,4w')", "罗盘（'东' 或 '3s' 或 '2n,4w'）"),
              (gpc == GPCOORDS_COMPASS)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMFULL,
              0, ATR_NONE, clr,
-             "full compass ('east' or '3south' or '2north,4west')",
+             TR("full compass ('east' or '3south' or '2north,4west')", "完整罗盘（'东' 或 '3south' 或 '2north,4west'）"),
              (gpc == GPCOORDS_COMFULL)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_MAP,
-             0, ATR_NONE, clr, "map <x,y>",
+             0, ATR_NONE, clr, TR("map <x,y>", "地图 <x,y>"),
              (gpc == GPCOORDS_MAP)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_SCREEN,
-             0, ATR_NONE, clr, "screen [row,column]",
+             0, ATR_NONE, clr, TR("screen [row,column]", "屏幕 [行,列]"),
              (gpc == GPCOORDS_SCREEN)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
     add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_NONE,
-             0, ATR_NONE, clr, "none (no coordinates displayed)",
+             0, ATR_NONE, clr, TR("none (no coordinates displayed)", "无（不显示坐标）"),
              (gpc == GPCOORDS_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     add_menu_str(tmpwin, "");
     Sprintf(buf, TR("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s", "地图：左上角：<%d,%d>，右下角：<%d,%d>%s"),
             1, 0, COLNO - 1, ROWNO - 1,
-            flags.verbose ? "; column 0 unused, off left edge" : "");
+            flags.verbose ? TR("; column 0 unused, off left edge", "；第 0 列不使用，位于左边缘之外") : "");
     add_menu_str(tmpwin, buf);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
         add_menu_str(tmpwin,
-      "screen: row is offset to accommodate tty interface's use of top line");
+      TR("screen: row is offset to accommodate tty interface's use of top line", "屏幕：行号有偏移，以适应 tty 界面对顶行的使用"));
 #if COLNO == 80
 #define COL80ARG flags.verbose ? "; column 80 is not used" : ""
 #else
@@ -6610,7 +6610,7 @@ handler_whatis_coord(void)
     add_menu_str(tmpwin, buf);
     add_menu_str(tmpwin, "");
     end_menu(tmpwin,
-        "Select coordinate display when auto-describing a map position:");
+        TR("Select coordinate display when auto-describing a map position:", "自动描述地图位置时选择坐标显示方式："));
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
         iflags.getpos_coords = window_pick[0].item.a_char;
         /* PICK_ONE doesn't unselect preselected entry when
@@ -6638,21 +6638,21 @@ handler_whatis_filter(void)
     any = cg.zeroany;
     any.a_char = (GFILTER_NONE + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'n',
-             0, ATR_NONE, clr, "no filtering",
+             0, ATR_NONE, clr, TR("no filtering", "不过滤"),
              (gfilt == GFILTER_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_VIEW + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'v',
-             0, ATR_NONE, clr, "in view only",
+             0, ATR_NONE, clr, TR("in view only", "仅在视野内"),
              (gfilt == GFILTER_VIEW)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_AREA + 1);
     add_menu(tmpwin, &nul_glyphinfo, &any, 'a',
-             0, ATR_NONE, clr, "in same area",
+             0, ATR_NONE, clr, TR("in same area", "在同一区域"),
              (gfilt == GFILTER_AREA)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     end_menu(tmpwin,
-      "Select location filtering when going for next/previous map position:");
+      TR("Select location filtering when going for next/previous map position:", "前往下一处/上一处地图位置时选择位置过滤方式："));
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
         iflags.getloc_filter = (window_pick[0].item.a_char - 1);
         /* PICK_ONE doesn't unselect preselected entry when
@@ -6732,7 +6732,7 @@ handler_autopickup_exception(void)
             }
         }
         Sprintf(apebuf, TR("%s autopickup exceptions", "%s自动拾取例外"),
-                (opt_idx == 1) ? "List of" : "Remove which");
+                (opt_idx == 1) ? TR("List of", "列出") : TR("Remove which", "要移除哪个"));
         end_menu(tmpwin, apebuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6832,7 +6832,7 @@ handler_menu_colors(void)
             tmp = tmp->next;
         }
         Sprintf(mcbuf, TR("%s menu colors", "%s菜单颜色"),
-                (opt_idx == 1) ? "List of" : "Remove which");
+                (opt_idx == 1) ? TR("List of", "列出") : TR("Remove which", "要移除哪个"));
         end_menu(tmpwin, mcbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6907,7 +6907,7 @@ handler_msgtype(void)
             tmp = tmp->next;
         }
         Sprintf(mtbuf, TR("%s message types", "%s消息类型"),
-                (opt_idx == 1) ? "List of" : "Remove which");
+                (opt_idx == 1) ? TR("List of", "列出") : TR("Remove which", "要移除哪个"));
         end_menu(tmpwin, mtbuf);
         pick_cnt = select_menu(tmpwin,
                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -6940,15 +6940,15 @@ handler_versinfo(void)
 
     any.a_int = n = VI_NUMBER; /* 1 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'n', n + '0', ATR_NONE, NO_COLOR,
-             "version number",
+             TR("version number", "版本号"),
              (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_int = n = VI_NAME; /* 2 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'g', n + '0', ATR_NONE, NO_COLOR,
-             "game name",
+             TR("game name", "游戏名称"),
              (vi & n) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_int = n = VI_BRANCH; /* 4 */
     add_menu(tmpwin, &nul_glyphinfo, &any, 'b', n + '0', ATR_NONE, NO_COLOR,
-             (have_branch ? "development branch"
+             (have_branch ? TR("development branch", "开发分支")
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
                           : "(not applicable)"
 #else
@@ -8889,7 +8889,7 @@ get_option_value(const char *optname, boolean cnfvalid)
         if (!strcmp(optname, allopt[i].name)) {
             if (allopt[i].opttyp == BoolOpt
                 && (bool_p = allopt[i].addr) != 0) {
-                Sprintf(retbuf, "%s", *bool_p ? "true" : "false");
+                Sprintf(retbuf, "%s", *bool_p ? "true" : "false"); /* NOTRANS */
                 return retbuf;
             } else if (allopt[i].opttyp == CompOpt && allopt[i].optfn) {
                 int reslt = optn_err;
@@ -8970,13 +8970,13 @@ doset_simple_menu(void)
            bound to keys and show those, but if meta keys are involved
            the player might not know how to type them; keep this simple */
         Strcpy(buf, TR("Use command '#optionsfull'", "使用命令「#optionsfull」")
-                    " to get the complete options list.");
+                    TR(" to get the complete options list.", "以获取完整的选项列表。"));
         add_menu_str(tmpwin, buf);
     }
     any = cg.zeroany;
     any.a_int = -2 + 1;
     add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, NO_COLOR,
-             gs.simple_options_help ? "hide help" : "show help",
+             gs.simple_options_help ? TR("hide help", "隐藏帮助") : TR("show help", "显示帮助"),
              MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
@@ -9020,7 +9020,7 @@ doset_simple_menu(void)
                     Sprintf(buf, fmtstr, name,
                             zh_option_value(k, ((reslt == optn_ok && buf2[0])
                                                     ? (const char *) buf2
-                                                    : "unknown")));
+                                                    : "unknown"))); /* NOTRANS */
 #else
                     Sprintf(buf, fmtstr, name,
                             ((reslt == optn_ok && buf2[0])
@@ -9211,7 +9211,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
             } else {
                 any.a_int = HELP_IDX + 1; /* handling pick_list subtracts 1 */
                 add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
-                         clr, "view help for options menu",
+                         clr, TR("view help for options menu", "查看选项菜单的帮助"),
                          MENU_ITEMFLAGS_SKIPINVERT);
             }
         }
@@ -9533,9 +9533,9 @@ show_menu_controls(winid win, boolean dolist)
         arg = ""; /* no extra prefix for 'dolist' */
     } else { /* menu controls help: '?k' */
         putstr(win, 0, "");
-        Sprintf(buf, mc_altfmt, "", "Whole", "Current");
+        Sprintf(buf, mc_altfmt, "", TR("Whole", "全部"), TR("Current", "当前"));
         putstr(win, 0, buf);
-        Sprintf(buf, mc_altfmt, "", " Menu", " Page");
+        Sprintf(buf, mc_altfmt, "", TR(" Menu", "菜单"), TR(" Page", "页"));
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, TR("Select", "全选"),
                 visctrl(get_menu_cmd_key(MENU_SELECT_ALL)),
@@ -9552,34 +9552,34 @@ show_menu_controls(winid win, boolean dolist)
         putstr(win, 0, "");
         Sprintf(buf, mc_fmt, "Go to",
                 visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)),
-                "Next page");
+                TR("Next page", "下一页"));
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)),
-                "Previous page");
+                TR("Previous page", "上一页"));
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)),
-                "First page");
+                TR("First page", "首页"));
         putstr(win, 0, buf);
         Sprintf(buf, mc_fmt, "",
                 visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
-                "Last page");
+                TR("Last page", "末页"));
         putstr(win, 0, buf);
         if (has_menu_shift) {
             Sprintf(buf, mc_fmt, TR("Pan view", "平移视图"),
                     visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)),
-                    "Right (perm_invent only)");
+                    TR("Right (perm_invent only)", "右移（仅持久物品栏）"));
             putstr(win, 0, buf);
             Sprintf(buf, mc_fmt, "",
                     visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)),
-                    "Left");
+                    TR("Left", "左移"));
             putstr(win, 0, buf);
         }
         putstr(win, 0, "");
         Sprintf(buf, mc_fmt, TR("Search", "搜索"),
                 visctrl(get_menu_cmd_key(MENU_SEARCH)),
-                "Exter a target string and invert all matching entries");
+                TR("Exter a target string and invert all matching entries", "输入目标字符串并反选所有匹配项"));
         putstr(win, 0, buf);
         /* separator before hardcoded */
         putstr(win, 0, "");
@@ -9680,11 +9680,11 @@ dotogglepickup(void)
     flags.pickup = !flags.pickup;
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
-        Sprintf(buf, TR("ON, for %s objects%s", "开启，适用于%s物品%s"), ocl[0] ? ocl : "all",
+        Sprintf(buf, TR("ON, for %s objects%s", "开启，适用于%s物品%s"), ocl[0] ? ocl : TR("all", "全部"),
                 (ga.apelist)
                     ? ((count_apes() == 1)
-                           ? ", with one exception"
-                           : ", with some exceptions")
+                           ? TR(", with one exception", "，只有一个例外")
+                           : TR(", with some exceptions", "，有一些例外"))
                     : "");
     } else {
         Strcpy(buf, TR("OFF", "关闭"));
@@ -9892,7 +9892,7 @@ option_help(void)
 
     datawin = create_nhwindow(NHW_TEXT);
     Snprintf(buf, sizeof buf,
-             "Set options as OPTIONS=<options> in %s", get_configfile());
+             TR("Set options as OPTIONS=<options> in %s", "在 %s 中把选项写成 OPTIONS=<options>"), get_configfile());
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);

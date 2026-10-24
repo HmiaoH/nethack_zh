@@ -2055,8 +2055,8 @@ mktrap(
             char errbuf[BUFSZ];
 
             Snprintf(errbuf, sizeof errbuf,
-                     "args (%d,%d,%s,%s) are invalid",
-                     num, mktrapflags, "null room", "null location");
+                     TR("args (%d,%d,%s,%s) are invalid", "参数 (%d,%d,%s,%s) 无效"),
+                     num, mktrapflags, TR("null room", "空房间"), TR("null location", "空位置"));
             paniclog("mktrap", errbuf);
         }
         return;

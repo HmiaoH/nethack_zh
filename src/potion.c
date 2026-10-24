@@ -96,7 +96,7 @@ make_confused(long xtime, boolean talk)
     if (!xtime && old) {
         if (talk)
             #ifdef ZHLANG
-You_feel("现在不那么%s了。", Hallucination ? "trippy" : "confused");
+You_feel("现在不那么%s了。", Hallucination ? TR("trippy", "飘飘然") : TR("confused", "混乱"));
 #else
 You_feel("less %s now.", Hallucination ? "trippy" : "confused");
 #endif
@@ -119,7 +119,7 @@ make_stunned(long xtime, boolean talk)
         if (talk)
             #ifdef ZHLANG
 You_feel("现在%s。",
-                     Hallucination ? "less wobbly" : "a bit steadier");
+                     Hallucination ? TR("less wobbly", "没那么摇晃了") : TR("a bit steadier", "稳了一点"));
 #else
 You_feel("%s now.",
                      Hallucination ? "less wobbly" : "a bit steadier");
@@ -130,7 +130,7 @@ You_feel("%s now.",
             if (u.usteed)
                 You(TR("wobble in the saddle.", "在马鞍上摇晃。"));
             else
-                You("%s...", stagger(gy.youmonst.data, "stagger"));
+                You("%s...", stagger(gy.youmonst.data, TR("stagger", "蹒跚")));
         }
     }
     if ((!xtime && old) || (xtime && !old))
@@ -169,7 +169,7 @@ You_feel("deathly sick.");
             /* already sick */
             if (talk)
                 #ifdef ZHLANG
-You_feel("%s更糟了。", xtime <= Sick / 2L ? "much" : "even");
+You_feel("%s更糟了。", xtime <= Sick / 2L ? TR("much", "病情") : TR("even", "状况"));
 #else
 You_feel("%s worse.", xtime <= Sick / 2L ? "much" : "even");
 #endif
@@ -325,7 +325,7 @@ You("can see again.");
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("itch", "发痒")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, TR("brighten", "变亮"), Hallucination ? "sadder" : "normal");
+                Your(vismsg, TR("brighten", "变亮"), Hallucination ? "sadder" : "normal"); /* NOTRANS */
             }
         }
     }
@@ -359,7 +359,7 @@ pline("A cloud of darkness falls upon you.");
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("twitch", "抽动")));
             } else { /* Eyes of the Overworld */
-                Your(vismsg, TR("dim", "变暗"), Hallucination ? "happier" : "normal");
+                Your(vismsg, TR("dim", "变暗"), Hallucination ? "happier" : "normal"); /* NOTRANS */
             }
         }
     }
@@ -447,7 +447,7 @@ make_hallucinated(
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("itch", "发痒")));
             } else { /* Grayswandir */
-                Your(vismsg, TR("flatten", "变平"), "normal");
+                Your(vismsg, TR("flatten", "变平"), "normal"); /* NOTRANS */
             }
         }
     }
@@ -493,7 +493,7 @@ make_deaf(long xtime, boolean talk)
         disp.botl = TRUE;
         if (talk)
             You(old && !Deaf ? TR("can hear again.", "又能听见了。")
-                             : "are unable to hear anything.");
+                             : TR("are unable to hear anything.", "什么也听不见了。"));
     }
 }
 
@@ -512,10 +512,10 @@ void
 self_invis_message(void)
 {
     pline("%s %s.",
-          Hallucination ? "Far out, man!  You"
-                        : "Gee!  All of a sudden, you",
-          See_invisible ? "can see right through yourself"
-                        : "can't see yourself");
+          Hallucination ? TR("Far out, man!  You", "哇！你")
+                        : TR("Gee!  All of a sudden, you", "天哪！突然间，你"),
+          See_invisible ? TR("can see right through yourself", "能看穿自己")
+                        : TR("can't see yourself", "看不见自己"));
 }
 
 staticfn void
@@ -541,7 +541,7 @@ pline("As you open the bottle, %s emerges.", something);
     }
     #ifdef ZHLANG
 pline("当你打开瓶子时，一个巨大的%s出现了！",
-          Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
+          Hallucination ? rndmonnam(NULL) : (const char *) TR("ghost", "幽灵"));
 #else
 pline("As you open the bottle, an enormous %s emerges!",
           Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
@@ -690,7 +690,7 @@ dopotion(struct obj *otmp)
         gp.potion_unkn++;
         #ifdef ZHLANG
 You("有一瞬间%s的感觉，然后它消失了。",
-            Hallucination ? "normal" : "peculiar");
+            Hallucination ? "normal" : "peculiar"); /* NOTRANS */
 #else
 You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "peculiar");
@@ -728,9 +728,9 @@ pline("Ulch!  This makes you feel mediocre!");
            or temporary dexterity loss due to wounded legs */
         #ifdef ZHLANG
 pline("哇！这让你感觉%s！",
-              (!otmp->blessed) ? "good"
-              : unfixable_trouble_count(FALSE) ? "better"
-                : "great");
+              (!otmp->blessed) ? TR("good", "不错")
+              : unfixable_trouble_count(FALSE) ? TR("better", "更好")
+                : TR("great", "好"));
 #else
 pline("Wow!  This makes you feel %s!",
               (!otmp->blessed) ? "good"
@@ -800,7 +800,7 @@ peffect_water(struct obj *otmp)
 {
     if (!otmp->blessed && !otmp->cursed) {
         #ifdef ZHLANG
-pline("这尝起来像%s。", hliquid("water"));
+pline("这尝起来像%s。", hliquid(TR("water", "水")));
 #else
 pline("This tastes like %s.", hliquid("water"));
 #endif
@@ -813,7 +813,7 @@ pline("This tastes like %s.", hliquid("water"));
         || u.ualign.type == A_CHAOTIC) {
         if (otmp->blessed) {
             #ifdef ZHLANG
-pline("这像%s一样灼烧！", hliquid("acid"));
+pline("这像%s一样灼烧！", hliquid(TR("acid", "酸液")));
 #else
 pline("This burns like %s!", hliquid("acid"));
 #endif
@@ -859,7 +859,7 @@ You_feel("full of awe.");
         } else {
             if (u.ualign.type == A_LAWFUL) {
                 #ifdef ZHLANG
-pline("这像%s一样灼烧！", hliquid("acid"));
+pline("这像%s一样灼烧！", hliquid(TR("acid", "酸液")));
 #else
 pline("This burns like %s!", hliquid("acid"));
 #endif
@@ -884,8 +884,8 @@ peffect_booze(struct obj *otmp)
     gp.potion_unkn++;
     #ifdef ZHLANG
 pline("哇！这尝起来像%s%s！",
-          otmp->odiluted ? "watered down " : "",
-          Hallucination ? "dandelion wine" : "liquid fire");
+          otmp->odiluted ? TR("watered down ", "兑水的") : "",
+          Hallucination ? TR("dandelion wine", "蒲公英酒") : TR("liquid fire", "液体火焰"));
 #else
 pline("Ooph!  This tastes like %s%s!",
           otmp->odiluted ? "watered down " : "",
@@ -980,7 +980,7 @@ peffect_see_invisible(struct obj *otmp)
     if (otmp->cursed)
         #ifdef ZHLANG
 pline("呃！这尝起来%s。",
-              Hallucination ? "overripe" : "rotten");
+              Hallucination ? TR("overripe", "熟过头了") : TR("rotten", "腐烂了"));
 #else
 pline("Yecch!  This tastes %s.",
               Hallucination ? "overripe" : "rotten");
@@ -988,9 +988,9 @@ pline("Yecch!  This tastes %s.",
     else
         pline(
               Hallucination
-              ? "This tastes like 10%% real %s%s all-natural beverage."
-              : "This tastes like %s%s.",
-              otmp->odiluted ? "reconstituted " : "", fruitname(TRUE));
+              ? TR("This tastes like 10%% real %s%s all-natural beverage.", "尝起来像含 10%% 纯正%s%s的天然饮料。")
+              : TR("This tastes like %s%s.", "尝起来像%s%s。"),
+              otmp->odiluted ? TR("reconstituted ", "复原的") : "", fruitname(TRUE));
     if (otmp->otyp == POT_FRUIT_JUICE) {
         u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
         newuhs(FALSE);
@@ -1169,9 +1169,9 @@ pline("Fortunately, you have been immunized.");
             int typ = rn2(A_MAX);
 
             Sprintf(contaminant, "%s%s",
-                    (Poison_resistance) ? "mildly " : "",
-                    (otmp->fromsink) ? "contaminated tap water"
-                    : "contaminated potion");
+                    (Poison_resistance) ? TR("mildly ", "轻度") : "",
+                    (otmp->fromsink) ? TR("contaminated tap water", "污染的自来水")
+                    : TR("contaminated potion", "受污染的药剂"));
             if (!Fixed_abil) {
                 poisontell(typ, FALSE);
                 (void) adjattrib(typ, Poison_resistance ? -1 : -rn1(4, 3),
@@ -1560,7 +1560,7 @@ peffect_acid(struct obj *otmp)
     if (Acid_resistance) {
         /* Not necessarily a creature who _likes_ acid */
         #ifdef ZHLANG
-pline("这尝起来%s。", Hallucination ? "tangy" : "sour");
+pline("这尝起来%s。", Hallucination ? TR("tangy", "有点冲") : TR("sour", "发酸"));
 #else
 pline("This tastes %s.", Hallucination ? "tangy" : "sour");
 #endif
@@ -1569,8 +1569,8 @@ pline("This tastes %s.", Hallucination ? "tangy" : "sour");
 
         #ifdef ZHLANG
 pline("这灼烧起来%s！",
-              otmp->blessed ? " a little" : otmp->cursed ? " a lot"
-                                                         : " like acid");
+              otmp->blessed ? TR(" a little", "有点疼") : otmp->cursed ? TR(" a lot", "很疼")
+                                                         : TR(" like acid", "像被酸烧一样"));
 #else
 pline("This burns%s!",
               otmp->blessed ? " a little" : otmp->cursed ? " a lot"
@@ -1589,7 +1589,7 @@ staticfn void
 peffect_polymorph(struct obj *otmp)
 {
     #ifdef ZHLANG
-You_feel("有点%s。", Hallucination ? "normal" : "strange");
+You_feel("有点%s。", Hallucination ? "normal" : "strange"); /* NOTRANS */
 #else
 You_feel("a little %s.", Hallucination ? "normal" : "strange");
 #endif
@@ -1738,7 +1738,7 @@ strange_feeling(struct obj *obj, const char *txt)
     if (flags.beginner || !txt)
         #ifdef ZHLANG
 You("有一瞬间%s的感觉，然后它消失了。",
-            Hallucination ? "normal" : "strange");
+            Hallucination ? "normal" : "strange"); /* NOTRANS */
 #else
 You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "strange");
@@ -1948,7 +1948,7 @@ pline("Crash!");
                                           FALSE)));
             } else if (has_head(mon->data)) {
                 Sprintf(buf, "%s %s", s_suffix(mnam),
-                        (gn.notonhead ? "body" : "head"));
+                        (gn.notonhead ? TR("body", "身体") : TR("head", "头部")));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -1976,7 +1976,7 @@ pline("%s.", Tobjnam(obj, "evaporate"));
             break;
         case POT_POLYMORPH:
             #ifdef ZHLANG
-You_feel("有点%s。", Hallucination ? "normal" : "strange");
+You_feel("有点%s。", Hallucination ? "normal" : "strange"); /* NOTRANS */
 #else
 You_feel("a little %s.", Hallucination ? "normal" : "strange");
 #endif
@@ -1989,8 +1989,8 @@ You_feel("a little %s.", Hallucination ? "normal" : "strange");
 
                 #ifdef ZHLANG
 pline("这灼烧起来%s！",
-                      obj->blessed ? " a little"
-                                   : obj->cursed ? " a lot" : "");
+                      obj->blessed ? TR(" a little", "有点疼")
+                                   : obj->cursed ? TR(" a lot", "很疼") : "");
 #else
 pline("This burns%s!",
                       obj->blessed ? " a little"
@@ -2013,7 +2013,7 @@ pline("This burns%s!",
         switch (obj->otyp) {
         case POT_WATER:
             Snprintf(saddle_glows, sizeof(saddle_glows), "%s %s",
-                     buf, aobjnam(saddle, "glow"));
+                     buf, aobjnam(saddle, TR("glow", "正")));
             affected = H2Opotion_dip(obj, saddle, useeit, saddle_glows);
             break;
         case POT_POLYMORPH:
@@ -2021,7 +2021,7 @@ pline("This burns%s!",
             break;
         }
         if (useeit && !affected)
-            pline(TR("%s %s wet.", "%s%s湿了。"), buf, aobjnam(saddle, "get"));
+            pline(TR("%s %s wet.", "%s%s湿了。"), buf, aobjnam(saddle, TR("get", "猛地")));
     } else {
         boolean angermon = your_fault, cureblind = FALSE;
 
@@ -2131,7 +2131,7 @@ pline("This burns%s!",
                 || is_were(mon->data) || is_vampshifter(mon)) {
                 if (obj->blessed) {
                     pline(TR("%s %s in pain!", "%s%s，痛苦不堪！"), Monnam(mon),
-                          is_silent(mon->data) ? "writhes" : "shrieks");
+                          is_silent(mon->data) ? TR("writhes", "扭动") : TR("shrieks", "尖啸"));
                     if (!is_silent(mon->data))
                         wake_nearto(tx, ty, mon->data->mlevel * 10);
                     mon->mhp -= d(2, 6);
@@ -2168,7 +2168,7 @@ pline("This burns%s!",
         case POT_ACID:
             if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
                 pline(TR("%s %s in pain!", "%s%s，痛苦不堪！"), Monnam(mon),
-                      is_silent(mon->data) ? "writhes" : "shrieks");
+                      is_silent(mon->data) ? TR("writhes", "扭动") : TR("shrieks", "尖啸"));
                 if (!is_silent(mon->data))
                     wake_nearto(tx, ty, mon->data->mlevel * 10);
                 mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
@@ -2264,7 +2264,7 @@ pline("Ulch!  That potion smells terrible!");
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 #ifdef ZHLANG
-Your("你的%s%s！", eyes, vtense(eyes, "sting"));
+Your("你的%s%s！", eyes, vtense(eyes, TR("sting", "刺痛")));
 #else
 Your("%s %s!", eyes, vtense(eyes, "sting"));
 #endif
@@ -2352,8 +2352,8 @@ You_feel("somewhat dizzy.");
         if (!Blind && !Invis) {
             kn++;
             pline(TR("For an instant you %s!", "有一瞬间你%s！"),
-                  See_invisible ? "could see right through yourself"
-                                : "couldn't see yourself");
+                  See_invisible ? TR("could see right through yourself", "能看穿自己")
+                                : TR("couldn't see yourself", "看不见自己"));
         }
         break;
     case POT_PARALYSIS:
@@ -2640,7 +2640,7 @@ dodip(void)
                                  /* 128 - (24 + 54 + 1) leaves 49 for
                                     <object> */
                                  QBUFSZ - sizeof "What do you want to dip\
- into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+ into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] ")); /* NOTRANS */
     }
 
     /* preceding #dip with 'm' skips the possibility of dipping into pools,
@@ -2733,7 +2733,7 @@ dip_into(void)
 
     /* "What do you want to dip into <the potion>? [abc or ?*] " */
     Snprintf(qbuf, sizeof qbuf, TR("dip into %s%s", "把什么浸入%s%s"),
-             is_plural(potion) ? "one of " : "", thesimpleoname(potion));
+             is_plural(potion) ? TR("one of ", "其中一具") : "", thesimpleoname(potion));
     obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT);
     if (!obj)
         return ECMD_CANCEL;
@@ -2763,7 +2763,7 @@ dip_potion_explosion(struct obj *obj, int dmg)
            to 'amt' because that's not implemented] */
         obj->in_use = 1;
         #ifdef ZHLANG
-pline("%s它们爆炸了！", !Deaf ? "BOOM!  " : "");
+pline("%s它们爆炸了！", !Deaf ? TR("BOOM!  ", "轰！") : "");
 #else
 pline("%sThey explode!", !Deaf ? "BOOM!  " : "");
 #endif
@@ -2885,7 +2885,7 @@ You("can't fit your %s into the mouth of the bottle!",
         }
         /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
         pline(TR("%s %s %s with %s%s...", "%s%s%s与%s%s……"), qbuf, simpleonames(obj),
-              otense(obj, "mix"), (potion->quan > 1L) ? "one of " : "",
+              otense(obj, TR("mix", "混合")), (potion->quan > 1L) ? TR("one of ", "其中一具") : "",
               thesimpleoname(potion));
         /* get rid of 'dippee' before potential perm_invent updates */
         useup(potion); /* now gone */
@@ -2922,14 +2922,14 @@ You("can't fit your %s into the mouth of the bottle!",
             default:
                 useupall(obj);
                 pline_The(TR("mixture %sevaporates.", "混合物%s蒸发了。"),
-                          !Blind ? "glows brightly and " : "");
+                          !Blind ? TR("glows brightly and ", "发出亮光然后") : "");
                 return ECMD_TIME;
             }
         }
         obj->odiluted = (obj->otyp != POT_WATER);
 
         if (obj->otyp == POT_WATER && !Hallucination) {
-            pline_The(TR("mixture bubbles%s.", "混合物冒泡%s。"), Blind ? "" : ", then clears");
+            pline_The(TR("mixture bubbles%s.", "混合物冒泡%s。"), Blind ? "" : TR(", then clears", "，然后变清"));
         } else if (!Blind) {
             pline_The(TR("mixture looks %s.", "混合物看起来呈%s色。"),
                       hcolor(OBJ_DESCR(objects[obj->otyp])));
@@ -2949,7 +2949,7 @@ You("can't fit your %s into the mouth of the bottle!",
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
         && obj->corpsenm == PM_LICHEN) {
         pline(TR("%s %s %s around the edges.", "%s的边缘%s%s。"), The(cxname(obj)),
-              otense(obj, "turn"), Blind ? "wrinkled"
+              otense(obj, TR("turn", "已经")), Blind ? TR("wrinkled", "起皱")
                                    : potion->odiluted ? hcolor(NH_ORANGE)
                                      : hcolor(NH_RED));
         potion->in_use = FALSE; /* didn't go poof */
@@ -3020,15 +3020,15 @@ pline("A coating wears off %s.", the(xname(obj)));
             /* uses up potion, doesn't set obj->greased */
             if (!Blind)
                 pline(TR("%s %s with an oily sheen.", "%s%s，泛着油光。"), Yname2(obj),
-                      otense(obj, "gleam"));
+                      otense(obj, TR("gleam", "闪耀")));
             else /*if (!uarmg)*/
-                pline(TR("%s %s oily.", "%s%s得油腻。"), Yname2(obj), otense(obj, "feel"));
+                pline(TR("%s %s oily.", "%s%s得油腻。"), Yname2(obj), otense(obj, TR("feel", "摸起来")));
         } else {
             pline(TR("%s %s less %s.", "%s%s得不那么%s了。"), Yname2(obj),
-                  otense(obj, !Blind ? "are" : "feel"),
+                  otense(obj, !Blind ? TR("are", "已经") : TR("feel", "摸起来")),
                   (obj->oeroded && obj->oeroded2)
-                      ? "corroded and rusty"
-                      : obj->oeroded ? "rusty" : "corroded");
+                      ? TR("corroded and rusty", "锈迹斑斑")
+                      : obj->oeroded ? TR("rusty", "生锈") : TR("corroded", "腐蚀"));
             if (obj->oeroded > 0)
                 obj->oeroded--;
             if (obj->oeroded2 > 0)
@@ -3059,7 +3059,7 @@ pline("A coating wears off %s.", the(xname(obj)));
             obj->age = 0;
         }
         if (obj->age > 1000L) {
-            pline(TR("%s %s full.", "%s%s满了。"), Yname2(obj), otense(obj, "are"));
+            pline(TR("%s %s full.", "%s%s满了。"), Yname2(obj), otense(obj, TR("are", "已经")));
             potion->in_use = FALSE; /* didn't go poof */
         } else {
             #ifdef ZHLANG
@@ -3124,7 +3124,7 @@ You("fill %s with oil.", yname(obj));
                         hcolor(OBJ_DESCR(objects[mixture])));
             if (*newbuf)
                 pline_The(TR("%spotion%s %s.", "%s药剂%s%s。"), oldbuf,
-                          more_than_one ? " that you dipped into" : "",
+                          more_than_one ? TR(" that you dipped into", "（你蘸过的）") : "",
                           newbuf);
             else
                 #ifdef ZHLANG
@@ -3325,7 +3325,7 @@ speed_up(long duration)
 {
    if (!Very_fast)
        #ifdef ZHLANG
-You("你突然移动得%s更快了。", Fast ? "" : "much ");
+You("你突然移动得%s更快了。", Fast ? "" : TR("much ", "许多"));
 #else
 You("are suddenly moving %sfaster.", Fast ? "" : "much ");
 #endif

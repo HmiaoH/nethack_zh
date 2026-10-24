@@ -1023,7 +1023,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
             #ifdef ZHLANG
-            Norep("你移过%s。", an(is_moat(x, y) ? "moat" : "pool"));
+            Norep("你移过%s。", an(is_moat(x, y) ? TR("moat", "护城河") : TR("pool", "水池")));
             #else
             Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
             #endif
@@ -1172,11 +1172,11 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         /* and whether hero is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
             Snprintf(svk.killer.name, sizeof svk.killer.name,
-                     "being hit by %s",
+                     TR("being hit by %s", "被%s击中"),
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
                      x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
-                              "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
+                              TR("hurtling", "飞扑而来的"), EXACT_NAME | SUPPRESS_NAME, FALSE));
             instapetrify(svk.killer.name);
             newsym(u.ux, u.uy);
         }
@@ -1217,7 +1217,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
 #ifdef ZHLANG
         You("被%s锚定住了。",
             (u.utraptype == TT_WEB) ? "蛛网"
-            : (u.utraptype == TT_LAVA) ? hliquid("lava")
+            : (u.utraptype == TT_LAVA) ? hliquid(TR("lava", "岩浆"))
               : (u.utraptype == TT_INFLOOR) ? surface(u.ux, u.uy)
                 : (u.utraptype == TT_BURIEDBALL) ? "埋藏的铁球"
                   : "陷阱");
@@ -1994,10 +1994,10 @@ throwit(
                             tether_released_msg = TRUE;
                         } else {
                             pline(Blind
-                                      ? "%s lands %s your %s."
-                                      : "%s back to you, landing %s your %s.",
+                                      ? TR("%s lands %s your %s.", "%s落到你的%s%s。")
+                                      : TR("%s back to you, landing %s your %s.", "%s朝你返回，落在你的%s%s。"),
                                   Blind ? Something : Tobjnam(obj, TR("return", "返回")),
-                                  Levitation ? "beneath" : "at",
+                                  Levitation ? TR("beneath", "下方") : "at",
                                   makeplural(body_part(FOOT)));
                         }
                     } else {
@@ -2013,9 +2013,9 @@ throwit(
                         } else {
                             pline(
                                 Blind
-                                    ? "%s your %s!"
-                                    : "%s back toward you, hitting your %s!",
-                                Tobjnam(obj, Blind ? TR("hit", "击中") : "fly"),
+                                    ? TR("%s your %s!", "%s你的%s！")
+                                    : TR("%s back toward you, hitting your %s!", "%s向你飞回，击中了你的%s！"),
+                                Tobjnam(obj, Blind ? TR("hit", "击中") : TR("fly", "飞")),
                                 body_part(ARM));
                         }
                         if (obj->oartifact)
@@ -2103,7 +2103,7 @@ throwit(
                     && !is_flammable(obj))) {
                 Soundeffect(se_splash, 50);
                 pline((weight(obj) > WT_SPLASH_THRESHOLD)
-                      ? "Splash!" : "Plop!");
+                      ? TR("Splash!", "哗啦！") : TR("Plop!", "扑通！"));
             }
         }
         if (flooreffects(obj, gb.bhitpos.x, gb.bhitpos.y, "fall")) {
@@ -2632,7 +2632,7 @@ thitmonst(
             }
         }
         Strcpy(trail,
-               digests(md) ? " entrails" : is_whirly(md) ? " currents" : "");
+               digests(md) ? TR(" entrails", "内脏") : is_whirly(md) ? TR(" currents", "气流") : "");
         monname = mon_nam(mon);
         if (*trail)
             monname = s_suffix(monname);
@@ -2867,7 +2867,7 @@ breakobj(
                         if (eyecount(gy.youmonst.data) != 1)
                             eyes = makeplural(eyes);
                         #ifdef ZHLANG
-                        Your("%s%s。", eyes, vtense(eyes, "water"));
+                        Your("%s%s。", eyes, vtense(eyes, TR("water", "水")));
                         #else
                         Your("%s %s.", eyes, vtense(eyes, "water"));
                         #endif

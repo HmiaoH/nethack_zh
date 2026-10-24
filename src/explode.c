@@ -690,12 +690,12 @@ explode(
                 } else if (olet == TRAP_EXPLODE) {
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "caught %sself in a %s", uhim(),
+                             TR("caught %sself in a %s", "%s被%s卷了进去"), uhim(),
                              str);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     svk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(svk.killer.name, sizeof svk.killer.name,
-                             "caught %sself in %s own %s", uhim(),
+                             TR("caught %sself in %s own %s", "%s被卷进了%s自己的%s"), uhim(),
                              uhis(), str);
                 } else {
                     svk.killer.format = (!strcmpi(str, "tower of flame")

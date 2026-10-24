@@ -615,7 +615,7 @@ eating_conducts(struct permonst *pd)
     if (!vegan(pd)) {
         if (!u.uconduct.unvegan++ && !ll_conduct) {
             livelog_printf(LL_CONDUCT,
-                           "consumed animal products (%s) for the first time",
+                           TR("consumed animal products (%s) for the first time", "首次摄入动物制品（%s）"),
                            pd->pmnames[NEUTRAL]);
             ll_conduct++;
         }
@@ -649,7 +649,7 @@ eat_brains(
     if (noncorporeal(pd)) {
         if (visflag)
             pline(TR("%s brain is unharmed.", "%s的脑子毫发无损。"),
-                  (mdef == &gy.youmonst) ? "Your" : s_suffix(Monnam(mdef)));
+                  (mdef == &gy.youmonst) ? TR("Your", "你") : s_suffix(Monnam(mdef)));
         return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
 #ifdef ZHLANG
@@ -1074,7 +1074,7 @@ givit(int type, struct permonst *ptr)
     case FIRE_RES:
         debugpline0("Trying to give fire resistance");
         if (!(HFire_resistance & FROMOUTSIDE)) {
-            You(Hallucination ? TR("be chillin'.", "感觉凉飕飕的。") : "feel a momentary chill.");
+            You(Hallucination ? TR("be chillin'.", "感觉凉飕飕的。") : TR("feel a momentary chill.", "感到短暂的寒意。"));
             HFire_resistance |= FROMOUTSIDE;
         }
         break;
@@ -1095,7 +1095,7 @@ givit(int type, struct permonst *ptr)
     case DISINT_RES:
         debugpline0("Trying to give disintegration resistance");
         if (!(HDisint_resistance & FROMOUTSIDE)) {
-            You_feel(Hallucination ? TR("totally together, man.", "身心完美合一，老兄。") : "very firm.");
+            You_feel(Hallucination ? TR("totally together, man.", "身心完美合一，老兄。") : TR("very firm.", "非常坚实。"));
             HDisint_resistance |= FROMOUTSIDE;
         }
         break;
@@ -1112,14 +1112,14 @@ givit(int type, struct permonst *ptr)
     case POISON_RES:
         debugpline0("Trying to give poison resistance");
         if (!(HPoison_resistance & FROMOUTSIDE)) {
-            You_feel(Poison_resistance ? TR("especially healthy.", "格外健康。") : "healthy.");
+            You_feel(Poison_resistance ? TR("especially healthy.", "格外健康。") : TR("healthy.", "很健康。"));
             HPoison_resistance |= FROMOUTSIDE;
         }
         break;
     case TELEPORT:
         debugpline0("Trying to give teleport");
         if (!(HTeleportation & FROMOUTSIDE)) {
-            You_feel(Hallucination ? TR("diffuse.", "弥散开来。") : "very jumpy.");
+            You_feel(Hallucination ? TR("diffuse.", "弥散开来。") : TR("very jumpy.", "非常躁动。"));
             HTeleportation |= FROMOUTSIDE;
         }
         break;
@@ -1127,7 +1127,7 @@ givit(int type, struct permonst *ptr)
         debugpline0("Trying to give teleport control");
         if (!(HTeleport_control & FROMOUTSIDE)) {
             You_feel(Hallucination ? TR("centered in your personal space.", "稳稳居于自身空间的正中。")
-                                   : "in control of yourself.");
+                                   : TR("in control of yourself.", "能掌控自己。"));
             HTeleport_control |= FROMOUTSIDE;
         }
         break;
@@ -1135,7 +1135,7 @@ givit(int type, struct permonst *ptr)
         debugpline0("Trying to give telepathy");
         if (!(HTelepat & FROMOUTSIDE)) {
             You_feel(Hallucination ? TR("in touch with the cosmos.", "与宇宙声息相通。")
-                                   : "a strange mental acuity.");
+                                   : TR("a strange mental acuity.", "一种奇特的心智敏锐。"));
             HTelepat |= FROMOUTSIDE;
             /* If blind, make sure monsters show up. */
             if (Blind)
@@ -1145,15 +1145,15 @@ givit(int type, struct permonst *ptr)
     case ACID_RES:
         debugpline0("Giving timed acid resistance");
         if (!Acid_resistance)
-            You_feel("%s.", Hallucination ? "secure from flashbacks"
-                            : "less concerned about being harmed by acid");
+            You_feel("%s.", Hallucination ? TR("secure from flashbacks", "不再受旧日幻影困扰")
+                            : TR("less concerned about being harmed by acid", "不再那么担心被酸所伤"));
         incr_itimeout(&HAcid_resistance, d(3, 6));
         break;
     case STONE_RES:
         debugpline0("Giving timed stoning resistance");
         if (!Stone_resistance)
-            You_feel("%s.", Hallucination ? "unusually limber"
-                            : "less concerned about becoming petrified");
+            You_feel("%s.", Hallucination ? TR("unusually limber", "身体异常柔韧")
+                            : TR("less concerned about becoming petrified", "不再那么担心被石化"));
         incr_itimeout(&HStone_resistance, d(3, 6));
         break;
     default:
@@ -1261,7 +1261,7 @@ cpostfx(int pm)
 
             if (!u.uconduct.polyselfs++) /* you're changing form */
                 livelog_printf(LL_CONDUCT,
-                            "changed form for the first time by mimicking %s",
+                            TR("changed form for the first time by mimicking %s", "首次通过模仿%s改变了形态"),
                                tempshape);
             You_cant(TR("resist the temptation to mimic %s.", "你无法抗拒模仿%s的诱惑。"), tempshape);
             /* A pile of gold can't ride. */
@@ -1271,8 +1271,8 @@ cpostfx(int pm)
             gm.multi_reason = TR("pretending to be a pile of gold", "正假装是一堆金子");
             Sprintf(buf,
                     Hallucination
-                       ? "You suddenly dread being peeled and mimic %s again!"
-                       : "You now prefer mimicking %s again.",
+                       ? TR("You suddenly dread being peeled and mimic %s again!", "你突然害怕被剥开，于是又模仿起了%s！")
+                       : TR("You now prefer mimicking %s again.", "你现在更愿意模仿%s了。"),
                     an(Upolyd ? pmname(gy.youmonst.data, Ugender)
                               : gu.urace.noun));
             ge.eatmbuf = dupstr(buf);
@@ -1320,8 +1320,8 @@ cpostfx(int pm)
             }
 
             You("%s.", (pm == PM_GENETIC_ENGINEER)
-                          ? "undergo a freakish metamorphosis"
-                          : "feel a change coming over you");
+                          ? TR("undergo a freakish metamorphosis", "经历一场怪异的变化")
+                          : TR("feel a change coming over you", "感到自己正在发生变化"));
             polyself(POLY_NOFLAGS);
         }
         break;
@@ -1611,8 +1611,8 @@ consume_tin(const char *mesg)
         if (mnum == NON_PM) {
             if (Hallucination)
                 pline(TR("It's full of %s.", "里面装满了%s。"),
-                      rn2(2) ? "air elemental souffle"
-                             : "dehydrated water");
+                      rn2(2) ? TR("air elemental souffle", "气元素舒芙蕾")
+                             : TR("dehydrated water", "脱水水"));
             else
 #ifdef ZHLANG
         pline("结果是空的。");
@@ -1716,7 +1716,7 @@ consume_tin(const char *mesg)
             make_glib(alreadyglib + rn1(11, 5)); /* 5..15 */
             pline(TR("Eating %s food made your %s %s slippery.", "吃了%s食物让你的%s变得%s滑腻。"),
                   tintxts[r].txt, fingers_or_gloves(TRUE),
-                  alreadyglib ? "even more" : "very");
+                  alreadyglib ? TR("even more", "更加") : TR("very", "非常"));
         }
 
     } else { /* spinach... */
@@ -1746,16 +1746,17 @@ consume_tin(const char *mesg)
             livelog_printf(LL_CONDUCT, TR("ate for the first time (spinach)", "首次进食（菠菜）"));
         if (!tin->cursed)
             pline(TR("This makes you feel like %s!", "这让你觉得自己像%s！"),
-                  /* "Swee'pea" is a character from the Popeye cartoons */
-                  Hallucination ? "Swee'pea"
+                  /* TR("Swee'pea", "甜豆") is a character from the Popeye cartoons */
+                  Hallucination ? TR("Swee'pea", "甜豆")
                   /* "feel like Popeye" unless sustain ability suppresses
                      any attribute change; this slightly oversimplifies
                      things:  we want "Popeye" if no strength increase
                      occurs due to already being at maximum, but we won't
                      get it if at-maximum and fixed-abil both apply */
-                  : !Fixed_abil ? "Popeye"
+                  : !Fixed_abil ? TR("Popeye", "大力水手")
                   /* no gain, feel like another character from Popeye */
-                  : (flags.female ? "Olive Oyl" : "Bluto"));
+                  : (flags.female ? TR("Olive Oyl", "奥莉薇")
+                                  : TR("Bluto", "布鲁托")));
         gainstr(tin, 0, FALSE);
 
         tin = svc.context.tin.tin = costly_tin(COST_OPEN);
@@ -1900,7 +1901,7 @@ staticfn int
 rottenfood(struct obj *obj)
 {
     pline(TR("Blecch!  %s %s!", "呸！%s %s！"),
-          is_rottable(obj) ? "Rotten" : "Awful", foodword(obj));
+          is_rottable(obj) ? TR("Rotten", "腐烂的") : TR("Awful", "糟糕的"), foodword(obj));
     if (!rn2(4)) {
         if (Hallucination)
             You_feel(TR("rather trippy.", "感觉相当迷幻。"));
@@ -1957,14 +1958,14 @@ eatcorpse(struct obj *otmp)
     if (!vegan(&mons[mnum]))
         if (!u.uconduct.unvegan++) {
             livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
+                  TR("consumed animal products for the first time, by eating %s", "首次摄入动物制品：吃下了%s"),
                            an(food_xname(otmp, FALSE)));
             ll_conduct++;
         }
     if (!vegetarian(&mons[mnum])) {
         if (!u.uconduct.unvegetarian && !ll_conduct)
             livelog_printf(LL_CONDUCT,
-                           "tasted meat for the first time, by eating %s",
+                           TR("tasted meat for the first time, by eating %s", "首次尝到肉：吃下了%s"),
                            an(food_xname(otmp, FALSE)));
         violated_vegetarian();
     }
@@ -1984,10 +1985,10 @@ eatcorpse(struct obj *otmp)
 
         /* tp++; -- early return makes this unnecessary */
         pline(TR("Ulch - that %s was tainted%s!", "呃——那块%s被污染了%s！"),
-              (mons[mnum].mlet == S_FUNGUS) ? "fungoid vegetation"
-              : vegetarian(&mons[mnum]) ? "protoplasm"
-                : "meat",
-              cannibal ? ", you cannibal" : "");
+              (mons[mnum].mlet == S_FUNGUS) ? TR("fungoid vegetation", "真菌植物")
+              : vegetarian(&mons[mnum]) ? TR("protoplasm", "原生质")
+                : TR("meat", "肉"),
+              cannibal ? TR(", you cannibal", "，你这个食人族") : "");
         if (Sick_resistance) {
             pline(TR("It doesn't seem at all sickening, though...", "不过它似乎一点也不让人觉得恶心……"));
         } else {
@@ -2033,7 +2034,7 @@ eatcorpse(struct obj *otmp)
     /* now any corpse left too long will make you mildly ill */
     } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
-        You_feel(TR("%ssick.", "%s感到恶心。"), (Sick) ? "very " : "");
+        You_feel(TR("%ssick.", "%s感到恶心。"), (Sick) ? TR("very ", "非常") : "");
         losehp(rnd(8), !glob ? "cadaver" : "rotted glob", KILLED_BY_AN);
     }
 
@@ -2243,8 +2244,8 @@ fprefx(struct obj *otmp)
     case FOOD_RATION: /* nutrition 800 */
         /* 200+800 remains below 1000+1, the satiation threshold */
         if (u.uhunger <= 200)
-            pline("%s!", Hallucination ? "Oh wow, like, superior, man"
-                                       : "This food really hits the spot");
+            pline("%s!", Hallucination ? TR("Oh wow, like, superior, man", "哇哦，太高级了，老兄")
+                                       : TR("This food really hits the spot", "这食物真对胃口"));
 
         /* 700-1+800 remains below 1500, the choking threshold which
            triggers "you're having a hard time getting it down" feedback */
@@ -2257,7 +2258,7 @@ fprefx(struct obj *otmp)
             pline(TR("This tripe ration is surprisingly good!", "这份内脏口粮出奇地好吃！"));
         } else if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC))) {
             pline(Hallucination ? TR("Tastes great!  Less filling!", "味道好极了！还不胀肚子！")
-                                : "Mmm, tripe... not bad!");
+                                : TR("Mmm, tripe... not bad!", "嗯，内脏……还不错！"));
         } else {
             pline(TR("Yak - dog food!", "呸——狗粮！"));
             more_experienced(1, 0);
@@ -2271,7 +2272,7 @@ fprefx(struct obj *otmp)
         break;
     case LEMBAS_WAFER:
         if (maybe_polyd(is_orc(gy.youmonst.data), Race_if(PM_ORC))) {
-            pline("%s", "!#?&* elf kibble!");
+            pline("%s", TR("!#?&* elf kibble!", "!#?&* 精灵的饲料！"));
             break;
         } else if (maybe_polyd(is_elf(gy.youmonst.data), Race_if(PM_ELF))) {
             pline(TR("A little goes a long way.", "一点点就顶很久。"));
@@ -2295,7 +2296,7 @@ fprefx(struct obj *otmp)
         if (otmp->otyp == SLIME_MOLD && !otmp->cursed
             && otmp->spe == svc.context.current_fruit) {
             pline(TR("My, this is a %s %s!", "哎呀，这可真是个%s的%s！"),
-                  Hallucination ? "primo" : "yummy",
+                  Hallucination ? TR("primo", "上等的") : TR("yummy", "好吃的"),
                   singular(otmp, xname));
         } else if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
             ; /* skip core joke; feedback deferred til fpostfx() */
@@ -2318,10 +2319,10 @@ fprefx(struct obj *otmp)
 
                 pline(TR("%s -- core dumped.", "%s——果核已转储。"),
                       (x <= 75)
-                         ? "Segmentation fault"
+                         ? TR("Segmentation fault", "段错误")
                          : (x <= 99)
-                            ? "Bus error"
-                            : "Yo' mama");
+                            ? TR("Bus error", "总线错误")
+                            : TR("Yo' mama", "你妈"));
             }
 #endif
         } else {
@@ -2445,7 +2446,7 @@ eataccessory(struct obj *otmp)
                     && !Blind) {
                     newsym(u.ux, u.uy);
                     Your(TR("body takes on a %s transparency...", "你的身体呈现出一种%s的透明感……"),
-                         Hallucination ? "normal" : "strange");
+                         Hallucination ? "normal" : "strange"); /* NOTRANS */
                     makeknown(typ);
                 }
                 break;
@@ -2512,7 +2513,7 @@ eataccessory(struct obj *otmp)
             makeknown(typ);
             change_sex();
             You(TR("are suddenly very %s!", "你突然变得非常%s！"),
-                flags.female ? "feminine" : "masculine");
+                flags.female ? TR("feminine", "女性化") : TR("masculine", "男性化"));
             disp.botl = TRUE;
             break;
         case AMULET_OF_UNCHANGING:
@@ -2674,7 +2675,7 @@ fpostfx(struct obj *otmp)
         if (!Blind)
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT,
-                    "became literate by reading the fortune inside a cookie");
+                    TR("became literate by reading the fortune inside a cookie", "通过阅读签饼里的签文而学会了识字"));
         break;
     case LUMP_OF_ROYAL_JELLY:
         if (gy.youmonst.data == &mons[PM_KILLER_BEE] && !Unchanging
@@ -2792,7 +2793,7 @@ edibility_prompts(struct obj *otmp)
     long rotted = 0L;
 
     Strcpy(foodsmell, Tobjnam(otmp, TR("smell", "闻起来")));
-    Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
+    Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : TR("they", "它们"));
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
         || otmp->otyp == GLOB_OF_GREEN_SLIME) {
@@ -2829,7 +2830,7 @@ edibility_prompts(struct obj *otmp)
                  foodsmell, it_or_they);
     } else if (stoneorslime) {
         Snprintf(buf, sizeof buf,
-                 "%s like %s could be something very dangerous!",
+                 TR("%s like %s could be something very dangerous!", "%s像%s，可能是非常危险的东西！"),
                  foodsmell, it_or_they);
     } else if (cadaver && rotted > 5L && Sick_resistance) {
         /* Tainted meat with Sick_resistance (testing for that is
@@ -2878,7 +2879,7 @@ edibility_prompts(struct obj *otmp)
 
     if (*buf) {
         Snprintf(eos(buf), sizeof buf - strlen(buf), TR("  Eat %s anyway?", "  还是要吃%s吗？"),
-                 (otmp->quan == 1L) ? "it" : "one");
+                 (otmp->quan == 1L) ? "it" : TR("one", "一个"));
         return (yn_function(buf, ynchars, 'n', TRUE) == 'n') ? 1 : 2;
     }
     return 0;
@@ -2927,14 +2928,14 @@ doeat_nonfood(struct obj *otmp)
         || material == DRAGON_HIDE || material == WAX) {
         if (!u.uconduct.unvegan++ && !ll_conduct) {
             livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
+                  TR("consumed animal products for the first time, by eating %s", "首次摄入动物制品：吃下了%s"),
                            an(food_xname(otmp, FALSE)));
             ll_conduct++;
         }
         if (material != WAX) {
             if (!u.uconduct.unvegetarian && !ll_conduct)
                 livelog_printf(LL_CONDUCT,
-                   "tasted meat by-products for the first time, by eating %s",
+                   TR("tasted meat by-products for the first time, by eating %s", "首次尝到肉类副产品：吃下了%s"),
                                an(food_xname(otmp, FALSE)));
             violated_vegetarian();
         }
@@ -3005,7 +3006,7 @@ doeat(void)
 
         if (res) {
             Your(
-               "%s stops tingling and your sense of smell returns to normal.",
+               TR("%s stops tingling and your sense of smell returns to normal.", "%s不再发麻，嗅觉也恢复了正常。"),
                  body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
@@ -3182,14 +3183,14 @@ doeat(void)
         case FLESH:
             if (!u.uconduct.unvegan++ && !ll_conduct) {
                 livelog_printf(LL_CONDUCT,
-                  "consumed animal products for the first time, by eating %s",
+                  TR("consumed animal products for the first time, by eating %s", "首次摄入动物制品：吃下了%s"),
                                an(food_xname(otmp, FALSE)));
                 ll_conduct++;
             }
             if (otmp->otyp != EGG) {
                 if (!u.uconduct.unvegetarian && !ll_conduct)
                     livelog_printf(LL_CONDUCT,
-                               "tasted meat for the first time, by eating %s",
+                               TR("tasted meat for the first time, by eating %s", "首次尝到肉：吃下了%s"),
                                    an(food_xname(otmp, FALSE)));
 
                 violated_vegetarian();
@@ -3201,7 +3202,7 @@ doeat(void)
                 || otmp->otyp == LUMP_OF_ROYAL_JELLY)
                 if (!u.uconduct.unvegan++ && !ll_conduct)
                     livelog_printf(LL_CONDUCT,
-                           "consumed animal products (%s) for the first time",
+                           TR("consumed animal products (%s) for the first time", "首次摄入动物制品（%s）"),
                                    food_xname(otmp, FALSE));
             break;
         }
@@ -3663,11 +3664,11 @@ newuhs(boolean incr)
         case HUNGRY:
             if (Hallucination) {
                 You(!incr ? TR("now have a lesser case of the munchies.", "你现在只是有点嘴馋了。")
-                    : "are getting the munchies.");
+                    : TR("are getting the munchies.", "又开始嘴馋了。"));
             } else
-                You("%s.", !incr ? "only feel hungry now"
-                           : (u.uhunger < 145) ? "feel hungry"
-                             : "are beginning to feel hungry");
+                You("%s.", !incr ? TR("only feel hungry now", "只是现在觉得饿了")
+                           : (u.uhunger < 145) ? TR("feel hungry", "觉得饿了")
+                             : TR("are beginning to feel hungry", "开始觉得饿了"));
             if (incr && go.occupation
                 && (go.occupation != eatfood && go.occupation != opentin))
                 stop_occupation();
@@ -3676,17 +3677,17 @@ newuhs(boolean incr)
         case WEAK:
             if (Hallucination)
                 pline(!incr ? TR("You still have the munchies.", "你还是嘴馋。")
-              : "The munchies are interfering with your motor capabilities.");
+              : TR("The munchies are interfering with your motor capabilities.", "嘴馋正在影响你的行动能力。"));
             else if (incr && (Role_if(PM_WIZARD) || Race_if(PM_ELF)
                               || Role_if(PM_VALKYRIE)))
                 pline(TR("%s needs food, badly!", "%s急需进食！"),
                       (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE))
                           ? gu.urole.name.m
-                          : "Elf");
+                          : TR("Elf", "精灵"));
             else
-                You(TR("%s weak.", "你%s虚弱。"), !incr ? "are still"
-                                : (u.uhunger < 45) ? "feel"
-                                  : "are beginning to feel");
+                You(TR("%s weak.", "你%s虚弱。"), !incr ? TR("are still", "仍然")
+                                : (u.uhunger < 45) ? TR("feel", "摸起来")
+                                  : TR("are beginning to feel", "开始感到"));
             if (incr && go.occupation
                 && (go.occupation != eatfood && go.occupation != opentin))
                 stop_occupation();
@@ -4054,7 +4055,7 @@ consume_oeaten(struct obj *obj, int amt)
         if (otyp == CORPSE || otyp == EGG || otyp == TIN) {
             Strcpy(itembuf, (otyp == CORPSE) ? "corpse" /* NOTRANS */
                             : (otyp == EGG) ? "egg"
-                              : (otyp == TIN) ? "tin" : "other?");
+                              : (otyp == TIN) ? "tin" : "other?"); /* NOTRANS */
             Sprintf(eos(itembuf), " [%d]", obj->corpsenm);
         } else {
             Sprintf(itembuf, "%d", otyp);

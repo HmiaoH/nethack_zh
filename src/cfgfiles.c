@@ -337,7 +337,7 @@ fopen_config_file(const char *filename, int src)
     else
         Sprintf(tmp_config, "%s%s%s", envp,
                 !strchr(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
-                "NetHack.cnf");
+                "NetHack.cnf"); /* NOTRANS */
     set_configfile_name(tmp_config);
     if ((fp = fopen(configfile, "r")) != (FILE *) 0)
         return fp;
@@ -346,7 +346,7 @@ fopen_config_file(const char *filename, int src)
     if (!envp)
         Strcpy(tmp_config, ".nethackrc"); /* NOTRANS */
     else
-        Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
+        Sprintf(tmp_config, "%s/%s", envp, ".nethackrc"); /* NOTRANS */
 
     set_configfile_name(tmp_config);
     if ((fp = fopen(configfile, "r")) != (FILE *) 0)
@@ -360,13 +360,13 @@ fopen_config_file(const char *filename, int src)
 
         /* OSX-style configuration settings */
         Snprintf(alt_config, sizeof alt_config, "%s/%s", envp,
-                 "Library/Preferences/NetHack Defaults");
+                 "Library/Preferences/NetHack Defaults"); /* NOTRANS */
         set_configfile_name(alt_config);
         if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
         /* may be easier for user to edit if filename has '.txt' suffix */
         Snprintf(alt_config, sizeof alt_config, "%s/%s", envp,
-                 "Library/Preferences/NetHack Defaults.txt");
+                 "Library/Preferences/NetHack Defaults.txt"); /* NOTRANS */
         set_configfile_name(alt_config);
         if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
@@ -1596,7 +1596,7 @@ config_erradd(const char *buf)
     if (!program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
            player gave bad value when prompted by interactive 'O' command */
-        pline("%s%s%s", !iflags.window_inited ? "config_error_add: " : "",
+        pline("%s%s%s", !iflags.window_inited ? TR("config_error_add: ", "配置错误：") : "",
               buf, punct);
         wait_synch();
         return;
@@ -1623,7 +1623,7 @@ config_erradd(const char *buf)
     } else
         lineno[0] = '\0';
 
-    pline("%s %s%s%s", config_error_data->secure ? "Error:" : " *",
+    pline("%s %s%s%s", config_error_data->secure ? TR("Error:", "错误：") : " *",
           lineno, buf, punct);
 }
 

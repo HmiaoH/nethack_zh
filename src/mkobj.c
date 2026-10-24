@@ -1743,7 +1743,7 @@ maybe_adjust_light(struct obj *obj, int old_range)
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
                 /* we just saw "The <obj> glows <color>." from dipping */
-                Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
+                Strcpy(buf, (obj->quan == 1L) ? "It" : TR("They", "它们"));
             else if (carried(obj) || cansee(ox, oy))
                 Strcpy(buf, Yname2(obj));
             if (*buf) {
@@ -3033,15 +3033,15 @@ obj_sanity_check(void)
                 } else if (obj->otyp == BOULDER) {
                     if (prevo && prevo->otyp != BOULDER) {
                         Sprintf(at_fmt,
-                                "%%s boulder@<%d,%d> %%s %%s: not on top",
+                                "%%s boulder@<%d,%d> %%s %%s: not on top", /* NOTRANS */
                                 x, y);
                         insane_object(obj, at_fmt, "boulder sanity",
                                       (struct monst *) 0);
                     }
                     if (is_pool_or_lava(x, y)) {
                         Sprintf(at_fmt,
-                                "%%s boulder@<%d,%d> %%s %%s: on/in %s",
-                                x, y, is_pool(x, y) ? "water" : "lava");
+                                "%%s boulder@<%d,%d> %%s %%s: on/in %s", /* NOTRANS */
+                                x, y, is_pool(x, y) ? TR("water", "水") : TR("lava", "岩浆"));
                         insane_object(obj, at_fmt, "boulder sanity",
                                       (struct monst *) 0);
                     }
@@ -3325,7 +3325,7 @@ insane_obj_bits(struct obj *obj, struct monst *mon)
                 o_in_use ? " in_use" : "",
                 o_bypass ? " bypass" : "",
                 o_nomerge ? " nomerge" : "",
-                o_boulder ? " nxtbldr" : "");
+                o_boulder ? " nxtbldr" : ""); /* NOTRANS */
         insane_object(obj, ofmt0, infobuf, mon);
     }
 }

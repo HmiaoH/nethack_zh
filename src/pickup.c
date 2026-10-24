@@ -1185,7 +1185,7 @@ query_objlist(const char *qstr,        /* query string */
         any = cg.zeroany;
         if (sorted && n > 1) {
             Sprintf(buf, TR("%s Creatures", "%s的生物"),
-                    digests(u.ustuck->data) ? "Swallowed" : "Engulfed");
+                    digests(u.ustuck->data) ? TR("Swallowed", "吞下") : TR("Engulfed", "包裹"));
             add_menu_heading(win, buf);
         }
         fake_hero_object = cg.zeroobj;
@@ -1364,18 +1364,18 @@ query_category(
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  /* note: menu_remarm() doesn't pass the CHOOSE_ALL flag,
                     so do_worn handling here is moot */
-                 do_worn ? "Auto-select every item being worn or wielded"
-                         : "Auto-select every relevant item",
+                 do_worn ? TR("Auto-select every item being worn or wielded", "自动选中所有穿戴和挥舞的物品")
+                         : TR("Auto-select every relevant item", "自动选中所有相关物品"),
                  MENU_ITEMFLAGS_SKIPINVERT);
         verify_All = (how == PICK_ANY) && ParanoidAutoAll;
         if (!verify_All) {
             if (!ga.A_first_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                   "    (ignored unless some other choices are also picked)");
+                   TR("    (ignored unless some other choices are also picked)", "    （除非同时还选了其他项，否则将被忽略）"));
         } else if (show_a) {
             if (!ga.A_second_hint++ || iflags.cmdassist)
                 add_menu_str(win,
-                      "    (if no other choices are picked, 'a' is implied)");
+                      TR("    (if no other choices are picked, 'a' is implied)", "    （如果没选其他项，则默认为「a」）"));
         }
         /* blank separator */
         add_menu_str(win, "");
@@ -1386,7 +1386,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 do_worn ? "All worn and wielded types" : "All types",
+                 do_worn ? TR("All worn and wielded types", "所有穿戴和挥舞的类别") : TR("All types", "所有类别"),
                  MENU_ITEMFLAGS_SKIPINVERT);
         ++invlet; /* invlet = 'b'; */
     }
@@ -1432,7 +1432,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'u';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0,
-                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_SKIPINVERT);
+                 ATR_NONE, clr, TR("Unpaid items", "未付款物品"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     /* billed items: checked by caller, so always include if BILLED_TYPES */
     if (do_usedup) {
@@ -1440,7 +1440,7 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'x';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Unpaid items already used up", MENU_ITEMFLAGS_SKIPINVERT);
+                 TR("Unpaid items already used up", "已用掉的未付款物品"), MENU_ITEMFLAGS_SKIPINVERT);
     }
 
     /* items with b/u/c/unknown if there are any;
@@ -1451,28 +1451,28 @@ query_category(
         any = cg.zeroany;
         any.a_int = 'B';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Blessed", MENU_ITEMFLAGS_SKIPINVERT);
+                 TR("Items known to be Blessed", "已知被祝福的物品"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Cursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 TR("Items known to be Cursed", "已知被诅咒的物品"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items known to be Uncursed", MENU_ITEMFLAGS_SKIPINVERT);
+                 TR("Items known to be Uncursed", "已知未被诅咒的物品"), MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Items of unknown Bless/Curse status",
+                 TR("Items of unknown Bless/Curse status", "祝福/诅咒状态未知的物品"),
                  MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (num_justpicked) {
@@ -1746,7 +1746,7 @@ You("can only %s %s of the %s %s.", verb,
         prefx2 = "is too heavy for you to ";
         suffx = "";
     }
-    There(TR("%s %s %s, but %s%s%s%s.", "%s%s%s，但%s%s%s%s。"), otense(obj, "are"), obj_nambuf, where,
+    There(TR("%s %s %s, but %s%s%s%s.", "%s%s%s，但%s%s%s%s。"), otense(obj, TR("are", "已经")), obj_nambuf, where,
           prefx1, prefx2, verb, suffx);
 
     /* *wt_after = iw; */
@@ -1812,7 +1812,7 @@ You("are carrying too much stuff to pick up %s %s.",
         Your(TR("knapsack cannot accommodate any more items%s.", "你的背包已经装不下更多物品了%s。"),
              /* floor follows by nexthere, otherwise container so by nobj */
              nxtobj(obj, GOLD_PIECE, (boolean) (obj->where == OBJ_FLOOR))
-                 ? " (except gold)" : "");
+                 ? TR(" (except gold)", "（金币除外）") : "");
         result = -1; /* nothing lifted */
     } else {
         result = 1;
@@ -1833,7 +1833,7 @@ You("are carrying too much stuff to pick up %s %s.",
                         : (next_encumbr >= HVY_ENCUMBER) ? nearloadpfx
                           : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
                             : slightloadpfx,
-                        !container ? "lifting" : "removing");
+                        !container ? TR("lifting", "抬起") : TR("removing", "取下"));
                 (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
                                  ansimpleoname, something);
                 obj->quan = savequan;
@@ -1916,7 +1916,7 @@ pickup_object(
         } else {
             #ifdef ZHLANG
 pline_The("卷轴%s%s，在你%s起%s时化为了灰烬。", plur(obj->quan),
-                      otense(obj, "turn"), telekinesis ? "举起" : "捡",
+                      otense(obj, TR("turn", "已经")), telekinesis ? "举起" : "捡",
                       (obj->quan == 1L) ? "它" : "它们");
 #else
 pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
@@ -2160,7 +2160,7 @@ able_to_loot(
            can tip underwater, but not when over--or stuck in--lava */
         #ifdef ZHLANG
 You("无法%s深陷在%s中的东西。", verb,
-            hliquid(is_lava(x, y) ? "lava" : "water"));
+            hliquid(is_lava(x, y) ? TR("lava", "岩浆") : TR("water", "水")));
 #else
 You("cannot %s things that are deep in the %s.", verb,
             hliquid(is_lava(x, y) ? "lava" : "water"));
@@ -2218,7 +2218,7 @@ do_loot_cont(
 #if 0
         if (ccount < 2 && (svl.level.objects[cobj->ox][cobj->oy] == cobj))
             pline(TR("%s locked.", "%s锁住了。"),
-                  cobj->lknown ? "It is" : "Hmmm, it turns out to be");
+                  cobj->lknown ? "It is" : TR("Hmmm, it turns out to be", "嗯，结果发现它"));
         else
 #endif
         if (cobj->lknown)
@@ -2479,7 +2479,7 @@ You("%s to loot on the %s.", dont_find_anything,
             if (!underfoot && container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
                     You_cant(TR("loot anything %sthere with %s in the way.", "无法搜刮%s那里的东西，因为%s挡着。"),
-                             prev_inquiry ? "else " : "", mon_nam(mtmp));
+                             prev_inquiry ? TR("else ", "别的") : "", mon_nam(mtmp));
                     return (timepassed ? ECMD_TIME : ECMD_OK);
                 } else {
                     #ifdef ZHLANG
@@ -2490,14 +2490,14 @@ You("have to be at a container to loot it.");
                 }
             } else {
                 You(TR("%s %s%shere to loot.", "你%s%s%s可以搜刮。"), dont_find_anything,
-                    (prev_inquiry || prev_loot) ? "else " : "",
+                    (prev_inquiry || prev_loot) ? TR("else ", "别的") : "",
                     !underfoot ? "t" : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
         }
     } else if (c != 'y' && c != 'n') {
         You(TR("%s %s to loot.", "你%s%s可以搜刮。"), dont_find_anything,
-            underfoot ? "here" : "there");
+            underfoot ? TR("here", "这里") : TR("there", "那里"));
     }
     return (timepassed ? ECMD_TIME : ECMD_OK);
 }
@@ -3035,7 +3035,7 @@ mbag_item_gone(boolean held, struct obj *item, boolean silent)
     if (!silent) {
         if (item->dknown)
             #ifdef ZHLANG
-pline("%s%s消失了！", Doname2(item), otense(item, "have"));
+pline("%s%s消失了！", Doname2(item), otense(item, TR("have", "已经")));
 #else
 pline("%s %s vanished!", Doname2(item), otense(item, "have"));
 #endif
@@ -3244,7 +3244,7 @@ use_container(
             update_inventory();
     }
     if (obj->olocked) {
-        pline(TR("%s locked.", "%s锁住了。"), Tobjnam(obj, "are"));
+        pline(TR("%s locked.", "%s锁住了。"), Tobjnam(obj, TR("are", "已经")));
         if (held)
             You(TR("must put it down to unlock.", "必须先放下它才能开锁。"));
         return ECMD_OK;
@@ -3292,7 +3292,7 @@ use_container(
     if (!outokay) /* preformat the empty-container message */
         Sprintf(emptymsg, TR("%s is %sempty.", "%s%s是空的。"),
                 Ysimple_name2(gc.current_container),
-                (quantum_cat || cursed_mbag) ? "now " : "");
+                (quantum_cat || cursed_mbag) ? TR("now ", "现在") : "");
 
     /*
      * What-to-do prompt's list of possible actions:
@@ -3689,14 +3689,14 @@ in_or_out_menu(
     }
     if (outokay) {
         any.a_int = 4; /* 'b' */
-        Sprintf(buf, TR("%stake out, then put in", "%s先取出，再放入"), inokay ? "both; " : "");
+        Sprintf(buf, TR("%stake out, then put in", "%s先取出，再放入"), inokay ? TR("both; ", "两者都") : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
     if (inokay) {
         any.a_int = 5; /* 'r' */
         Sprintf(buf, TR("%sput in, then take out", "%s先放入，再取出"),
-                outokay ? "both reversed; " : "");
+                outokay ? TR("both reversed; ", "反过来") : "");
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
                  ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int = 6; /* 's' */
@@ -3708,11 +3708,11 @@ in_or_out_menu(
     if (more_containers) {
         any.a_int = 7; /* 'n' */
         add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
-                 ATR_NONE, clr, "loot next container",
+                 ATR_NONE, clr, TR("loot next container", "搜刮下一个容器"),
                  MENU_ITEMFLAGS_SELECTED);
     }
     any.a_int = 8; /* 'q' */
-    Strcpy(buf, alreadyused ? TR("done", "完成") : "do nothing");
+    Strcpy(buf, alreadyused ? TR("done", "完成") : TR("do nothing", "什么也不做"));
     add_menu(win, &nul_glyphinfo, &any, menuselector[any.a_int], 0,
              ATR_NONE, clr, buf,
              more_containers ? MENU_ITEMFLAGS_NONE : MENU_ITEMFLAGS_SELECTED);
@@ -3788,7 +3788,7 @@ choose_tip_container_menu(void)
            containers that it's already being used */
         i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
         add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
-                 clr, "tip something being carried",
+                 clr, TR("tip something being carried", "倾倒随身携带的某物"),
                  MENU_ITEMFLAGS_SELECTED);
     }
     end_menu(win, TR("Tip which container?", "倾倒哪个容器？"));
@@ -3848,7 +3848,7 @@ dotip(void)
         && (!iflags.menu_requested
             || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
         Sprintf(buf, TR("You can't tip %s while carrying so much.", "你携带太多东西，无法倾倒%s。"),
-                !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
+                !flags.verbose ? TR("a container", "一个容器") : (boxes > 1) ? TR("one", "一个") : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
                 int res;
@@ -3874,12 +3874,12 @@ dotip(void)
                      */
                     (void) tipcontainer_gettarget(cobj, &dum, &target_count);
                     Sprintf(prompt_part2, TR(" here, tip it%s%s?", "这里，倒出它%s%s？"),
-                            (target_count == 0) ? " onto the " : "",
+                            (target_count == 0) ? TR(" onto the ", "到") : "",
                             (target_count == 0) ? surface(cobj->ox, cobj->oy)
                                                 : "");
                     c = ynq(safe_qbuf(qbuf, TR("There is ", "这里有"), prompt_part2,
                                       cobj,
-                                      doname, ansimpleoname, "container"));
+                                      doname, ansimpleoname, TR("container", "容器")));
                     if (c == 'q')
                         return ECMD_OK;
                     if (c == 'n')
@@ -3924,12 +3924,12 @@ dotip(void)
     if (spillage) {
         buf[0] = '\0';
         if (is_pool(u.ux, u.uy))
-            Sprintf(buf, TR(" and gradually %s", "，并逐渐%s"), vtense(spillage, "dissipate"));
+            Sprintf(buf, TR(" and gradually %s", "，并逐渐%s"), vtense(spillage, TR("dissipate", "消散")));
         else if (is_lava(u.ux, u.uy))
             Sprintf(buf, TR(" and immediately %s away", "，并立即%s掉"),
-                    vtense(spillage, "burn"));
+                    vtense(spillage, TR("burn", "点燃")));
         pline(TR("Some %s %s onto the %s%s.", "一些%s%s到了%s上%s。"), spillage,
-              vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
+              vtense(spillage, TR("spill", "洒")), surface(u.ux, u.uy), buf);
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
             consume_obj_charge(cobj, TRUE);
@@ -3939,7 +3939,7 @@ dotip(void)
     }
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
-        pline_The(TR("%s %s securely sealed.", "%s%s密封得很严实。"), xname(cobj), otense(cobj, "are"));
+        pline_The(TR("%s %s securely sealed.", "%s%s密封得很严实。"), xname(cobj), otense(cobj, TR("are", "已经")));
     else if (uarmh && cobj == uarmh)
         return tiphat() ? ECMD_TIME : ECMD_OK;
     else if (cobj->otyp == STATUE)
@@ -4020,11 +4020,11 @@ tipcontainer(struct obj *box) /* or bag */
          */
         if (targetbox)
             pline(TR("%s into %s.", "%s滚进了%s。"),
-                  box->cobj->nobj ? "Objects tumble" : "An object tumbles",
+                  box->cobj->nobj ? TR("Objects tumble", "一些物品") : TR("An object tumbles", "一件物品"),
                   the(xname(targetbox)));
         else
             pline(TR("%s out%c", "%s涌出%c"),
-              box->cobj->nobj ? "Objects spill" : "An object spills",
+              box->cobj->nobj ? TR("Objects spill", "一些物品") : TR("An object spills", "一件物品"),
               terse ? ':' : '.');
 
         for (otmp = box->cobj; otmp; otmp = nobj) {
@@ -4048,12 +4048,12 @@ tipcontainer(struct obj *box) /* or bag */
             if (targetbox) {
                 if (Is_mbag(targetbox) && mbag_explodes(otmp, 0)) {
                     livelog_printf(LL_ACHIEVE,
-                                 "just blew up %s bag of holding via tipping",
+                                 TR("just blew up %s bag of holding via tipping", "因为倾倒炸毁了%s的次元袋"),
                                    uhis());
                     /* explicitly mention what item is triggering explosion */
                     urgent_pline(
-                   "As %s %s inside, you are blasted by a magical explosion!",
-                                 doname(otmp), otense(otmp, "tumble"));
+                   TR("As %s %s inside, you are blasted by a magical explosion!", "当%s%s进去时，你被一阵魔法爆炸轰击！"),
+                                 doname(otmp), otense(otmp, TR("tumble", "滚落")));
 
                     /* if putting one bag of holding into another, first
                        blow up the one going in, then (below) blow up the
@@ -4086,7 +4086,7 @@ tipcontainer(struct obj *box) /* or bag */
                     doaltarobj(otmp);
                 } else if (!terse) {
                     pline(TR("%s %s to the %s.", "%s%s掉到了%s上。"), Doname2(otmp),
-                          otense(otmp, "drop"), surface(ox, oy));
+                          otense(otmp, TR("drop", "掉落")), surface(ox, oy));
                 } else {
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
                     iflags.last_msg = PLNMSG_OBJNAM_ONLY;

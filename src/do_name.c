@@ -488,11 +488,11 @@ oname(
             /* violate illiteracy conduct since successfully wrote arti-name */
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT | LL_ARTIFACT,
-                               "became literate by naming %s",
+                               TR("became literate by naming %s", "因命名%s而学会识字"),
                                bare_artifactname(obj));
             else
                 livelog_printf(LL_ARTIFACT,
-                               "chose %s to be named \"%s\"",
+                               TR("chose %s to be named \"%s\"", "选择将%s命名为「%s」"),
                                ansimpleoname(obj), bare_artifactname(obj));
         }
     }
@@ -598,30 +598,30 @@ docallcmd(void)
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
-             ATR_NONE, clr, "a monster", MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, TR("a monster", "一个怪物"), MENU_ITEMFLAGS_NONE);
     if (gi.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
-                 ATR_NONE, clr, "a particular object in inventory",
+                 ATR_NONE, clr, TR("a particular object in inventory", "物品栏中的某个具体物品"),
                  MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
-                 ATR_NONE, clr, "the type of an object in inventory",
+                 ATR_NONE, clr, TR("the type of an object in inventory", "物品栏中某类物品的类型"),
                  MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
-             ATR_NONE, clr, "the type of an object upon the floor",
+             ATR_NONE, clr, TR("the type of an object upon the floor", "地面上某类物品的类型"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
-             ATR_NONE, clr, "the type of an object on discoveries list",
+             ATR_NONE, clr, TR("the type of an object on discoveries list", "已发现物品列表中某类物品的类型"),
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
-             ATR_NONE, clr, "record an annotation for the current level",
+             ATR_NONE, clr, TR("record an annotation for the current level", "为当前楼层记录注释"),
              MENU_ITEMFLAGS_NONE);
 #ifdef ZHLANG
     end_menu(win, "你想命名什么？");
@@ -774,7 +774,7 @@ namefloorobj(void)
        the help text once getpos() has started */
     Sprintf(buf, TR("object on map (or '.' for one %s you)", "地图上的物体（或用「.」表示你%s的那个）"),
             (u.uundetected && hides_under(gy.youmonst.data))
-              ? "over" : "under");
+              ? TR("over", "上方") : TR("under", "身下"));
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (u_at(cc.x, cc.y)) {
@@ -983,8 +983,8 @@ x_monnam(
         boolean s_one = humanoid(mdat) && !is_animal(mdat) && !mindless(mdat);
 
         Strcpy(buf, !augment_it ? "it"
-                    : (!do_hallu ? s_one : !rn2(2)) ? "someone"
-                      : "something");
+                    : (!do_hallu ? s_one : !rn2(2)) ? TR("someone", "某人")
+                      : TR("something", "某物"));
         return buf;
     }
 
@@ -1296,7 +1296,7 @@ distant_monnam(
     if (mon->data == &mons[PM_HIGH_CLERIC] && !Hallucination
         && Is_astralevel(&u.uz) && !m_next2u(mon)) {
         Strcpy(outbuf, article == ARTICLE_THE ? TR("the ", "这个 ") : "");
-        Strcat(outbuf, mon->female ? TR("high priestess", "女大祭司") : "high priest");
+        Strcat(outbuf, mon->female ? TR("high priestess", "女大祭司") : TR("high priest", "大祭司"));
     } else {
         Strcpy(outbuf, x_monnam(mon, article, (char *) 0, 0, TRUE));
     }
@@ -1393,7 +1393,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
                 mon->mx, mon->my);
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
-                mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
+                mon->mtame ? TR("tame ", "已驯服的") : mon->mpeaceful ? TR("peaceful ", "和平的") : "",
                 mon_pmname(mon), mon->mx, mon->my);
         if (mon->cham != NON_PM)
             Sprintf(eos(outbuf), "{%s}",

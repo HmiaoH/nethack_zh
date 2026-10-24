@@ -234,7 +234,7 @@ obj_typename(int otyp)
         if (otyp != SPE_NOVEL) {
             Strcpy(buf, TR("spellbook", "法术书"));
         } else {
-            Strcpy(buf, !nn ? TR("book", "书") : "novel");
+            Strcpy(buf, !nn ? TR("book", "书") : TR("novel", "小说"));
             nn = 0;
         }
         break;
@@ -433,7 +433,7 @@ fruitname(
     else
         fruit_nam = svp.pl_fruit; /* use it as is */
 
-    Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? " juice" : "");
+    Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? TR(" juice", "汁") : "");
     return buf;
 }
 
@@ -725,7 +725,7 @@ xname_flags(
         if (typ == LENSES)
             Strcpy(buf, TR("pair of ", "一双"));
         else if (is_wet_towel(obj))
-            Strcpy(buf, (obj->spe < 3) ? TR("moist ", "湿的") : "wet ");
+            Strcpy(buf, (obj->spe < 3) ? TR("moist ", "湿的") : TR("wet ", "湿透的"));
 
         if (!dknown)
             Strcat(buf, dn);
@@ -835,11 +835,11 @@ xname_flags(
 
             Snprintf(buf, bufspaceleft, "%s%s of %s%s",
                      (Role_if(PM_ARCHEOLOGIST)
-                      && (obj->spe & CORPSTAT_HISTORIC) != 0) ? "historic "
+                      && (obj->spe & CORPSTAT_HISTORIC) != 0) ? TR("historic ", "古老的")
                        : "",
                      actualn,
                      type_is_pname(&mons[omndx]) ? ""
-                       : the_unique_pm(&mons[omndx]) ? "the "
+                       : the_unique_pm(&mons[omndx]) ? TR("the ", "这个 ")
                          : just_an(anbuf, statue_pmname),
                      statue_pmname);
         } else if (typ == BOULDER && obj->next_boulder == 1) {
@@ -1337,8 +1337,8 @@ add_erosion_words(struct obj *obj, char *prefix)
             break;
         }
         Strcat(prefix, is_rustprone(obj) ? TR("rusty ", "生锈的")
-                       : is_crackable(obj) ? "cracked "
-                         : "burnt ");
+                       : is_crackable(obj) ? TR("cracked ", "开裂的")
+                         : TR("burnt ", "烧焦的"));
     }
     if (obj->oeroded2 && !iscrys) {
         switch (obj->oeroded2) {
@@ -1349,18 +1349,18 @@ add_erosion_words(struct obj *obj, char *prefix)
             Strcat(prefix, TR("thoroughly ", "彻底"));
             break;
         }
-        Strcat(prefix, is_corrodeable(obj) ? TR("corroded ", "腐蚀的") : "rotted ");
+        Strcat(prefix, is_corrodeable(obj) ? TR("corroded ", "腐蚀的") : TR("rotted ", "腐烂的"));
     }
     /* note: it is possible for an item to be both eroded and erodeproof
        (cursed scroll of destroy armor read while confused erodeproofs an
        item of armor without repairing existing erosion) */
     if (rknown && obj->oerodeproof)
         Strcat(prefix, iscrys ? TR("fixed ", "加固过的")
-                       : is_rustprone(obj) ? "rustproof "
-                         : is_corrodeable(obj) ? "corrodeproof "
-                           : is_flammable(obj) ? "fireproof "
-                             : is_crackable(obj) ? "tempered " /* hardened */
-                               : is_rottable(obj) ? "rotproof "
+                       : is_rustprone(obj) ? TR("rustproof ", "防锈的")
+                         : is_corrodeable(obj) ? TR("corrodeproof ", "防腐蚀的")
+                           : is_flammable(obj) ? TR("fireproof ", "防火的")
+                             : is_crackable(obj) ? TR("tempered ", "加硬的") /* hardened */
+                               : is_rottable(obj) ? TR("rotproof ", "防腐的")
                                  : "");
 }
 
@@ -1665,7 +1665,7 @@ doname_base(
 
             /* separately formatted suffix avoids need for ConcatF3() */
             Sprintf(suffix, "%s%s", plur(obj->spe),
-                    !obj->lamplit ? " attached" : ", lit");
+                    !obj->lamplit ? TR(" attached", "，未点燃") : TR(", lit", "，已点燃"));
             ConcatF2(bp, 0, " (%d of 7 candle%s)", obj->spe, suffix);
             break;
         } else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
@@ -2004,7 +2004,7 @@ doname_base(
             if (!doname_full++) {
                 paniclog("doname", bp);
                 Sprintf(tmpbuf, "long object description%s.", /* NOTRANS */
-                        offsetbp ? " truncated for menu use" : "");
+                        offsetbp ? " truncated for menu use" : ""); /* NOTRANS */
                 paniclog("doname", tmpbuf);
             }
             bp[BUFSZ - 1 - offsetbp] = '\0';
@@ -3903,7 +3903,7 @@ wizterrainwish(struct _readobjnam_data *d)
             trap = t->ttyp;
             tname = trapname(trap, TRUE);
             pline("%s%s.", An(tname),
-                  (trap != MAGIC_PORTAL) ? "" : " to nowhere");
+                  (trap != MAGIC_PORTAL) ? "" : TR(" to nowhere", "，通往虚无"));
         } else {
             pline(TR("Creation of %s failed.", "创建%s失败。"), an(tname));
         }
@@ -3922,7 +3922,7 @@ wizterrainwish(struct _readobjnam_data *d)
             svl.level.flags.nfountains++;
         lev->looted = d->looted ? F_LOOTED : 0; /* overlays 'flags' */
         lev->blessedftn = d->blessed || !strncmpi(bp, "magic ", 6);
-        pline(TR("A %sfountain.", "一座%s喷泉。"), lev->blessedftn ? "magic " : "");
+        pline(TR("A %sfountain.", "一座%s喷泉。"), lev->blessedftn ? TR("magic ", "魔法") : "");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 6, "throne")) {
         lev->typ = THRONE;
@@ -3984,7 +3984,7 @@ wizterrainwish(struct _readobjnam_data *d)
         del_engr_at(x, y);
         if (!is_dbridge) {
             pline(TR("A %s of molten lava.", "一片%s熔岩。"),
-                  (lev->typ == LAVAPOOL) ? "pool" : "wall");
+                  (lev->typ == LAVAPOOL) ? TR("pool", "水池") : TR("wall", "墙"));
             if (!(Levitation || Flying) || lev->typ == LAVAWALL)
                 pooleffects(FALSE);
         } else {
@@ -4038,7 +4038,7 @@ wizterrainwish(struct _readobjnam_data *d)
         if (IS_GRAVE(lev->typ)) {
             lev->looted = 0; /* overlays 'flags' */
             lev->disturbed = d->looted ? 1 : 0;
-            pline(TR("A %sgrave.", "一座%s坟墓。"), lev->disturbed ? "disturbed " : "");
+            pline(TR("A %sgrave.", "一座%s坟墓。"), lev->disturbed ? TR("disturbed ", "被扰动的") : "");
             madeterrain = TRUE;
         } else {
             pline(TR("Can't place a grave here.", "这里不能放置坟墓。"));
@@ -4144,7 +4144,7 @@ wizterrainwish(struct _readobjnam_data *d)
             pline("%s.", upstart(an(dbuf)));
             madeterrain = TRUE;
         } else {
-            Strcpy(dbuf, secret ? TR("secret door", "秘门") : "door");
+            Strcpy(dbuf, secret ? TR("secret door", "秘门") : TR("door", "门"));
             pline(TR("%s requires door or wall location.", "%s需要门或墙的位置。"), upstart(dbuf));
             badterrain = TRUE;
         }
@@ -4251,7 +4251,7 @@ dbterrainmesg(
     coordxy x, coordxy y)
 {
     pline(TR("%s %s the drawbridge.", "%s，就在吊桥%s。"), newtype,
-          (levl[x][y].typ == DRAWBRIDGE_UP) ? "in front of" : "under");
+          (levl[x][y].typ == DRAWBRIDGE_UP) ? TR("in front of", "前方") : TR("under", "身下"));
 }
 
 #define TIN_UNDEFINED 0

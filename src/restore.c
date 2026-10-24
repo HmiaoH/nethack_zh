@@ -1651,12 +1651,12 @@ restore_menu(
                : (k <= 26 + 'N' - 'A') ? 'N' : 0;
         any.a_int = -1;                    /* not >= 0 */
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'N', ATR_NONE, clr,
-                 "Start a new character", MENU_ITEMFLAGS_NONE);
+                 TR("Start a new character", "开始新角色"), MENU_ITEMFLAGS_NONE);
         clet = (k + 1 <= 'q' - 'a' && clet == 'n') ? 'q'  /* quit */
                : (k + 1 <= 26 + 'Q' - 'A' && clet == 'N') ? 'Q' : 0;
         any.a_int = -2;
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 'Q', ATR_NONE, clr,
-                 "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
+                 TR("Never mind (quit)", "算了（退出）"), MENU_ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         end_menu(tmpwin, (char *) 0);
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {

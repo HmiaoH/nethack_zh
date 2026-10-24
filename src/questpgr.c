@@ -765,7 +765,7 @@ com_pager_core(
 void
 com_pager(const char *msgid)
 {
-    (void) com_pager_core("common", msgid, TRUE, (char **) 0);
+    (void) com_pager_core("common", msgid, TRUE, (char **) 0); /* NOTRANS */
 }
 
 void

@@ -960,7 +960,7 @@ welcome(boolean new_game) /* false => restoring an old game */
      */
     if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT] || adrift)
         Sprintf(eos(buf), " %s%s",
-                adrift ? "adrift " : "",
+                adrift ? TR("adrift ", "漂泊中") : "",
                 adrift ? align_str(u.ualign.type)
                        : align_str(u.ualignbase[A_CURRENT]));
 #endif

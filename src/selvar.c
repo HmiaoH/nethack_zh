@@ -770,9 +770,9 @@ selection_size_description(struct selectionvar *sel, char *buf)
     dx = rect.hx - rect.lx + 1;
     dy = rect.hy - rect.ly + 1;
     Sprintf(buf, "%s %i by %i",
-            selection_is_irregular(sel) ? "irregularly shaped"
-            : (dx == dy) ? "square"
-              : "rectangular",
+            selection_is_irregular(sel) ? TR("irregularly shaped", "不规则形状")
+            : (dx == dy) ? TR("square", "正方形")
+              : TR("rectangular", "长方形"),
             dx, dy);
     return buf;
 }

@@ -3719,14 +3719,14 @@ print_mapseen(
         Sprintf(buf, TR("%sOracle of Delphi.", "%s德尔斐神谕。"), PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
         Sprintf(buf, "%s%s.", PREFIX,
-                mptr->flags.sokosolved ? "Solved" : "Unsolved");
+                mptr->flags.sokosolved ? TR("Solved", "已解开") : TR("Unsolved", "未解开"));
     } else if (mptr->flags.bigroom) {
         Sprintf(buf, TR("%sA very big room.", "%s一个非常大的房间。"), PREFIX);
     } else if (mptr->flags.roguelevel) {
         Sprintf(buf, TR("%sA primitive area.", "%s一片原始的区域。"), PREFIX);
     } else if (on_level(&mptr->lev, &qstart_level)) {
         Sprintf(buf, TR("%sHome%s.", "%s家园%s。"), PREFIX,
-                mptr->flags.notreachable ? " (no way back...)" : "");
+                mptr->flags.notreachable ? TR(" (no way back...)", "（无法返回……）") : "");
         if (u.uevent.qcompleted)
             Sprintf(buf, TR("%sCompleted quest for %s.", "%s已完成对%s的任务。"), PREFIX, ldrname());
         else if (mptr->flags.questing)
@@ -3779,7 +3779,7 @@ print_mapseen(
             if (bp->bonesknown || wizard || final > 0)
                 ++kncnt;
         if (kncnt) {
-            Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
+            Sprintf(buf, "%s%s", PREFIX, TR("Final resting place for", "最终长眠者："));
             add_menu_str(win, buf);
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead

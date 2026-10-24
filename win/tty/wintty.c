@@ -2863,11 +2863,42 @@ tty_end_menu(
         }
 
         /* cut off any lines that are too long */
+#ifdef ZHLANG
+        /* Chinese text takes two columns per character but three bytes;
+           cut at a display-column boundary so that no UTF-8 sequence is
+           split in half */
+        len = u8_width(curr->str) + 2; /* extra space at beg & end */
+        if (len > (int) ttyDisplay->cols) {
+            int maxcols = (int) ttyDisplay->cols - 2, col = 0;
+            char *cut = curr->str;
+
+            while (*cut) {
+                int slen = u8_seqlen(cut), cw2, k;
+                char tmp[5];
+
+                if (slen > 1) {
+                    (void) memcpy(tmp, cut, (size_t) slen);
+                    tmp[slen] = '\0';
+                    cw2 = u8_width(tmp);
+                } else {
+                    cw2 = 1;
+                }
+                if (col + cw2 > maxcols)
+                    break;
+                for (k = 0; k < slen; ++k)
+                    ++cut;
+                col += cw2;
+            }
+            *cut = '\0';
+            len = u8_width(curr->str) + 2;
+        }
+#else
         len = strlen(curr->str) + 2; /* extra space at beg & end */
         if (len > (int) ttyDisplay->cols) {
             curr->str[ttyDisplay->cols - 2] = 0;
             len = ttyDisplay->cols;
         }
+#endif
         if (len > cw->cols)
             cw->cols = len;
     }

@@ -90,7 +90,7 @@ beehive_mon_sound(struct monst *mtmp)
             Soundeffect(se_bees, 100);
             #ifdef ZHLANG
             You_hear(TR("bees in your %sbonnet!", "有蜜蜂在你%s帽子里嗡嗡作响！"),
-                     uarmh ? "" : "(nonexistent) ");
+                     uarmh ? "" : TR("(nonexistent) ", "（不存在的）"));
             #else
             You_hear("bees in your %sbonnet!",
                      uarmh ? "" : "(nonexistent) ");
@@ -120,11 +120,11 @@ morgue_mon_sound(struct monst *mtmp)
             break;
         case 1:
             pline_The(TR("%s on the back of your %s %s up.", "%s在你%s后面%s起来。"), hair,
-                      body_part(NECK), vtense(hair, "stand"));
+                      body_part(NECK), vtense(hair, TR("stand", "竖")));
             break;
         case 2:
             pline_The(TR("%s on your %s %s to stand up.", "%s在你%s上%s竖起。"), hair,
-                      body_part(HEAD), vtense(hair, "seem"));
+                      body_part(HEAD), vtense(hair, TR("seem", "现在")));
             break;
         }
         return TRUE;
@@ -822,23 +822,23 @@ domonnoise(struct monst *mtmp)
         if (mtmp->mtame) {
             if (kindred) {
                 Sprintf(verbuf, TR("Good %s to you Master%s", "祝%s好，主人%s"),
-                        isnight ? "evening" : "day",
-                        isnight ? "!" : ".  Why do we not rest?");
+                        isnight ? TR("evening", "晚上") : TR("day", "白天"),
+                        isnight ? "!" : TR(".  Why do we not rest?", "。我们为何不歇息呢？"));
                 verbl_msg = verbuf;
             } else {
                 Sprintf(verbuf, "%s%s",
-                        nightchild ? "Child of the night, " : "",
+                        nightchild ? TR("Child of the night, ", "暗夜之子，") : "",
                         midnight()
-                         ? "I can stand this craving no longer!"
+                         ? TR("I can stand this craving no longer!", "我再也受不了这种渴望了！")
                          : isnight
-                          ? "I beg you, help me satisfy this growing craving!"
-                          : "I find myself growing a little weary.");
+                          ? TR("I beg you, help me satisfy this growing craving!", "求求你，帮我满足这日益增长的渴望！")
+                          : TR("I find myself growing a little weary.", "我觉得自己有点疲倦了。"));
                 verbl_msg = verbuf;
             }
         } else if (mtmp->mpeaceful) {
             if (kindred && isnight) {
                 Sprintf(verbuf, TR("Good feeding %s!", "用餐愉快，%s！"),
-                        flags.female ? "sister" : "brother");
+                        flags.female ? TR("sister", "姐妹") : TR("brother", "兄弟"));
                 verbl_msg = verbuf;
             } else if (nightchild && isnight) {
                 Sprintf(verbuf, TR("How nice to hear you, child of the night!", "很高兴听到你的声音，暗夜之子！"));
@@ -861,10 +861,11 @@ domonnoise(struct monst *mtmp)
                        || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf,
-                        "%s!  Your silver sheen"" does not frighten me!",
+                        TR("%s!  Your silver sheen does not frighten me!",
+                           "%s！你那一身银光吓不倒我！"),
                         (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
-                            ? "Fool"
-                            : "Young Fool");
+                            ? TR("Fool", "蠢货")
+                            : TR("Young Fool", "小蠢货"));
                 verbl_msg = verbuf;
             } else {
                 vampindex = rn2(SIZE(vampmsg));
@@ -890,7 +891,7 @@ domonnoise(struct monst *mtmp)
             #ifdef ZHLANG
             pline(TR("%s throws back %s head and lets out a blood curdling %s!", "%s仰起%s头，发出一声令人毛骨悚然的%s！"),
                   Monnam(mtmp), mhis(mtmp),
-                  (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
+                  (ptr == &mons[PM_HUMAN_WERERAT]) ? TR("shriek", "尖啸") : TR("howl", "嚎叫"));
             #else
             pline("%s throws back %s head and lets out a blood curdling %s!",
                   Monnam(mtmp), mhis(mtmp),
@@ -1214,7 +1215,7 @@ domonnoise(struct monst *mtmp)
         if (mtmp->mpeaceful) {
             SetVoice(mtmp, 0, 80, 0);
             #ifdef ZHLANG
-            verbalize(TR("Just the facts, %s.", "只要事实，%s。"), flags.female ? "Ma'am" : "Sir");
+            verbalize(TR("Just the facts, %s.", "只要事实，%s。"), flags.female ? "Ma'am" : TR("Sir", "先生"));
             #else
             verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
             #endif
@@ -1417,7 +1418,7 @@ dochat(void)
 
     if (u.dz) {
         #ifdef ZHLANG
-        pline(TR("They won't hear you %s there.", "%s边的人听不到你。"), u.dz < 0 ? "up" : "down");
+        pline(TR("They won't hear you %s there.", "%s边的人听不到你。"), u.dz < 0 ? "up" : "down"); /* NOTRANS */
         #else
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
         #endif
@@ -1457,7 +1458,7 @@ dochat(void)
             if (!Blind)
                 pline_The(TR("%s seems not to notice you.", "%s似乎没有注意到你。"),
                           /* if hallucinating, you can't tell it's a statue */
-                          Hallucination ? rndmonnam((char *) 0) : "statue");
+                          Hallucination ? rndmonnam((char *) 0) : TR("statue", "雕像"));
             return ECMD_OK;
         }
         if (!Deaf && (IS_WALL(levl[tx][ty].typ)
@@ -1534,7 +1535,7 @@ dochat(void)
 
         #ifdef ZHLANG
         pline(TR("Any response%s%s %s.", "%s%s的回应%s。"),
-              canspotmon(mtmp) ? " from " : "",
+              canspotmon(mtmp) ? TR(" from ", "来自") : "",
               canspotmon(mtmp) ? mon_nam(mtmp) : "",
               xresponse);
         #else
@@ -1604,7 +1605,7 @@ tiphat(void)
                 (void) domonnoise(u.usteed);
         } else if (u.dz) {
             #ifdef ZHLANG
-            pline(TR("There's no one %s there.", "%s边没有人。"), (u.dz < 0) ? "up" : "down");
+            pline(TR("There's no one %s there.", "%s边没有人。"), (u.dz < 0) ? "up" : "down"); /* NOTRANS */
             #else
             pline("There's no one %s there.", (u.dz < 0) ? "up" : "down");
             #endif
@@ -1646,7 +1647,7 @@ tiphat(void)
 
     if (unseen || (statue && Hallucination)) {
         #ifdef ZHLANG
-        pline(TR("That %screature is ignoring you!", "那%s生物根本不理你！"), unseen ? "unseen " : "");
+        pline(TR("That %screature is ignoring you!", "那%s生物根本不理你！"), unseen ? TR("unseen ", "隐形的") : "");
         #else
         pline("That %screature is ignoring you!", unseen ? "unseen " : "");
         #endif
@@ -1697,7 +1698,7 @@ tiphat(void)
 
             #ifdef ZHLANG
             pline(TR("%s %s%s%s at you...", "%s对你%s%s%s……"), Monnam(mtmp), reaction[which],
-                  twice ? " and " : "", twice ? reaction[twice] : "");
+                  twice ? TR(" and ", "且") : "", twice ? reaction[twice] : "");
             #else
             pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
                   twice ? " and " : "", twice ? reaction[twice] : "");

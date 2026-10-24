@@ -88,10 +88,10 @@ precheck(struct monst *mon, struct obj *obj)
                     if (vis) {
                         #ifdef ZHLANG
                         pline(
-                            "As %s opens the bottle, an enormous %s emerges!",
+                            TR("As %s opens the bottle, an enormous %s emerges!", "当%s打开瓶子时，一只巨大的%s冒了出来！"),
                               mon_nam(mon),
                               Hallucination ? rndmonnam(NULL)
-                                            : (const char *) "ghost");
+                                            : (const char *) TR("ghost", "幽灵"));
                         #else
                         pline(
                             "As %s opens the bottle, an enormous %s emerges!",
@@ -101,7 +101,7 @@ precheck(struct monst *mon, struct obj *obj)
                         #endif
                         #ifdef ZHLANG
                         pline(TR("%s is frightened to death,", "%s被吓死了，")
-                              " and unable to move.",
+                              TR(" and unable to move.", "动弹不得。"),
                               Monnam(mon));
                         #else
                         pline("%s is frightened to death,"
@@ -184,7 +184,7 @@ precheck(struct monst *mon, struct obj *obj)
             #ifdef ZHLANG
             You_hear(TR("a zap and an explosion %s.", "电光和爆炸声%s。"),
                      (mdistu(mon) <= range * range)
-                        ? "nearby" : "in the distance");
+                        ? TR("nearby", "在附近") : TR("in the distance", "在远处"));
             #else
             You_hear("a zap and an explosion %s.",
                      (mdistu(mon) <= range * range)
@@ -222,7 +222,7 @@ mzapwand(
         Soundeffect(se_zap, 100);
         #ifdef ZHLANG
         You_hear(TR("a %s zap.", "一声%s的电击声。"), (mdistu(mtmp) <= range * range)
-                                 ? "nearby" : "distant");
+                                 ? TR("nearby", "在附近") : TR("distant", "远处"));
         #else
         You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
                                  ? "nearby" : "distant");
@@ -231,7 +231,7 @@ mzapwand(
     } else if (self) {
         #ifdef ZHLANG
         pline(TR("%s with %s!", "%s，用的是%s！"),
-              monverbself(mtmp, Monnam(mtmp), "zap", (char *) 0),
+              monverbself(mtmp, Monnam(mtmp), TR("zap", "电击"), (char *) 0),
               doname(otmp));
         #else
         pline("%s with %s!",
@@ -262,7 +262,7 @@ mplayhorn(
         #ifdef ZHLANG
         You_hear(TR("a horn being played %s.", "号角吹奏声%s。"),
                  (mdistu(mtmp) <= range * range)
-                    ? "nearby" : "in the distance");
+                    ? TR("nearby", "在附近") : TR("in the distance", "在远处"));
         #else
         You_hear("a horn being played %s.",
                  (mdistu(mtmp) <= range * range)
@@ -277,7 +277,7 @@ mplayhorn(
         Sprintf(objbuf, TR("a %s directed at", "一件对准自己的%s"), objnamp);
         /* "<mon> plays a <horn> directed at himself!" */
         #ifdef ZHLANG
-        pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
+        pline("%s!", monverbself(mtmp, Monnam(mtmp), TR("play", "吹奏"), objbuf));
         #else
         pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
         #endif
@@ -288,10 +288,10 @@ mplayhorn(
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
         #ifdef ZHLANG
-        pline(TR("%s %s %s directed at you!", "%s%s%s，直冲你而来！"),
+        pline("%s%s%s，直冲你而来！",
               /* monverbself() would adjust the verb if hallucination made
                  subject plural; stick with singular here, at least for now */
-              Monnam(mtmp), "plays", an(objnamp));
+              Monnam(mtmp), an(objnamp), "");
         #else
         pline("%s %s %s directed at you!",
               /* monverbself() would adjust the verb if hallucination made
@@ -1171,7 +1171,7 @@ use_defensive(struct monst *mtmp)
             if (vismon)
                 #ifdef ZHLANG
                 pline(TR("As %s climbs the stairs, a mysterious force", "当%s爬上楼梯时，一股神秘的力量")
-                      " momentarily surrounds %s...",
+                      TR(" momentarily surrounds %s...", "瞬间包围了%s……"),
                       mon_nam(mtmp), mhim(mtmp));
                 #else
                 pline("As %s climbs the stairs, a mysterious force"
@@ -2010,7 +2010,7 @@ use_offensive(struct monst *mtmp)
         /* Identify the scroll */
         if (canspotmon(mtmp)) {
             pline_The(TR("%s rumbles %s %s!", "%s在%s%s隆隆作响！"), ceiling(mtmp->mx, mtmp->my),
-                      otmp->blessed ? "around" : "above", mon_nam(mtmp));
+                      otmp->blessed ? TR("around", "四周") : TR("above", "上方"), mon_nam(mtmp));
             if (oseen)
                 makeknown(otmp->otyp);
         } else if (cansee(mtmp->mx, mtmp->my)) {
@@ -2594,7 +2594,7 @@ use_misc(struct monst *mtmp)
                 #ifdef ZHLANG
                 pline(TR("%s body takes on a %s transparency.", "%s身体呈现出%s的透明感。"),
                       upstart(s_suffix(nambuf)),
-                      Hallucination ? "normal" : "strange");
+                      Hallucination ? "normal" : "strange"); /* NOTRANS */
                 #else
                 pline("%s body takes on a %s transparency.",
                       upstart(s_suffix(nambuf)),
@@ -2747,7 +2747,7 @@ use_misc(struct monst *mtmp)
             if (welded(obj)) {
                 #ifdef ZHLANG
                 pline(TR("%s welded to your %s%c", "%s焊在了你的%s上%c"),
-                      !is_plural(obj) ? "It is" : "They are", hand_buf,
+                      !is_plural(obj) ? "It is" : TR("They are", "它们"), hand_buf,
                       !obj->bknown ? '!' : '.');
                 #else
                 pline("%s welded to your %s%c",
@@ -3070,7 +3070,7 @@ ureflects(const char *fmt, const char *str)
     } else if (EReflecting & W_ARM) {
         if (fmt && str)
             #ifdef ZHLANG
-            pline(fmt, str, uskin ? TR("luster", "光泽") : "armor");
+            pline(fmt, str, uskin ? TR("luster", "光泽") : TR("armor", "护甲"));
             #else
             pline(fmt, str, uskin ? "luster" : "armor");
             #endif
@@ -3156,7 +3156,7 @@ mon_consume_unstone(
     } else if (!Deaf)
         #ifdef ZHLANG
         You_hear("%s.",
-                 (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
+                 (obj->oclass == POTION_CLASS) ? TR("drinking", "喝东西的声音") : TR("chewing", "咀嚼的声音"));
         #else
         You_hear("%s.",
                  (obj->oclass == POTION_CLASS) ? "drinking" : "chewing");
@@ -3356,7 +3356,7 @@ muse_unslime(
             if (vis)
                 #ifdef ZHLANG
                 pline(TR("%s triggers %s fire trap!", "%s触发了%s火焰陷阱！"), Mnam,
-                      trap->tseen ? "the" : "a");
+                      trap->tseen ? TR("the", "那个") : "a");
                 #else
                 pline("%s triggers %s fire trap!", Mnam,
                       trap->tseen ? "the" : "a");
@@ -3371,9 +3371,9 @@ muse_unslime(
             if (vis)
                 #ifdef ZHLANG
                 pline(TR("%s %s %s %s fire trap!", "%s%s，%s%s火焰陷阱！"), Mnam,
-                      vtense(fakename[0], locomotion(mon->data, "move")),
-                      is_floater(mon->data) ? "over" : "onto",
-                      trap->tseen ? "the" : "a");
+                      vtense(fakename[0], locomotion(mon->data, TR("move", "移动"))),
+                      is_floater(mon->data) ? TR("over", "上方") : TR("onto", "上"),
+                      trap->tseen ? TR("the", "那个") : "a");
                 #else
                 pline("%s %s %s %s fire trap!", Mnam,
                       vtense(fakename[0], locomotion(mon->data, "move")),

@@ -1724,7 +1724,7 @@ postmov(
 #ifdef ZHLANG
                 Norep("%s%s%s了铁栏杆。", Monnam(mtmp),
                       /* pluralization fakes verb conjugation */
-                      makeplural(locomotion(ptr, "pass")),
+                      makeplural(locomotion(ptr, TR("pass", "硬生生"))),
                       passes_walls(ptr) ? "穿过" : "挤过");
 #else
                 Norep("%s %s %s the iron bars.", Monnam(mtmp),

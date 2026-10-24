@@ -721,7 +721,7 @@ topten(int how, time_t when)
 #ifdef LOGFILE /* used for debugging (who dies of what, where) */
     if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
         if (!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open log file!");
+            HUP raw_print(TR("Cannot open log file!", "无法打开日志文件！"));
         } else {
             writeentry(lfile, t0);
             (void) fclose(lfile);
@@ -732,7 +732,8 @@ topten(int how, time_t when)
 #ifdef XLOGFILE
     if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
         if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open extended log file!");
+            HUP raw_print(TR("Cannot open extended log file!",
+                             "无法打开扩展日志文件！"));
         } else {
             writexlentry(xlfile, t0, how);
             (void) fclose(xlfile);
@@ -748,8 +749,9 @@ topten(int how, time_t when)
 
                 topten_print("");
                 Sprintf(pbuf,
-             "Since you were in %s mode, the score list will not be checked.",
-                        wizard ? "wizard" : "discover");
+             TR("Since you were in %s mode, the score list will not be checked.",
+                "由于你处于%s模式，分数榜不会被检查。"),
+                        wizard ? TR("wizard", "巫师") : TR("discover", "探索"));
                 topten_print(pbuf);
             }
         goto showwin;
@@ -765,7 +767,7 @@ topten(int how, time_t when)
 #endif
 
     if (!rfile) {
-        HUP raw_print("Cannot open record file!");
+        HUP raw_print(TR("Cannot open record file!", "无法打开记录文件！"));
         unlock_file(RECORD);
         goto destroywin;
     }
@@ -811,7 +813,8 @@ topten(int how, time_t when)
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                         "You didn't beat your previous score of %ld points.",
+                         TR("You didn't beat your previous score of %ld points.",
+                            "你没有超过之前的 %ld 分成绩。"),
                             t1->points);
                     topten_print(pbuf);
                     topten_print("");
@@ -838,7 +841,8 @@ topten(int how, time_t when)
 #else
         (void) fclose(rfile);
         if (!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))) {
-            HUP raw_print("Cannot write record file");
+            HUP raw_print(TR("Cannot write record file",
+                             "无法写入记录文件"));
             unlock_file(RECORD);
             free_ttlist(tt_head);
             goto destroywin;
@@ -847,13 +851,19 @@ topten(int how, time_t when)
         if (!done_stopprint)
             if (rank0 > 0) {
                 if (rank0 <= 10) {
-                    topten_print("You made the top ten list!");
+                    topten_print(TR("You made the top ten list!",
+                                    "你进入了前十名！"));
                 } else {
                     char pbuf[BUFSZ];
 
+#ifdef ZHLANG
+                    Sprintf(pbuf, "你在前 %d 名榜单中排第 %d 名。",
+                            sysopt.entrymax, rank0);
+#else
                     Sprintf(pbuf,
                             "You reached the %d%s place on the top %d list.",
                             rank0, ordin(rank0), sysopt.entrymax);
+#endif
                     topten_print(pbuf);
                 }
                 topten_print("");
@@ -999,7 +1009,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         second_line = FALSE;
     } else if (!strncmp("ascended", t1->death, 8)) {
         Sprintf(eos(linebuf), TR("ascended to demigod%s-hood", "飞升为半神%s"),
-                (t1->plgend[0] == 'F') ? "dess" : "");
+                (t1->plgend[0] == 'F') ? TR("dess", "（女）") : "");
         second_line = FALSE;
     } else {
         if (!strncmp(t1->death, "quit", 4)) {
@@ -1021,6 +1031,31 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             Strcat(linebuf, TR("died", "死亡"));
 
         if (t1->deathdnum == astral_level.dnum) {
+#ifdef ZHLANG
+            const char *plane_zh = "虚空";
+
+            switch (t1->deathlev) {
+            case -5:
+                plane_zh = "星界";
+                break;
+            case -4:
+                plane_zh = "水位面";
+                break;
+            case -3:
+                plane_zh = "火位面";
+                break;
+            case -2:
+                plane_zh = "气位面";
+                break;
+            case -1:
+                plane_zh = "土位面";
+                break;
+            default:
+                plane_zh = "虚空";
+                break;
+            }
+            Sprintf(eos(linebuf), " 位于%s", plane_zh);
+#else
             const char *arg, *fmt = " on the Plane of %s";
 
             switch (t1->deathlev) {
@@ -1045,8 +1080,9 @@ outentry(int rank, struct toptenentry *t1, boolean so)
                 break;
             }
             Sprintf(eos(linebuf), fmt, arg);
+#endif
         } else {
-            Sprintf(eos(linebuf), " in %s",
+            Sprintf(eos(linebuf), TR(" in %s", "于%s"),
                     dname_zh(svd.dungeons[t1->deathdnum].dname));
             if (t1->deathdnum != knox_level.dnum)
                 Sprintf(eos(linebuf), TR(" on level %d", "，在第 %d 层"), t1->deathlev);
@@ -1234,7 +1270,7 @@ prscore(int argc, char **argv)
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
     if (!rfile) {
-        raw_print("Cannot open record file!");
+        raw_print(TR("Cannot open record file!", "无法打开记录文件！"));
         return;
     }
 
@@ -1318,7 +1354,7 @@ prscore(int argc, char **argv)
         }
     } else {
         Sprintf(pbuf, TR("Cannot find any %sentries for ", "找不到任何%s记录，涉及 "),
-                current_ver ? "current " : "");
+                current_ver ? TR("current ", "当前的") : "");
         if (playerct < 1) {
             Strcat(pbuf, TR("you", "你"));
         } else {

@@ -678,7 +678,7 @@ exerchk(void)
                 AEXE(i) = ax = 0;
                 /* then print an explanation */
                 You("%s %s.",
-                    (mod_val > 0) ? "must have been" : "haven't been",
+                    (mod_val > 0) ? TR("must have been", "一定是在") : TR("haven't been", "最近没有"),
                     exertext[i][(mod_val > 0) ? 0 : 1]);
             }
  nextattrib:
@@ -964,11 +964,11 @@ from_what(
                 Strcpy(buf, TR(" from your creature form", "（因你的怪物形态）"));
             else if (propidx == FAST && Very_fast)
                 Sprintf(buf, because_of,
-                        ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
+                        ((HFast & TIMEOUT) != 0L) ? TR("a potion or spell", "药水或法术")
                           : ((EFast & W_ARMF) != 0L && uarmf->dknown
                              && objects[uarmf->otyp].oc_name_known)
                               ? ysimple_name(uarmf) /* speed boots */
-                                : EFast ? "worn equipment"
+                                : EFast ? TR("worn equipment", "穿戴的装备")
                                   : something);
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
@@ -1387,8 +1387,8 @@ uchangealign(
                            aligns[1 - newalign].adj);
         } else if (reason == A_CG_HELM_OFF) {
             Your(TR("mind is %s.", "心智%s。"), Hallucination
-                                    ? "much of a muchness"
-                                    : "back in sync with your body");
+                                    ? TR("much of a muchness", "混沌不清")
+                                    : TR("back in sync with your body", "重新与身体同步"));
         }
     }
     if (u.ualign.type != oldalign) {
