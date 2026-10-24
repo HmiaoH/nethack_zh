@@ -742,7 +742,7 @@ canletgo(struct obj *obj, const char *word)
         /* no weldmsg(), so uwep->bknown might become set silently
            if word is "" */
         if (*word) {
-            const char *hand = body_part(HAND);
+            const char *hand = zh_body_part(HAND);
 
             if (bimanual(uwep))
                 hand = makeplural(hand);
@@ -773,7 +773,7 @@ pline("For some reason, you cannot %s%s the stone%s!", word,
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
         if (*word)
-            pline_The(TR("leash is tied around your %s.", "牵绳系在你的%s上。"), body_part(HAND));
+            pline_The(TR("leash is tied around your %s.", "牵绳系在你的%s上。"), zh_body_part(HAND));
         return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
@@ -816,7 +816,7 @@ drop(struct obj *obj)
             /* doname can call s_suffix, reusing its buffer */
             if (digests(u.ustuck->data)) {
                 Sprintf(monbuf, "%s %s", s_suffix(mnam_p),
-                        mbodypart(u.ustuck, STOMACH));
+                        zh_mbodypart(u.ustuck, STOMACH));
                 mnam_p = monbuf;
             }
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
@@ -1045,7 +1045,7 @@ better_not_try_to_drop_that(struct obj *otmp)
         Snprintf(
             buf, sizeof buf,
             TR("Drop the %s corpse without %s protection on?", "要丢下%s的尸体吗？你的%s上没有保护。"),
-            obj_pmname(otmp), body_part(HAND));
+            obj_pmname(otmp), zh_body_part(HAND));
         return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
     }
     return FALSE;
@@ -1296,7 +1296,7 @@ Your("latent levitation ceases.");
         }
         if (Is_airlevel(&u.uz))
             #ifdef ZHLANG
-You("正飘浮在%s。", surface(u.ux, u.uy));
+You("正飘浮在%s。", zh_surface(u.ux, u.uy));
 #else
 You("are floating in the %s.", surface(u.ux, u.uy));
 #endif
@@ -1306,7 +1306,7 @@ You("are floating in the %s.", surface(u.ux, u.uy));
         else
             floating_above(stairs_down ? "stairs"
                            : ladder_down ? "ladder"
-                             : surface(u.ux, u.uy));
+                             : zh_surface(u.ux, u.uy));
         return ECMD_OK; /* didn't move */
     }
 
@@ -1320,7 +1320,7 @@ You("fly out of hiding.");
 #endif
         } else { /* piercer */
             #ifdef ZHLANG
-You("向%s落下。", surface(u.ux, u.uy));
+You("向%s落下。", zh_surface(u.ux, u.uy));
 #else
 You("drop to the %s.", surface(u.ux, u.uy));
 #endif
@@ -2425,7 +2425,7 @@ You_feel("squirming in your backpack!");
             } else if (container_where == OBJ_INVENT) {
                 Strcpy(sackname, an(xname(container)));
                 pline(TR("%s %s out of %s in your pack!", "%s%s，从你背包里的%s中钻了出来！"), mnam,
-                      locomotion(mtmp->data, TR("writhes", "扭动")), sackname);
+                      zh_locomotion(mtmp->data, TR("writhes", "扭动"), "扭动"), sackname);
             } else if (container_where == OBJ_FLOOR
                        && cansee(corpsex, corpsey)) {
                 Strcpy(sackname, an(xname(container)));
@@ -2607,7 +2607,7 @@ pline("You've got the glop off.");
         return 0;
     } else if (!u.ucreamed) {
         #ifdef ZHLANG
-Your("你的%s现在感觉干净了。", body_part(FACE));
+Your("你的%s现在感觉干净了。", zh_body_part(FACE));
 #else
 Your("%s feels clean now.", body_part(FACE));
 #endif
@@ -2623,7 +2623,7 @@ dowipe(void)
     if (u.ucreamed) {
         static NEARDATA char buf[39];
 
-        Sprintf(buf, TR("wiping off your %s", "擦掉你%s上的东西"), body_part(FACE));
+        Sprintf(buf, TR("wiping off your %s", "擦掉你%s上的东西"), zh_body_part(FACE));
         set_occupation(wipeoff, buf, 0);
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
@@ -2631,7 +2631,7 @@ dowipe(void)
         return ECMD_TIME;
     }
     #ifdef ZHLANG
-Your("你的%s已经很干净了。", body_part(FACE));
+Your("你的%s已经很干净了。", zh_body_part(FACE));
 #else
 Your("%s is already clean.", body_part(FACE));
 #endif
@@ -2647,7 +2647,7 @@ legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
         pline(TR("%s is in no shape for %s.", "%s现在的状态做不了%s。"), Monnam(u.usteed), for_what);
     } else {
         long wl = (EWounded_legs & BOTH_SIDES);
-        const char *bp = body_part(LEG);
+        const char *bp = zh_body_part(LEG);
 
         if (wl == BOTH_SIDES)
             bp = makeplural(bp);
@@ -2694,7 +2694,7 @@ heal_legs(
            before the final stages and that calls us (how==2) to cure
            wounded legs, but we want to suppress the feel better message */
         if (!u.usteed && how != 2) {
-            const char *legs = body_part(LEG);
+            const char *legs = zh_body_part(LEG);
 
             if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
                 legs = makeplural(legs);

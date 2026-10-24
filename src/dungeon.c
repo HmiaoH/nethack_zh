@@ -1615,7 +1615,7 @@ earth_sense(void)
 
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp->nobj)
         if (u_at(otmp->ox, otmp->oy)) {
-            You(TR("sense something below your %s.", "感觉到你的%s下方有东西。"), makeplural(body_part(FOOT)));
+            You(TR("sense something below your %s.", "感觉到你的%s下方有东西。"), makeplural(zh_body_part(FOOT)));
             return;
         }
 }
@@ -1841,6 +1841,96 @@ surface(coordxy x, coordxy y)
         return "floor";
     else
         return "ground";
+}
+
+/*
+ * Display-only name for a surface() or ceiling() result.
+ *
+ * surface() and ceiling() must keep returning their English identifiers:
+ * trap.c compares the result with "floor"/"ground", invent.c compares a
+ * terrain feature name against it, and engrave.c has its own translation
+ * helper.  Callers which splice the name into a message use the wrappers
+ * below instead.  They are language-neutral: an English build gets the
+ * English name back unchanged; a ZHLANG build gets a Chinese name.
+ */
+const char *
+zh_surface_name(const char *en)
+{
+    if (!en || !*en)
+        return "";
+#ifdef ZHLANG
+    {
+        /* values returned by surface(), ceiling(), and a few nouns which
+           callers substitute for a surface() result before displaying it */
+        static const struct {
+            const char *en, *zh;
+        } names[] = {
+            /* surface() */
+            { "maw", "巨口" },
+            { "husk", "残壳" },
+            { "nonesuch", "异物" },
+            { "air bubble", "气泡" },
+            { "cloud", "云层" },
+            { "air", "空中" },
+            { "bottom", "水底" },
+            { "water", "水面" },
+            { "ice", "冰面" },
+            { "lava", "熔岩" },
+            { "bridge", "桥面" },
+            { "altar", "祭坛" },
+            { "headstone", "墓碑" },
+            { "fountain", "喷泉" },
+            { "stairs", "楼梯" },
+            { "wall", "墙壁" },
+            { "doorway", "门口" },
+            { "floor", "地面" },
+            { "ground", "地面" },
+            /* ceiling() */
+            { "vault's ceiling", "金库的天花板" },
+            { "temple's ceiling", "神殿的天花板" },
+            { "shop's ceiling", "商店的天花板" },
+            { "water above", "上方的水" },
+            { "sky", "天空" },
+            { "flames above", "上方的火焰" },
+            { "expanse above", "上方的旷野" },
+            { "water's surface", "水面" },
+            { "ceiling", "天花板" },
+            { "rock cavern", "岩洞" },
+            /* variants substituted by callers before display */
+            { "trap door", "活板门" },
+            { "edge of the hole", "洞口边缘" },
+            { "edge of the pit", "坑边" },
+            { "saddle", "马鞍" },
+            { "buried ball", "埋在地下的铁球" },
+            { "solid ground", "坚实的地面" },
+            { "it", "它" },
+            { 0, 0 }
+        };
+        int i;
+
+        for (i = 0; names[i].en; ++i)
+            if (!strcmp(en, names[i].en))
+                return names[i].zh;
+        /* hallucinated liquids and anything else unrecognized */
+        return "奇怪的地方";
+    }
+#else
+    return en;
+#endif
+}
+
+/* surface() result for display in a message */
+const char *
+zh_surface(coordxy x, coordxy y)
+{
+    return zh_surface_name(surface(x, y));
+}
+
+/* ceiling() result for display in a message */
+const char *
+zh_ceiling(coordxy x, coordxy y)
+{
+    return zh_surface_name(ceiling(x, y));
 }
 
 /*

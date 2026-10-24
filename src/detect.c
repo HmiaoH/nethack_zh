@@ -429,7 +429,7 @@ gold_detect(struct obj *sobj)
     if (stale)
         docrt();
 #ifdef ZHLANG
-    You("注意到你的%s之间有些金币。", makeplural(body_part(FOOT)));
+    You("注意到你的%s之间有些金币。", makeplural(zh_body_part(FOOT)));
 #else
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
 #endif
@@ -550,7 +550,7 @@ food_detect(struct obj *sobj)
             if (sobj && sobj->blessed) {
                 if (!u.uedibility)
 #ifdef ZHLANG
-                    Your("%s开始发麻。", body_part(NOSE));
+                    Your("%s开始发麻。", zh_body_part(NOSE));
 #else
                     Your("%s starts to tingle.", body_part(NOSE));
 #endif
@@ -560,7 +560,7 @@ food_detect(struct obj *sobj)
             char buf[BUFSZ];
 
 #ifdef ZHLANG
-            Sprintf(buf, "你的%s抽动了一下%s。", body_part(NOSE),
+            Sprintf(buf, "你的%s抽动了一下%s。", zh_body_part(NOSE),
                     (sobj->blessed && !u.uedibility)
                         ? "然后开始发麻"
                         : "");
@@ -591,7 +591,7 @@ food_detect(struct obj *sobj)
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
 #ifdef ZHLANG
-                Your("%s开始发麻。", body_part(NOSE));
+                Your("%s开始发麻。", zh_body_part(NOSE));
 #else
                 Your("%s starts to tingle.", body_part(NOSE));
 #endif
@@ -630,7 +630,7 @@ food_detect(struct obj *sobj)
         if (sobj) {
             if (sobj->blessed) {
 #ifdef ZHLANG
-                Your("%s%s发麻，你闻到了%s。", body_part(NOSE),
+                Your("%s%s发麻，你闻到了%s。", zh_body_part(NOSE),
                      u.uedibility ? "继续" : "开始", what);
 #else
                 Your("%s %s to tingle and you smell %s.", body_part(NOSE),
@@ -639,7 +639,7 @@ food_detect(struct obj *sobj)
                 u.uedibility = 1;
             } else
 #ifdef ZHLANG
-                Your("%s发麻，你闻到了%s。", body_part(NOSE), what);
+                Your("%s发麻，你闻到了%s。", zh_body_part(NOSE), what);
 #else
                 Your("%s tingles and you smell %s.", body_part(NOSE), what);
 #endif
@@ -1167,12 +1167,12 @@ trap_detect(
     if (!found) {
         char buf[BUFSZ];
 
-        Sprintf(buf, TR("Your %s stop itching.", "你的%s不再发痒了。"), makeplural(body_part(TOE)));
+        Sprintf(buf, TR("Your %s stop itching.", "你的%s不再发痒了。"), makeplural(zh_body_part(TOE)));
         strange_feeling(sobj, buf);
         return 1;
     }
     /* traps exist, but only under me - no separate display required */
-    Your(TR("%s itch.", "你的%s发痒。"), makeplural(body_part(TOE)));
+    Your(TR("%s itch.", "你的%s发痒。"), makeplural(zh_body_part(TOE)));
     return 0;
 }
 

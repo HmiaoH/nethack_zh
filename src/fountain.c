@@ -35,7 +35,7 @@ floating_above(const char *what)
 #else
         umsg = "are trapped in the %s.";
 #endif
-        what = surface(u.ux, u.uy); /* probably redundant */
+        what = zh_surface(u.ux, u.uy); /* probably redundant */
     }
     You(umsg, what);
 }
@@ -270,8 +270,8 @@ watchman_warn_fountain(struct monst *mtmp)
                   nolimbs(mtmp->data) ? "摇晃着" : "挥舞着",
                   mhis(mtmp),
                   nolimbs(mtmp->data)
-                  ? mbodypart(mtmp, HEAD)
-                  : makeplural(mbodypart(mtmp, ARM)));
+                  ? zh_mbodypart(mtmp, HEAD)
+                  : makeplural(zh_mbodypart(mtmp, ARM)));
 #else
             pline("%s earnestly %s %s %s!",
                   Amonnam(mtmp),
@@ -679,7 +679,7 @@ dipfountain(struct obj *obj)
         break;
     case 26: /* Strange feeling */
 #ifdef ZHLANG
-        pline("一阵奇怪的刺痛感沿着你的%s蔓延。", body_part(ARM));
+        pline("一阵奇怪的刺痛感沿着你的%s蔓延。", zh_body_part(ARM));
 #else
         pline("A strange tingling runs up your %s.", body_part(ARM));
 #endif
@@ -763,7 +763,7 @@ dipfountain(struct obj *obj)
 int
 wash_hands(void)
 {
-    const char *hands = makeplural(body_part(HAND));
+    const char *hands = makeplural(zh_body_part(HAND));
     int res = ER_NOTHING;
     boolean was_glib = !!Glib;
 
@@ -1157,7 +1157,7 @@ sink_backs_up(coordxy x, coordxy y)
 #endif
     else
 #ifdef ZHLANG
-        Sprintf(buf, "有什么东西溅到了你的%s上", body_part(FACE));
+        Sprintf(buf, "有什么东西溅到了你的%s上", zh_body_part(FACE));
 #else
         Sprintf(buf, "Something splashes you in the %s", body_part(FACE));
 #endif

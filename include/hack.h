@@ -1532,9 +1532,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
    evaluated exactly as in the English version. */
 #define plur(x) (((x) == 1) ? "" : "")
 /* nonzero if 'str' contains a byte outside 7-bit ASCII, which in this build
-   means Chinese text that the English grammar helpers must not touch (B1) */
+   means Chinese text that the English grammar helpers must not touch */
 extern boolean zh_nonascii(const char *);
-/* C3: longest Chinese monster name at the start of 'zh'; NON_PM if none.
+/* longest Chinese monster name at the start of 'zh'; NON_PM if none.
    Sets *bytelenp to the matched name's size in bytes and *mgenderp to the
    matching gender variant (MALE/FEMALE/NEUTRAL).  Implemented in objnam.c;
    name_to_monplus() uses it so #genocide and polymorph accept Chinese names

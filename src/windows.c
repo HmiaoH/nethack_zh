@@ -1872,6 +1872,10 @@ getlin(const char *query, char *bufp)
     boolean got_cmdq = FALSE;
     struct _cmd_queue *cmdq = NULL;
 
+#ifdef ZHLANG
+    query = zh_tidy(query); /* Chinese punctuation and spacing */
+#endif
+
     while ((cmdq = cmdq_pop()) != 0) {
         if (cmdq->typ == CMDQ_KEY) {
             got_cmdq = TRUE;

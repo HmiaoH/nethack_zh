@@ -66,6 +66,286 @@ enum checkfileflags {
     chkfilIaCheck  = 4,
 };
 
+#ifdef ZHLANG
+/*
+ * Chinese for the screen-symbol explanations of defsyms[], def_monsyms[],
+ * def_oc_syms[] and def_warnsyms[] plus the few phrases pager.c adds while
+ * describing a map location.  The tables themselves stay English: they are
+ * matched with strcmp()/strstri() while a description is built, and
+ * 'firstmatch' is the data.base key.  Only finished text that is about to
+ * be shown goes through zh_symdesc().
+ */
+static const struct {
+    const char *en, *zh;
+} zh_symdesc_tab[] = {
+    /* defsyms[] */
+    { "dark part of a room", "房间的黑暗部分" },
+    { "floor of a room", "房间地面" },
+    { "vertical wall", "竖墙" },
+    { "horizontal wall", "横墙" },
+    { "top left corner wall", "左上墙角" },
+    { "top right corner wall", "右上墙角" },
+    { "bottom left corner wall", "左下墙角" },
+    { "bottom right corner wall", "右下墙角" },
+    { "cross wall", "十字墙" },
+    { "tuwall", "T 形墙" }, { "tdwall", "T 形墙" },
+    { "tlwall", "T 形墙" }, { "trwall", "T 形墙" },
+    { "no door", "无门的门口" },
+    { "vertical open door", "开着的门" },
+    { "horizontal open door", "开着的门" },
+    { "vertical closed door", "关着的门" },
+    { "horizontal closed door", "关着的门" },
+    { "broken door", "破门" },
+    { "iron bars", "铁栏杆" },
+    { "tree", "树" },
+    { "lit corridor", "明亮的走廊" },
+    { "dark corridor", "黑暗的走廊" },
+    { "branch staircase up", "通往分支的上行楼梯" },
+    { "branch staircase down", "通往分支的下行楼梯" },
+    { "branch ladder up", "通往分支的上行梯子" },
+    { "branch ladder down", "通往分支的下行梯子" },
+    { "staircase up", "上行楼梯" },
+    { "staircase down", "下行楼梯" },
+    { "up stairs", "上行楼梯" },
+    { "down stairs", "下行楼梯" },
+    { "up ladder", "上行梯子" },
+    { "ladder up", "上行梯子" },
+    { "ladder down", "下行梯子" },
+    { "down ladder", "下行梯子" },
+    { "altar", "祭坛" },
+    { "grave", "坟墓" },
+    { "throne", "王座" },
+    { "sink", "水槽" },
+    { "fountain", "喷泉" },
+    { "pool of water", "水池" },
+    { "wall of water", "水墙" },
+    { "limitless water", "无边的水" },
+    { "pool", "水池" },
+    { "water", "水" },
+    { "ice", "冰面" },
+    { "molten lava", "熔岩" },
+    { "wall of lava", "熔岩墙" },
+    { "vertical open drawbridge", "放下的吊桥" },
+    { "horizontal open drawbridge", "放下的吊桥" },
+    { "vertical closed drawbridge", "升起的吊桥" },
+    { "horizontal closed drawbridge", "升起的吊桥" },
+    { "open drawbridge portcullis", "吊桥闸门" },
+    { "air", "空气" },
+    { "cloud", "云" },
+    { "poison cloud", "毒云" },
+    { "land", "陆地" },
+    { "unexplored", "未探索" },
+    { "stone", "石头" },
+    { "engraving in a room", "房间里的刻字" },
+    { "engraving in a corridor", "走廊里的刻字" },
+    { "arrow trap", "箭陷阱" },
+    { "dart trap", "飞镖陷阱" },
+    { "falling rock trap", "落石陷阱" },
+    { "squeaky board", "嘎吱响的地板" },
+    { "bear trap", "捕熊夹" },
+    { "land mine", "地雷" },
+    { "rolling boulder trap", "滚石陷阱" },
+    { "sleeping gas trap", "催眠气体陷阱" },
+    { "rust trap", "生锈陷阱" },
+    { "fire trap", "火焰陷阱" },
+    { "spiked pit", "尖刺坑" },
+    { "pit", "坑" },
+    { "hole", "洞" },
+    { "trap door", "活板门" },
+    { "teleportation trap", "传送陷阱" },
+    { "level teleporter", "楼层传送器" },
+    { "magic portal", "魔法传送门" },
+    { "web", "蛛网" },
+    { "statue trap", "雕像陷阱" },
+    { "magic trap", "魔法陷阱" },
+    { "anti magic trap", "反魔法陷阱" },
+    { "anti-magic field", "反魔法场" },
+    { "polymorph trap", "变形陷阱" },
+    { "vibrating square", "振动的方格" },
+    { "trapped door", "设了陷阱的门" },
+    { "trapped chest", "设了陷阱的箱子" },
+    { "valid position", "有效位置" },
+    /* alternate names (second column of PCHAR2) */
+    { "wall", "墙" },
+    { "doorway", "门口" },
+    { "open door", "开着的门" },
+    { "closed door", "关着的门" },
+    { "engraving", "刻字" },
+    { "corridor", "走廊" },
+    { "opulent throne", "华丽的王座" },
+    { "lowered drawbridge", "放下的吊桥" },
+    { "raised drawbridge", "升起的吊桥" },
+    /* def_monsyms[] */
+    { "ant or other insect", "蚂蚁或其他昆虫" },
+    { "blob", "团状生物" },
+    { "cockatrice", "鸡蛇" },
+    { "dog or other canine", "狗或其他犬类" },
+    { "eye or sphere", "眼睛或球体" },
+    { "cat or other feline", "猫或其他猫科动物" },
+    { "gremlin", "小魔怪" },
+    { "humanoid", "类人生物" },
+    { "imp or minor demon", "小鬼或低等恶魔" },
+    { "jelly", "胶冻" },
+    { "kobold", "狗头人" },
+    { "leprechaun", "矮妖" },
+    { "mimic", "拟态怪" },
+    { "nymph", "宁芙" },
+    { "orc", "兽人" },
+    { "piercer", "穿刺者" },
+    { "quadruped", "四足动物" },
+    { "rodent", "啮齿动物" },
+    { "arachnid or centipede", "蛛形动物或蜈蚣" },
+    { "trapper or lurker above", "捕猎者或潜伏者" },
+    { "unicorn or horse", "独角兽或马" },
+    { "vortex", "漩涡" },
+    { "worm", "蠕虫" },
+    { "xan or other mythical/fantastic insect", "刺蝇或其他神话昆虫" },
+    { "light", "光体" },
+    { "zruty", "兹鲁提" },
+    { "angelic being", "天使" },
+    { "bat or bird", "蝙蝠或鸟" },
+    { "centaur", "半人马" },
+    { "dragon", "龙" },
+    { "elemental", "元素生物" },
+    { "fungus or mold", "真菌或霉菌" },
+    { "gnome", "侏儒" },
+    { "giant humanoid", "巨型类人生物" },
+    { "invisible monster", "隐形怪物" },
+    { "jabberwock", "炸脖龙" },
+    { "Keystone Kop", "基石警察" },
+    { "lich", "巫妖" },
+    { "mummy", "木乃伊" },
+    { "naga", "那伽" },
+    { "ogre", "食人魔" },
+    { "pudding or ooze", "布丁怪或软泥怪" },
+    { "quantum mechanic", "量子力学家" },
+    { "rust monster or disenchanter", "锈蚀怪或解魔怪" },
+    { "snake", "蛇" },
+    { "troll", "巨魔" },
+    { "umber hulk", "土巨怪" },
+    { "vampire", "吸血鬼" },
+    { "wraith", "幽灵" },
+    { "xorn", "索恩" },
+    { "apelike creature", "类猿生物" },
+    { "zombie", "僵尸" },
+    { "human or elf", "人类或精灵" },
+    { "ghost", "鬼魂" },
+    { "golem", "魔像" },
+    { "major demon", "高等恶魔" },
+    { "sea monster", "海怪" },
+    { "lizard", "蜥蜴" },
+    { "long worm tail", "长蠕虫的尾巴" },
+    { "remembered, unseen, creature", "记得的看不见的生物" },
+    /* def_oc_syms[] */
+    { "strange object", "奇怪的物体" },
+    { "weapon", "武器" },
+    { "suit or piece of armor", "一套或一件盔甲" },
+    { "ring", "戒指" },
+    { "amulet", "护身符" },
+    { "useful item (pick-axe, key, lamp...)", "有用的物品（镐、钥匙、灯……）" },
+    { "piece of food", "食物" },
+    { "potion", "药水" },
+    { "scroll", "卷轴" },
+    { "spellbook", "魔法书" },
+    { "wand", "魔杖" },
+    { "pile of coins", "一堆钱币" },
+    { "gem or rock", "宝石或石头" },
+    { "boulder or statue", "巨石或雕像" },
+    { "boulder", "巨石" },
+    { "statue", "雕像" },
+    { "iron ball", "铁球" },
+    { "iron chain", "铁链" },
+    { "splash of venom", "一摊毒液" },
+    /* def_warnsyms[] */
+    { "unknown creature causing you worry", "让你担心的未知生物" },
+    { "unknown creature causing you concern", "让你忧虑的未知生物" },
+    { "unknown creature causing you anxiety", "让你焦虑的未知生物" },
+    { "unknown creature causing you disquiet", "让你不安的未知生物" },
+    { "unknown creature causing you alarm", "让你惊恐的未知生物" },
+    { "unknown creature causing you dread", "让你恐惧的未知生物" },
+    { "you", "你" },
+};
+
+/* true if 'c' may sit next to a translatable phrase (not a letter) */
+#define zh_symdesc_edge(c) \
+    (!(((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z')))
+
+/* Translate a finished map-location description for display.  Returns a
+   rotating static buffer; text that is not a known phrase is kept. */
+const char *
+zh_symdesc(const char *src)
+{
+    static char bufs[4][BUFSZ];
+    static int bufidx = 0;
+    char *out = bufs[bufidx];
+    const char *p = src;
+    size_t olen = 0;
+
+    bufidx = (bufidx + 1) % SIZE(bufs);
+    if (!p)
+        return strcpy(out, "");
+    while (*p && olen < BUFSZ - 1) {
+        const char *zh = 0;
+        size_t best = 0, i, n;
+
+        /* encoded glyph "\GXXXXNNNN" (see encglyph()): copy verbatim, its
+           hex digits must not be taken for words or articles */
+        if (p[0] == '\\' && p[1] == 'G' && strlen(p) >= 10
+            && olen + 10 < BUFSZ - 1) {
+            (void) memcpy(out + olen, p, 10);
+            olen += 10;
+            p += 10;
+            continue;
+        }
+
+        /* longest table phrase starting here on a word boundary */
+        if (p == src || zh_symdesc_edge(p[-1])) {
+            for (i = 0; i < SIZE(zh_symdesc_tab); ++i) {
+                n = strlen(zh_symdesc_tab[i].en);
+                if (n > best && !strncmp(p, zh_symdesc_tab[i].en, n)
+                    && zh_symdesc_edge(p[n])) {
+                    best = n;
+                    zh = zh_symdesc_tab[i].zh;
+                }
+            }
+        }
+        if (zh) {
+            n = strlen(zh);
+            if (olen + n >= BUFSZ - 1)
+                break;
+            Strcpy(out + olen, zh);
+            olen += n;
+            p += best;
+        } else if (!strncmp(p, " or ", 4)) {
+            if (olen + 3 >= BUFSZ - 1)
+                break;
+            Strcpy(out + olen, "或");
+            olen += 3;
+            p += 4;
+        } else if ((!strncmp(p, "a ", 2) || !strncmp(p, "an ", 3)
+                    || !strncmp(p, "the ", 4))
+                   && (p == src || zh_symdesc_edge(p[-1]))) {
+            /* drop an English article in front of a translated phrase */
+            const char *q = strchr(p, ' ') + 1;
+            for (i = 0; i < SIZE(zh_symdesc_tab); ++i) {
+                n = strlen(zh_symdesc_tab[i].en);
+                if (!strncmp(q, zh_symdesc_tab[i].en, n)
+                    && zh_symdesc_edge(q[n]))
+                    break;
+            }
+            if (i < SIZE(zh_symdesc_tab) || ((uchar) *q & 0x80))
+                p = q;
+            else
+                out[olen++] = *p++;
+        } else {
+            out[olen++] = *p++;
+        }
+    }
+    out[olen] = '\0';
+    return out;
+}
+#endif /* ZHLANG */
+
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 
@@ -127,34 +407,8 @@ zh_pager_race(const char *adj)
     return adj;
 }
 
-/* Chinese name of a surface() result, for display only */
-staticfn const char *
-zh_pager_surface(const char *en)
-{
-    if (!strcmp(en, "floor") || !strcmp(en, "ground"))
-        return "地面";
-    if (!strcmp(en, "ice"))
-        return "冰面";
-    if (!strcmp(en, "water") || !strcmp(en, "bottom"))
-        return "水面";
-    if (!strcmp(en, "lava"))
-        return "熔岩";
-    if (!strcmp(en, "wall"))
-        return "墙壁";
-    if (!strcmp(en, "doorway"))
-        return "门口";
-    if (!strcmp(en, "bridge"))
-        return "桥面";
-    if (!strcmp(en, "altar"))
-        return "祭坛";
-    if (!strcmp(en, "headstone"))
-        return "墓碑";
-    if (!strcmp(en, "fountain"))
-        return "喷泉";
-    if (!strcmp(en, "stairs"))
-        return "楼梯";
-    return "地面";
-}
+/* zh_pager_surface() used to live here; the surface()/ceiling() display
+   conversion is now shared, see zh_surface_name() in dungeon.c */
 #endif /* ZHLANG */
 
 /* shared by monster probing (via query_objlist!) as well as lookat() */
@@ -285,7 +539,7 @@ mhidden_description(
         if (incl_prefix)
             Strcpy(outbuf, TR(", mimicking ", "，伪装成"));
         if (M_AP_TYPE(mon) == M_AP_FURNITURE) {
-            what = defsyms[mon->mappearance].explanation;
+            what = ZH_SYMDESC(defsyms[mon->mappearance].explanation);
             if (incl_article)
                 what = an(what);
             Strcat(outbuf, what);
@@ -297,7 +551,7 @@ mhidden_description(
             fakeobj = object_from_map(glyph, x, y, &otmp);
             what = (otmp && otmp->otyp != STRANGE_OBJECT)
                    ? simpleonames(otmp)
-                   : obj_descr[STRANGE_OBJECT].oc_name;
+                   : OBJ_NAME(objects[STRANGE_OBJECT]);
             if (incl_article && (!otmp || otmp->quan == 1L))
                 what = an(what);
             Strcat(outbuf, what);
@@ -338,7 +592,7 @@ mhidden_description(
 #ifdef ZHLANG
             Sprintf(eos(outbuf), " 在%s上",
                     ceiling_hider(mon->data) ? "天花板"
-                       : zh_pager_surface(surface(x, y))); /* trapper */
+                       : zh_surface(x, y)); /* trapper */
 #else
             Sprintf(eos(outbuf), TR(" on the %s", " 在%s上"),
                     ceiling_hider(mon->data) ? "ceiling"
@@ -481,7 +735,7 @@ look_at_object(
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
                      ? distant_name(otmp, otmp->dknown ? doname_with_price
                                                        : doname_vague_quan)
-                     : obj_descr[STRANGE_OBJECT].oc_name);
+                     : OBJ_NAME(objects[STRANGE_OBJECT]));
         if (fakeobj) {
             otmp->where = OBJ_FREE; /* object_from_map set it to OBJ_FLOOR */
             dealloc_obj(otmp), otmp = NULL; /* has no contents */
@@ -2111,7 +2365,11 @@ do_look(int mode, coord *click_cc)
         /* Finally, print out our explanation. */
         if (found) {
             /* use putmixed() because there may be an encoded glyph present */
+#ifdef ZHLANG
+            putmixed(WIN_MESSAGE, 0, zh_symdesc(out_str));
+#else
             putmixed(WIN_MESSAGE, 0, out_str);
+#endif
 #ifdef DUMPLOG_CORE
             {
                 char dmpbuf[BUFSZ];

@@ -58,7 +58,7 @@ ballfall(void)
         int dmg = rn1(7, 25);
 
 #ifdef ZHLANG
-        pline_The("铁球砸在了你的%s上。", body_part(HEAD));
+        pline_The("铁球砸在了你的%s上。", zh_body_part(HEAD));
 #else
         pline_The("iron ball falls on your %s.", body_part(HEAD));
 #endif
@@ -969,7 +969,7 @@ drop_ball(coordxy x, coordxy y)
 #ifdef ZHLANG
                     Your("%s%s受到了严重伤害。",
                          (side == LEFT_SIDE) ? "左" : "右",
-                         body_part(LEG));
+                         zh_body_part(LEG));
 #else
                     Your("%s %s is severely damaged.",
                          (side == LEFT_SIDE) ? "left" : "right",

@@ -418,7 +418,8 @@ curses_choose_character(void)
     prompt[count_off] = '\0';
     Snprintf(choice, sizeof(choice), "%s%c", tmpchoice, '\033');
     if (strchr(tmpchoice, 't')) {       /* Tutorial mode */
-        mvaddstr(0, 1, "New? Press t to enter a tutorial.");
+        mvaddstr(0, 1, TR("New? Press t to enter a tutorial.",
+                          "新角色？按 t 开始教程。"));
     }
 
     /* Add capital letters as choices that aren't displayed */
@@ -482,7 +483,8 @@ curses_choose_character(void)
         choices[n] = (const char *) 0;
         if (n > 1)
             sel = curses_character_dialog(choices,
-                                        "Choose one of the following roles:");
+                                        TR("Choose one of the following roles:",
+                                           "请选择以下职业之一："));
         else
             sel = 0;
         if (sel >= 0)
@@ -544,7 +546,8 @@ curses_choose_character(void)
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
                 sel = curses_character_dialog(choices,
-                                        "Choose one of the following races:");
+                                        TR("Choose one of the following races:",
+                                           "请选择以下种族之一："));
             else
                 sel = 0;
             if (sel >= 0)
@@ -604,7 +607,8 @@ curses_choose_character(void)
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
                 sel = curses_character_dialog(choices,
-                                      "Choose one of the following genders:");
+                                      TR("Choose one of the following genders:",
+                                         "请选择以下性别之一："));
             else
                 sel = 0;
             if (sel >= 0)
@@ -662,7 +666,8 @@ curses_choose_character(void)
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
                 sel = curses_character_dialog(choices,
-                                   "Choose one of the following alignments:");
+                                   TR("Choose one of the following alignments:",
+                                      "请选择以下阵营之一："));
             else
                 sel = 0;
             if (sel >= 0)
@@ -717,12 +722,12 @@ curses_character_dialog(const char **choices, const char *prompt)
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
     curses_add_menu(wid, &nul_glyphinfo, &identifier, '*', 0,
-                    A_NORMAL, clr, "Random", MENU_ITEMFLAGS_NONE);
+                    A_NORMAL, clr, TR("Random", "随机"), MENU_ITEMFLAGS_NONE);
 
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
     curses_add_menu(wid, &nul_glyphinfo, &identifier, 'q', 0,
-                    A_NORMAL, clr, "Quit", MENU_ITEMFLAGS_NONE);
+                    A_NORMAL, clr, TR("Quit", "退出"), MENU_ITEMFLAGS_NONE);
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
     if (ret == 1) {

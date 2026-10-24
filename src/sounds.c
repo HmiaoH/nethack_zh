@@ -108,7 +108,7 @@ morgue_mon_sound(struct monst *mtmp)
     if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
         && mon_in_room(mtmp, MORGUE)) {
         int hallu = Hallucination ? 1 : 0;
-        const char *hair = body_part(HAIR); /* hair/fur/scales */
+        const char *hair = zh_body_part(HAIR); /* hair/fur/scales */
 
         switch (rn2(2) + hallu) {
         case 0:
@@ -120,11 +120,11 @@ morgue_mon_sound(struct monst *mtmp)
             break;
         case 1:
             pline_The(TR("%s on the back of your %s %s up.", "%s在你%s后面%s起来。"), hair,
-                      body_part(NECK), vtense(hair, TR("stand", "竖")));
+                      zh_body_part(NECK), vtense(hair, TR("stand", "竖")));
             break;
         case 2:
             pline_The(TR("%s on your %s %s to stand up.", "%s在你%s上%s竖起。"), hair,
-                      body_part(HEAD), vtense(hair, TR("seem", "现在")));
+                      zh_body_part(HEAD), vtense(hair, TR("seem", "现在")));
             break;
         }
         return TRUE;

@@ -887,13 +887,13 @@ m_throw(
                     else
 #ifdef ZHLANG
                         pline("有%s黏糊糊的东西糊在你的%s上。",
-                              something, body_part(FACE));
+                              something, zh_body_part(FACE));
 #else
                         pline("There's %s sticky all over your %s.",
                               something, body_part(FACE));
 #endif
                 } else if (singleobj->otyp == BLINDING_VENOM) {
-                    const char *eyes = body_part(EYE);
+                    const char *eyes = zh_body_part(EYE);
 
                     if (eyecount(gy.youmonst.data) != 1)
                         eyes = makeplural(eyes);
@@ -1030,7 +1030,7 @@ return_from_mtoss(
             if (!do_not_annoy || (svm.moves - do_not_annoy) > 500L) {
 #ifdef ZHLANG
                 pline("%s回到了%s的%s中！", Tobjnam(otmp, "回"),
-                      s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
+                      s_suffix(mon_nam(magr)), zh_mbodypart(magr, HAND));
 #else
                 pline("%s to %s %s!", Tobjnam(otmp, "return"),
                       s_suffix(mon_nam(magr)), mbodypart(magr, HAND));
@@ -1076,7 +1076,7 @@ return_from_mtoss(
 #ifdef ZHLANG
                     pline("%s飞向%s，击中了%s的%s！",
                           Tobjnam(otmp, "飞"), mon_nam(magr),
-                          mhis(magr), body_part(ARM));
+                          mhis(magr), zh_body_part(ARM));
 #else
                     pline("%s back toward %s, hitting %s %s!",
                           Tobjnam(otmp, "fly"), mon_nam(magr),

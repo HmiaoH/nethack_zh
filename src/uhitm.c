@@ -95,7 +95,7 @@ mhitm_mgc_atk_negated(
                 You("avoid harm.");
 #endif
             else if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s avoids harm.", Monnam(mdef));
+                pline_mon(mdef, TR("%s avoids harm.", "%s毫发无伤。"), Monnam(mdef));
         }
         return TRUE;
     }
@@ -594,7 +594,7 @@ do_attack(struct monst *mtmp)
                 You("开始用你的%s%s%s怪物。",
                     ing_suffix(Role_if(PM_MONK) ? TR("strike", "打击") : TR("bash", "猛击")),
                     uarmg ? TR("gloved", "戴着手套") : TR("bare", "裸露"), /* Del Lamb */
-                    makeplural(body_part(HAND)));
+                    makeplural(zh_body_part(HAND)));
 #else
                 You("begin %s monsters with your %s %s.",
                     ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
@@ -2510,8 +2510,8 @@ mhitm_ad_rust(
             return;
         if (completelyrusts(pd)) { /* PM_IRON_GOLEM */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+                pline_mon(mdef, TR("%s %s to pieces!", "%s%s成了碎片！"), Monnam(mdef),
+                      !mlifesaver(mdef) ? TR("falls", "碎") : TR("starts to fall", "开始崩碎"));
             monkilled(mdef, (char *) 0, AD_RUST);
             if (!DEADMONSTER(mdef)) {
                 mhm->hitflags = M_ATTK_MISS;
@@ -2599,8 +2599,8 @@ mhitm_ad_dcay(
             /* note: the life-saved case is hypothetical because
                life-saving doesn't work for golems */
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+                pline_mon(mdef, TR("%s %s to pieces!", "%s%s成了碎片！"), Monnam(mdef),
+                      !mlifesaver(mdef) ? TR("falls", "碎") : TR("starts to fall", "开始崩碎"));
             monkilled(mdef, (char *) 0, AD_DCAY);
             if (!DEADMONSTER(mdef)) {
                 mhm->done = TRUE;
@@ -2710,7 +2710,7 @@ mhitm_ad_drli(
             if (!is_death) /* Stormbringer uses monhp_per_lvl (1d8) */
                 mhm->damage = d(2, 6);
             if (gv.vis && canspotmon(mdef))
-                pline_mon(mdef, "%s becomes weaker!", Monnam(mdef));
+                pline_mon(mdef, TR("%s becomes weaker!", "%s变弱了！"), Monnam(mdef));
             if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
                 mdef->mhpmax -= mhm->damage;
             } else {
@@ -2834,8 +2834,8 @@ mhitm_ad_fire(
                life-saving doesn't work for golems */
             if (gv.vis && canseemon(mdef))
                 pline_mon(mdef, "%s %s!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "burns completely"
-                                        : "is totally engulfed in flames");
+                      !mlifesaver(mdef) ? TR("burns completely", "烧光了")
+                                        : TR("is totally engulfed in flames", "完全陷入火焰中"));
             monkilled(mdef, (char *) 0, AD_FIRE);
             if (!DEADMONSTER(mdef)) {
                 mhm->hitflags = M_ATTK_MISS;
@@ -2913,7 +2913,7 @@ mhitm_ad_cold(
             return;
         }
         if (gv.vis && canseemon(mdef))
-            pline_mon(mdef, "%s is covered in frost!", Monnam(mdef));
+            pline_mon(mdef, TR("%s is covered in frost!", "%s被冰霜覆盖了！"), Monnam(mdef));
         if (resists_cold(mdef) || defended(mdef, AD_COLD)) {
             if (gv.vis && canseemon(mdef))
                 pline_The(TR("frost doesn't seem to chill %s!", "霜冻似乎冻不到%s！"), mon_nam(mdef));
@@ -2979,7 +2979,7 @@ mhitm_ad_elec(
             return;
         }
         if (gv.vis && canseemon(mdef))
-            pline_mon(mdef, "%s gets zapped!", Monnam(mdef));
+            pline_mon(mdef, TR("%s gets zapped!", "%s被电击了！"), Monnam(mdef));
         if (resists_elec(mdef) || defended(mdef, AD_ELEC)) {
             if (gv.vis && canseemon(mdef))
                 pline_The(TR("zap doesn't shock %s!", "电击无法电到%s！"), mon_nam(mdef));
@@ -3042,7 +3042,7 @@ mhitm_ad_acid(
 #endif
             mhm->damage = 0;
         } else if (gv.vis && canseemon(mdef)) {
-            pline_mon(mdef, "%s is covered in %s!", Monnam(mdef), hliquid("acid"));
+            pline_mon(mdef, TR("%s is covered in %s!", "%s被%s覆盖了！"), Monnam(mdef), hliquid(TR("acid", "酸液")));
             #ifdef ZHLANG
             pline("它灼烧了%s！", mon_nam(mdef));
 #else
@@ -3227,7 +3227,7 @@ mhitm_ad_tlpt(
             ; /* no negation message */
         } else if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (gv.vis)
-                pline_mon(mdef, "%s is not affected.", Monnam(mdef));
+                pline_mon(mdef, TR("%s is not affected.", "%s没有受到影响。"), Monnam(mdef));
         } else {
             char mdef_Monnam[BUFSZ];
             boolean wasseen = canspotmon(mdef);
@@ -3366,7 +3366,7 @@ mhitm_ad_curs(
                 if (Blind) {
                     You_hear(TR("laughter.", "传来笑声。"));
                 } else {
-                    pline_mon(magr, "%s chuckles.", Monnam(magr));
+                    pline_mon(magr, TR("%s chuckles.", "%s咯咯地笑了。"), Monnam(magr));
                 }
             }
             if (u.umonnum == PM_CLAY_GOLEM) {
@@ -3399,7 +3399,7 @@ mhitm_ad_curs(
                     pline("Some writing vanishes from %s head!",
                           s_suffix(mon_nam(mdef)));
 #endif
-                    pline_mon(mdef, "%s is destroyed!", Monnam(mdef));
+                    pline_mon(mdef, TR("%s is destroyed!", "%s被摧毁了！"), Monnam(mdef));
                 }
                 mondied(mdef);
                 if (!DEADMONSTER(mdef)) {
@@ -3419,7 +3419,7 @@ mhitm_ad_curs(
                 if (!gv.vis)
                     You_hear(TR("laughter.", "传来笑声。"));
                 else if (canseemon(magr))
-                    pline_mon(magr, "%s chuckles.", Monnam(magr));
+                    pline_mon(magr, TR("%s chuckles.", "%s咯咯地笑了。"), Monnam(magr));
             }
         }
     }
@@ -3628,7 +3628,7 @@ mhitm_ad_drin(
 
         if (gn.notonhead || !has_head(pd)) {
             if (gv.vis && canspotmon(mdef))
-                pline_mon(mdef, "%s doesn't seem harmed.", Monnam(mdef));
+                pline_mon(mdef, TR("%s doesn't seem harmed.", "%s似乎没有受伤。"), Monnam(mdef));
             /* Not clear what to do for green slimes */
             mhm->damage = 0;
             /* don't bother with additional DRIN attacks since they wouldn't
@@ -3748,7 +3748,7 @@ mhitm_ad_wrap(
                     else
                         #ifdef ZHLANG
                         You("擦过了%s的%s。", s_suffix(mon_nam(mdef)),
-                            tailmiss ? TR("tail", "尾巴") : mbodypart(mdef, LEG));
+                            tailmiss ? TR("tail", "尾巴") : zh_mbodypart(mdef, LEG));
 #else
                         You("brush against %s %s.", s_suffix(mon_nam(mdef)),
                             tailmiss ? "tail" : mbodypart(mdef, LEG));
@@ -3794,10 +3794,10 @@ mhitm_ad_wrap(
                 mhm->damage = 0;
                 if (flags.verbose) {
                     if (coil)
-                        pline_mon(magr, "%s brushes against you.",
+                        pline_mon(magr, TR("%s brushes against you.", "%s擦碰了你一下。"),
                                   Monnam(magr));
                     else
-                        pline_mon(magr, "%s brushes against your %s.",
+                        pline_mon(magr, TR("%s brushes against your %s.", "%s擦碰到了你的%s。"),
                                   Monnam(magr), body_part(LEG));
                 }
             }
@@ -4138,7 +4138,7 @@ mhitm_ad_slow(
             mon_adjust_speed(mdef, -1, (struct obj *) 0);
             mdef->mstrategy &= ~STRAT_WAITFORU;
             if (mdef->mspeed != oldspeed && gv.vis && canspotmon(mdef))
-                pline_mon(mdef, "%s slows down.", Monnam(mdef));
+                pline_mon(mdef, TR("%s slows down.", "%s减速了。"), Monnam(mdef));
         }
     }
 }
@@ -4187,7 +4187,7 @@ mhitm_ad_conf(
          */
         if (!magr->mcan && !mdef->mconf && !magr->mspec_used) {
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s looks confused.", Monnam(mdef));
+                pline_mon(mdef, TR("%s looks confused.", "%s看起来一脸困惑。"), Monnam(mdef));
             mdef->mconf = 1;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
@@ -4265,7 +4265,7 @@ mhitm_ad_famn(
         goto mhitm_famn;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        pline_mon(magr, "%s reaches out, and your body shrivels.",
+        pline_mon(magr, TR("%s reaches out, and your body shrivels.", "%s伸出手来，你的身体枯萎了。"),
                   Monnam(magr));
         exercise(A_CON, FALSE);
         if (!is_fainted())
@@ -4296,7 +4296,7 @@ mhitm_ad_pest(
         goto mhitm_pest;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        pline_mon(magr, "%s reaches out, and you feel fever and chills.",
+        pline_mon(magr, TR("%s reaches out, and you feel fever and chills.", "%s伸出手来，你感到忽冷忽热。"),
                   Monnam(magr));
         (void) diseasemu(pa);
         /* plus the normal damage */
@@ -4325,7 +4325,7 @@ mhitm_ad_deth(
         goto mhitm_deth;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        pline_mon(magr, "%s reaches out with its deadly touch.", Monnam(magr));
+        pline_mon(magr, TR("%s reaches out with its deadly touch.", "%s伸出了它的致命之手。"), Monnam(magr));
         if (is_undead(pd)) {
             /* still does some damage */
             mhm->damage = (mhm->damage + 1) / 2;
@@ -4400,8 +4400,8 @@ mhitm_ad_halu(
         /* mhitm */
         if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
             if (gv.vis && canseemon(mdef))
-                pline_mon(mdef, "%s looks %sconfused.", Monnam(mdef),
-                      mdef->mconf ? "more " : "");
+                pline_mon(mdef, TR("%s looks %sconfused.", "%s看起来%s困惑了。"), Monnam(mdef),
+                      mdef->mconf ? TR("more ", "更多") : "");
             mdef->mconf = 1;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
@@ -4448,7 +4448,7 @@ do_stone_mon(
     }
     if (!resists_ston(mdef)) {
         if (gv.vis && canseemon(mdef))
-            pline_mon(mdef, "%s turns to stone!", Monnam(mdef));
+            pline_mon(mdef, TR("%s turns to stone!", "%s变成了石头！"), Monnam(mdef));
         monstone(mdef);
  post_stone:
         if (!DEADMONSTER(mdef)) {
@@ -4516,7 +4516,7 @@ mhitm_ad_phys(
                     mhm->hitflags |= M_ATTK_MISS;
                 } else {
                     set_ustuck(magr);
-                    pline_mon(magr, "%s grabs you!", Monnam(magr));
+                    pline_mon(magr, TR("%s grabs you!", "%s抓住了你！"), Monnam(magr));
                     mhm->hitflags |= M_ATTK_HIT;
                 }
             } else if (u.ustuck == magr) {
@@ -4541,7 +4541,7 @@ mhitm_ad_phys(
                 if (otmp->otyp == CORPSE
                     && touch_petrifies(&mons[otmp->corpsenm])) {
                     mhm->damage = 1;
-                    pline_mon(magr, "%s hits you with the %s corpse.",
+                    pline_mon(magr, TR("%s hits you with the %s corpse.", "%s用%s的尸体打了你！"),
                               Monnam(magr),
                               mons[otmp->corpsenm].pmnames[NEUTRAL]);
                     if (!Stoned) {
@@ -4662,7 +4662,7 @@ mhitm_ad_phys(
                 if (!artifact_hit(magr, mdef, mwep, &mhm->damage,
                                   mhm->dieroll)) {
                     if (gv.vis)
-                        pline_mon(magr, "%s hits %s.", Monnam(magr),
+                        pline_mon(magr, TR("%s hits %s.", "%s击中了%s。"), Monnam(magr),
                               mon_nam_too(mdef, magr));
                     mhm->hitflags |= M_ATTK_HIT;
                 }
@@ -4825,7 +4825,7 @@ mhitm_ad_heal(
             && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
 
-            pline_mon(magr, "%s hits!  (I hope you don't mind.)",
+            pline_mon(magr, TR("%s hits!  (I hope you don't mind.)", "%s击中了！（希望你不介意。）"),
                       Monnam(magr));
             if (Upolyd) {
                 u.mh += rnd(7);
@@ -4928,8 +4928,8 @@ mhitm_ad_stun(
         if (magr->mcan)
             return;
         if (canseemon(mdef))
-            pline_mon(mdef, "%s %s for a moment.", Monnam(mdef),
-                  makeplural(stagger(pd, "stagger")));
+            pline_mon(mdef, TR("%s %s for a moment.", "%s，呈%s，持续了片刻。"), Monnam(mdef),
+                  makeplural(stagger(pd, TR("stagger", "蹒跚"))));
         mdef->mstun = 1;
         mhitm_ad_phys(magr, mattk, mdef, mhm);
         if (mhm->done)
@@ -4959,6 +4959,12 @@ mhitm_ad_legs(
         const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
                    *Monst_name = Monnam(magr), *leg = body_part(LEG);
 
+#ifdef ZHLANG
+        /* the Chinese messages below need Chinese words too */
+        sidestr = (side == RIGHT_SIDE) ? "右" : "左";
+        leg = zh_body_part(LEG);
+#endif
+
         /* This case is too obvious to ignore, but Nethack is not in
          * general very good at considering height--most short monsters
          * still _can_ attack you when you're flying or mounted.
@@ -4971,7 +4977,7 @@ mhitm_ad_legs(
 #endif
             mhm->damage = 0;
         } else if (magr->mcan) {
-            pline_mon(magr, "%s nuzzles against your %s %s!", Monnam(magr),
+            pline_mon(magr, TR("%s nuzzles against your %s %s!", "%s蹭了蹭你的%s%s！"), Monnam(magr),
                   sidestr, leg);
             mhm->damage = 0;
         } else {
@@ -4987,16 +4993,16 @@ mhitm_ad_legs(
 #endif
                 } else if (!rn2(5)) {
                     #ifdef ZHLANG
-                    pline("%s刺穿了你%s的靴子！", Monst_name,
-                          sidestr);
+                    pline("%s刺穿了你%s%s的靴子！", Monst_name,
+                          sidestr, leg);
 #else
                     pline("%s pricks through your %s boot!", Monst_name,
                           sidestr);
 #endif
                 } else {
                     #ifdef ZHLANG
-                    pline("%s划伤了你%s的靴子！", Monst_name,
-                          sidestr);
+                    pline("%s划伤了你%s%s的靴子！", Monst_name,
+                          sidestr, leg);
 #else
                     pline("%s scratches your %s boot!", Monst_name,
                           sidestr);
@@ -5051,10 +5057,10 @@ mhitm_ad_dgst(
             if (gv.vis && canseemon(magr))
                 pline_mon(magr, "%s %s!", Monnam(magr),
                       (pd == &mons[PM_FAMINE])
-                          ? "belches feebly, shrivels up and dies"
+                          ? TR("belches feebly, shrivels up and dies", "虚弱地打了个嗝，萎缩下去死了")
                           : (pd == &mons[PM_PESTILENCE])
-                                ? "coughs spasmodically and collapses"
-                                : "vomits violently and drops dead");
+                                ? TR("coughs spasmodically and collapses", "剧烈地咳嗽着倒下了")
+                                : TR("vomits violently and drops dead", "剧烈地呕吐，随即倒地而亡"));
             mondied(magr);
             if (!DEADMONSTER(magr)) {
                 mhm->hitflags = M_ATTK_MISS; /* lifesaved */
@@ -5188,10 +5194,10 @@ mhitm_ad_sedu(
                       type, but when defending, it remains as-is */
                    || dmgtype(gy.youmonst.data, AD_SSEX)) {
             pline_mon(magr, "%s %s.", Monnam(magr),
-                  Deaf ? "says something but you can't hear it"
+                  Deaf ? TR("says something but you can't hear it", "说了些什么，但你听不见")
                   : magr->minvent
-                    ? "brags about the goods some dungeon explorer provided"
-                  : "makes some remarks about how difficult theft is lately");
+                    ? TR("brags about the goods some dungeon explorer provided", "吹嘘某位地牢探险者提供的财物")
+                  : TR("makes some remarks about how difficult theft is lately", "评论说最近偷窃有多难"));
             if (!tele_restrict(magr))
                 (void) rloc(magr, RLOC_MSG);
             mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
@@ -5232,9 +5238,9 @@ mhitm_ad_sedu(
                 (void) rloc(magr, RLOC_MSG);
             if (is_animal(magr->data) && *buf) {
                 if (canseemon(magr))
-                    pline_mon(magr, "%s tries to %s away with %s.",
+                    pline_mon(magr, TR("%s tries to %s away with %s.", "%s试图%s，带着%s逃走。"),
                               Monnam(magr),
-                              locomotion(magr->data, "run"), buf);
+                              locomotion(magr->data, TR("run", "奔跑")), buf);
             }
             monflee(magr, 0, FALSE, FALSE);
             mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
@@ -5666,7 +5672,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (!DEADMONSTER(mdef)) { /* monster lifesaved */
                     #ifdef ZHLANG
                     You("赶紧把%s里咝咝作响的东西吐了出来。",
-                        body_part(STOMACH));
+                        zh_body_part(STOMACH));
 #else
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));
@@ -7119,7 +7125,7 @@ nohandglow(struct monst *mon)
     if (!u.umconf || mon->mconf)
         return;
 
-    hands = makeplural(body_part(HAND));
+    hands = makeplural(zh_body_part(HAND));
     altfeedback = (Blind || Invisible); /* Invisible == Invis && !See_invis */
     if (u.umconf == 1) {
         if (altfeedback)
@@ -7246,10 +7252,10 @@ light_hits_gremlin(struct monst *mon, int dmg)
     if (!Deaf && mdistu(mon) <= 90) {
         /* cry of pain can be heard somewhat farther than the waking radius */
         pline_mon(mon, "%s %s!", Monnam(mon),
-                  (dmg > mon->mhp / 2) ? "wails in agony"
-                                       : "cries out in pain");
+                  (dmg > mon->mhp / 2) ? TR("wails in agony", "痛苦地哀嚎")
+                                       : TR("cries out in pain", "痛苦地叫喊"));
     } else if (canseemon(mon)) {
-        pline_mon(mon, "%s recoils from the light!", Monnam(mon));
+        pline_mon(mon, TR("%s recoils from the light!", "%s被光逼退了！"), Monnam(mon));
     }
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);

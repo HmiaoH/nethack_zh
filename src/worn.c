@@ -1412,7 +1412,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             if (vis)
 #ifdef ZHLANG
                 pline_mon(mon, "%s的头盔掉到了%s上！",
-                          s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
+                          s_suffix(Monnam(mon)), zh_surface(mon->mx, mon->my));
 #else
                 pline_mon(mon, "%s helmet falls to the %s!",
                           s_suffix(Monnam(mon)), surface(mon->mx, mon->my));

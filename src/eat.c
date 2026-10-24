@@ -1906,7 +1906,7 @@ rottenfood(struct obj *obj)
         if (Hallucination)
             You_feel(TR("rather trippy.", "感觉相当迷幻。"));
         else
-            You_feel(TR("rather %s.", "感到相当%s。"), body_part(LIGHT_HEADED));
+            You_feel(TR("rather %s.", "感到相当%s。"), zh_body_part(LIGHT_HEADED));
         make_confused(HConfusion + d(2, 4), FALSE);
     } else if (!rn2(4) && !Blind) {
         pline(TR("Everything suddenly goes dark.", "一切突然暗了下来。"));
@@ -1916,6 +1916,17 @@ rottenfood(struct obj *obj)
         if (!Blind)
             Your1(vision_clears);
     } else if (!rn2(3)) {
+#ifdef ZHLANG
+        int duration = rnd(10);
+
+        if (!Blind)
+            pline_The("世界天旋地转，眼前一黑。");
+        else if (Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
+            pline_The("世界天旋地转，你失去了对身体的控制。");
+        else
+            pline_The("世界天旋地转，你撞在了%s上。",
+                      (u.usteed) ? "马鞍" : zh_surface(u.ux, u.uy));
+#else
         const char *what, *where;
         int duration = rnd(10);
 
@@ -1926,7 +1937,8 @@ rottenfood(struct obj *obj)
         else
             what = "you slap against the",
             where = (u.usteed) ? "saddle" : surface(u.ux, u.uy);
-        pline_The(TR("world spins and %s %s.", "世界天旋地转，%s %s。"), what, where);
+        pline_The("world spins and %s %s.", what, where);
+#endif
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
@@ -2011,7 +2023,7 @@ eatcorpse(struct obj *otmp)
     } else if (acidic(&mons[mnum]) && !Acid_resistance) {
         tp++;
 #ifdef ZHLANG
-        You("有严重的胃酸问题。");   /* not body_part() */
+        You("有严重的胃酸问题。");   /* not zh_body_part() */
 #else
         You("have a very bad case of stomach acid.");   /* not body_part() */
 #endif
@@ -2094,7 +2106,7 @@ eatcorpse(struct obj *otmp)
             "Tokay", "Istringy", "Igamey", "Ifatty", "Itough"
         };
 #ifdef ZHLANG
-        /* R5: the Chinese taste adjectives; the English palatable_msgs[]
+        /* the Chinese taste adjectives; the English palatable_msgs[]
            above is still used for the "is" vs "tastes" wording and by the
            English build */
         static const char *const palatable_msgs_zh[] = {
@@ -2250,7 +2262,7 @@ fprefx(struct obj *otmp)
         /* 700-1+800 remains below 1500, the choking threshold which
            triggers "you're having a hard time getting it down" feedback */
         else if (u.uhunger < 700)
-            pline(TR("This satiates your %s!", "这填饱了你的%s！"), body_part(STOMACH));
+            pline(TR("This satiates your %s!", "这填饱了你的%s！"), zh_body_part(STOMACH));
         /* [satiation message may be inaccurate if eating gets interrupted] */
         break;
     case TRIPE_RATION:
@@ -3012,7 +3024,7 @@ doeat(void)
         if (res) {
             Your(
                TR("%s stops tingling and your sense of smell returns to normal.", "%s不再发麻，嗅觉也恢复了正常。"),
-                 body_part(NOSE));
+                 zh_body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
                 return ECMD_OK;
@@ -3079,7 +3091,7 @@ doeat(void)
             You(TR("spit out %s.", "你吐出了%s。"), the(xname(otmp)));
         } else {
             You(TR("spit %s out onto the %s.", "你把%s吐到了%s上。"), the(xname(otmp)),
-                surface(u.ux, u.uy));
+                zh_surface(u.ux, u.uy));
             if (carried(otmp)) {
                 /* no need to check for leash in use; it's not metallic */
                 if (otmp->owornmask)
@@ -3774,7 +3786,7 @@ tin_ok(struct obj *obj)
 }
 
 #ifdef ZHLANG
-/* R5: Chinese form of the floorfood() request verb ("eat", "sacrifice" or
+/* Chinese form of the floorfood() request verb ("eat", "sacrifice" or
    "tin"); the prompts built around it must be whole Chinese sentences, so
    the verb cannot stay English.  Already-localized input is unchanged. */
 staticfn const char *
@@ -3926,7 +3938,7 @@ floorfood(
 #ifdef ZHLANG
             /* whole Chinese sentence: 这里有<物品>；要吃它吗？  the English
                version spliced otense()'s "is"/"are" and the English verb
-               into the sentence, which cannot be done in Chinese (R5) */
+               into the sentence, which cannot be done in Chinese */
             Strcpy(qbuf, "这里有");
             Sprintf(qsfx,
                     one ? "；要%s它吗？" : "；要%s其中一个吗？",
@@ -3985,7 +3997,7 @@ vomit(void) /* A good idea from David Neves */
 
     if (cantvomit(gy.youmonst.data)) {
         /* doesn't cure food poisoning; message assumes that we aren't
-           dealing with some esoteric body_part() */
+           dealing with some esoteric zh_body_part() */
         Your(TR("jaw gapes convulsively.", "你的下巴痉挛般地大张着。"));
     } else {
         if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
@@ -3994,7 +4006,7 @@ vomit(void) /* A good idea from David Neves */
            vomiting_dialog() gives a vomit message when its countdown
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */
         if (u.uhs >= FAINTING)
-            Your(TR("%s heaves convulsively!", "你的%s剧烈翻腾起来！"), body_part(STOMACH));
+            Your(TR("%s heaves convulsively!", "你的%s剧烈翻腾起来！"), zh_body_part(STOMACH));
         else
             spewed = TRUE;
     }

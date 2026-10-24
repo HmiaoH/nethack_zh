@@ -52,7 +52,7 @@
    with the game, which reads them from global.h (and switches to the
    *_zh variants in a ZHLANG build) */
 #define ORACLE_FILE ORACLEFILE
-#define DATA_FILE "data"
+#define DATA_FILE DATAFILE /* "data", or "data_zh" in a ZHLANG build */
 #define RUMOR_FILE RUMORFILE
 
 /* These are affiliated with outdated options

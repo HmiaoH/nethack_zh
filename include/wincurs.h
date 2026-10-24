@@ -5,6 +5,16 @@
 #ifndef WINCURS_H
 #define WINCURS_H
 
+/* Measure terminal columns without changing the untranslated port. */
+#ifdef ZHLANG
+#include "utf8map.h"
+#define curses_strwidth(s) u8_width(s)
+extern int curses_utf8_nbytes(const char *, int);
+extern void curses_utf8_truncate(char *, int);
+#else
+#define curses_strwidth(s) ((int) strlen(s))
+#endif
+
 /* Global declarations for curses interface */
 
 extern int term_rows, term_cols;   /* size of underlying terminal   */

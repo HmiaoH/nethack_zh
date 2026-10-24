@@ -981,7 +981,7 @@ from_what(
                      && BlindedTimeout == (long) u.ucreamed
                      && !EBlinded && !(HBlinded & ~TIMEOUT))
                 Sprintf(buf, TR("due to goop covering your %s", "（因你的%s上糊着黏胶）"),
-                        body_part(FACE));
+                        zh_body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(buf, " pair of ")) != 0)

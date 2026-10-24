@@ -213,7 +213,7 @@ throne_sit_effect(void)
                     #endif
                 } else {
                     int num_of_eyes = eyecount(gy.youmonst.data);
-                    const char *eye = body_part(EYE);
+                    const char *eye = zh_body_part(EYE);
 
                     /* note: 1 eye case won't actually happen--can't
                        sit on throne when poly'd into always-levitating
@@ -234,7 +234,7 @@ throne_sit_effect(void)
                     case 0: /* no eyes */
                         #ifdef ZHLANG
                         You("你的%s有一种非常奇怪的感觉。",
-                            body_part(HEAD));
+                            zh_body_part(HEAD));
                         #else
                         You("have a very strange feeling in your %s.",
                             body_part(HEAD));
@@ -687,7 +687,7 @@ dosit(void)
             if (u.utraptype == TT_BEARTRAP) {
                 #ifdef ZHLANG
                 You_cant("脚%s被捕熊夹夹着，无法坐下。",
-                         body_part(FOOT));
+                         zh_body_part(FOOT));
                 #else
                 You_cant("sit down with your %s in the bear trap.",
                          body_part(FOOT));
@@ -852,7 +852,7 @@ dosit(void)
         return lay_an_egg();
     } else {
         #ifdef ZHLANG
-        pline("坐在%s上有趣吗？", surface(u.ux, u.uy));
+        pline("坐在%s上有趣吗？", zh_surface(u.ux, u.uy));
         #else
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
         #endif

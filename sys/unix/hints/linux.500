@@ -40,6 +40,13 @@ endif
 # note: '#-INCLUDE' is not just a comment
 #        multiw-1.500 contains sections 1 to 2
 #-INCLUDE multiw-1.500
+# Chinese localization build: include the curses interface as well as
+# tty (pick it with OPTIONS=windowtype:curses); tty stays the default.
+# Either can be switched off on the make command line, e.g.
+# 'make WANT_WIN_CURSES='.
+WANT_WIN_TTY ?= 1
+WANT_WIN_CURSES ?= 1
+WANT_DEFAULT ?= tty
 
 # note: '#-INCLUDE' is not just a comment
 #        it pulls in the contents of dirs-perms.500

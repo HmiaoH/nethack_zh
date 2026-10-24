@@ -65,6 +65,9 @@
 #define ENGRAVEFILE "engrave_zh"
 #undef BOGUSMONFILE
 #define BOGUSMONFILE "bogusmon_zh"
+/* encyclopedia: compiled from dat/data_zh.base */
+#undef DATAFILE
+#define DATAFILE "data_zh"
 #endif
 
 /*
@@ -72,7 +75,7 @@
  * English text otherwise.  Use it whenever both strings have exactly the
  * same printf conversions in the same order; if the argument order has to
  * differ, use a full #ifdef ZHLANG / #else / #endif block around the whole
- * statement instead (never inside a macro call; see doc/zh/TASKS.md E0).
+ * statement instead (never inside a macro call).
  */
 #ifdef ZHLANG
 #define TR(en, zh) zh

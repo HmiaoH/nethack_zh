@@ -735,6 +735,13 @@ extern char *rndmonnam(char *);
 extern const char *hcolor(const char *);
 extern const char *rndcolor(void);
 extern const char *hliquid(const char *);
+/* Display names for colors and liquids; Chinese in a ZHLANG build, the
+   argument itself otherwise, so these may be called unconditionally.
+   The English tables (hcolors[], hliquids[], c_obj_colors[]) stay the
+   internal ones. */
+extern const char *zh_obj_color(const char *);
+extern const char *zh_hcolor(const char *);
+extern const char *zh_hliquid(const char *);
 extern const char *roguename(void);
 /*
 extern struct obj *realloc_obj(struct obj *, int, genericptr_t, int,
@@ -912,6 +919,11 @@ extern boolean has_ceiling(d_level *) NONNULLARG1;
 extern boolean avoid_ceiling(d_level *) NONNULLARG1;
 extern const char *surface(coordxy, coordxy);
 extern const char *ceiling(coordxy, coordxy);
+/* display-only name for a surface()/ceiling() result (English in an English
+   build, Chinese under ZHLANG); see dungeon.c */
+extern const char *zh_surface_name(const char *);
+extern const char *zh_surface(coordxy, coordxy);
+extern const char *zh_ceiling(coordxy, coordxy);
 extern boolean In_quest(d_level *) NONNULLARG1;
 extern boolean In_mines(d_level *) NONNULLARG1;
 extern branch *dungeon_branch(const char *) NONNULL NONNULLARG1;
@@ -1921,6 +1933,8 @@ extern int little_to_big(int);
 extern int big_to_little(int);
 extern boolean big_little_match(int, int);
 extern const char *locomotion(const struct permonst *, const char *) NONNULLARG12;
+extern const char *zh_locomotion(const struct permonst *, const char *,
+                                 const char *) NONNULLARG123;
 extern const char *stagger(const struct permonst *, const char *) NONNULLARG12;
 extern const char *on_fire(struct permonst *, struct attack *) NONNULLARG12;
 extern const char *msummon_environ(struct permonst *, const char **) NONNULLARG12;
@@ -2375,6 +2389,13 @@ extern void check_perm_invent_again(void);
 
 /* ### pager.c ### */
 
+#ifdef ZHLANG
+extern const char *zh_symdesc(const char *) NONNULL;
+#define ZH_SYMDESC(s) zh_symdesc(s)
+#else
+#define ZH_SYMDESC(s) (s)
+#endif
+
 extern char *self_lookat(char *) NONNULL NONNULLARG1;
 extern char *monhealthdescr(struct monst *mon, boolean,
                             char *) NONNULL NONNULLARG3;
@@ -2494,6 +2515,11 @@ extern boolean u_safe_from_fatal_corpse(struct obj *obj, int) NONNULLARG1;
 
 /* ### pline.c ### */
 
+#ifdef ZHLANG
+extern const char *zh_tidy(const char *) NONNULL;
+extern void zh_squeeze_spaces(char *) NONNULLARG1;
+#endif
+
 #ifdef DUMPLOG_CORE
 extern void dumplogmsg(const char *);
 extern void dumplogfreemessages(void);
@@ -2548,6 +2574,8 @@ extern void uunstick(void);
 extern void skinback(boolean);
 extern const char *mbodypart(struct monst *, int) NONNULLARG1;
 extern const char *body_part(int);
+extern const char *zh_mbodypart(struct monst *, int) NONNULLARG1;
+extern const char *zh_body_part(int);
 extern int poly_gender(void);
 extern void ugolemeffects(int, int);
 extern boolean ugenocided(void);

@@ -155,7 +155,7 @@ throw_obj(struct obj *obj, int shotlimit)
             corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
-            makeplural(body_part(HAND)));
+            makeplural(zh_body_part(HAND)));
         #else
         You("throw %s with your bare %s.",
             corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
@@ -664,7 +664,7 @@ hitfloor(
         doaltarobj(obj);
     } else if (verbosely) {
         const char *verb = (obj->otyp == WAN_STRIKING) ? "strike" : "hit";
-        const char *surf = surface(u.ux, u.uy);
+        const char *surf = zh_surface(u.ux, u.uy);
         struct trap *t = t_at(u.ux, u.uy);
 
         /* describe something that might keep the object where it is
@@ -672,14 +672,14 @@ hitfloor(
         if (t && t->tseen) {
             switch (t->ttyp) {
             case TRAPDOOR:
-                surf = "trap door";
+                surf = zh_surface_name("trap door");
                 break;
             case HOLE:
-                surf = "edge of the hole";
+                surf = zh_surface_name("edge of the hole");
                 break;
             case PIT:
             case SPIKED_PIT:
-                surf = "edge of the pit";
+                surf = zh_surface_name("edge of the pit");
                 break;
             default:
                 break;
@@ -1218,7 +1218,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
         You("被%s锚定住了。",
             (u.utraptype == TT_WEB) ? "蛛网"
             : (u.utraptype == TT_LAVA) ? hliquid(TR("lava", "岩浆"))
-              : (u.utraptype == TT_INFLOOR) ? surface(u.ux, u.uy)
+              : (u.utraptype == TT_INFLOOR) ? zh_surface(u.ux, u.uy)
                 : (u.utraptype == TT_BURIEDBALL) ? "埋藏的铁球"
                   : "陷阱");
 #else
@@ -1407,7 +1407,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     } else if (hitsroof) {
         if (breaktest(obj)) {
             #ifdef ZHLANG
-            pline("%s击中了%s。", Doname2(obj), ceiling(u.ux, u.uy));
+            pline("%s击中了%s。", Doname2(obj), zh_ceiling(u.ux, u.uy));
             #else
             pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
             #endif
@@ -1427,7 +1427,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     }
     #ifdef ZHLANG
     pline("%s%s了%s，然后落回到你的%s上。", Doname2(obj),
-          action, ceiling(u.ux, u.uy), body_part(HEAD));
+          action, zh_ceiling(u.ux, u.uy), zh_body_part(HEAD));
     #else
     pline("%s %s the %s, then falls back on top of your %s.", Doname2(obj),
           action, ceiling(u.ux, u.uy), body_part(HEAD));
@@ -1470,7 +1470,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         case CREAM_PIE:
         case BLINDING_VENOM:
             #ifdef ZHLANG
-            pline("你弄得满脸都是%s！", body_part(FACE));
+            pline("你弄得满脸都是%s！", zh_body_part(FACE));
             #else
             pline("You've got it all over your %s!", body_part(FACE));
             #endif
@@ -1785,7 +1785,7 @@ throwit(
             && !impaired) {
             #ifdef ZHLANG
             pline(TR("%s the %s and returns to your hand!", "%s击中%s并回到你手中！"), Tobjnam(obj, "击中"),
-                  ceiling(u.ux, u.uy));
+                  zh_ceiling(u.ux, u.uy));
             #else
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
@@ -1850,7 +1850,7 @@ throwit(
                 pline("你没有装备%s，所以用手%s投掷了%s。",
                       an(skill_name(weapon_type(obj))),
                       weapon_descr(obj),
-                      body_part(HAND));
+                      zh_body_part(HAND));
                 #else
                 pline("You aren't wielding %s, so you throw your %s by %s.",
                       an(skill_name(weapon_type(obj))),
@@ -1902,7 +1902,7 @@ throwit(
                 if (!tether_released_msg) {
                     #ifdef ZHLANG
                     pline("系绳从你的%s上脱落。",
-                           body_part(ARM));
+                           zh_body_part(ARM));
                     #else
                     pline("The tether comes off your %s.",
                            body_part(ARM));
@@ -1927,7 +1927,7 @@ throwit(
             if (!tether_released_msg) {
                 #ifdef ZHLANG
                 pline("系绳从你的%s上脱落。",
-                       body_part(ARM));
+                       zh_body_part(ARM));
                 #else
                 pline("The tether comes off your %s.",
                        body_part(ARM));
@@ -1986,7 +1986,7 @@ throwit(
                              * and it is tethered to your arm */
                             #ifdef ZHLANG
                             pline("系绳的%s弹回，但系绳从你的%s滑落。",
-                                  simpleonames(obj), body_part(ARM));
+                                  simpleonames(obj), zh_body_part(ARM));
                             #else
                             pline("Your tethered %s snaps back but the tether slips from your %s.",
                                   simpleonames(obj), body_part(ARM));
@@ -1998,14 +1998,14 @@ throwit(
                                       : TR("%s back to you, landing %s your %s.", "%s朝你返回，落在你的%s%s。"),
                                   Blind ? Something : Tobjnam(obj, TR("return", "返回")),
                                   Levitation ? TR("beneath", "下方") : "at",
-                                  makeplural(body_part(FOOT)));
+                                  makeplural(zh_body_part(FOOT)));
                         }
                     } else {
                         dmg += rnd(3);
                         if (tethered_weapon) {
 #ifdef ZHLANG
                             Your("系绳的%s返回并击中你的%s！",
-                                 simpleonames(obj), body_part(ARM));
+                                 simpleonames(obj), zh_body_part(ARM));
 #else
                             Your("tethered %s returns and hits your %s!",
                                  simpleonames(obj), body_part(ARM));
@@ -2016,7 +2016,7 @@ throwit(
                                     ? TR("%s your %s!", "%s你的%s！")
                                     : TR("%s back toward you, hitting your %s!", "%s向你飞回，击中了你的%s！"),
                                 Tobjnam(obj, Blind ? TR("hit", "击中") : TR("fly", "飞")),
-                                body_part(ARM));
+                                zh_body_part(ARM));
                         }
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
@@ -2035,7 +2035,7 @@ throwit(
                         if (!tether_released_msg) {
 #ifdef ZHLANG
                             pline_The("%s的系绳从你的%s上脱落。",
-                                  s_suffix(simpleonames(obj)), body_part(ARM));
+                                  s_suffix(simpleonames(obj)), zh_body_part(ARM));
 #else
                             pline_The("%s tether comes off your %s.",
                                   s_suffix(simpleonames(obj)), body_part(ARM));
@@ -2051,7 +2051,7 @@ throwit(
                    if (!tether_released_msg) {
                        #ifdef ZHLANG
                        pline("系绳从你的%s上脱落。",
-                              body_part(ARM));
+                              zh_body_part(ARM));
                        #else
                        pline("The tether comes off your %s.",
                               body_part(ARM));
@@ -2862,7 +2862,7 @@ breakobj(
                         You("smell a peculiar odor...");
 #endif
                     } else {
-                        const char *eyes = body_part(EYE);
+                        const char *eyes = zh_body_part(EYE);
 
                         if (eyecount(gy.youmonst.data) != 1)
                             eyes = makeplural(eyes);
@@ -3068,7 +3068,7 @@ throw_gold(struct obj *obj)
             && !Is_waterlevel(&u.uz)) {
 #ifdef ZHLANG
             pline_The("金币击中了%s，然后落回到你的%s上。",
-                      ceiling(u.ux, u.uy), body_part(HEAD));
+                      zh_ceiling(u.ux, u.uy), zh_body_part(HEAD));
 #else
             pline_The("gold hits the %s, then falls back on top of your %s.",
                       ceiling(u.ux, u.uy), body_part(HEAD));
@@ -3116,7 +3116,7 @@ throw_gold(struct obj *obj)
         return ECMD_TIME;
     if (u.dz > 0)
 #ifdef ZHLANG
-        pline_The("金币击中了%s。", surface(gb.bhitpos.x, gb.bhitpos.y));
+        pline_The("金币击中了%s。", zh_surface(gb.bhitpos.x, gb.bhitpos.y));
 #else
         pline_The("gold hits the %s.", surface(gb.bhitpos.x, gb.bhitpos.y));
 #endif

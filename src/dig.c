@@ -317,7 +317,7 @@ digcheck_fail_message(enum digcheck_result digresult, struct monst *madeby,
     case DIGCHECK_FAIL_TOOHARD:
     case DIGCHECK_FAIL_UNDESTROYABLETRAP:
 #ifdef ZHLANG
-        pline_The("这里的%s太硬了，无法%s。", surface(x, y), verb);
+        pline_The("这里的%s太硬了，无法%s。", zh_surface(x, y), verb);
 #else
         pline_The("%s here is too hard to %s.", surface(x, y), verb);
 #endif
@@ -471,12 +471,12 @@ dig(void)
                 else if (uarmf)
                     dmg = (dmg + 1) / 2;
 #ifdef ZHLANG
-                You("打到了自己的%s。", body_part(FOOT));
+                You("打到了自己的%s。", zh_body_part(FOOT));
 #else
                 You("hit yourself in the %s.", body_part(FOOT));
 #endif
                 Sprintf(kbuf, TR("chopping off %s own %s", "砍掉了%s自己的%s"), uhis(),
-                        body_part(FOOT));
+                        zh_body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
 #ifdef ZHLANG
@@ -802,16 +802,17 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     furniture[0] = '\0';
     if (IS_FURNITURE(lev->typ)) {
         /* should mirror the word used by surface() for normal floor */
-        surface_type = (IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)
-                         ? "floor" : "ground");
+        surface_type = zh_surface_name(
+                           (IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
+                               ? "floor" : "ground");
         if (IS_ALTAR(lev->typ)) {
             old_aligntyp = Amask2align(levl[x][y].altarmask & AM_MASK);
             Strcpy(furniture, align_str(old_aligntyp));
             Strcat(furniture, " ");
         }
-        Strcat(furniture, surface(x, y));
+        Strcat(furniture, zh_surface(x, y));
     } else {
-        surface_type = surface(x, y);
+        surface_type = zh_surface(x, y);
     }
     shopdoor = IS_DOOR(lev->typ) && *in_rooms(x, y, SHOPBASE);
     oldobjs = svl.level.objects[x][y];
@@ -1080,7 +1081,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
         || (IS_OBSTRUCTED(old_typ) && old_typ != SDOOR
             && (lev->wall_info & W_NONDIGGABLE) != 0)) {
 #ifdef ZHLANG
-        pline_The("%s太硬了，无法挖掘。", surface(dig_x, dig_y));
+        pline_The("%s太硬了，无法挖掘。", zh_surface(dig_x, dig_y));
 #else
         pline_The("%s %shere is too hard to dig in.", surface(dig_x, dig_y),
                   (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
@@ -1154,7 +1155,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              * the drawbridge.  The following is a cop-out. --dlc
              */
             pline_The(TR("%s %shere is too hard to dig in.", "%s%s处太硬了，挖不动。"),
-                      surface(dig_x, dig_y),
+                      zh_surface(dig_x, dig_y),
                       (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
         } else {
             lev->drawbridgemask &= ~DB_UNDER;
@@ -1409,7 +1410,7 @@ use_pick_axe2(struct obj *obj)
 #endif
         else
 #ifdef ZHLANG
-            You_cant("够不到%s。", ceiling(u.ux, u.uy));
+            You_cant("够不到%s。", zh_ceiling(u.ux, u.uy));
 #else
             You_cant("reach the %s.", ceiling(u.ux, u.uy));
 #endif
@@ -1637,7 +1638,7 @@ You("cannot stay under%s long enough.",
                              && trap->ttyp != BEAR_TRAP))) {
         #ifdef ZHLANG
 pline("%s仅仅刮擦了%s。", Yobjnam2(obj, (char *) 0),
-              surface(u.ux, u.uy));
+              zh_surface(u.ux, u.uy));
 #else
 pline("%s merely scratches the %s.", Yobjnam2(obj, (char *) 0),
               surface(u.ux, u.uy));
@@ -1914,7 +1915,7 @@ zap_dig(void)
             if (digests(mtmp->data))
                 #ifdef ZHLANG
 You("刺穿了%s的%s壁！", s_suffix(mon_nam(mtmp)),
-                    mbodypart(mtmp, STOMACH));
+                    zh_mbodypart(mtmp, STOMACH));
 #else
 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
@@ -1937,7 +1938,7 @@ You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     #ifdef ZHLANG
 pline_The("光束从%s弹开，击中了%s。",
                               stway->isladder ? "梯子" : "楼梯",
-                              ceiling(u.ux, u.uy));
+                              zh_ceiling(u.ux, u.uy));
 #else
 pline_The("beam bounces off the %s and hits the %s.",
                               stway->isladder ? "ladder" : "stairs",
@@ -1945,12 +1946,12 @@ pline_The("beam bounces off the %s and hits the %s.",
 #endif
                 }
                 #ifdef ZHLANG
-You("从%s上弄松了一块石头。", ceiling(u.ux, u.uy));
+You("从%s上弄松了一块石头。", zh_ceiling(u.ux, u.uy));
 #else
 You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
 #endif
                 #ifdef ZHLANG
-pline("它砸在了你的%s上！", body_part(HEAD));
+pline("它砸在了你的%s上！", zh_body_part(HEAD));
 #else
 pline("It falls on your %s!", body_part(HEAD));
 #endif

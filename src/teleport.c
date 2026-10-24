@@ -1345,7 +1345,7 @@ level_tele(void)
             if (gi.invent)
                 #ifdef ZHLANG
                 Your("物品砰地落在%s上。",
-                     surface(u.ux, u.uy));
+                     zh_surface(u.ux, u.uy));
                 #else
                 Your("possessions land on the %s with a thud.",
                      surface(u.ux, u.uy));
@@ -2218,9 +2218,9 @@ mlevel_tele_trap(
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
-                    pline_mon(mtmp, "%s avoids the %s.",
+                    pline_mon(mtmp, TR("%s avoids the %s.", "%s避开了%s。"),
                               Monnam(mtmp),
-                             (tt == HOLE) ? "hole" : "trap");
+                             (tt == HOLE) ? TR("hole", "洞") : TR("trap", "陷阱"));
                 return Trap_Effect_Finished;
             } else {
                 assign_level(&tolevel, &trap->dst);
@@ -2232,7 +2232,7 @@ mlevel_tele_trap(
                                       || rn2(7))) {
                 if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
                     pline_mon(mtmp,
-                              "%s seems to shimmer for a moment.",
+                              TR("%s seems to shimmer for a moment.", "%s似乎闪烁了一下。"),
                               Monnam(mtmp));
                     seetrap(trap);
                 }
@@ -2252,7 +2252,7 @@ mlevel_tele_trap(
                 || (tt == NO_TRAP && onscary(0, 0, mtmp))) {
                 if (in_sight)
                     pline_mon(mtmp,
-                             "%s seems very disoriented for a moment.",
+                             TR("%s seems very disoriented for a moment.", "%s似乎一时完全迷失了方向。"),
                              Monnam(mtmp));
                 return Trap_Effect_Finished;
             }
@@ -2266,7 +2266,7 @@ mlevel_tele_trap(
                 nlev = random_teleport_level();
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
-                        pline_mon(mtmp, "%s shudders for a moment.",
+                        pline_mon(mtmp, TR("%s shudders for a moment.", "%s颤抖了一下。"),
                                   Monnam(mtmp));
                     return Trap_Effect_Finished;
                 }
@@ -2278,10 +2278,10 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-            pline_mon(mtmp, "Suddenly, %s %s.", mon_nam(mtmp),
-                     (tt == HOLE) ? "falls into a hole"
-                   : (tt == TRAPDOOR) ? "falls through a trap door"
-                   : "disappears out of sight");
+            pline_mon(mtmp, TR("Suddenly, %s %s.", "突然，%s%s。"), mon_nam(mtmp),
+                     (tt == HOLE) ? TR("falls into a hole", "掉进了洞里")
+                   : (tt == TRAPDOOR) ? TR("falls through a trap door", "从活板门掉了下去")
+                   : TR("disappears out of sight", "消失在视线之外"));
             if (trap)
                 seetrap(trap);
         }

@@ -77,7 +77,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 #	-DZHLANG (added by hints/include/chinese.500) it reads the dat/*_zh.*
 #	sources and writes the *_zh files that the ZHLANG runtime looks for.
 ifneq ($(findstring -DZHLANG,$(CFLAGS)),)
-ZHDATANAMES = bogusmon_zh data engrave_zh epitaph_zh oracles_zh rumors_zh
+ZHDATANAMES = bogusmon_zh data_zh engrave_zh epitaph_zh oracles_zh rumors_zh
 else
 ZHDATANAMES = bogusmon data engrave epitaph oracles rumors
 endif

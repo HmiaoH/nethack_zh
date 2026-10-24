@@ -1725,7 +1725,7 @@ staticfn char *
 getobj_hands_txt(const char *action, char *qbuf)
 {
     /* 'action' may already have been translated to Chinese by getobj();
-       accept both spellings so the hands description stays Chinese (R5/B5) */
+       accept both spellings so the hands description stays Chinese */
     if (!strcmp(action, "grease")
 #ifdef ZHLANG
         || !strcmp(action, "涂油")
@@ -1737,7 +1737,7 @@ getobj_hands_txt(const char *action, char *qbuf)
                || !strcmp(action, "书写")
 #endif
                ) {
-        Sprintf(qbuf, TR("your %s", "你的%s"), body_part(FINGERTIP));
+        Sprintf(qbuf, TR("your %s", "你的%s"), zh_body_part(FINGERTIP));
     } else if (!strcmp(action, "wield")
 #ifdef ZHLANG
                || !strcmp(action, "挥舞")
@@ -1748,7 +1748,7 @@ getobj_hands_txt(const char *action, char *qbuf)
                 !uwep ? "（已挥舞）" : "");
 #else
         Sprintf(qbuf, TR("your %s %s%s", "你的%s%s%s"), uarmg ? "gloved" : "bare",
-                makeplural(body_part(HAND)),
+                makeplural(zh_body_part(HAND)),
                 !uwep ? " (wielded)" : "");
 #endif
     } else if (!strcmp(action, "ready")
@@ -1763,7 +1763,7 @@ getobj_hands_txt(const char *action, char *qbuf)
                 !uquiver ? " (nothing readied)" : "");
 #endif
     } else {
-        Sprintf(qbuf, TR("your %s", "你的%s"), makeplural(body_part(HAND)));
+        Sprintf(qbuf, TR("your %s", "你的%s"), makeplural(zh_body_part(HAND)));
     }
     return qbuf;
 }
@@ -1783,7 +1783,7 @@ zh_getobj_verb(const char *word)
         "open","close","loot","pay","buy","spill","force",
         "engrave","write","adjust","swap","pick up",
         /* less common getobj() verbs; without a translation they would be
-           spliced into the Chinese prompt as English (B5) */
+           spliced into the Chinese prompt as English */
         "charge","destroy","grease","identify","split","untrap with",
         "use or apply","write on","write with","rub the royal jelly on",
         NULL };
@@ -1845,7 +1845,7 @@ getobj(
     struct _cmd_queue cq, *cmdq;
     boolean need_more_cq = FALSE;
 #ifdef ZHLANG
-    /* R5: 'word' stays English here because the logic below compares it
+    /* 'word' stays English here because the logic below compares it
        (e.g. "throw"); zhword is used only for the Chinese prompts */
     const char *zhword = zh_getobj_verb(word);
 #endif
@@ -2233,7 +2233,7 @@ silly_thing(const char *word,
             pline(silly_thing_to, zhword); /* "%s那个太荒唐了。" */
         else
             /* no Chinese equivalent for this verb: use a generic sentence
-               rather than mixing English into the Chinese one (B5) */
+               rather than mixing English into the Chinese one */
             pline("%s", "那样做太荒唐了。");
 #else
         pline(silly_thing_to, word);
@@ -3115,7 +3115,7 @@ xprname(
         /* ordinary inventory display or pickup message */
         if (use_invlet)
             let = obj->invlet;
-        /* R6: the trailing sentence period is Chinese punctuation in the
+        /* the trailing sentence period is Chinese punctuation in the
            ZHLANG build ("e - 2 银匕首。") */
         Strcpy(suffix, dot ? TR(".", "。") : "");
     }
@@ -3490,7 +3490,7 @@ display_pickinv(
                 char barehands[QBUFSZ];
 
                 /* like doname() below, makeplural() returns an obuf[] */
-                formattedobj = makeplural(body_part(HAND));
+                formattedobj = makeplural(zh_body_part(HAND));
                 Sprintf(barehands, TR("%s %s (no weapon)", "%s%s（无武器）"),
                         uarmg ? TR("gloved", "戴着手套") : TR("bare", "裸露"), formattedobj);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
@@ -4322,7 +4322,7 @@ look_here(
          *  so is unreachable from in here...").
          */
         Sprintf(fbuf, TR("Contents of %s %s", "%s%s里的物品"), s_suffix(mon_nam(mtmp)),
-                mbodypart(mtmp, STOMACH));
+                zh_mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
         You(TR("%s to %s what is lying in %s.", "%s%s%s里有什么。"), Blind ? TR("try", "试着") : TR("look around", "环顾"),
             verb, &fbuf[12]);
@@ -4576,7 +4576,7 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
 
         if (poly_when_stoned(gy.youmonst.data))
             You(TR("touched %s with your bare %s.", "碰了%s，用的是你裸露的%s。"), kbuf,
-                makeplural(body_part(HAND)));
+                makeplural(zh_body_part(HAND)));
         else
             pline(TR("Touching %s is a fatal mistake...", "碰触%s是致命的错误……"), kbuf);
         /* normalize body shape here; hand, not body_part(HAND) */
@@ -5683,7 +5683,7 @@ display_cinventory(struct obj *obj)
     int n;
     menu_item *selected = 0;
 #ifdef ZHLANG
-    /* R6: Chinese container title is "<物品>里的物品：" - prefix is empty and
+    /* Chinese container title is "<物品>里的物品：" - prefix is empty and
        the wording goes after the object name */
     const char *qpfx = "", *qsfx = "里的物品：", *lastR = "那个";
 #else
@@ -5731,7 +5731,11 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
 {
     struct obj *obj;
     char qbuf[QBUFSZ];
+#ifdef ZHLANG
+    const char *underwhat = "这里";
+#else
     const char *underwhat = "here";
+#endif
     menu_item *selected = 0;
     int n, n2 = 0;
 
@@ -5741,19 +5745,28 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
        has already used bhitpile() which will have set dknown on all items) */
     if (is_pool_or_lava(x, y) && !Underwater
         && (obj = svl.level.objects[x][y]) != 0) {
-        const char *real_liquid = is_pool(x, y) ? "water" : "lava",
+        const char *real_liquid = is_pool(x, y) ? TR("water", "水")
+                                               : TR("lava", "岩浆"),
                    *seen_liquid = hliquid(real_liquid);
 
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
+#ifdef ZHLANG
+            There("这里%s下面有%s。", seen_liquid, doname(obj));
+#else
             There(TR("%s %s under the %s here.", "%s %s在%s下面。"), more_than_1 ? TR("are", "已经") : "is",
                   doname(obj), seen_liquid);
+#endif
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
             if (pair_of(obj))
                 more_than_1 = TRUE;
+#ifdef ZHLANG
+            underwhat = more_than_1 ? "它们下面" : "它下面";
+#else
             underwhat = more_than_1 ? "under them" : "beneath it";
+#endif
         } else {
             Sprintf(qbuf, TR("Things that are under the %s here:", "这里%s下面的东西："), seen_liquid);
             if (query_objlist(qbuf, &svl.level.objects[x][y], BY_NEXTHERE,
@@ -5761,7 +5774,11 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
                 free((genericptr_t) selected), selected = 0;
             for (n2 = 0; obj; obj = obj->nexthere)
                 ++n2;
+#ifdef ZHLANG
+            underwhat = "它们下面";
+#else
             underwhat = "beneath them";
+#endif
         }
     }
 

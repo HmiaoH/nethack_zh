@@ -2977,7 +2977,7 @@ hornoplenty(
                 else
 #ifdef ZHLANG
                     pline("%s掉到了%s上。", Doname2(obj),
-                          surface(u.ux, u.uy));
+                          zh_surface(u.ux, u.uy));
 #else
                     pline("%s %s to the %s.", Doname2(obj),
                           otense(obj, "drop"), surface(u.ux, u.uy));

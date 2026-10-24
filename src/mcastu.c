@@ -91,7 +91,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
             point_msg = "at you, then curses";
 #endif
 
-        pline_mon(mtmp, "%s points %s.", Monnam(mtmp), point_msg);
+        pline_mon(mtmp, TR("%s points %s.", "%s指着%s。"), Monnam(mtmp), point_msg);
     } else if ((!(svm.moves % 4) || !rn2(4))) {
         if (!Deaf)
 #ifdef ZHLANG
@@ -772,7 +772,7 @@ mcast_psi_bolt(int dmg)
     }
     if (dmg <= 5)
 #ifdef ZHLANG
-        You("感到轻微的%s痛。", body_part(HEAD));
+        You("感到轻微的%s痛。", zh_body_part(HEAD));
 #else
         You("get a slight %sache.", body_part(HEAD));
 #endif
@@ -784,13 +784,13 @@ mcast_psi_bolt(int dmg)
 #endif
     else if (dmg <= 20)
 #ifdef ZHLANG
-        Your("%s突然疼痛难忍！", body_part(HEAD));
+        Your("%s突然疼痛难忍！", zh_body_part(HEAD));
 #else
         Your("%s suddenly aches painfully!", body_part(HEAD));
 #endif
     else
 #ifdef ZHLANG
-        Your("%s突然剧痛无比！", body_part(HEAD));
+        Your("%s突然剧痛无比！", zh_body_part(HEAD));
 #else
         Your("%s suddenly aches very painfully!", body_part(HEAD));
 #endif
@@ -964,8 +964,8 @@ mcast_blind_you(void)
 
 #ifdef ZHLANG
         pline("鳞片覆盖了你的%s！", (num_eyes == 1)
-                                       ? body_part(EYE)
-                                       : makeplural(body_part(EYE)));
+                                       ? zh_body_part(EYE)
+                                       : makeplural(zh_body_part(EYE)));
 #else
         pline("Scales cover your %s!", (num_eyes == 1)
                                        ? body_part(EYE)

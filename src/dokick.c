@@ -653,7 +653,7 @@ really_kick_object(coordxy x, coordxy y)
         && !Stone_resistance) {
 #ifdef ZHLANG
         You("用光着的%s踢了%s。",
-            makeplural(body_part(FOOT)),
+            makeplural(zh_body_part(FOOT)),
             corpse_xname(gk.kickedobj, (const char *) 0, CXN_PFX_THE));
 #else
         You("kick %s with your bare %s.",
@@ -876,7 +876,7 @@ really_kick_object(coordxy x, coordxy y)
     if (slide && !Blind)
         #ifdef ZHLANG
         pline("哇！%s在%s上%s。", Doname2(gk.kickedobj),
-              otense(gk.kickedobj, "滑落"), surface(x, y));
+              otense(gk.kickedobj, "滑落"), zh_surface(x, y));
         #else
         pline("Whee!  %s %s across the %s.", Doname2(gk.kickedobj),
               otense(gk.kickedobj, "slide"), surface(x, y));
@@ -1587,7 +1587,7 @@ dokick(void)
             break;
         case TT_WEB:
         case TT_BEARTRAP:
-            You_cant(TR("move your %s!", "你无法挪动你的%s！"), body_part(LEG));
+            You_cant(TR("move your %s!", "你无法挪动你的%s！"), zh_body_part(LEG));
             break;
         default:
             break;
@@ -1625,7 +1625,7 @@ dokick(void)
     if (u.uswallow) {
         switch (rn2(3)) {
         case 0:
-            You_cant(TR("move your %s!", "你无法挪动你的%s！"), body_part(LEG));
+            You_cant(TR("move your %s!", "你无法挪动你的%s！"), zh_body_part(LEG));
             break;
         case 1:
             if (digests(u.ustuck->data)) {

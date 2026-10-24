@@ -1496,7 +1496,7 @@ seffect_confuse_monster(struct obj **sobjp)
             scursed = sobj->cursed,
             confused = (Confusion != 0),
             altfeedback = (Blind || Invisible);
-    const char *const hands = makeplural(body_part(HAND));
+    const char *const hands = makeplural(zh_body_part(HAND));
 
     if (gy.youmonst.data->mlet != S_HUMAN || scursed) {
         if (!HConfusion)
@@ -1511,7 +1511,7 @@ seffect_confuse_monster(struct obj **sobjp)
         } else {
             pline(TR("A %s%s surrounds your %s.", "一团%s%s环绕着你的%s。"),
                   altfeedback ? "" : hcolor(NH_RED),
-                  altfeedback ? TR("faint buzz", "微弱的嗡鸣") : TR(" glow", "光芒"), body_part(HEAD));
+                  altfeedback ? TR("faint buzz", "微弱的嗡鸣") : TR(" glow", "光芒"), zh_body_part(HEAD));
             make_confused(0L, TRUE);
         }
     } else {
@@ -1692,7 +1692,7 @@ seffect_remove_curse(struct obj **sobjp)
         unpunish();
     if (u.utrap && u.utraptype == TT_BURIEDBALL) {
         buried_ball_to_freedom();
-        pline_The(TR("clasp on your %s vanishes.", "你%s上的锁扣消失了。"), body_part(LEG));
+        pline_The(TR("clasp on your %s vanishes.", "你%s上的锁扣消失了。"), zh_body_part(LEG));
     }
     update_inventory();
 }
@@ -1989,14 +1989,14 @@ seffect_fire(struct obj **sobjp)
             monstseesu(M_SEEN_FIRE);
             if (!Blind)
                 pline(TR("Oh, look, what a pretty fire in your %s.", "哦，看哪，你的%s里燃起了多漂亮的火。"),
-                      makeplural(body_part(HAND)));
+                      makeplural(zh_body_part(HAND)));
             else
                 You_feel(TR("a pleasant warmth in your %s.", "感到%s传来一阵舒适的暖意。"),
-                         makeplural(body_part(HAND)));
+                         makeplural(zh_body_part(HAND)));
         } else {
             monstunseesu(M_SEEN_FIRE);
             pline_The(TR("scroll catches fire and you burn your %s.", "卷轴着火了，烧伤了你的%s。"),
-                      makeplural(body_part(HAND)));
+                      makeplural(zh_body_part(HAND)));
             losehp(1, "scroll of fire", KILLED_BY_AN);
         }
         return;
@@ -2060,7 +2060,7 @@ You_hear("rumbling.");
 #endif
         } else {
             if (!avoid_ceiling(&u.uz)) {
-                pline_The(TR("%s rumbles %s you!", "%s在你%s轰隆作响！"), ceiling(u.ux, u.uy),
+                pline_The(TR("%s rumbles %s you!", "%s在你%s轰隆作响！"), zh_ceiling(u.ux, u.uy),
                           sblessed ? TR("around", "四周") : TR("above", "上方"));
             } else {
                 char matbuf[BUFSZ];
@@ -2260,7 +2260,7 @@ pline("哇！现代艺术。");
 pline("Wow!  Modern art.");
 #endif
             else
-                Your(TR("%s spins in bewilderment.", "%s困惑地旋转着。"), body_part(HEAD));
+                Your(TR("%s spins in bewilderment.", "%s困惑地旋转着。"), zh_body_part(HEAD));
             make_confused(HConfusion + rnd(30), FALSE);
             return;
         }
@@ -2280,7 +2280,7 @@ pline("Wow!  Modern art.");
     }
 
     if (svl.level.flags.nommap) {
-        Your(TR("%s spins as %s blocks the spell!", "%s旋转着，因为%s挡住了法术！"), body_part(HEAD),
+        Your(TR("%s spins as %s blocks the spell!", "%s旋转着，因为%s挡住了法术！"), zh_body_part(HEAD),
              something);
         make_confused(HConfusion + rnd(30), FALSE);
         return;
@@ -2525,8 +2525,8 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (engulfing_u(mtmp))
             You_hear(TR("something hit %s %s over your %s!", "有东西击中%s%s，就在你%s上方！"),
-                     s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
-                     body_part(HEAD));
+                     s_suffix(mon_nam(mtmp)), zh_mbodypart(mtmp, STOMACH),
+                     zh_body_part(HEAD));
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
         if (helmet) {
@@ -2721,7 +2721,7 @@ litroom(
                 ; /* no feedback */
             else if (digests(u.ustuck->data))
                 pline(TR("%s %s is lit.", "%s%s亮了起来。"), s_suffix(Monnam(u.ustuck)),
-                      mbodypart(u.ustuck, STOMACH));
+                      zh_mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
                 pline(TR("%s shines briefly.", "%s短暂地闪耀了一下。"), Monnam(u.ustuck));
             else

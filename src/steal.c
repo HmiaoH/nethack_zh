@@ -77,18 +77,20 @@ stealgold(struct monst *mtmp)
         if (u.usteed) {
             who = u.usteed;
             whose = s_suffix(y_monnam(who));
-            what = makeplural(mbodypart(who, FOOT));
+            what = makeplural(zh_mbodypart(who, FOOT));
         } else {
             who = &gy.youmonst;
-            whose = "your";
-            what = makeplural(body_part(FOOT));
+            whose = TR("your", "你的");
+            what = makeplural(zh_body_part(FOOT));
         }
         /* [ avoid "between your rear regions" :-] */
         if (slithy(who->data))
-            what = "coils";
+            what = TR("coils", "盘绕的身体");
+#ifndef ZHLANG
         /* reduce "rear hooves/claws" to "hooves/claws" */
         if (!strncmp(what, "rear ", 5))
             what += 5;
+#endif
 #ifdef ZHLANG
         pline("%s迅速从%s%s%s抓走了一些金币！", Monnam(mtmp),
               (Levitation || Flying) ? "下方" : "之间", whose, what);
@@ -888,7 +890,7 @@ maybe_absorb_item(
                   yname(obj), (obj->quan > 1L) ? "them" : "it");
 #endif
         } else {
-            const char *hand_s = body_part(HAND);
+            const char *hand_s = zh_body_part(HAND);
 
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);

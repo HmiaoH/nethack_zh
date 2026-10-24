@@ -482,7 +482,7 @@ trap_predicament(char *outbuf, int final, boolean wizxtra)
         Sprintf(outbuf, TR("sinking into %s", "正陷入%s"), final ? TR("lava", "岩浆") : hliquid(TR("lava", "岩浆")));
         break;
     case TT_INFLOOR:
-        Sprintf(outbuf, TR("stuck in %s", "卡在%s里"), the(surface(u.ux, u.uy)));
+        Sprintf(outbuf, TR("stuck in %s", "卡在%s里"), the(zh_surface(u.ux, u.uy)));
         break;
     default: /* TT_BEARTRAP, TT_PIT, or TT_WEB */
         Strcpy(outbuf, TR("trapped", "被困住"));
@@ -1446,7 +1446,7 @@ status_enlightenment(int mode, int final)
         Sprintf(buf, TR("walking on %s", "在%s上行走"),
                 is_pool(u.ux, u.uy) ? TR("water", "水面")
                 : is_lava(u.ux, u.uy) ? TR("lava", "岩浆")
-                  : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
+                  : zh_surface(u.ux, u.uy)); /* catchall; shouldn't happen */
         you_are(buf, from_what(WWALKING));
     }
     if (Upolyd && (u.uundetected || U_AP_TYPE != M_AP_NOTHING))
@@ -2942,7 +2942,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
                 Sprintf(bp, TR(" underneath %s", " 在%s下面"), ansimpleoname(o));
         } else if (is_clinger(gy.youmonst.data) || Flying) {
             /* Flying: 'lurker above' hides on ceiling but doesn't cling */
-            Sprintf(bp, TR(" on the %s", " 在%s上"), ceiling(u.ux, u.uy));
+            Sprintf(bp, TR(" on the %s", " 在%s上"), zh_ceiling(u.ux, u.uy));
         } else {
             /* on floor; is_hider() but otherwise not special: 'trapper' */
             if (u.utrap && u.utraptype == TT_PIT) {
@@ -2951,7 +2951,7 @@ youhiding(boolean via_enlghtmt, /* enlightenment line vs topl message */
                 Sprintf(bp, TR(" in a %spit", " 在%s坑里"),
                         (t && t->ttyp == SPIKED_PIT) ? TR("spiked ", "带刺") : "");
             } else
-                Sprintf(bp, TR(" on the %s", " 在%s上"), surface(u.ux, u.uy));
+                Sprintf(bp, TR(" on the %s", " 在%s上"), zh_surface(u.ux, u.uy));
         }
     } else {
         ; /* shouldn't happen; will result in generic "you are hiding" */
@@ -4436,7 +4436,7 @@ mstatusline(struct monst *mtmp)
                some form of extrinsic impairment; HWounded_legs is used for
                timeout; both apply to steed instead of hero when mounted */
             long legs = (EWounded_legs & BOTH_SIDES);
-            const char *what = mbodypart(mtmp, LEG);
+            const char *what = zh_mbodypart(mtmp, LEG);
 
             if (legs == BOTH_SIDES)
                 what = makeplural(what);
@@ -4505,7 +4505,7 @@ ustatusline(void)
            form of extrinsic impairment; HWounded_legs is used for timeout;
            both apply to steed instead of hero when mounted */
         long legs = (EWounded_legs & BOTH_SIDES);
-        const char *what = body_part(LEG);
+        const char *what = zh_body_part(LEG);
 
         if (legs == BOTH_SIDES)
             what = makeplural(what);

@@ -1244,7 +1244,7 @@ disp_artifact_discoveries(
             algnstr = "non-aligned";
 
 #ifdef ZHLANG
-        /* R6/F5: show the Chinese artifact name in the discoveries list */
+        /* show the Chinese artifact name in the discoveries list */
         Sprintf(buf, TR("  %s [%s %s]", "  %s［%s %s］"), artiname_zh(m),
                 algnstr, simple_typename(otyp));
 #else
@@ -1790,7 +1790,7 @@ artifact_hit(
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
 #ifdef ZHLANG
                     pline(TR("%s slices through %s %s.", "%s划过了%s%s。"), wepdesc,
-                          s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
+                          s_suffix(mon_nam(mdef)), zh_mbodypart(mdef, NECK));
 #else
                     pline("%s slices through %s %s.", wepdesc,
                           s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
@@ -1829,7 +1829,7 @@ artifact_hit(
                     || amorphous(gy.youmonst.data)) {
 #ifdef ZHLANG
                     pline(TR("%s slices through your %s.", "%s划过了你的%s。"), wepdesc,
-                          body_part(NECK));
+                          zh_body_part(NECK));
 #else
                     pline("%s slices through your %s.", wepdesc,
                           body_part(NECK));
@@ -2948,7 +2948,7 @@ retouch_object(
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
 #ifdef ZHLANG
                 pline(TR("%s to the %s.", "%s，落到了%s上。"), Tobjnam(obj, TR("fall", "坠落")),
-                      surface(u.ux, u.uy));
+                      zh_surface(u.ux, u.uy));
 #else
                 pline("%s to the %s.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));

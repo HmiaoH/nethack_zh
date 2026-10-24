@@ -1164,7 +1164,7 @@ TILE_H      = $(WSHR)tile.h
 # Miscellaneous
 #==========================================
 
-DATABASE = $(DAT)data.base
+DATABASE = $(DAT)data_zh.base
 
 #==========================================
 #==========================================
@@ -1740,7 +1740,7 @@ $(GAMEDIR)NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 # install
 #--------
 #
-binary.tag: 	$(DAT)data $(DAT)rumors_zh $(DAT)oracles_zh $(DLB) \
+binary.tag: 	$(DAT)data_zh $(DAT)rumors_zh $(DAT)oracles_zh $(DLB) \
 		$(HACKCSRC) $(SOUNDSRCS)
 	copy nhdat$(NHV)          $(GAMEDIR)
 	copy $(DAT)license       $(GAMEDIR)
@@ -1760,7 +1760,7 @@ binary.tag: 	$(DAT)data $(DAT)rumors_zh $(DAT)oracles_zh $(DLB) \
 	copy $(DAT)bogusmon_zh $(GAMEDIR)
 	copy $(DAT)cmdhelp $(GAMEDIR)
 	copy $(DAT)cmdhelp_zh $(GAMEDIR)
-	copy $(DAT)data $(GAMEDIR)
+	copy $(DAT)data_zh $(GAMEDIR)
 	copy $(DAT)engrave_zh $(GAMEDIR)
 	copy $(DAT)epitaph_zh $(GAMEDIR)
 	copy $(DAT)help $(GAMEDIR)
@@ -2180,7 +2180,7 @@ $(DAT)porthelp: $(MSWSYS)porthelp
 	@copy $(MSWSYS)porthelp $@ >nul
 
 !IF ("$(USE_DLB)"=="Y")
-nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles_zh $(OPTIONS_FILE) $(LUA_FILES) \
+nhdat$(NHV):	$(U)dlb.exe $(DAT)data_zh $(DAT)oracles_zh $(OPTIONS_FILE) $(LUA_FILES) \
 	$(DAT)rumors_zh $(DAT)help $(DAT)help_zh $(DAT)hh $(DAT)hh_zh \
 	$(DAT)cmdhelp $(DAT)cmdhelp_zh $(DAT)keyhelp $(DAT)keyhelp_zh \
 	$(DAT)history $(DAT)history_zh $(DAT)opthelp $(DAT)opthelp_zh \
@@ -2190,7 +2190,7 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)data $(DAT)oracles_zh $(OPTIONS_FILE) $(LUA_FILES
 	$(DAT)tribute
 	@echo Building $@
 	@cd $(DAT)
-	@echo data >dlb.lst
+	@echo data_zh >dlb.lst
 	@echo oracles_zh >>dlb.lst
 	@if exist options @echo options >>dlb.lst
 	@if exist ttyoptions @echo ttyoptions >>dlb.lst
@@ -2552,7 +2552,7 @@ $(OUTL)alloc.o: alloc.c $(CONFIG_H)
 # dat dependencies
 #
 
-$(DAT)data: $(U)makedefs.exe $(DATABASE)
+$(DAT)data_zh: $(U)makedefs.exe $(DATABASE)
 	$(U)makedefs -d
 
 $(DAT)rumors_zh: $(U)makedefs.exe $(DAT)rumors_zh.tru   $(DAT)rumors_zh.fal
@@ -2851,7 +2851,7 @@ binary:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
 		opdctxtdir$(TARGET_CPU).tag opdcguidir$(TARGET_CPU).tag \
 		$(LUASRC)lua.h $(PDCDEP) \
 		$(INCL)nhlua.h $(OUTL)utility.tag \
-		$(DAT)data $(DAT)rumors_zh $(DAT)oracles_zh $(DAT)engrave_zh \
+		$(DAT)data_zh $(DAT)rumors_zh $(DAT)oracles_zh $(DAT)engrave_zh \
 		$(DAT)epitaph_zh $(DAT)bogusmon_zh $(GAMEDIR)NetHack.exe \
 		$(GAMEDIR)NetHackW.exe $(SFCTOOLPKG) $(GAMEDIRDLLS) binary.tag
 	@echo NetHack is up to date.
@@ -2870,7 +2870,7 @@ spotless: clean
 	if exist $(INCL)pm.h            del $(INCL)pm.h
 	if exist $(U)*.lnk              del $(U)*.lnk
 	if exist $(U)*.map              del $(U)*.map
-	if exist $(DAT)data             del $(DAT)data
+	if exist $(DAT)data_zh          del $(DAT)data_zh
 	if exist $(DAT)rumors_zh        del $(DAT)rumors_zh
 	if exist $(DAT)engrave_zh       del $(DAT)engrave_zh
 	if exist $(DAT)epitaph_zh       del $(DAT)epitaph_zh

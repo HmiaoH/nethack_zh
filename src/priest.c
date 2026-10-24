@@ -527,7 +527,7 @@ intemple(int roomno)
             break;
         case 2:
             #ifdef ZHLANG
-            pline("一股战栗沿着你的%s直下。", body_part(SPINE));
+            pline("一股战栗沿着你的%s直下。", zh_body_part(SPINE));
             #else
             pline("A shiver runs down your %s.", body_part(SPINE));
             #endif

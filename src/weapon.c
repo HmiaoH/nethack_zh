@@ -785,7 +785,7 @@ possibly_unwield(struct monst *mon, boolean polyspot)
         mon->weapon_check = NO_WEAPON_WANTED;
         /* if we're going to call distant_name(), do so before extract_self */
         if (cansee(mon->mx, mon->my)) {
-            pline_mon(mon, "%s drops %s.", Monnam(mon), distant_name(obj, doname));
+            pline_mon(mon, TR("%s drops %s.", "%s掉落了%s。"), Monnam(mon), distant_name(obj, doname));
             newsym(mon->mx, mon->my);
         }
         obj_extract_self(obj);
@@ -883,7 +883,7 @@ mon_wield_item(struct monst *mon)
         if (mw_tmp && mwelded(mw_tmp)) {
             if (canseemon(mon)) {
                 char welded_buf[BUFSZ];
-                const char *mon_hand = mbodypart(mon, HAND);
+                const char *mon_hand = zh_mbodypart(mon, HAND);
 
                 if (bimanual(mw_tmp))
                     mon_hand = makeplural(mon_hand);
@@ -911,7 +911,7 @@ mon_wield_item(struct monst *mon)
                           xname(obj));
                     #endif
                 } else {
-                    pline_mon(mon, "%s tries to wield %s.", Monnam(mon), doname(obj));
+                    pline_mon(mon, TR("%s tries to wield %s.", "%s试图挥舞%s。"), Monnam(mon), doname(obj));
                     pline("%s %s!", Yname2(mw_tmp), welded_buf);
                 }
                 mw_tmp->bknown = 1;
@@ -926,11 +926,11 @@ mon_wield_item(struct monst *mon)
             boolean newly_welded;
             const struct throw_and_return_weapon *arw;
 
-            pline_mon(mon, "%s wields %s%c",
+            pline_mon(mon, TR("%s wields %s%c", "%s挥舞着%s%c"),
                       Monnam(mon), doname(obj),
                       exclaim ? '!' : '.');
             if ((arw = autoreturn_weapon(obj)) != 0 && arw->tethered != 0)
-                pline_mon(mon, "%s secures the tether on %s.", Monnam(mon),
+                pline_mon(mon, TR("%s secures the tether on %s.", "%s系紧了%s上的拴绳。"), Monnam(mon),
                           the(xname(obj)));
 
             /* 3.6.3: mwelded() predicate expects the object to have its
@@ -942,7 +942,7 @@ mon_wield_item(struct monst *mon)
             newly_welded = mwelded(obj);
             obj->owornmask &= ~W_WEP;
             if (newly_welded) {
-                const char *mon_hand = mbodypart(mon, HAND);
+                const char *mon_hand = zh_mbodypart(mon, HAND);
 
                 if (bimanual(obj))
                     mon_hand = makeplural(mon_hand);
@@ -964,7 +964,7 @@ mon_wield_item(struct monst *mon)
                 #ifdef ZHLANG
                 pline("%s在%s的%s中%s！", Tobjnam(obj, TR("shine", "正")),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
-                      mbodypart(mon, HAND));
+                      zh_mbodypart(mon, HAND));
                 #else
                 pline("%s %s in %s %s!", Tobjnam(obj, "shine"),
                       arti_light_description(obj), s_suffix(mon_nam(mon)),
@@ -1893,7 +1893,7 @@ setmnotwielded(struct monst *mon, struct obj *obj)
         if (canseemon(mon))
             #ifdef ZHLANG
             pline("%s在%s%s中%s发光。", The(xname(obj)),
-                  s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
+                  s_suffix(mon_nam(mon)), zh_mbodypart(mon, HAND),
                   otense(obj, TR("stop", "已经")));
             #else
             pline("%s in %s %s %s shining.", The(xname(obj)),

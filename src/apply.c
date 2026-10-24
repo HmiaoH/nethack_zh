@@ -100,7 +100,7 @@ use_camera(struct obj *obj)
     } else if (u.uswallow) {
         #ifdef ZHLANG
         You("给%s的%s拍了张照。", s_suffix(mon_nam(u.ustuck)),
-            mbodypart(u.ustuck, STOMACH));
+            zh_mbodypart(u.ustuck, STOMACH));
 #else
         You("take a picture of %s %s.", s_suffix(mon_nam(u.ustuck)),
             mbodypart(u.ustuck, STOMACH));
@@ -108,7 +108,7 @@ use_camera(struct obj *obj)
     } else if (u.dz) {
         #ifdef ZHLANG
         You("给%s拍了张照。",
-            (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
+            (u.dz > 0) ? zh_surface(u.ux, u.uy) : zh_ceiling(u.ux, u.uy));
 #else
         You("take a picture of the %s.",
             (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
@@ -129,7 +129,7 @@ use_towel(struct obj *obj)
 
     if (!freehand()) {
         #ifdef ZHLANG
-        You("没有空闲的%s！", body_part(HAND));
+        You("没有空闲的%s！", zh_body_part(HAND));
 #else
         You("have no free %s!", body_part(HAND));
 #endif
@@ -148,7 +148,7 @@ use_towel(struct obj *obj)
         case 2:
             old = (Glib & TIMEOUT);
             make_glib((int) old + rn1(10, 3)); /* + 3..12 */
-            Your("%s %s!", makeplural(body_part(HAND)),
+            Your("%s %s!", makeplural(zh_body_part(HAND)),
                  (old ? TR("are filthier than ever", "比以往更脏") : TR("get slimy", "变得黏滑")));
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
@@ -158,7 +158,7 @@ use_towel(struct obj *obj)
                 old = u.ucreamed;
                 u.ucreamed += rn1(10, 3);
                 #ifdef ZHLANG
-                pline("呕！你的%s%s粘糊糊的东西！", body_part(FACE),
+                pline("呕！你的%s%s粘糊糊的东西！", zh_body_part(FACE),
                       (old ? TR("has more", "又多了一些") : TR("now has", "现在沾了")));
 #else
                 pline("Yecch!  Your %s %s gunk on it!", body_part(FACE),
@@ -203,7 +203,7 @@ use_towel(struct obj *obj)
         make_glib(0);
         #ifdef ZHLANG
         You("擦掉了你的%s。",
-            !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
+            !uarmg ? makeplural(zh_body_part(HAND)) : gloves_simple_name(uarmg));
 #else
         You("wipe off your %s.",
             !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
@@ -225,15 +225,15 @@ use_towel(struct obj *obj)
                 make_blinded(0L, TRUE);
             }
         } else {
-            Your(TR("%s feels clean now.", "%s现在干净了。"), body_part(FACE));
+            Your(TR("%s feels clean now.", "%s现在干净了。"), zh_body_part(FACE));
         }
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
         return ECMD_TIME;
     }
 
-    Your(TR("%s and %s are already clean.", "%s和%s已经很干净了。"), body_part(FACE),
-         makeplural(body_part(HAND)));
+    Your(TR("%s and %s are already clean.", "%s和%s已经很干净了。"), zh_body_part(FACE),
+         makeplural(zh_body_part(HAND)));
 
     return ECMD_OK;
 }
@@ -395,7 +395,7 @@ use_stethoscope(struct obj *obj)
         return ECMD_OK;
     } else if (!freehand()) {
         #ifdef ZHLANG
-        You("没有空闲的%s。", body_part(HAND));
+        You("没有空闲的%s。", zh_body_part(HAND));
 #else
         You("have no free %s.", body_part(HAND));
 #endif
@@ -443,7 +443,7 @@ use_stethoscope(struct obj *obj)
             Soundeffect(se_crackling_of_hellfire, 35);
             You_hear(TR("the crackling of hellfire.", "传来地狱之火的噼啪声。"));
         } else {
-            pline_The(TR("%s seems healthy enough.", "%s看起来还算健康。"), surface(u.ux, u.uy));
+            pline_The(TR("%s seems healthy enough.", "%s看起来还算健康。"), zh_surface(u.ux, u.uy));
         }
         return res;
     } else if (obj->cursed && !rn2(2)) {
@@ -569,7 +569,7 @@ use_whistle(struct obj *obj)
     } else {
         if (Deaf)
             #ifdef ZHLANG
-            You_feel("急流的气流挠着你的%s。", body_part(NOSE));
+            You_feel("急流的气流挠着你的%s。", zh_body_part(NOSE));
 #else
             You_feel("rushing air tickle your %s.", body_part(NOSE));
 #endif
@@ -833,7 +833,7 @@ m_unleash(struct monst *mtmp, boolean feedback)
 
     if (feedback) {
         if (canseemon(mtmp))
-            pline_mon(mtmp, "%s pulls free of %s leash!",
+            pline_mon(mtmp, TR("%s pulls free of %s leash!", "%s挣脱了%s的牵引绳！"),
                       Monnam(mtmp), mhis(mtmp));
         else
             Your(TR("leash falls slack.", "拴绳松了下来。"));
@@ -1120,7 +1120,7 @@ check_leash(coordxy x, coordxy y)
                     if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
-                    pline_mon(mtmp, "%s is choked by the leash!",
+                    pline_mon(mtmp, TR("%s is choked by the leash!", "%s被牵引绳勒住了！"),
                               Monnam(mtmp));
                     /* tameness eventually drops to 1 here (never 0) */
                     if (mtmp->mtame && rn2(mtmp->mtame))
@@ -1206,7 +1206,7 @@ use_mirror(struct obj *obj)
     if (!u.dx && !u.dy && !u.dz) {
         if (!useeit) {
             #ifdef ZHLANG
-            You_cant("看不到你的%s%s。", uvisage, body_part(FACE));
+            You_cant("看不到你的%s%s。", uvisage, zh_body_part(FACE));
 #else
             You_cant("see your %s %s.", uvisage, body_part(FACE));
 #endif
@@ -1277,7 +1277,7 @@ use_mirror(struct obj *obj)
         if (useeit)
             #ifdef ZHLANG
             You("映出了%s的%s。", s_suffix(mon_nam(u.ustuck)),
-                mbodypart(u.ustuck, STOMACH));
+                zh_mbodypart(u.ustuck, STOMACH));
 #else
             You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
                 mbodypart(u.ustuck, STOMACH));
@@ -1301,7 +1301,7 @@ use_mirror(struct obj *obj)
         if (useeit)
             #ifdef ZHLANG
             You("映出了%s。",
-                (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
+                (u.dz > 0) ? zh_surface(u.ux, u.uy) : zh_ceiling(u.ux, u.uy));
 #else
             You("reflect the %s.",
                 (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
@@ -2667,7 +2667,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_INFLOOR:
                 #ifdef ZHLANG
                 You("你用力拉自己的%s，但仍然%s。",
-                    makeplural(body_part(LEG)),
+                    makeplural(zh_body_part(LEG)),
                     (u.utraptype == TT_INFLOOR)
                         ? TR("stuck in the floor", "卡在地板里")
                         : TR("attached to the buried ball", "被埋在地下的球拴住"));
@@ -3053,7 +3053,7 @@ fig_transform(anything *arg, long timeout)
         if (mtmp->mundetected) {
             if (hides_under(mtmp->data) && mshelter) {
                 Sprintf(and_vanish, TR(" and %s under %s", "，随后%s到%s下面"),
-                        locomotion(mtmp->data, TR("crawl", "爬")), doname(mshelter));
+                        zh_locomotion(mtmp->data, TR("crawl", "爬"), "爬"), doname(mshelter));
             } else if (mtmp->data->mlet == S_MIMIC
                        || mtmp->data->mlet == S_EEL) {
                 suppress_see = TRUE;
@@ -3066,14 +3066,14 @@ fig_transform(anything *arg, long timeout)
             if (Blind || suppress_see)
                 #ifdef ZHLANG
                 You_feel("%s%s从你的背包里掉了出来！", something,
-                         locomotion(mtmp->data, TR("drop", "掉落")));
+                         zh_locomotion(mtmp->data, TR("drop", "掉落"), "掉落"));
 #else
                 You_feel("%s %s from your pack!", something,
                          locomotion(mtmp->data, "drop"));
 #endif
             else
                 You_see(TR("%s %s out of your pack%s!", "%s%s从你的背包里%s！"), monnambuf,
-                        locomotion(mtmp->data, TR("drop", "掉落")), and_vanish);
+                        zh_locomotion(mtmp->data, TR("drop", "掉落"), "掉落"), and_vanish);
             break;
 
         case OBJ_FLOOR:
@@ -3106,7 +3106,7 @@ fig_transform(anything *arg, long timeout)
                 else
                     Strcpy(carriedby, TR("thin air", "稀薄的空气中"));
                 You_see(TR("%s %s out of %s%s!", "%s%s从%s%s！"), monnambuf,
-                        locomotion(mtmp->data, TR("drop", "掉落")), carriedby,
+                        zh_locomotion(mtmp->data, TR("drop", "掉落"), "掉落"), carriedby,
                         and_vanish);
             }
             break;
@@ -3461,7 +3461,8 @@ use_stone(struct obj *tstone)
                 break;
             }
         }
-        streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+        streak_color = zh_obj_color(
+                            c_obj_colors[objects[obj->otyp].oc_color]);
         break; /* gem or ring */
 
     default:
@@ -3506,7 +3507,8 @@ use_stone(struct obj *tstone)
                scratch a stone.  They will leave streaks on
                non-touchstones and touchstones alike. */
             if (is_flimsy(obj))
-                streak_color = c_obj_colors[objects[obj->otyp].oc_color];
+                streak_color = zh_obj_color(
+                                    c_obj_colors[objects[obj->otyp].oc_color]);
             else
                 do_scratch = (tstone->otyp != TOUCHSTONE);
             break;
@@ -3762,7 +3764,7 @@ use_whip(struct obj *obj)
 
     } else if (u.dz < 0) {
         #ifdef ZHLANG
-        You("从%s上弹掉了一只虫子。", ceiling(u.ux, u.uy));
+        You("从%s上弹掉了一只虫子。", zh_ceiling(u.ux, u.uy));
 #else
         You("flick a bug off of the %s.", ceiling(u.ux, u.uy));
 #endif
@@ -3821,7 +3823,7 @@ use_whip(struct obj *obj)
             if (otmp && proficient) {
                 #ifdef ZHLANG
                 You("用鞭子卷住了%s上的%s。",
-                    an(singular(otmp, xname)), surface(u.ux, u.uy));
+                    an(singular(otmp, xname)), zh_surface(u.ux, u.uy));
 #else
                 You("wrap your bullwhip around %s on the %s.",
                     an(singular(otmp, xname)), surface(u.ux, u.uy));
@@ -3835,7 +3837,7 @@ use_whip(struct obj *obj)
         if (dam <= 0)
             dam = 1;
         #ifdef ZHLANG
-        You("鞭子打到了自己的%s。", body_part(FOOT));
+        You("鞭子打到了自己的%s。", zh_body_part(FOOT));
 #else
         You("hit your %s with your bullwhip.", body_part(FOOT));
 #endif
@@ -3844,7 +3846,7 @@ use_whip(struct obj *obj)
         return ECMD_TIME;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
-        pline_The(TR("bullwhip slips out of your %s.", "长鞭从你的%s中滑脱了。"), body_part(HAND));
+        pline_The(TR("bullwhip slips out of your %s.", "长鞭从你的%s中滑脱了。"), zh_body_part(HAND));
         dropx(obj);
 
     } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -3952,7 +3954,7 @@ use_whip(struct obj *obj)
 
             Strcpy(onambuf, cxname(otmp));
             if (gotit) {
-                mon_hand = mbodypart(mtmp, HAND);
+                mon_hand = zh_mbodypart(mtmp, HAND);
                 if (bimanual(otmp))
                     mon_hand = makeplural(mon_hand);
             } else
@@ -3990,7 +3992,7 @@ use_whip(struct obj *obj)
                     /* to floor near you */
                     #ifdef ZHLANG
                     You("把%s拽到了%s！", yname(otmp),
-                        surface(u.ux, u.uy));
+                        zh_surface(u.ux, u.uy));
 #else
                     You("yank %s to the %s!", yname(otmp),
                         surface(u.ux, u.uy));
@@ -4447,7 +4449,7 @@ use_cream_pie(struct obj *obj)
 #endif
     else
         #ifdef ZHLANG
-        You("把你的%s浸入了%s%s。", body_part(FACE),
+        You("把你的%s浸入了%s%s。", zh_body_part(FACE),
               several ? TR("one of ", "其中一具") : "",
               several ? makeplural(the(xname(obj))) : the(xname(obj)));
 #else
@@ -4463,7 +4465,7 @@ use_cream_pie(struct obj *obj)
         if (!Blind || (Blind && wasblind))
             #ifdef ZHLANG
             pline("你的%s上%s沾满了黏糊糊的东西。",
-                  wascreamed ? TR("more ", "更多") : "", body_part(FACE));
+                  wascreamed ? TR("more ", "更多") : "", zh_body_part(FACE));
 #else
             pline("There's %ssticky goop all over your %s.",
                   wascreamed ? "more " : "", body_part(FACE));
@@ -4471,7 +4473,7 @@ use_cream_pie(struct obj *obj)
         else /* Blind  && !wasblind */
             #ifdef ZHLANG
             You_cant("透过%s上黏糊糊的东西看到。",
-                     body_part(FACE));
+                     zh_body_part(FACE));
 #else
             You_cant("see through all the sticky goop on your %s.",
                      body_part(FACE));
@@ -4685,14 +4687,14 @@ use_grapple(struct obj *obj)
         any.a_int = 1; /* use index+1 (can't use 0) as identifier */
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.a_int++;
-        Sprintf(buf, TR("an object on the %s", "%s上的某件物品"), surface(cc.x, cc.y));
+        Sprintf(buf, TR("an object on the %s", "%s上的某件物品"), zh_surface(cc.x, cc.y));
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int++;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  clr, TR("a monster", "一个怪物"), MENU_ITEMFLAGS_NONE);
         any.a_int++;
-        Sprintf(buf, TR("the %s", "%s"), surface(cc.x, cc.y));
+        Sprintf(buf, TR("the %s", "%s"), zh_surface(cc.x, cc.y));
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  buf, MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, TR("Aim for what?", "要瞄准什么？"));
@@ -4717,7 +4719,7 @@ use_grapple(struct obj *obj)
     case 1: /* Object */
         if ((otmp = svl.level.objects[cc.x][cc.y]) != 0) {
             #ifdef ZHLANG
-            You("从%s钩到了一个物品！", surface(cc.x, cc.y));
+            You("从%s钩到了一个物品！", zh_surface(cc.x, cc.y));
 #else
             You("snag an object from the %s!", surface(cc.x, cc.y));
 #endif
@@ -4760,10 +4762,10 @@ use_grapple(struct obj *obj)
     /*FALLTHRU*/
     case 3: /* Surface */
         if (IS_AIR(levl[cc.x][cc.y].typ) || is_pool(cc.x, cc.y))
-            pline_The(TR("hook slices through the %s.", "钩子划穿了%s。"), surface(cc.x, cc.y));
+            pline_The(TR("hook slices through the %s.", "钩子划穿了%s。"), zh_surface(cc.x, cc.y));
         else {
             #ifdef ZHLANG
-            You("被拽向了%s！", surface(cc.x, cc.y));
+            You("被拽向了%s！", zh_surface(cc.x, cc.y));
 #else
             You("are yanked toward the %s!", surface(cc.x, cc.y));
 #endif
@@ -4845,7 +4847,7 @@ do_break_wand(struct obj *obj)
 #endif
         return ECMD_OK;
     } else if (!freehand()) {
-        Your(TR("%s are occupied!", "你的%s都被占用了！"), makeplural(body_part(HAND)));
+        Your(TR("%s are occupied!", "你的%s都被占用了！"), makeplural(zh_body_part(HAND)));
         return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         #ifdef ZHLANG
@@ -4862,7 +4864,7 @@ do_break_wand(struct obj *obj)
         return ECMD_OK;
     #ifdef ZHLANG
     pline("把%s高举过%s，你把它%s成两半！", yname(obj),
-          body_part(HEAD), is_fragile ? TR("snap", "折断") : TR("break", "突然"));
+          zh_body_part(HEAD), is_fragile ? TR("snap", "折断") : TR("break", "突然"));
 #else
     pline("Raising %s high above your %s, you %s it in two!", yname(obj),
           body_part(HEAD), is_fragile ? "snap" : "break");

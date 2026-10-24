@@ -406,7 +406,7 @@ fix_worst_trouble(int trouble)
         FALLTHROUGH;
         /* FALLTHRU*/
     case TROUBLE_HUNGRY:
-        Your(TR("%s feels content.", "%s感到很满足。"), body_part(STOMACH));
+        Your(TR("%s feels content.", "%s感到很满足。"), zh_body_part(STOMACH));
         init_uhunger();
         disp.botl = TRUE;
         break;
@@ -554,7 +554,7 @@ fix_worst_trouble(int trouble)
         break;
     case TROUBLE_BLIND: { /* handles deafness as well as blindness */
         char msgbuf[BUFSZ];
-        const char *eyes = body_part(EYE);
+        const char *eyes = zh_body_part(EYE);
         boolean cure_deaf = (HDeaf & TIMEOUT) ? TRUE : FALSE;
 
         msgbuf[0] = '\0';
@@ -673,7 +673,8 @@ god_zaps_you(aligntyp resp_god)
             fry_by_god(resp_god, TRUE);
             monstunseesu(M_SEEN_DISINT);
         } else {
-            You(TR("bask in its %s glow for a minute...", "在它的%s光芒中沐浴片刻……"), NH_BLACK);
+            You(TR("bask in its %s glow for a minute...", "在它的%s光芒中沐浴片刻……"),
+                zh_obj_color(NH_BLACK));
             godvoice(resp_god, "I believe it not!");
             monstseesu(M_SEEN_DISINT);
         }
@@ -807,12 +808,12 @@ at_your_feet(const char *str)
     if (u.uswallow) {
         /* barrier between you and the floor */
         pline(TR("%s %s into %s %s.", "%s%s进%s%s中。"), str, vtense(str, TR("drop", "掉落")),
-              s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
+              s_suffix(mon_nam(u.ustuck)), zh_mbodypart(u.ustuck, STOMACH));
     } else {
         pline(TR("%s %s %s your %s!", "%s%s%s你的%s！"), str,
               vtense(str, Blind ? TR("land", "陆地") : TR("appear", "出现")),
               Levitation ? TR("beneath", "下方") : "at",
-              makeplural(body_part(FOOT)));
+              makeplural(zh_body_part(FOOT)));
     }
 }
 
@@ -2150,12 +2151,12 @@ offer_corpse(struct obj *otmp, boolean highaltar, aligntyp altaralign)
         if (u.uluck != orig_luck) {
             if (Blind)
                 You(TR("think %s brushed your %s.", "觉得%s拂过了你的%s。"), something,
-                    body_part(FOOT));
+                    zh_body_part(FOOT));
             else
                 You(Hallucination
                 ? TR("see crabgrass at your %s.  A funny thing in a dungeon.", "看到你的%s上长着马唐草。地牢里可真稀奇。")
                         : TR("glimpse a four-leaf clover at your %s.", "瞥见你的%s上有一株四叶草。"),
-                    makeplural(body_part(FOOT)));
+                    makeplural(zh_body_part(FOOT)));
         }
     }
 }

@@ -364,7 +364,7 @@ s_suffix(const char *s)
 
     Strcpy(buf, s);
 #ifdef ZHLANG
-    /* Chinese possessive is "的" after the noun, not "'s" (B1) */
+    /* Chinese possessive is "的" after the noun, not "'s" */
     if (zh_nonascii(s)) {
         /* plain strlen(): hacklib.c gets linked into util programs that
            don't include strutil.o, where Strlen_() lives */
@@ -395,7 +395,7 @@ ing_suffix(const char *s)
 
     Strcpy(buf, s);
 #ifdef ZHLANG
-    /* Chinese verbs don't get an English "ing" suffix (B2) */
+    /* Chinese verbs don't get an English "ing" suffix */
     if (zh_nonascii(s))
         return buf;
 #endif

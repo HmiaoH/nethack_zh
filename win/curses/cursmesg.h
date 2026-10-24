@@ -8,6 +8,10 @@
 
 
 /* Global declarations */
+#if defined(ZHLANG) && defined(CURSES_UNICODE)
+void curses_utf8_getline(WINDOW *, int, int, int, int,
+                        const char *, char *, int);
+#endif
 
 void curses_message_win_puts(const char *message, boolean recursed);
 void curses_got_input(void);

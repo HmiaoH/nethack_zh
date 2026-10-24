@@ -35,6 +35,7 @@ struct _readobjnam_data {
 staticfn char *strprepend(char *, const char *) NONNULL NONNULLARG1;
 staticfn char *nextobuf(void) NONNULL;
 staticfn void releaseobuf(char *) NONNULLARG1;
+staticfn int rparen_len(const char *, const char *) NONNULLARG12;
 staticfn void xcalled(char *, int, const char *, const char *);
 staticfn char *xname_flags(struct obj *, unsigned);
 staticfn char *minimal_xname(struct obj *);
@@ -94,6 +95,32 @@ struct Jitem {
     /* convert signed ptrdiff_t to unsigned size_t */                   \
     base ## spaceleft = (size_t) (base ## _end - base ## _eos)
 
+/* bytes taken by the closing paren that ends a doname() suffix: ')' or,
+   in a Chinese build, the full-width '）'; 0 if the suffix got truncated */
+staticfn int
+rparen_len(const char *buf, const char *buf_eos)
+{
+    if (buf_eos > buf && buf_eos[-1] == ')')
+        return 1;
+#ifdef ZHLANG
+    if (buf_eos - buf >= 3 && !strncmp(buf_eos - 3, "）", 3))
+        return 3;
+#endif
+    return 0;
+}
+
+#ifdef ZHLANG
+/* Chinese for the warning glow verbs ("flickering", ...) of glow_verb() */
+staticfn const char *
+zh_glow_verb(const char *en)
+{
+    return !strncmp(en, "quiver", 6) ? "颤动"
+           : !strncmp(en, "flicker", 7) ? "闪烁"
+             : !strncmp(en, "glimmer", 7) ? "微微闪耀"
+               : !strncmp(en, "gleam", 5) ? "闪耀" : en;
+}
+#endif
+
 /* true for gems/rocks that should have " stone" appended to their names */
 #define GemStone(typ)                                                  \
     (typ == FLINT                                                      \
@@ -118,6 +145,14 @@ static const struct Jitem Japanese_items[] = {
     { POT_BOOZE, "sake" },
     { 0, "" }
 };
+#ifdef ZHLANG
+/* what a samurai sees in a Chinese build, same order as Japanese_items[];
+   the romanized names above stay accepted when wishing (readobjnam) */
+static const char *const Japanese_items_zh[] = {
+    "胁差", "忍者刀", "双节棍", "薙刀", "开锁针", "琴", "魔法琴",
+    "小刀", "短甲", "兜", "弓悬", "兵粮丸", "清酒", ""
+};
+#endif
 
 staticfn char *
 strprepend(char *s, const char *pref)
@@ -809,13 +844,14 @@ xname_flags(
                appropriate and omitted by xname(); shrink_glob() wants
                it but uses Yname2() -> yname() -> xname() rather than
                doname() so we've added an external flag to request it */
-            Concat(buf, 0, "partly eaten ");
+            Concat(buf, 0, TR("partly eaten ", "吃了一部分的"));
         }
         if (obj->globby) { /* 5.0 added "medium" to replace no-prefix */
-            ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? "small"
-                                      : (obj->owt <= 300) ? "medium"
-                                        : (obj->owt <= 500) ? "large"
-                                          : "very large",
+            ConcatF2(buf, 0, TR("%s %s", "%s%s"),
+                     (obj->owt <= 100) ? TR("small", "小")
+                     : (obj->owt <= 300) ? TR("medium", "中")
+                       : (obj->owt <= 500) ? TR("large", "大")
+                         : TR("very large", "巨大"),
                      actualn);
             break;
         }
@@ -1138,17 +1174,17 @@ xname_flags(
         switch (obj->otyp) {
         case T_SHIRT:
         case ALCHEMY_SMOCK:
-            ConcatF1(buf, 0, " with text \"%s\"",
+            ConcatF1(buf, 0, TR(" with text \"%s\"", "，印着“%s”"),
                      (obj->otyp == T_SHIRT) ? tshirt_text(obj, tmpbuf)
                                             : apron_text(obj, tmpbuf));
             break;
         case CANDY_BAR:
             lbl = candy_wrapper_text(obj);
             if (*lbl)
-                ConcatF1(buf, 0, " labeled \"%s\"", lbl);
+                ConcatF1(buf, 0, TR(" labeled \"%s\"", "，标签为“%s”"), lbl);
             break;
         case HAWAIIAN_SHIRT:
-            ConcatF1(buf, 0, " with %s motif",
+            ConcatF1(buf, 0, TR(" with %s motif", "，饰有%s图案"),
                      an(hawaiian_motif(obj, tmpbuf)));
             break;
         default:
@@ -1158,7 +1194,17 @@ xname_flags(
 
     if (has_oname(obj) && dknown) {
 #ifdef ZHLANG
-        Concat(buf, 0, "名为");
+        /* Chinese puts the name first: "名为埃克斯卡利伯的长剑" rather than
+           "长剑名为埃克斯卡利伯".  (Objects that are their own proper name
+           come through 'nameit' below and show just the name.) */
+        char zhbase[BUFSZ];
+
+        Strcpy(zhbase, buf);
+        Snprintf(buf, (size_t) (buf_end - buf), "名为%s的%s",
+                 obj->oartifact ? artiname_zh(obj->oartifact) : ONAME(obj),
+                 zhbase);
+        ConcUpdate(buf);
+        goto zh_named;
 #else
         Concat(buf, 0, " named ");
 #endif
@@ -1168,7 +1214,7 @@ xname_flags(
         /*assert(has_oname(obj));*/
         obufp = eos(buf); /* remember where the name will start */
 #ifdef ZHLANG
-        /* R6/F5: an artifact's oname is its English canonical name (that is
+        /* an artifact's oname is its English canonical name (that is
            what every internal lookup and the save file use); show the
            Chinese name here instead.  An object with a player-given name
            that isn't an artifact keeps that name. */
@@ -1183,6 +1229,9 @@ xname_flags(
         if (obj->oartifact && !strncmp(obufp, "The ", 4))
             *obufp = lowc(*obufp); /* change 'T' in "The " to 't' */
     }
+#ifdef ZHLANG
+ zh_named:
+#endif
 
     if (!strncmpi(buf, "the ", 4))
         buf += 4;
@@ -1417,6 +1466,7 @@ doname_base(
     char *bp;
     char *bp_eos, *bp_end;
     size_t bpspaceleft;
+    int rp; /* length of the closing paren to overwrite, see rparen_len() */
 
     /* 'bp' will be within an obuf[] rather than at the start of one,
        usually (but not always) pointing at &obuf[PREFIX];
@@ -1578,7 +1628,8 @@ doname_base(
            everything out if no merges occur */
         long itemcount = count_contents(obj, FALSE, FALSE, TRUE, FALSE);
 
-        ConcatF2(bp, 0, " containing %ld item%s", itemcount, plur(itemcount));
+        ConcatF2(bp, 0, TR(" containing %ld item%s", "（装有 %ld 件物品%s）"),
+                 itemcount, plur(itemcount));
     }
 
     switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
@@ -1610,21 +1661,22 @@ doname_base(
 #endif
             /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
-            if (bp_eos[-1] == ')') {
+            if ((rp = rparen_len(bp, bp_eos)) != 0) {
                 /* slippery fingers is an intrinsic condition of the hero
                    rather than extrinsic condition of objects, but gloves
                    are described as slippery when hero has slippery fingers */
                 if (obj == uarmg && Glib) /* just appended "(something)",
                                            * replace paren, changing that
                                            * to be "(something; slippery)" */
-                    Concat(bp,  1, "; slippery)");
+                    Concat(bp, rp, TR("; slippery)", "；滑溜溜的）"));
             }
-            if (bp_eos[-1] == ')') {
+            if ((rp = rparen_len(bp, bp_eos)) != 0) {
                 /* there could be light-emitting artifact gloves someday,
                    so add 'lit' separately from 'slippery' rather than via
                    'else if' after uarmg+Glib */
                 if (!Blind && obj->lamplit && artifact_light(obj))
-                    ConcatF1(bp, 1, ", %s lit)", arti_light_description(obj));
+                    ConcatF1(bp, rp, TR(", %s lit)", "，发出%s的光）"),
+                             arti_light_description(obj));
             }
         }
         FALLTHROUGH;
@@ -1650,7 +1702,8 @@ doname_base(
             struct monst *mlsh = find_mid(obj->leashmon, FM_FMON);
 
             if (mlsh && !DEADMONSTER(mlsh)) {
-                ConcatF1(bp, 0, " (attached to %s)", noit_mon_nam(mlsh));
+                ConcatF1(bp, 0, TR(" (attached to %s)", "（拴着%s）"),
+                         noit_mon_nam(mlsh));
             } else {
                 if (mlsh) /*&& DEADMONSTER(mlsh)*/
                     impossible("leashed %s #%u is dead",
@@ -1668,7 +1721,8 @@ doname_base(
             /* separately formatted suffix avoids need for ConcatF3() */
             Sprintf(suffix, "%s%s", plur(obj->spe),
                     !obj->lamplit ? TR(" attached", "，未点燃") : TR(", lit", "，已点燃"));
-            ConcatF2(bp, 0, " (%d of 7 candle%s)", obj->spe, suffix);
+            ConcatF2(bp, 0, TR(" (%d of 7 candle%s)", "（插着 %d/7 根蜡烛%s）"),
+                     obj->spe, suffix);
             break;
         } else if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
                    || obj->otyp == BRASS_LANTERN || Is_candle(obj)) {
@@ -1692,7 +1746,7 @@ doname_base(
                     Strcat(prefix, TR("partly used ", "用了一部分的"));
             }
             if (obj->lamplit)
-                Concat(bp, 0, " (lit)");
+                Concat(bp, 0, TR(" (lit)", "（已点燃）"));
             break;
         }
         if (objects[obj->otyp].oc_charged)
@@ -1705,16 +1759,16 @@ doname_base(
         break;
     case POTION_CLASS:
         if (obj->otyp == POT_OIL && obj->lamplit)
-            Concat(bp, 0, " (lit)");
+            Concat(bp, 0, TR(" (lit)", "（已点燃）"));
         break;
     case RING_CLASS:
  ring:  /* normal rings reach here 'naturally'; meat ring jumps here */
         if (obj->owornmask & W_RINGR)
-            Concat(bp, 0, " (on right ");
+            Concat(bp, 0, TR(" (on right ", "（戴在右"));
         if (obj->owornmask & W_RINGL)
-            Concat(bp, 0, " (on left ");
+            Concat(bp, 0, TR(" (on left ", "（戴在左"));
         if (obj->owornmask & W_RING) /* either left or right */
-            ConcatF1(bp, 0,"%s)", body_part(HAND));
+            ConcatF1(bp, 0, TR("%s)", "%s上）"), zh_body_part(HAND));
         if (known && objects[obj->otyp].oc_charged) {
             Sprintf(eos(prefix), "%+d ", obj->spe); /* sitoa(obj->spe)+" " */
         }
@@ -1743,7 +1797,8 @@ doname_base(
                current obuf[]) but keep it accurate anyway */
             save_xnamep = gx.xnamep;
             cxstr = corpse_xname(obj, prefix, cxarg);
-            Sprintf(prefix, "%s ", cxstr);
+            /* Chinese: no space between the monster and "尸体" */
+            Sprintf(prefix, TR("%s ", "%s"), cxstr);
             /* avoid having doname(corpse) consume an extra obuf */
             releaseobuf(cxstr);
             gx.xnamep = save_xnamep;
@@ -1758,9 +1813,9 @@ doname_base(
                    ZHLANG is enabled and is equivalent to the direct
                    pmnames[NEUTRAL] access in an English build */
                 Strcat(prefix, pmname(&mons[omndx], NEUTRAL));
-                Strcat(prefix, " ");
+                Strcat(prefix, TR(" ", ""));
                 if (obj->spe == 1)
-                    Concat(bp, 0, " (laid by you)");
+                    Concat(bp, 0, TR(" (laid by you)", "（你下的）"));
             }
         } else if (obj->otyp == MEAT_RING) {
             goto ring;
@@ -1770,8 +1825,9 @@ doname_base(
     case CHAIN_CLASS:
         add_erosion_words(obj, prefix);
         if (obj->owornmask & (W_BALL | W_CHAIN))
-            ConcatF1(bp, 0, " (%s to you)",
-                     (obj->owornmask & W_BALL) ? "chained" : "attached");
+            ConcatF1(bp, 0, TR(" (%s to you)", "（%s你身上）"),
+                     (obj->owornmask & W_BALL) ? TR("chained", "锁在")
+                                               : TR("attached", "连在"));
         break;
     }
 
@@ -1784,7 +1840,7 @@ doname_base(
 
         ConcatF1(bp, 0, " (%s)",
                  (cgend != CORPSTAT_RANDOM) ? genders[mgend].adj
-                                            : "unspecified gender");
+                                            : TR("unspecified gender", "性别未定"));
     }
 
     if ((obj->owornmask & W_WEP) && !gm.mrg_to_wielded) {
@@ -1846,16 +1902,23 @@ doname_base(
 
             /* we just added a parenthesized phrase, but the right paren
                might be absent if the appended string got truncated */
-            if (!Blind && bpspaceleft && bp_eos[-1] == ')') {
+            if (!Blind && bpspaceleft
+                && (rp = rparen_len(bp, bp_eos)) != 0) {
                 if (gw.warn_obj_cnt && obj == uwep
                     && (EWarn_of_mon & W_WEP) != 0L)
                     /* we know bp[] ends with ')'; overwrite that */
-                    ConcatF2(bp, 1, ", %s %s)",
+#ifdef ZHLANG
+                    ConcatF2(bp, rp, "，%s着%s的光）",
+                             zh_glow_verb(glow_verb(gw.warn_obj_cnt, TRUE)),
+                             zh_hcolor(glow_color(obj->oartifact)));
+#else
+                    ConcatF2(bp, rp, ", %s %s)",
                              glow_verb(gw.warn_obj_cnt, TRUE),
                              glow_color(obj->oartifact));
+#endif
                 else if (obj->lamplit && artifact_light(obj))
                     /* as above, overwrite known closing paren */
-                    ConcatF1(bp, 1, ", %s lit)",
+                    ConcatF1(bp, rp, TR(", %s lit)", "，发出%s的光）"),
                              arti_light_description(obj));
             }
         }
@@ -1923,8 +1986,9 @@ doname_base(
 
         /* separately formatted suffix avoids need for ConcatF3() */
         Sprintf(pricebuf, "%ld %s", quotedprice, currency(quotedprice));
-        ConcatF2(bp, 0, " (%s, %s)",
-                 obj->unpaid ? "unpaid" : "contents", pricebuf);
+        ConcatF2(bp, 0, TR(" (%s, %s)", "（%s，%s）"),
+                 obj->unpaid ? TR("unpaid", "未付款") : TR("contents", "内含物"),
+                 pricebuf);
 
         record_price_quote(obj->otyp, quotedprice / obj->quan, TRUE);
     } else if (with_price) { /* on floor or in container on floor */
@@ -1935,10 +1999,11 @@ doname_base(
             char pricebuf[40];
 
             Sprintf(pricebuf, "%ld %s", price, currency(price));
-            ConcatF2(bp, 0, " (%s, %s)",
-                     nochrg ? "contents" : "for sale", pricebuf);
+            ConcatF2(bp, 0, TR(" (%s, %s)", "（%s，%s）"),
+                     nochrg ? TR("contents", "内含物") : TR("for sale", "出售"),
+                     pricebuf);
         } else if (nochrg > 0) {
-            Concat(bp, 0, " (no charge)");
+            Concat(bp, 0, TR(" (no charge)", "（免费）"));
         } else if (iflags.pricequotes && !objects[obj->otyp].oc_name_known) {
             append_price_quote(bp, &bp_eos, obj->otyp);
         }
@@ -1962,10 +2027,10 @@ doname_base(
        "aum" is stolen from Crawl's "Arbitrary Unit of Measure" */
     if (wizard && iflags.wizweight) {
         /* wizard mode user has asked to see object weights */
-        if (with_price && bp_eos[-1] == ')')
-            ConcatF1(bp, 1, ", %u aum)", obj->owt);
+        if (with_price && (rp = rparen_len(bp, bp_eos)) != 0)
+            ConcatF1(bp, rp, TR(", %u aum)", "，重 %u）"), obj->owt);
         else
-            ConcatF1(bp, 0, " (%u aum)", obj->owt);
+            ConcatF1(bp, 0, TR(" (%u aum)", "（重 %u）"), obj->owt);
 
         /* ConcatF1(bp) updates bp_eos and bpspaceleft but we're done
            with them now; add a fake use so compiler won't complain
@@ -2012,6 +2077,11 @@ doname_base(
             bp[BUFSZ - 1 - offsetbp] = '\0';
         }
     }
+#ifdef ZHLANG
+    /* "未诅咒的 食物口粮" -> "未诅咒的食物口粮"; inventory menus show this
+       text directly, without going through pline()'s zh_tidy() */
+    zh_squeeze_spaces(bp);
+#endif
 
     return bp;
 }
@@ -2191,7 +2261,7 @@ corpse_xname(
             Strcat(nambuf, "s");
 #else
             /* Chinese doesn't inflect for plural and the suffix is the
-               Chinese "尸体" now, so "…尸体s" must not be produced (B2) */
+               Chinese "尸体" now, so "…尸体s" must not be produced */
 #endif
             any_prefix = FALSE; /* avoid "a newt corpses" */
         }
@@ -2475,7 +2545,7 @@ the(const char *str)
         return strcpy(buf, "the []");
     }
 #ifdef ZHLANG
-    /* Chinese has no articles; leave Chinese names alone (B1) */
+    /* Chinese has no articles; leave Chinese names alone */
     if (zh_nonascii(str))
         return strcpy(buf, str);
 #endif
@@ -2877,7 +2947,7 @@ vtense(const char *subj, const char *verb)
 
 #ifdef ZHLANG
     /* Chinese verbs have no 3rd person singular form; never append the
-       English "s"/"es"/"ies" to them (B2).  A Chinese subject with an
+       English "s"/"es"/"ies" to them.  A Chinese subject with an
        English verb still gets the normal English inflection. */
     if (zh_nonascii(verb)) {
         Strcpy(buf, verb);
@@ -3166,7 +3236,7 @@ makeplural(const char *oldstr)
         return str;
     }
 #ifdef ZHLANG
-    /* Chinese nouns have no plural form; return the name unchanged (B1) */
+    /* Chinese nouns have no plural form; return the name unchanged */
     if (zh_nonascii(oldstr))
         return strcpy(str, oldstr);
 #endif
@@ -3371,7 +3441,7 @@ makesingular(const char *oldstr)
         return str;
     }
 #ifdef ZHLANG
-    /* Chinese nouns have no singular/plural distinction (B1) */
+    /* Chinese nouns have no singular/plural distinction */
     if (zh_nonascii(oldstr))
         return strcpy(str, oldstr);
 #endif
@@ -3816,7 +3886,7 @@ rnd_otyp_by_namedesc(
      * scrolls are supposed to be much more common than books.]
      */
     for (i = lo; i <= hi; ++i) {
-        /* identity lookup (A2/C3): wish strings are matched against the
+        /* identity lookup: wish strings are matched against the
            English tables, never against the Chinese display names.  In an
            English build these fields are exactly what OBJ_NAME() and
            OBJ_DESCR() expand to, so its behavior is unchanged. */
@@ -4612,7 +4682,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     }
     /* real vs fake is only useful for wizard mode but we'll accept its
        parsing in normal play (result is never real Amulet for that case) */
-    /* identity lookup (A2/C3): use the English description, not the
+    /* identity lookup: use the English description, not the
        Chinese display name */
     if ((d->p = strstri(d->bp,
                         obj_descr[objects[AMULET_OF_YENDOR].oc_descr_idx]
@@ -5068,7 +5138,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
         for (i = svb.bases[GEM_CLASS]; i <= LAST_REAL_GEM; i++) {
             const char *zn;
 
-            /* identity lookup (A2/C3): English name, not Chinese display */
+            /* identity lookup: English name, not Chinese display */
             zn = obj_descr[objects[i].oc_name_idx].oc_name;
             if (zn != 0 && !strcmpi(d->actualn, zn)) {
                 d->typ = i;
@@ -5212,7 +5282,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
 
         /* Perhaps it's an artifact specified by name, not type */
 #ifdef ZHLANG
-        /* C3/F5: accept a Chinese artifact name by translating it back to
+        /* accept a Chinese artifact name by translating it back to
            the canonical English name (all internal lookups use English) */
         {
             const char *en = artifact_name_zh(aname, &objtyp, TRUE);
@@ -5445,7 +5515,7 @@ zh_wish_objname(const char *zh)
    does.  *bytelenp gets the byte length of the matched Chinese name (so the
    caller can find the remainder of the string) and *mgenderp its gender
    variant.  Exported (declared in hack.h) so that name_to_monplus() can use
-   it for the #genocide and polymorph prompts as well as for wishes (C3). */
+   it for the #genocide and polymorph prompts as well as for wishes. */
 int
 zh_mon_name(const char *zh, unsigned *bytelenp, int *mgenderp)
 {
@@ -5516,7 +5586,7 @@ zh_wish_run(const char *zh, char *out, size_t outsz)
         return TRUE;
     }
 
-    /* 2b: a Chinese artifact name (F5): artifact.c returns the canonical
+    /* 2b: a Chinese artifact name: artifact.c returns the canonical
        English name, which the parser below already knows how to handle */
     if ((en = artifact_name_zh(zh, (short *) 0, TRUE)) != 0) {
         copynchars(out, en, (int) outsz - 1);
@@ -5662,7 +5732,7 @@ readobjnam(char *bp, struct obj *no_wish)
     /* first, remove extra whitespace they may have typed */
     (void) mungspaces(bp);
 #ifdef ZHLANG
-    /* C3: rewrite a Chinese wish into the English words parsed below */
+    /* rewrite a Chinese wish into the English words parsed below */
     if (zh_nonascii(bp))
         (void) zh_wish_normalize(bp);
 #endif
@@ -6126,7 +6196,7 @@ readobjnam(char *bp, struct obj *no_wish)
         obfree(d.otmp, (struct obj *) 0);
         d.otmp = &hands_obj;
         pline(TR("For a moment, you feel %s in your %s, but it disappears!", "有那么一刻，你感到%s在你的%s里，但它消失了！"),
-              something, makeplural(body_part(HAND)));
+              something, makeplural(zh_body_part(HAND)));
         return d.otmp;
     }
 
@@ -6175,7 +6245,11 @@ Japanese_item_name(int i, const char *ordinaryname)
 
     while (j->item) {
         if (i == j->item)
+#ifdef ZHLANG
+            return Japanese_items_zh[j - Japanese_items];
+#else
             return j->name;
+#endif
         j++;
     }
     return ordinaryname;

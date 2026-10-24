@@ -359,7 +359,7 @@ objdescr_is(struct obj *obj, const char *descr)
     }
 
     /* callers pass an untranslated description such as "milky" or "dull",
-       so always compare against the English table (A2) */
+       so always compare against the English table */
     objdescr = OBJ_DESCR_EN(objects[obj->otyp]);
     if (!objdescr)
         return FALSE; /* no obj description, no match */

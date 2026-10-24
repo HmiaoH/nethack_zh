@@ -340,7 +340,7 @@ mount_steed(
                       TEST_MOVE)) {
         if (Punished || !(u.uswallow || u.ustuck || u.utrap))
 #ifdef ZHLANG
-            You(TR("are unable to swing your %s over.", "无法把%s跨过去。"), body_part(LEG));
+            You(TR("are unable to swing your %s over.", "无法把%s跨过去。"), zh_body_part(LEG));
 #else
             You("are unable to swing your %s over.", body_part(LEG));
 #endif
@@ -916,7 +916,7 @@ dismount_steed(
                     if (!Underwater)
 #ifdef ZHLANG
                         pline(TR("%s falls into the %s!", "%s掉进了%s里！"), Monnam(mtmp),
-                              surface(u.ux, u.uy));
+                              zh_surface(u.ux, u.uy));
 #else
                         pline("%s falls into the %s!", Monnam(mtmp),
                               surface(u.ux, u.uy));

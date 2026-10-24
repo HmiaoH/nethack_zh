@@ -180,7 +180,7 @@ check_strangling(boolean on)
 #ifdef ZHLANG
             Your("%s%s了你的%s！", simpleonames(uamul),
                  was_strangled ? "仍在勒紧" : "开始勒紧",
-                 body_part(NECK));
+                 zh_body_part(NECK));
 #else
             Your("%s %s your %s!", simpleonames(uamul),
                  was_strangled ? "still constricts" : "begins constricting",
@@ -1435,7 +1435,7 @@ break_armor(void)
                     cancel_don();
 #ifdef ZHLANG
                 Your("%s掉落在%s上！", helm_simple_name(otmp),
-                     surface(u.ux, u.uy));
+                     zh_surface(u.ux, u.uy));
 #else
                 Your("%s falls to the %s!", helm_simple_name(otmp),
                      surface(u.ux, u.uy));
@@ -1474,7 +1474,7 @@ break_armor(void)
                 cancel_don();
 #ifdef ZHLANG
             Your("%s掉落在%s上！", helm_simple_name(otmp),
-                 surface(u.ux, u.uy));
+                 zh_surface(u.ux, u.uy));
 #else
             Your("%s falls to the %s!", helm_simple_name(otmp),
                  surface(u.ux, u.uy));
@@ -1651,7 +1651,7 @@ rehumanize(void)
     if (was_flying && !Flying && u.usteed)
 #ifdef ZHLANG
         You("和%s轻轻落回%s。",
-            mon_nam(u.usteed), surface(u.ux, u.uy));
+            mon_nam(u.usteed), zh_surface(u.ux, u.uy));
 #else
         You("and %s return gently to the %s.",
             mon_nam(u.usteed), surface(u.ux, u.uy));
@@ -1736,7 +1736,7 @@ doremove(void)
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
 #ifdef ZHLANG
             pline_The("铁球和锁链牢牢埋在%s中。",
-                      surface(u.ux, u.uy));
+                      zh_surface(u.ux, u.uy));
 #else
             pline_The("ball and chain are buried firmly in the %s.",
                       surface(u.ux, u.uy));
@@ -2602,6 +2602,219 @@ const char *
 body_part(int part)
 {
     return mbodypart(&gy.youmonst, part);
+}
+
+#ifdef ZHLANG
+/*
+ * Chinese display names for body parts.
+ *
+ * mbodypart() and body_part() keep returning English strings: several
+ * callers compare them with strcmp() or use them as identifiers, so their
+ * behaviour must not change.  Code which splices a body part into a
+ * Chinese sentence (or into a TR()'d message) calls zh_mbodypart() /
+ * zh_body_part() instead; in the English build those simply delegate to
+ * the original functions, so the English output is unchanged.
+ *
+ * The table covers every string mbodypart() can return (all of its
+ * monster-shape tables plus the special cases).  Anything unexpected
+ * falls back to the English word.
+ */
+static const struct zh_bodypart_pair {
+    const char *en;
+    const char *zh;
+} zh_bodypart_pairs[] = {
+    /* humanoid */
+    { "arm", "手臂" },
+    { "eye", "眼睛" },
+    { "face", "脸" },
+    { "finger", "手指" },
+    { "fingertip", "指尖" },
+    { "foot", "脚" },
+    { "hand", "手" },
+    { "handed", "惯用手" },
+    { "head", "头" },
+    { "leg", "腿" },
+    { "light headed", "头晕" },
+    { "neck", "脖子" },
+    { "spine", "脊背" },
+    { "toe", "脚趾" },
+    { "hair", "头发" },
+    { "blood", "血液" },
+    { "lung", "肺" },
+    { "nose", "鼻子" },
+    { "stomach", "胃" },
+    /* jelly-like creatures */
+    { "pseudopod", "伪足" },
+    { "dark spot", "暗斑" },
+    { "front", "前部" },
+    { "pseudopod extension", "伪足延伸部" },
+    { "pseudopod extremity", "伪足末端" },
+    { "pseudopod root", "伪足根部" },
+    { "grasp", "握持部" },
+    { "grasped", "被握持部" },
+    { "cerebral area", "脑区" },
+    { "lower pseudopod", "下伪足" },
+    { "viscous", "黏液" },
+    { "middle", "中部" },
+    { "surface", "表面" },
+    { "ripples", "波纹" },
+    { "juices", "汁液" },
+    { "sensor", "感应器" },
+    /* animals */
+    { "forelimb", "前肢" },
+    { "foreclaw", "前爪" },
+    { "claw tip", "爪尖" },
+    { "rear claw", "后爪" },
+    { "clawed", "有爪的" },
+    { "rear limb", "后肢" },
+    { "rear claw tip", "后爪尖" },
+    { "fur", "毛皮" },
+    /* birds */
+    { "wing", "翅膀" },
+    { "wing tip", "翼尖" },
+    { "winged", "有翼的" },
+    { "feathers", "羽毛" },
+    { "bill", "喙" },
+    /* horses and similar */
+    { "foreleg", "前腿" },
+    { "forehoof", "前蹄" },
+    { "hoof tip", "蹄尖" },
+    { "rear hoof", "后蹄" },
+    { "hooved", "有蹄的" },
+    { "rear leg", "后腿" },
+    { "backbone", "脊骨" },
+    { "rear hoof tip", "后蹄尖" },
+    { "mane", "鬃毛" },
+    /* floating spheres */
+    { "appendage", "附肢" },
+    { "optic nerve", "视神经" },
+    { "body", "身体" },
+    { "tentacle", "触手" },
+    { "tentacle tip", "触手尖" },
+    { "lower appendage", "下附肢" },
+    { "tentacled", "有触手的" },
+    { "lower tentacle", "下触手" },
+    { "rotational", "旋转部" },
+    { "equator", "赤道部" },
+    { "lower tentacle tip", "下触手尖" },
+    { "cilia", "纤毛" },
+    { "life force", "生命力" },
+    { "retina", "视网膜" },
+    { "olfactory nerve", "嗅觉神经" },
+    { "interior", "内部" },
+    /* fungi */
+    { "mycelium", "菌丝体" },
+    { "visual area", "视觉区" },
+    { "hypha", "菌丝" },
+    { "root", "根部" },
+    { "strand", "菌丝束" },
+    { "stranded", "有菌丝束的" },
+    { "cap area", "菌盖区" },
+    { "rhizome", "根状茎" },
+    { "sporulated", "产孢的" },
+    { "stalk", "菌柄" },
+    { "rhizome tip", "根状茎尖端" },
+    { "spores", "孢子" },
+    { "gill", "菌褶" },
+    /* vortices and elementals */
+    { "region", "区域" },
+    { "minor current", "小气流" },
+    { "lower current", "下气流" },
+    { "swirl", "旋涡" },
+    { "swirled", "旋转的" },
+    { "central core", "核心" },
+    { "addled", "混乱的" },
+    { "center", "中心" },
+    { "currents", "气流" },
+    { "edge", "边缘" },
+    { "leading edge", "前沿" },
+    /* snakes and dragons */
+    { "vestigial limb", "退化肢体" },
+    { "large scale", "大鳞片" },
+    { "large scale tip", "大鳞片尖端" },
+    { "rear region", "后部" },
+    { "scale gap", "鳞片缝隙" },
+    { "scale gapped", "鳞片有缝的" },
+    { "length", "身体长度" },
+    { "rear scale", "后部鳞片" },
+    { "scales", "鳞片" },
+    { "forked tongue", "分叉的舌头" },
+    /* worms */
+    { "anterior segment", "前段" },
+    { "light sensitive cell", "感光细胞" },
+    { "clitellum", "环带" },
+    { "setae", "刚毛" },
+    { "posterior segment", "后段" },
+    { "segment", "体节" },
+    { "segmented", "分节的" },
+    { "posterior", "后部" },
+    { "over stretched", "过度拉伸" },
+    { "posterior setae", "后部刚毛" },
+    { "skin", "皮肤" },
+    { "prostomium", "口前叶" },
+    /* spiders */
+    { "pedipalp", "触肢" },
+    { "tarsus", "跗节" },
+    { "claw", "爪" },
+    { "palped", "有触肢的" },
+    { "cephalothorax", "头胸部" },
+    { "abdomen", "腹部" },
+    { "hemolymph", "血淋巴" },
+    { "book lung", "书肺" },
+    { "labrum", "上唇" },
+    { "digestive tract", "消化道" },
+    /* fish */
+    { "fin", "鳍" },
+    { "premaxillary", "前颌" },
+    { "pelvic axillary", "腹鳍腋" },
+    { "pelvic fin", "腹鳍" },
+    { "anal fin", "臀鳍" },
+    { "pectoral fin", "胸鳍" },
+    { "finned", "有鳍的" },
+    { "peduncle", "尾柄" },
+    { "played out", "力竭的" },
+    { "gills", "鳃" },
+    { "dorsal fin", "背鳍" },
+    { "caudal fin", "尾鳍" },
+    { "nostril", "鼻孔" },
+    /* special cases */
+    { "paw", "爪子" },
+    { "pawed", "有爪的" },
+    { "rear paw", "后爪" },
+    { "hands", "手" },
+    { "arms", "手臂" },
+    { "legs", "腿" },
+    { "trunk", "长鼻" },
+    { "cornea", "角膜" },
+    { "rayed", "放射状" },
+    { "ray", "光线" },
+    { "beam", "光束" },
+    { "mystery part", "神秘部位" },
+};
+#endif /* ZHLANG */
+
+/* display-only form of mbodypart(); English build behaviour is identical */
+const char *
+zh_mbodypart(struct monst *mon, int part)
+{
+#ifdef ZHLANG
+    const char *en = mbodypart(mon, part);
+    int i;
+
+    for (i = 0; i < SIZE(zh_bodypart_pairs); ++i)
+        if (!strcmp(en, zh_bodypart_pairs[i].en))
+            return zh_bodypart_pairs[i].zh;
+    return en;
+#else
+    return mbodypart(mon, part);
+#endif
+}
+
+/* display-only form of body_part(); English build behaviour is identical */
+const char *
+zh_body_part(int part)
+{
+    return zh_mbodypart(&gy.youmonst, part);
 }
 
 int

@@ -62,9 +62,16 @@ staticfn boolean better_not_take_that_off(struct obj *) NONNULLARG1;
 const char *
 fingers_or_gloves(boolean check_gloves)
 {
+#ifdef ZHLANG
+    if (check_gloves && uarmg)
+        return !strcmp(gloves_simple_name(uarmg), "gauntlets") ? "护手"
+                                                               : "手套";
+    return "手指";
+#else
     return ((check_gloves && uarmg)
             ? gloves_simple_name(uarmg) /* "gloves" or "gauntlets" */
             : makeplural(body_part(FINGER))); /* "fingers" */
+#endif
 }
 
 void
@@ -99,7 +106,7 @@ on_msg(struct obj *otmp)
 
         how[0] = '\0';
         if (otmp->otyp == TOWEL)
-            Sprintf(how, TR(" around your %s", "，围在你的%s上"), body_part(HEAD));
+            Sprintf(how, TR(" around your %s", "，围在你的%s上"), zh_body_part(HEAD));
         #ifdef ZHLANG
 You("现在穿着%s%s。",
             obj_is_pname(otmp) ? the(otmp_name) : an(otmp_name), how);
@@ -687,7 +694,7 @@ wielding_corpse(
 
         #ifdef ZHLANG
 You("用赤裸的%s%s%s。",
-            makeplural(body_part(HAND)),
+            makeplural(zh_body_part(HAND)),
             (how && is_gloves(how)) ? "握着" : "正在握",
             corpse_xname(obj, (const char *) 0, CXN_ARTICLE));
 #else
@@ -1265,7 +1272,7 @@ You("are breathing poison gas!");
             disp.botl = TRUE;
             if (Breathless)
                 #ifdef ZHLANG
-Your("%s不再被勒住了！", body_part(NECK));
+Your("%s不再被勒住了！", zh_body_part(NECK));
 #else
 Your("%s is no longer constricted!", body_part(NECK));
 #endif
@@ -2360,7 +2367,7 @@ You("have too many hooves to wear %s.", c_boots);
             if (u.utraptype == TT_BEARTRAP) {
                 if (noisy)
                     #ifdef ZHLANG
-Your("%s被困住了！", body_part(FOOT));
+Your("%s被困住了！", zh_body_part(FOOT));
 #else
 Your("%s is trapped!", body_part(FOOT));
 #endif
@@ -2368,7 +2375,7 @@ Your("%s is trapped!", body_part(FOOT));
                 if (noisy)
                     #ifdef ZHLANG
 Your("%s卡在了%s里！",
-                         makeplural(body_part(FOOT)), surface(u.ux, u.uy));
+                         makeplural(zh_body_part(FOOT)), zh_surface(u.ux, u.uy));
 #else
 Your("%s are stuck in the %s!",
                          makeplural(body_part(FOOT)), surface(u.ux, u.uy));
@@ -2377,7 +2384,7 @@ Your("%s are stuck in the %s!",
                 if (noisy)
                     #ifdef ZHLANG
 Your("%s被拴在了埋着的铁球上！",
-                         body_part(LEG));
+                         zh_body_part(LEG));
 #else
 Your("%s is attached to the buried ball!",
                          body_part(LEG));
@@ -2557,7 +2564,7 @@ There("are no more %s%s to fill.",
                 do {
                     Sprintf(qbuf, TR("Which %s%s, Right or Left?", "哪根%s%s，右还是左？"),
                             humanoid(gy.youmonst.data) ? TR("ring-", "戴戒指的") : "",
-                            body_part(FINGER));
+                            zh_body_part(FINGER));
                     answer = yn_function(qbuf, rightleftchars, '\0', TRUE);
                     switch (answer) {
                     case '\0':
@@ -2602,7 +2609,7 @@ You("cannot remove your %s to put on the ring.", c_gloves);
                 if (((mask == RIGHT_RING && URIGHTY)
                      || (mask == LEFT_RING  && ULEFTY)
                      || bimanual(uwep)) && welded(uwep)) {
-                    const char *hand = body_part(HAND);
+                    const char *hand = zh_body_part(HAND);
 
                     /* welded will set bknown */
                     if (bimanual(uwep))
@@ -2637,7 +2644,7 @@ You("have no head to wear %s on.", ansimpleoname(obj));
                 if (ublindf->otyp == TOWEL)
                     #ifdef ZHLANG
 Your("%s已经被毛巾盖住了。",
-                         body_part(FACE));
+                         zh_body_part(FACE));
 #else
 Your("%s is already covered by a towel.",
                          body_part(FACE));
@@ -2878,7 +2885,7 @@ glibr(void)
 Your("%s从%s上滑落了。",
              (leftfall && rightfall) ? "戒指" : "戒指",
              (leftfall && rightfall) ? fingers_or_gloves(FALSE)
-                                     : body_part(FINGER));
+                                     : zh_body_part(FINGER));
 #else
 Your("%s off your %s.",
              (leftfall && rightfall) ? "rings slip" : "ring slips",
@@ -2910,7 +2917,7 @@ Your("%s off your %s.",
         otherwep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
         if (otmp->quan > 1L)
             otherwep = makeplural(otherwep);
-        hand = body_part(HAND);
+        hand = zh_body_part(HAND);
         which = URIGHTY ? "left " : "right ";  /* text for the off hand */
         Your(TR("%s %s%s from your %s%s.", "%s%s%s从你的%s%s滑落。"), otherwep, xfl ? TR("also ", "也") : "",
              otense(otmp, TR("slip", "突然")), which, hand);
@@ -2940,7 +2947,7 @@ Your("%s off your %s.",
             else
                 thiswep = makeplural(thiswep);
         }
-        hand = body_part(HAND);
+        hand = zh_body_part(HAND);
         which = "";
         if (bimanual(otmp)) {
             hand = makeplural(hand);
@@ -3058,7 +3065,7 @@ pline_The("ring is stuck.");
         glibdummy = cg.zeroobj;
         why = 0; /* the item which prevents ring removal */
         if (welded(uwep) && ((otmp == RING_ON_PRIMARY) || bimanual(uwep))) {
-            Sprintf(buf, TR("free a weapon %s", "空出握武器的%s"), body_part(HAND));
+            Sprintf(buf, TR("free a weapon %s", "空出握武器的%s"), zh_body_part(HAND));
             why = uwep;
         } else if (uarmg && (uarmg->cursed || Glib)) {
             Sprintf(buf, TR("take off your %s%s", "脱下你的%s%s"),
@@ -3101,7 +3108,7 @@ You("are unable to take off your %s while wielding that %s.",
         if (u.utrap && u.utraptype == TT_BEARTRAP) {
             #ifdef ZHLANG
 pline_The("捕熊夹让你无法把%s拔出来。",
-                      body_part(FOOT));
+                      zh_body_part(FOOT));
 #else
 pline_The("bear trap prevents you from pulling your %s out.",
                       body_part(FOOT));
@@ -3110,7 +3117,7 @@ pline_The("bear trap prevents you from pulling your %s out.",
         } else if (u.utrap && u.utraptype == TT_INFLOOR) {
             #ifdef ZHLANG
 You("被困在%s里，无法把%s拔出来。",
-                surface(u.ux, u.uy), makeplural(body_part(FOOT)));
+                zh_surface(u.ux, u.uy), makeplural(zh_body_part(FOOT)));
 #else
 You("are stuck in the %s, and cannot pull your %s out.",
                 surface(u.ux, u.uy), makeplural(body_part(FOOT)));
@@ -3624,7 +3631,7 @@ disintegrate_arm(struct obj *atmp)
         urgent_pline(TR("Your %s %s to dust and %s to the %s!", "你的%s%s成灰，并%s到%s上！"),
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, TR("turn", "已经")), vtense(suit, TR("fall", "坠落")),
-                     surface(u.ux, u.uy));
+                     zh_surface(u.ux, u.uy));
     } else if (!resistedc && !resistedsuit
              && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {
         urgent_pline(TR("Your %s crumbles into tiny threads and falls apart!", "你的%s碎成细丝，散落开来！"),

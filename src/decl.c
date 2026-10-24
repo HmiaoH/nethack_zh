@@ -36,20 +36,95 @@ const char *c_obj_colors[] = {
     "white",          /* CLR_WHITE */
 };
 
+#ifdef ZHLANG
+/* Chinese display names, indexed the same way as c_obj_colors[]; the
+   English array above stays the internal one (lookups and comparisons). */
+const char *c_obj_colors_zh[] = {
+    "黑色",      /* CLR_BLACK */
+    "红色",      /* CLR_RED */
+    "绿色",      /* CLR_GREEN */
+    "棕色",      /* CLR_BROWN */
+    "蓝色",      /* CLR_BLUE */
+    "洋红色",    /* CLR_MAGENTA */
+    "青色",      /* CLR_CYAN */
+    "灰色",      /* CLR_GRAY */
+    "透明",      /* no_color */
+    "橙色",      /* CLR_ORANGE */
+    "亮绿色",    /* CLR_BRIGHT_GREEN */
+    "黄色",      /* CLR_YELLOW */
+    "亮蓝色",    /* CLR_BRIGHT_BLUE */
+    "亮洋红色",  /* CLR_BRIGHT_MAGENTA */
+    "亮青色",    /* CLR_BRIGHT_CYAN */
+    "白色",      /* CLR_WHITE */
+};
+#endif
+
+/*
+ * Display name of a real color ("black", "light blue", ...).  In a Chinese
+ * build the values from c_color_names (NH_* constants) and c_obj_colors are
+ * translated; everything else (already translated text, unknown input) is
+ * returned unchanged.  English builds always get the argument back, so this
+ * may be used unconditionally.
+ */
+const char *
+zh_obj_color(const char *en)
+{
+#ifdef ZHLANG
+    static const struct {
+        const char *en, *zh;
+    } names[] = {
+        { "black", "黑色" },
+        { "amber", "琥珀色" },
+        { "golden", "金色" },
+        { "light blue", "浅蓝色" },
+        { "red", "红色" },
+        { "green", "绿色" },
+        { "silver", "银色" },
+        { "blue", "蓝色" },
+        { "purple", "紫色" },
+        { "white", "白色" },
+        { "orange", "橙色" },
+        { "brown", "棕色" },
+        { "magenta", "洋红色" },
+        { "cyan", "青色" },
+        { "gray", "灰色" },
+        { "transparent", "透明" },
+        { "bright green", "亮绿色" },
+        { "yellow", "黄色" },
+        { "bright blue", "亮蓝色" },
+        { "bright magenta", "亮洋红色" },
+        { "bright cyan", "亮青色" },
+        { "colorless", "无色" },
+        { 0, 0 }
+    };
+    int i;
+
+    if (!en)
+        return "";
+    for (i = 0; names[i].en; ++i)
+        if (!strcmp(en, names[i].en))
+            return names[i].zh;
+#endif
+    return en;
+}
+
 const struct c_common_strings c_common_strings =
-    { "Nothing happens.",
-      "Nothing seems to happen.",
-      "That's enough tries!",
-      /* R6: the argument is a verb; the Chinese sentence must not leave the
+    { TR("Nothing happens.", "什么也没有发生。"),
+      TR("Nothing seems to happen.", "似乎什么也没有发生。"),
+      TR("That's enough tries!", "试得够多了！"),
+      /* the argument is a verb; the Chinese sentence must not leave the
          English frame around it ("That is a silly thing to 喝.") */
       TR("That is a silly thing to %s.", "%s那个太荒唐了。"),
-      "shudder for a moment.",
-      "something",
-      "Something",
-      "You can move again.",
-      "Never mind.",
-      "vision quickly clears.",
-      { "the", "your" },
+      /* used via You1(); the Chinese You() supplies the "你" */
+      TR("shudder for a moment.", "颤抖了一下。"),
+      TR("something", "某物"),
+      TR("Something", "某物"),
+      TR("You can move again.", "你又能动了。"),
+      TR("Never mind.", "算了。"),
+      /* used via Your1(); the Chinese Your() supplies the "你的" */
+      TR("vision quickly clears.", "视线很快恢复了清晰。"),
+      /* "the pit" / "your pit": Chinese needs no article */
+      { TR("the", ""), TR("your", "你的") },
       { "mon", "you" }
 };
 

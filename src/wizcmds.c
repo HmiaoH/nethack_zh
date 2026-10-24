@@ -1031,7 +1031,7 @@ wiz_smell(void)
         if (mptr) {
             if (is_you)
 #ifdef ZHLANG
-                You("偷偷闻了闻你的%s下面。", body_part(ARM));
+                You("偷偷闻了闻你的%s下面。", zh_body_part(ARM));
 #else
                 You("surreptitiously sniff under your %s.", body_part(ARM));
 #endif

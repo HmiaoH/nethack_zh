@@ -8,6 +8,10 @@
 #include "wincurs.h"
 #include "cursmesg.h"
 #include "curswins.h"
+#if defined(ZHLANG) && defined(CURSES_UNICODE)
+#include <wchar.h>
+#include <limits.h>
+#endif
 
 /* defined in sys/<foo>/<foo>tty.c or cursmain.c as last resort;
    set up by curses_init_nhwindows() */
@@ -56,7 +60,9 @@ typedef struct nhpm {
 } nhprev_mesg;
 
 static void scroll_window(winid wid);
+#if !defined(ZHLANG) || !defined(CURSES_UNICODE)
 static void unscroll_window(winid wid);
+#endif
 static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
@@ -83,7 +89,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean bold, border = curses_window_has_border(MESSAGE_WIN),
                   adjustbold = FALSE;
-    int message_length = (int) strlen(message);
+    int message_length = (int) curses_strwidth(message);
 #ifdef USE_CURSES_PUTMIXED
     boolean have_mixed_leadin = FALSE;
     cchar_t mixed_leadin_cchar[2];
@@ -218,7 +224,7 @@ curses_message_win_puts(const char *message, boolean recursed)
             nhUse(have_mixed_leadin);
         }
 #endif
-        mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
+        mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) curses_strwidth(tmpstr);
         /* one space to separate first part of message from rest [is this
            actually useful?] */
         if (mx < width)
@@ -540,7 +546,8 @@ curses_prev_mesg(void)
     }
     if (!count)
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                        A_NORMAL, clr, "[No past messages available.]",
+                        A_NORMAL, clr,
+                        TR("[No past messages available.]", "[没有可显示的历史消息。]"),
                         MENU_ITEMFLAGS_NONE);
 
     curses_end_menu(wid, "");
@@ -626,9 +633,143 @@ curses_count_window(const char *count_text)
 }
 
 /* Gets a "line" (buffer) of input. */
+#if defined(ZHLANG) && defined(CURSES_UNICODE)
+/* A line editor owns complete UTF-8 characters, while the engine buffer
+   and capacity remain byte-based.  Both popup and message prompts use it. */
+void
+curses_utf8_getline(WINDOW *win, int left, int top, int width, int rows,
+                   const char *prompt, char *answer, int capacity)
+{
+    int len = 0, saved_cursor = curs_set(1), rc, n, w, count, col, first;
+    int y, x, offset, end;
+    wint_t key;
+    char encoded[MB_LEN_MAX], ch[5];
+    mbstate_t state;
+    size_t encoded_len, prompt_len = strlen(prompt);
+    char *text = (char *) alloc((unsigned) (prompt_len + capacity + 2));
+    int *starts = (int *) alloc((unsigned)
+                               ((prompt_len + capacity + 2) * sizeof(int)));
+
+    width = max(2, width);
+    rows = max(1, rows);
+#ifdef EDIT_GETLIN
+    /* Discard an overlong preload at a complete character boundary. */
+    while (answer[len]) {
+        n = u8_seqlen(answer + len);
+        if (len + n >= capacity)
+            break;
+        len += n;
+    }
+#endif
+    answer[len] = '\0';
+    keypad(win, TRUE);
+    noecho();
+    while (1) {
+        Sprintf(text, "%s %s", prompt, answer);
+        starts[0] = 0;
+        count = 1;
+        col = 0;
+        for (offset = 0; text[offset]; offset += n) {
+            n = u8_seqlen(text + offset);
+            (void) memcpy(ch, text + offset, n);
+            ch[n] = '\0';
+            w = u8_width(ch);
+            /* Reserve one cell for the insertion cursor at the margin. */
+            if (col + w > width - 1 && col) {
+                starts[count++] = offset;
+                col = 0;
+            }
+            col += w;
+        }
+        first = max(0, count - rows);
+        for (y = 0; y < rows; ++y) {
+            mvwhline(win, top + y, left, ' ', width);
+            if (first + y < count) {
+                offset = starts[first + y];
+                end = first + y + 1 < count ? starts[first + y + 1]
+                                             : (int) strlen(text);
+                mvwaddnstr(win, top + y, left, text + offset, end - offset);
+            }
+        }
+        y = top + count - first - 1;
+        x = left + col;
+        wmove(win, y, min(x, left + width - 1));
+        wrefresh(win);
+        curses_got_input();
+        rc = wget_wch(win, &key);
+        if (rc == ERR) {
+            iflags.term_gone = 1;
+            answer[0] = '\0';
+            break;
+        }
+        if (key == '\r' || key == '\n' || (rc == KEY_CODE_YES && key == KEY_ENTER))
+            break;
+        if (key == '\033') {
+            if (!len) {
+                Strcpy(answer, "\033");
+                break;
+            }
+            len = 0;
+        } else if (key == '\b' || key == '\177' || (rc == KEY_CODE_YES && key == KEY_BACKSPACE)
+                   || (rc == KEY_CODE_YES && key == KEY_DC)
+                   || (erase_char && key == (uchar) erase_char)) {
+            if (len) {
+                --len;
+                while (len && ((uchar) answer[len] & 0xc0) == 0x80)
+                    --len;
+            }
+        } else if (key == C('u')
+                   || (kill_char && key == (uchar) kill_char
+                       && key < ' ')) {
+            len = 0;
+        } else if (rc == OK && key >= ' ' && key != '\177') {
+            (void) memset(&state, 0, sizeof state);
+            encoded_len = wcrtomb(encoded, (wchar_t) key, &state);
+            if (encoded_len != (size_t) -1
+                && len + (int) encoded_len < capacity) {
+                (void) memcpy(answer + len, encoded, encoded_len);
+                len += (int) encoded_len;
+            } else {
+                beep();
+            }
+        }
+        answer[len] = '\0';
+    }
+    free(starts);
+    free(text);
+    curs_set(saved_cursor);
+}
+#endif /* ZHLANG && CURSES_UNICODE */
+
 void
 curses_message_win_getline(const char *prompt, char *answer, int buffer)
 {
+#if defined(ZHLANG) && defined(CURSES_UNICODE)
+    int height, width, b = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+    char *combined;
+    int bytes = 0, n;
+
+    curses_get_window_size(MESSAGE_WIN, &height, &width);
+    curses_utf8_getline(win, b, b, width, height, prompt, answer, buffer);
+    if (answer[0] != '\033') {
+        combined = (char *) alloc((unsigned) (strlen(prompt) + strlen(answer) + 2));
+        Sprintf(combined, "%s %s", prompt, answer);
+        while (combined[bytes]) {
+            n = u8_seqlen(combined + bytes);
+            if (bytes + n >= (int) sizeof gt.toplines)
+                break;
+            bytes += n;
+        }
+        (void) memcpy(gt.toplines, combined, bytes);
+        gt.toplines[bytes] = '\0';
+        mesg_add_line(combined);
+        free(combined);
+    }
+    my = height - 1 + b;
+    mx = width + b;
+#else
+
     int height, width; /* of window */
     char *tmpbuf, *p_answer; /* combined prompt + answer */
     int nlines, maxlines, i; /* prompt + answer */
@@ -869,6 +1010,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     curs_set(orig_cursor);
     return;
+#endif /* ZHLANG && CURSES_UNICODE */
 }
 
 /* Scroll lines upward in given window, or clear window if only one line. */
@@ -878,11 +1020,13 @@ scroll_window(winid wid)
     directional_scroll(wid, 1);
 }
 
+#if !defined(ZHLANG) || !defined(CURSES_UNICODE)
 static void
 unscroll_window(winid wid)
 {
     directional_scroll(wid, -1);
 }
+#endif
 
 static void
 directional_scroll(winid wid, int nlines)

@@ -1276,7 +1276,7 @@ doengrave(void)
     }
 
     if (de->otmp == &hands_obj) {
-        Strcat(strcpy(de->fbuf, TR("your ", "你的")), body_part(FINGERTIP));
+        Strcat(strcpy(de->fbuf, TR("your ", "你的")), zh_body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
         de->writer = yname(de->otmp);
@@ -1287,7 +1287,7 @@ doengrave(void)
      */
     if (!freehand() && de->otmp != uwep && !de->otmp->owornmask) {
 #ifdef ZHLANG
-        You("没有空闲的%s用来书写！", body_part(HAND));
+        You("没有空闲的%s用来书写！", zh_body_part(HAND));
 #else
         You("have no free %s to write with!", body_part(HAND));
 #endif
@@ -1549,7 +1549,7 @@ doengrave(void)
     if (de->otmp != &hands_obj)
         You("用%s在%s上%s。", doname(de->otmp), de->eloc, de->everb);
     else
-        You("用你的%s在%s上%s。", body_part(FINGERTIP), de->eloc, de->everb);
+        You("用你的%s在%s上%s。", zh_body_part(FINGERTIP), de->eloc, de->everb);
 
     /* Prompt for engraving! */
     Sprintf(de->qbuf, "你要在%s上%s什么？", de->eloc, de->everb);
@@ -1563,7 +1563,7 @@ doengrave(void)
             doname(de->otmp));
     else
         You(TR("%s the %s with your %s.", "%s%s，用你的%s。"),
-            de->everb, de->eloc, body_part(FINGERTIP));
+            de->everb, de->eloc, zh_body_part(FINGERTIP));
 
     /* Prompt for engraving! */
     Sprintf(de->qbuf, TR("What do you want to %s the %s here?", "你想在这里%s什么%s？"),

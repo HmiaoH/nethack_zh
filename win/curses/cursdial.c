@@ -10,6 +10,7 @@
 #include "curswins.h"
 #include "cursmisc.h"
 #include "cursdial.h"
+#include "cursmesg.h"
 #include "func_tab.h"
 
 #if defined(FILENAME_CMP) && !defined(strcasecmp)
@@ -116,7 +117,7 @@ curses_line_input_dialog(
     WINDOW *askwin, *bwin;
     char *tmpstr;
     int prompt_width, prompt_height = 1, height = prompt_height,
-        answerx = 0, answery = 0, trylim;
+        answerx = 0, answery = 0, trylim = 0;
     char input[BUFSZ];
 
     /* if messages were being suppressed for the remainder of the turn,
@@ -126,7 +127,7 @@ curses_line_input_dialog(
     if (buffer > (int) sizeof input)
         buffer = (int) sizeof input;
     /* +1: space between prompt and answer; buffer already accounts for \0 */
-    prompt_width = (int) strlen(prompt) + 1 + buffer;
+    prompt_width = (int) curses_strwidth(prompt) + 1 + buffer;
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
@@ -176,6 +177,14 @@ curses_line_input_dialog(
         getyx(askwin, answery, answerx);
     }
 
+#if defined(ZHLANG) && defined(CURSES_UNICODE)
+    input[0] = '\0';
+    curses_utf8_getline(askwin, 0, 0, prompt_width, height,
+                       prompt, input, buffer);
+    nhUse(trylim);
+    nhUse(answerx);
+    nhUse(answery);
+#else
     echo();
     curs_set(1);
     trylim = 10;
@@ -193,6 +202,7 @@ curses_line_input_dialog(
         if (input[0] != '\033' && strchr(input, '\033') != 0)
              input[0] = '\0';
     } while (--trylim > 0 && !input[0]);
+#endif
     curs_set(0);
     Strcpy(answer, input);
     werase(bwin);
@@ -274,7 +284,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     }
 
     /* +1: room for a trailing space where the cursor will rest */
-    prompt_width = (int) strlen(askstr) + 1;
+    prompt_width = (int) curses_strwidth(askstr) + 1;
 
     if ((prompt_width + 2) > maxwidth) {
         prompt_height = curses_num_lines(askstr, maxwidth);
@@ -523,7 +533,8 @@ curses_ext_cmd(void)
         char extcmd_char = extcmd_initiator();
 
         if (*cur_choice)
-            pline("%s%s: unknown extended command.",
+            pline(TR("%s%s: unknown extended command.",
+                     "%s%s：未知扩展命令。"),
                   visctrl(extcmd_char), cur_choice);
     }
     return ret;
@@ -1044,7 +1055,7 @@ menu_win_size(nhmenu *menu)
 {
     int maxwidth, maxheight, curentrywidth, lastline;
     int maxentrywidth = 0;
-    int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
+    int maxheaderwidth = menu->prompt ? (int) curses_strwidth(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr, *last_item_ptr = NULL;
     boolean only_if_no_headers = (iflags.menuobjsyms & 4) != 0;
 
@@ -1081,7 +1092,7 @@ menu_win_size(nhmenu *menu)
     assert(menu->entries != NULL); /* at least one iteration will occur */
     for (menu_item_ptr = menu->entries; menu_item_ptr != NULL;
          menu_item_ptr = menu_item_ptr->next_item) {
-        curentrywidth = (int) strlen(menu_item_ptr->str);
+        curentrywidth = (int) curses_strwidth(menu_item_ptr->str);
         if (menu_item_ptr->identifier.a_void == NULL) {
             if (curentrywidth > maxheaderwidth) {
                 maxheaderwidth = curentrywidth;
@@ -1135,7 +1146,16 @@ menu_win_size(nhmenu *menu)
        stepping on a pile of 2 items; also, multi-page menus need enough
        room for "(Page M of N) => " even if all entries are narrower
        than that; we specify same minimum width even when single page */
+#ifdef ZHLANG
+    char footer[BUFSZ];
+    Snprintf(footer, sizeof footer,
+             TR("<= (Page %d of %d) =>", "<=（第 %d 页，共 %d 页）=>"),
+             menu->num_pages, menu->num_pages);
+    menu->width = min(term_cols - 2,
+                      max(maxwidth, max(25, curses_strwidth(footer))));
+#else
     menu->width = max(maxwidth, 25);
+#endif
     menu->height = max(maxheight, 5);
 }
 
@@ -1348,7 +1368,8 @@ menu_display_page(
     if (menu->num_pages > 1) {
         int footer_x, footwidth, shoesize = menu->num_pages;
 
-        footwidth = (int) (sizeof "<- (Page X of Y) ->" - sizeof "");
+        footwidth = curses_strwidth(TR("<- (Page X of Y) ->",
+                                       "<=（第 X 页，共 Y 页）=>"));
         while (shoesize >= 10) { /* possible for pickup from big piles... */
              /* room for wider feet; extra digit for both X and Y */
             footwidth += 2;
@@ -1360,7 +1381,8 @@ menu_display_page(
             mvwaddstr(win, menu->height, footer_x, "<=");
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
         }
-        mvwprintw(win, menu->height, footer_x + 2, " (Page %d of %d) ",
+        mvwprintw(win, menu->height, footer_x + 2,
+                  TR(" (Page %d of %d) ", "（第 %d 页，共 %d 页）"),
                   page_num, menu->num_pages);
         if (page_num != menu->num_pages) {
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
@@ -1472,7 +1494,8 @@ curs_nonselect_menu_action(
             break;
 
         search_key[0] = '\0';
-        curses_line_input_dialog("Search for:", search_key, BUFSZ);
+        curses_line_input_dialog(TR("Search for:", "搜索："),
+                                 search_key, BUFSZ);
 
         refresh();
         touchwin(win);

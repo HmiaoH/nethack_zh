@@ -1360,7 +1360,7 @@ dog_move(
 
 #ifdef ZHLANG
             pline_mon(mtmp, "%s不情愿地%s%s了%s。", noit_Monnam(mtmp),
-                  vtense((char *) 0, locomotion(mtmp->data, "走")),
+                  vtense((char *) 0, zh_locomotion(mtmp->data, TR("step", "走"), "走")),
                   (is_flyer(mtmp->data) || is_floater(mtmp->data)) ? "过" : "上",
                   what);
 #else

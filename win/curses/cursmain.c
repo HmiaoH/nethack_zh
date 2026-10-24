@@ -195,11 +195,11 @@ curses_init_nhwindows(
        On MS-DOS, if no font_map is set, use ter-u16v.psf if it is present.
        PDC_FONT has no effect on other PDCurses or PDCursesMod ports. */
     if (iflags.wc_font_map && iflags.wc_font_map[0]) {
-        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=%s",
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=%s", /* NOTRANS */
                  iflags.wc_font_map);
 #ifdef MSDOS
     } else if (access("ter-u16v.psf", R_OK) >= 0) {
-        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=ter-u16v.psf");
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=ter-u16v.psf"); /* NOTRANS */
 #endif
     }
     if (pdc_font[0] != '\0') {
@@ -258,13 +258,13 @@ curses_init_nhwindows(
 # else
 #  ifdef VERSION_STRING
     Snprintf(window_title, sizeof window_title, "%s %s",
-                "NetHack", VERSION_STRING);
+                "NetHack", VERSION_STRING); /* NOTRANS: game name */
 #  else
     if (nomakedefs.version_string)
         Snprintf(window_title, sizeof window_title, "%s %s",
-                    "NetHack", nomakedefs.version_string);
+                    "NetHack", nomakedefs.version_string); /* NOTRANS */
     else
-        Snprintf(window_title, sizeof window_title, "%s", "NetHack");
+        Snprintf(window_title, sizeof window_title, "%s", "NetHack"); /* NOTRANS */
 #  endif
        /* VERSION_STRING */
 # endif/* DEF_GAME_NAME */
@@ -280,10 +280,12 @@ curses_init_nhwindows(
     counting = FALSE;
     curses_init_options();
     if (term_rows < 15 || term_cols < 40) {
-        panic("Terminal is too small; must have at least %s%s%s.",
-              (term_rows < 15) ? "15 rows" : "",
-              (term_rows < 15 && term_cols < 40) ? " and " : "",
-              (term_cols < 40) ? "40 columns" : "");
+        panic(TR("Terminal is too small; must have at least %s%s%s.",
+                 "终端尺寸过小；至少需要%s%s%s。"),
+              (term_rows < 15) ? TR("15 rows", "15 行") : "",
+              (term_rows < 15 && term_cols < 40)
+                  ? TR(" and ", "和") : "",
+              (term_cols < 40) ? TR("40 columns", "40 列") : "");
     }
     /* during line input, deletes the most recently typed character */
     erase_char = erasechar(); /* <delete>/<rubout> or possibly <backspace> */
@@ -329,7 +331,8 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("Who are you?", svp.plname, PL_NSIZ);
+    curses_line_input_dialog(TR("Who are you?", "你叫什么名字？"),
+                             svp.plname, PL_NSIZ);
     (void) mungspaces(svp.plname);
     if (!svp.plname[0] || svp.plname[0] == '\033')
          goto bail;
@@ -339,7 +342,7 @@ curses_askname(void)
 
  bail:
     /* message is delivered via raw_print() */
-    curses_bail("\nUntil next time then...\n");
+    curses_bail(TR("\nUntil next time then...\n", "\n后会有期……\n"));
     /*NOTREACHED*/
 }
 
@@ -872,7 +875,8 @@ curses_wait_synch(void)
          * a more curses-specific way to handle this. FIXME?]
          */
 
-        (void) fprintf(stdout, "\nPress <return> to continue: ");
+        (void) fprintf(stdout, TR("\nPress <return> to continue: ",
+                                  "\n按回车继续："));
         (void) fflush(stdout);
         do {
             chr = fgetc(stdin);

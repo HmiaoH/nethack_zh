@@ -169,7 +169,7 @@ dowrite(struct obj *pen)
     last = svb.bases[(int) paper->oclass + 1] - 1;
     /* first loop: look for match with name/description; player input is
        parsed against the untranslated tables so that the chosen object
-       type is unambiguous (A2) */
+       type is unambiguous */
     for (i = first; i <= last; i++) {
         /* extra shufflable descr not representing a real object */
         if (!OBJ_NAME_EN(objects[i]))

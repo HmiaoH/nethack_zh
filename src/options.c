@@ -207,7 +207,7 @@ static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
 #ifdef ZHLANG
 /*
  * Display form of the option values shown by the options menus and the
- * option-setting handlers (R7).  Option parsing and the config file written
+ * option-setting handlers.  Option parsing and the config file written
  * by #saveoptions keep using the English tokens from get_cnf_val; only the
  * text the player sees goes through here.
  */

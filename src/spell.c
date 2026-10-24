@@ -193,7 +193,7 @@ cursed_book(struct obj *bp)
         } else {
             #ifdef ZHLANG
             pline("当你读这本书时，它在你%s%s！", explodes,
-                  body_part(FACE));
+                  zh_body_part(FACE));
             #else
             pline("As you read the book, it %s in your %s!", explodes,
                   body_part(FACE));
@@ -295,7 +295,7 @@ deadbook(struct obj *book2)
 
         if (!u.uhave.bell || !u.uhave.menorah) {
             #ifdef ZHLANG
-            pline("一股寒意沿着你的%s直下。", body_part(SPINE));
+            pline("一股寒意沿着你的%s直下。", zh_body_part(SPINE));
             #else
             pline("A chill runs down your %s.", body_part(SPINE));
             #endif
@@ -591,7 +591,7 @@ study_book(struct obj *spellbook)
             dullbook -= rnd(objects[booktype].oc_level);
 
         if (dullbook > 0) {
-            eyes = body_part(EYE);
+            eyes = zh_body_part(EYE);
             if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
             #ifdef ZHLANG
@@ -1325,6 +1325,20 @@ cast_protection(void)
                 struct permonst *pm = u.ustuck ? u.ustuck->data : 0;
 
                 rmtyp = levl[u.ux][u.uy].typ;
+#ifdef ZHLANG
+                /* this noun is spliced into the Chinese sentence below */
+                atmosphere = (pm && u.uswallow)
+                                ? ((pm == &mons[PM_FOG_CLOUD]) ? "薄雾"
+                                   : is_whirly(pm) ? "漩涡"
+                                     : enfolds(pm) ? "褶皱"
+                                       : is_animal(pm) ? "巨口"
+                                         : "黏液")
+                                : (u.uinwater ? hliquid(TR("water", "水"))
+                                   : (rmtyp == CLOUD) ? "云层"
+                                     : IS_TREE(rmtyp) ? "植被"
+                                       : IS_STWALL(rmtyp) ? "石头"
+                                         : "空气");
+#else
                 atmosphere = (pm && u.uswallow)
                                 ? ((pm == &mons[PM_FOG_CLOUD]) ? "mist"
                                    : is_whirly(pm) ? "maelstrom"
@@ -1336,6 +1350,7 @@ cast_protection(void)
                                      : IS_TREE(rmtyp) ? "vegetation"
                                        : IS_STWALL(rmtyp) ? "stone"
                                          : "air");
+#endif
 #ifdef ZHLANG
                 pline_The("你周围的%s开始闪烁%s雾气。",
                           atmosphere, an(hgolden));
@@ -1816,7 +1831,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
         /* at present, only one thing blocks clairvoyance */
         } else if (uarmh && uarmh->otyp == CORNUTHAUM)
             #ifdef ZHLANG
-            You("感觉到你%s上有一顶尖顶帽。", body_part(HEAD));
+            You("感觉到你%s上有一顶尖顶帽。", zh_body_part(HEAD));
             #else
             You("sense a pointy hat on top of your %s.", body_part(HEAD));
             #endif

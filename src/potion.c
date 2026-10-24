@@ -322,7 +322,7 @@ You("can see again.");
             if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
-                eyes = body_part(EYE);
+                eyes = zh_body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("itch", "发痒")));
@@ -363,7 +363,7 @@ pline("A cloud of darkness falls upon you.");
             if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
-                eyes = body_part(EYE);
+                eyes = zh_body_part(EYE);
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, TR("twitch", "抽动")));
@@ -457,7 +457,7 @@ make_hallucinated(
             if (!haseyes(gy.youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blind) {
-                const char *eyes = body_part(EYE);
+                const char *eyes = zh_body_part(EYE);
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
@@ -1064,8 +1064,8 @@ You("are frozen in place!");
 #endif
         else
             #ifdef ZHLANG
-Your("你的%s被冻在了%s上！", makeplural(body_part(FOOT)),
-                 surface(u.ux, u.uy));
+Your("你的%s被冻在了%s上！", makeplural(zh_body_part(FOOT)),
+                 zh_surface(u.ux, u.uy));
 #else
 Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
@@ -1335,7 +1335,7 @@ pline("It tasted bad.");
                 }
             }
             #ifdef ZHLANG
-You("升了上去，穿过了%s！", ceiling(u.ux, u.uy));
+You("升了上去，穿过了%s！", zh_ceiling(u.ux, u.uy));
 #else
 You("rise up, through the %s!", ceiling(u.ux, u.uy));
 #endif
@@ -1453,8 +1453,8 @@ peffect_levitation(struct obj *otmp)
             int dmg = rnd(!uarmh ? 10 : !hard_helmet(uarmh) ? 6 : 3);
 
             #ifdef ZHLANG
-You("撞上了%s上的%s。", body_part(HEAD),
-                ceiling(u.ux, u.uy));
+You("撞上了%s上的%s。", zh_body_part(HEAD),
+                zh_ceiling(u.ux, u.uy));
 #else
 You("hit your %s on the %s.", body_part(HEAD),
                 ceiling(u.ux, u.uy));
@@ -1542,7 +1542,7 @@ pline("Ahh, a refreshing drink.");
              * possible so there's no need to try to handle that.
              */
             #ifdef ZHLANG
-You("烧到了你的%s。", body_part(FACE));
+You("烧到了你的%s。", zh_body_part(FACE));
 #else
 You("burn your %s.", body_part(FACE));
 #endif
@@ -1935,7 +1935,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The(TR("%s crashes on your %s and breaks into shards.", "%s砸在你的%s上，碎成了碎片。"), botlnam,
-                  body_part(HEAD));
+                  zh_body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
                (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
                                            : "thrown potion",
@@ -2280,7 +2280,7 @@ pline("呃！那瓶药水闻起来真糟糕！");
 pline("Ulch!  That potion smells terrible!");
 #endif
             } else if (haseyes(gy.youmonst.data)) {
-                const char *eyes = body_part(EYE);
+                const char *eyes = zh_body_part(EYE);
 
                 if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
@@ -2655,7 +2655,7 @@ dodip(void)
      * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
      */
     if (is_hands) {
-        Snprintf(obuf, sizeof obuf, TR("your %s", "你的%s"), makeplural(body_part(HAND)));
+        Snprintf(obuf, sizeof obuf, TR("your %s", "你的%s"), makeplural(zh_body_part(HAND)));
     } else {
         Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
                                  /* 128 - (24 + 54 + 1) leaves 49 for
@@ -2819,7 +2819,7 @@ pline("That is a potion bottle, not a Klein bottle!");
     if (obj == &hands_obj) {
         #ifdef ZHLANG
 You("你无法把你的%s塞进瓶口！",
-            body_part(HAND));
+            zh_body_part(HAND));
 #else
 You("can't fit your %s into the mouth of the bottle!",
             body_part(HAND));
@@ -3301,7 +3301,8 @@ split_mon(
 
     reason[0] = '\0';
     if (mtmp)
-        Sprintf(reason, TR(" from %s heat", "，因为%s的热量"),
+        /* both arguments already end in 的 in Chinese ("你的", s_suffix) */
+        Sprintf(reason, TR(" from %s heat", "，因为%s热量"),
                 (mtmp == &gy.youmonst) ? the_your[1]
                                     : (const char *) s_suffix(mon_nam(mtmp)));
 
@@ -3352,7 +3353,7 @@ You("are suddenly moving %sfaster.", Fast ? "" : "much ");
 #endif
    else
        #ifdef ZHLANG
-Your("你的%s获得了新的能量。", makeplural(body_part(LEG)));
+Your("你的%s获得了新的能量。", makeplural(zh_body_part(LEG)));
 #else
 Your("%s get new energy.", makeplural(body_part(LEG)));
 #endif

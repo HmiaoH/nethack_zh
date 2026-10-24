@@ -237,7 +237,7 @@
     <BmpFiles Include = "$(WinWin32Dir)splash.bmp"/>
   </ItemGroup>
   <ItemGroup>
-    <DlbList Include = "$(DatDir)data"/>
+    <DlbList Include = "$(DatDir)data_zh"/>
     <DlbList Include = "$(DatDir)oracles_zh"/>
     <DlbList Include = "$(DatDir)options" Condition="Exists('$(DatDir)options')"/>
     <DlbList Include = "$(DatDir)ttyoptions" Condition="Exists('$(DatDir)ttyoptions')"/>

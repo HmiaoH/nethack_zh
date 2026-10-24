@@ -104,7 +104,13 @@ src/nethack
 src/recover
 src/tile.c
 dat/bogusmon
+dat/bogusmon_zh
 dat/data
+dat/data_zh
+dat/engrave_zh
+dat/epitaph_zh
+dat/oracles_zh
+dat/rumors_zh
 dat/engrave
 dat/epitaph
 dat/nhdat

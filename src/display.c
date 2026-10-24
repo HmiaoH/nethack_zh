@@ -2107,7 +2107,7 @@ show_glyph(coordxy x, coordxy y, int glyph)
         a11y.accessiblemsg = TRUE;
         cc.x = x, cc.y = y;
         do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
-        pline_xy(x, y, "%s.", firstmatch);
+        pline_xy(x, y, TR("%s.", "%s。"), ZH_SYMDESC(firstmatch));
         a11y.accessiblemsg = tmp_accessiblemsg;
     }
 }

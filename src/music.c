@@ -308,7 +308,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             }
             /* Falling is okay for falling down
                within a pit from jostling too */
-            mselftouch(mtmp, "Falling, ", TRUE);
+            mselftouch(mtmp, TR("Falling, ", "下落中，"), TRUE);
             if (!DEADMONSTER(mtmp)) {
                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
                 if (DEADMONSTER(mtmp)) {

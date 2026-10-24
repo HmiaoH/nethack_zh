@@ -917,17 +917,17 @@ arti_light_description(struct obj *obj)
 {
     switch (arti_light_radius(obj)) {
     case 4:
-        return "radiantly"; /* blessed gold dragon scale mail */
+        return TR("radiantly", "耀眼"); /* blessed gold dragon scale mail */
     case 3:
-        return "brilliantly"; /* blessed artifact, uncursed gold DSM */
+        return TR("brilliantly", "灿烂"); /* blessed artifact, uncursed gold DSM */
     case 2:
-        return "brightly"; /* uncursed artifact, cursed gold DSM */
+        return TR("brightly", "明亮"); /* uncursed artifact, cursed gold DSM */
     case 1:
-        return "dimly"; /* cursed artifact, embedded scales */
+        return TR("dimly", "昏暗"); /* cursed artifact, embedded scales */
     default:
         break;
     }
-    return "strangely";
+    return TR("strangely", "奇异");
 }
 
 /* the #lightsources command */

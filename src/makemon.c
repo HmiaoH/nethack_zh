@@ -1489,7 +1489,7 @@ makemon(
             }
             if (what) {
                 set_msg_xy(mtmp->mx, mtmp->my);
-                Norep("%s%s %s%s%c", what,
+                Norep(TR("%s%s %s%s%c", "%s%s%s%s%c"), what,
                       exclaim ? TR(" suddenly", "突然") : "",
                       /* 'what' might be "gold pieces" so need plural verb */
                       vtense(what, TR("appear", "出现")),
@@ -2149,9 +2149,9 @@ grow_up(struct monst *mtmp, struct monst *victim)
                       : (fem && !mtmp->female) ? TR("female ", "雌性") : "",
                     pmname(ptr, fem));
             pline_mon(mtmp, "%s %s %s.", YMonnam(mtmp),
-                      (fem != mtmp->female) ? "changes into"
-                                            : humanoid(ptr) ? "becomes"
-                                                            : "grows up into",
+                      (fem != mtmp->female) ? TR("changes into", "变成了")
+                                            : humanoid(ptr) ? TR("becomes", "成为了")
+                                                            : TR("grows up into", "长大成了"),
                       an(buf));
         }
         set_mon_data(mtmp, ptr);

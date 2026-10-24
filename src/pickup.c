@@ -1765,7 +1765,7 @@ lift_object(
 
     if (obj->otyp == BOULDER && Sokoban) {
         #ifdef ZHLANG
-You("没法用%s抓住这个%s。", body_part(HAND),
+You("没法用%s抓住这个%s。", zh_body_part(HAND),
             xname(obj));
 #else
 You("cannot get your %s around this %s.", body_part(HAND),
@@ -2176,7 +2176,7 @@ pline("Without limbs, you cannot %s anything.", verb);
     } else if (looting && !freehand()) {
         #ifdef ZHLANG
 pline("没有空闲的%s，无法搜刮任何东西。",
-              body_part(HAND));
+              zh_body_part(HAND));
 #else
 pline("Without a free %s, you cannot loot anything.",
               body_part(HAND));
@@ -2452,7 +2452,7 @@ You("need to dig up the grave to effectively loot it...");
             goto lootcont;
         if (u.dz < 0) {
             #ifdef ZHLANG
-You("在%s上%s到可以搜刮的东西。", ceiling(cc.x, cc.y), "没找");
+You("在%s上%s到可以搜刮的东西。", zh_ceiling(cc.x, cc.y), "没找");
 #else
 You("%s to loot on the %s.", dont_find_anything,
                 ceiling(cc.x, cc.y));
@@ -3087,7 +3087,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
                 if (!canspotmon(livecat))
                     #ifdef ZHLANG
 You("觉得有什么东西擦过了你的%s。",
-                        body_part(FOOT));
+                        zh_body_part(FOOT));
 #else
 You("think %s brushed your %s.", something,
                         body_part(FOOT));
@@ -3193,10 +3193,10 @@ boolean
 u_handsy(void)
 {
     if (nohands(gy.youmonst.data)) {
-        You(TR("have no hands!", "你没有手！")); /* not `body_part(HAND)' */
+        You(TR("have no hands!", "你没有手！")); /* not `zh_body_part(HAND)' */
         return FALSE;
     } else if (!freehand()) {
-        You(TR("have no free %s.", "你没有空闲的%s。"), body_part(HAND));
+        You(TR("have no free %s.", "你没有空闲的%s。"), zh_body_part(HAND));
         return FALSE;
     }
     return TRUE;
@@ -3878,7 +3878,7 @@ dotip(void)
                     (void) tipcontainer_gettarget(cobj, &dum, &target_count);
                     Sprintf(prompt_part2, TR(" here, tip it%s%s?", "这里，倒出它%s%s？"),
                             (target_count == 0) ? TR(" onto the ", "到") : "",
-                            (target_count == 0) ? surface(cobj->ox, cobj->oy)
+                            (target_count == 0) ? zh_surface(cobj->ox, cobj->oy)
                                                 : "");
                     c = ynq(safe_qbuf(qbuf, TR("There is ", "这里有"), prompt_part2,
                                       cobj,
@@ -3932,7 +3932,7 @@ dotip(void)
             Sprintf(buf, TR(" and immediately %s away", "，并立即%s掉"),
                     vtense(spillage, TR("burn", "点燃")));
         pline(TR("Some %s %s onto the %s%s.", "一些%s%s到了%s上%s。"), spillage,
-              vtense(spillage, TR("spill", "洒")), surface(u.ux, u.uy), buf);
+              vtense(spillage, TR("spill", "洒")), zh_surface(u.ux, u.uy), buf);
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
             consume_obj_charge(cobj, TRUE);
@@ -4089,7 +4089,7 @@ tipcontainer(struct obj *box) /* or bag */
                     doaltarobj(otmp);
                 } else if (!terse) {
                     pline(TR("%s %s to the %s.", "%s%s掉到了%s上。"), Doname2(otmp),
-                          otense(otmp, TR("drop", "掉落")), surface(ox, oy));
+                          otense(otmp, TR("drop", "掉落")), zh_surface(ox, oy));
                 } else {
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
                     iflags.last_msg = PLNMSG_OBJNAM_ONLY;
@@ -4196,7 +4196,7 @@ tipcontainer_gettarget(
             any = cg.zeroany;
             any.a_obj = &dummyobj;
             /* tip to floor does not require free hands */
-            Sprintf(on_the_surface, TR("on the %s", "%s上"), surface(u.ux, u.uy));
+            Sprintf(on_the_surface, TR("on the %s", "%s上"), zh_surface(u.ux, u.uy));
             add_menu(win, &nul_glyphinfo, &any, '-', 0, ATR_NONE, clr,
                      on_the_surface, MENU_ITEMFLAGS_SELECTED);
             add_menu_str(win, "");

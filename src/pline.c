@@ -60,6 +60,133 @@ dumplogfreemessages(void)
 }
 #endif
 
+#ifdef ZHLANG
+/*
+ * Chinese typography for text that is about to be shown.  Messages are
+ * assembled from pieces shared with the English game ("%s.", "?" appended
+ * to a prompt, an adjective followed by " "), so the Chinese result ends
+ * up with half-width punctuation after Chinese text and stray spaces
+ * between Chinese words.  These helpers fix that at the output layer only;
+ * English text is never touched because every rule needs a Chinese
+ * character next to it.
+ */
+
+/* length of the UTF-8 sequence starting at 's' */
+#define zh_u8len(s) \
+    ((((uchar) *(s)) & 0x80) == 0 ? 1                                    \
+     : (((uchar) *(s)) & 0xE0) == 0xC0 ? 2                               \
+       : (((uchar) *(s)) & 0xF0) == 0xE0 ? 3 : 4)
+
+/* the code point at 's' (0 for a malformed or ASCII sequence) */
+staticfn unsigned
+zh_codepoint(const char *s)
+{
+    const uchar *b = (const uchar *) s;
+
+    if ((b[0] & 0xF0) == 0xE0 && (b[1] & 0xC0) == 0x80
+        && (b[2] & 0xC0) == 0x80)
+        return ((b[0] & 0x0Fu) << 12) | ((b[1] & 0x3Fu) << 6) | (b[2] & 0x3Fu);
+    return 0;
+}
+
+/* CJK ideograph */
+#define zh_is_han(cp) ((cp) >= 0x4E00 && (cp) <= 0x9FFF)
+/* text that full-width punctuation may follow: ideographs and the
+   closing marks ）」』”】 */
+#define zh_is_zhtail(cp) \
+    (zh_is_han(cp) || (cp) == 0xFF09 || (cp) == 0x300D || (cp) == 0x300F \
+     || (cp) == 0x201D || (cp) == 0x3011)
+
+/* start of the character that ends just before 'p' (p > base) */
+staticfn const char *
+zh_prevchar(const char *base, const char *p)
+{
+    const char *q = p - 1;
+
+    while (q > base && (((uchar) *q) & 0xC0) == 0x80)
+        --q;
+    return q;
+}
+
+/* remove a single space that sits between two ideographs ("未诅咒的 食物
+   口粮") or between an ideograph and an enchantment ("的 +3"); works in
+   place since the text only gets shorter */
+void
+zh_squeeze_spaces(char *buf)
+{
+    char *in = buf, *out = buf;
+
+    while (*in) {
+        if (*in == ' ' && in > buf && in[1] != ' '
+            && zh_is_han(zh_codepoint(zh_prevchar(buf, in)))
+            && (zh_is_han(zh_codepoint(in + 1))
+                /* "未诅咒的 +3 小盾" -> "未诅咒的+3 小盾", matching the
+                   erosion words that are written without a space */
+                || ((in[1] == '+' || in[1] == '-')
+                    && in[2] >= '0' && in[2] <= '9'))) {
+            ++in;
+            continue;
+        }
+        *out++ = *in++;
+    }
+    *out = '\0';
+}
+
+/* full-width punctuation after Chinese text plus zh_squeeze_spaces();
+   returns a rotating static buffer of BUFSZ */
+const char *
+zh_tidy(const char *src)
+{
+    static char bufs[3][BUFSZ];
+    static int bufidx = 0;
+    char *out = bufs[bufidx];
+    const char *p = src;
+    size_t olen = 0;
+
+    bufidx = (bufidx + 1) % SIZE(bufs);
+    if (!src)
+        return strcpy(out, "");
+    while (*p) {
+        const char *rep = 0;
+        int skip = 1, n = zh_u8len(p);
+
+        if (p > src && strchr("?!,:;.", *p)
+            && zh_is_zhtail(zh_codepoint(zh_prevchar(src, p)))) {
+            switch (*p) {
+            case '?': rep = "？"; break;
+            case '!': rep = "！"; break;
+            case ',': rep = "，"; break;
+            case ':': rep = "："; break;
+            case ';': rep = "；"; break;
+            case '.':
+                if (!strncmp(p, "...", 3)) {
+                    rep = "……", skip = 3;
+                } else if (!p[1] || p[1] == ' ' || p[1] == '"'
+                           || zh_codepoint(p + 1)) {
+                    rep = "。";
+                }
+                break;
+            }
+        }
+        if (rep) {
+            n = (int) strlen(rep);
+            if (olen + n >= BUFSZ - 1)
+                break;
+            (void) memcpy(out + olen, rep, (size_t) n);
+            olen += n, p += skip;
+        } else {
+            if (olen + n >= BUFSZ - 1)
+                break; /* never split a character */
+            (void) memcpy(out + olen, p, (size_t) n);
+            olen += n, p += n;
+        }
+    }
+    out[olen] = '\0';
+    zh_squeeze_spaces(out);
+    return out;
+}
+#endif /* ZHLANG */
+
 /* keeps windowprocs usage out of pline() */
 staticfn void
 putmesg(const char *line)
@@ -217,7 +344,7 @@ vpline(const char *line, va_list the_args)
         /*
          * Chinese messages are multi-byte UTF-8, so the cut points must
          * fall on character boundaries or the tty would receive a broken
-         * sequence (D1).  Keep the same shape as the English version:
+         * sequence.  Keep the same shape as the English version:
          * head, "...", then the last three *characters*.
          */
         {
@@ -259,6 +386,9 @@ vpline(const char *line, va_list the_args)
         line = pbuf;
     }
     msgtyp = MSGTYP_NORMAL;
+#ifdef ZHLANG
+    line = zh_tidy(line); /* Chinese punctuation and spacing */
+#endif
 
 #ifdef DUMPLOG_CORE
     /* We hook here early to have options-agnostic output.

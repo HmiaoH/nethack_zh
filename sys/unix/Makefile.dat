@@ -21,12 +21,14 @@ ZHORACLEFILE = oracles_zh
 ZHENGRAVEFILE = engrave_zh
 ZHEPITAPHFILE = epitaph_zh
 ZHBOGUSMONFILE = bogusmon_zh
+ZHDATAFILE = data_zh
 else
 ZHRUMORFILE = rumors
 ZHORACLEFILE = oracles
 ZHENGRAVEFILE = engrave
 ZHEPITAPHFILE = epitaph
 ZHBOGUSMONFILE = bogusmon
+ZHDATAFILE = data
 endif
 
 all:	$(VARDAT) spec_levs quest_levs
@@ -112,7 +114,7 @@ GEM_RSC.RSC:
 	$(UUDECODE) ../win/gem/gem_rsc.uu
 
 
-data:	data.base ../util/makedefs
+data:	$(ZHDATAFILE).base ../util/makedefs
 	../util/makedefs -d
 
 rumors:	$(ZHRUMORFILE).tru $(ZHRUMORFILE).fal ../util/makedefs
@@ -145,7 +147,7 @@ clean:
 	-rm -f spec_levs quest_levs gitinfo.txt
 
 spotless: clean
-	-rm -f nhdat $(VARDAT) $(ZHRUMORFILE) $(ZHORACLEFILE) \
+	-rm -f nhdat $(VARDAT) $(ZHRUMORFILE) $(ZHORACLEFILE) $(ZHDATAFILE) \
 		$(ZHENGRAVEFILE) $(ZHEPITAPHFILE) $(ZHBOGUSMONFILE) \
 		x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm \
 		rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad \

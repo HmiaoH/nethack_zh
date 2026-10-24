@@ -2036,7 +2036,7 @@ create_monster(monster *m, struct mkroom *croom)
             case M_AP_OBJECT:
                 for (i = 0; i < NUM_OBJECTS; i++)
                     /* internal lookup: Lua scripts use English object ids,
-                       so compare against the untranslated table (A2) */
+                       so compare against the untranslated table */
                     if (OBJ_NAME_EN(objects[i])
                         && !strcmp(OBJ_NAME_EN(objects[i]),
                                    m->appear_as.str))

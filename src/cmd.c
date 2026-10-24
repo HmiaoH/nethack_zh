@@ -1534,7 +1534,7 @@ dolookaround(void)
 
                 cc.x = x, cc.y = y;
                 do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
-                pline_xy(x, y, "%s.", firstmatch);
+                pline_xy(x, y, TR("%s.", "%s。"), ZH_SYMDESC(firstmatch));
             }
         }
 
@@ -6612,6 +6612,9 @@ yn_function(
 #endif
 
     iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
+#ifdef ZHLANG
+    query = zh_tidy(query); /* Chinese punctuation and spacing */
+#endif
 
     /* maximum acceptable length is QBUFSZ-1 */
     if (strlen(query) >= QBUFSZ) {

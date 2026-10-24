@@ -152,7 +152,7 @@ cant_wield_corpse(struct obj *obj)
     /* Prevent wielding cockatrice when not wearing gloves --KAA */
 #ifdef ZHLANG
     You("赤手%s挥舞着%s。",
-        makeplural(body_part(HAND)),
+        makeplural(zh_body_part(HAND)),
         corpse_xname(obj, (const char *) 0, CXN_PFX_THE));
 #else
     You("wield %s in your bare %s.",
@@ -233,8 +233,8 @@ ready_weapon(struct obj *wep)
 #ifdef ZHLANG
             pline("%s%s到你的%s%s！", tmp, aobjnam(wep, "粘在"),
                   wep->quan == 1L ? "自身" : "它们",
-                  bimanual(wep) ? (const char *) makeplural(body_part(HAND))
-                                : body_part(HAND));
+                  bimanual(wep) ? (const char *) makeplural(zh_body_part(HAND))
+                                : zh_body_part(HAND));
 #else
             pline("%s%s %s to your %s%s!", tmp, aobjnam(wep, "weld"),
                   (wep->quan == 1L) ? "itself" : "themselves", /* a3 */
@@ -894,7 +894,7 @@ wield_tool(struct obj *obj,
     }
     if (uwep && welded(uwep)) {
         if (flags.verbose) {
-            const char *hand = body_part(HAND);
+            const char *hand = zh_body_part(HAND);
 
             if (bimanual(uwep))
                 hand = makeplural(hand);
@@ -994,7 +994,7 @@ can_twoweapon(void)
                              ? gu.urole.name.f : gu.urole.name.m));
 #endif
     } else if (!uwep || !uswapwep) {
-        const char *hand_s = body_part(HAND);
+        const char *hand_s = zh_body_part(HAND);
 
         if (!uwep && !uswapwep)
             hand_s = makeplural(hand_s);
@@ -1064,7 +1064,7 @@ drop_uswapwep(void)
        dual-wielded, or to get this far attempting to achieve that,
        uswapwep must be one-handed; since it's secondary, the hand must
        be the left one */
-    Sprintf(left_hand, TR("left %s", "左%s"), body_part(HAND));
+    Sprintf(left_hand, TR("left %s", "左%s"), zh_body_part(HAND));
     if (!obj->cursed)
         /* attempting to two-weapon while Glib */
 #ifdef ZHLANG
@@ -1216,7 +1216,7 @@ chwepon(struct obj *otmp, int amount)
             } else {
                 /* cursed tin opener is wielded in right hand */
 #ifdef ZHLANG
-                Sprintf(buf, "你的右%s有刺痛感。", body_part(HAND));
+                Sprintf(buf, "你的右%s有刺痛感。", zh_body_part(HAND));
 #else
                 Sprintf(buf, "Your right %s tingles.", body_part(HAND));
 #endif
@@ -1225,7 +1225,7 @@ chwepon(struct obj *otmp, int amount)
             update_inventory();
         } else {
 #ifdef ZHLANG
-            Sprintf(buf, "你的%s%s。", makeplural(body_part(HAND)),
+            Sprintf(buf, "你的%s%s。", makeplural(zh_body_part(HAND)),
                     (amount >= 0) ? "抽搐了一下" : "发痒");
 #else
             Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
@@ -1356,7 +1356,7 @@ chwepon(struct obj *otmp, int amount)
      */
     if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {
 #ifdef ZHLANG
-        Your("右%s%s了一下！", body_part(HAND),
+        Your("右%s%s了一下！", zh_body_part(HAND),
              (((amount > 1) && (uwep->spe > 1)) ? "抽" : "抖"));
 #else
         Your("right %s %sches!", body_part(HAND),
@@ -1391,7 +1391,7 @@ void
 weldmsg(struct obj *obj)
 {
     long savewornmask;
-    const char *hand = body_part(HAND);
+    const char *hand = zh_body_part(HAND);
 
     if (bimanual(obj))
         hand = makeplural(hand);

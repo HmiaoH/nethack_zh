@@ -1121,7 +1121,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             return FALSE;
         if (!Blind) {
 #ifdef ZHLANG
-            Your("%s刺痛。", makeplural(body_part(EYE)));
+            Your("%s刺痛。", makeplural(zh_body_part(EYE)));
 #else
             Your("%s sting.", makeplural(body_part(EYE)));
 #endif
@@ -1130,7 +1130,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
         if (!Poison_resistance) {
 #ifdef ZHLANG
             pline("%s灼烧着你的%s！", Something,
-                  makeplural(body_part(LUNG)));
+                  makeplural(zh_body_part(LUNG)));
             You("咳嗽着吐出血来！");
 #else
             pline("%s is burning your %s!", Something,

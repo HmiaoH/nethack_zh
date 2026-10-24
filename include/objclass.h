@@ -195,7 +195,7 @@ extern NEARDATA struct objdescr obj_descr_zh[NUM_OBJECTS + 1];
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
 #endif
 /* internal identity / lookup names must stay English in every language:
-   obj_descr[] always holds the untranslated table (see A2 in TASKS.md) */
+   obj_descr[] always holds the untranslated table */
 #define OBJ_NAME_EN(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR_EN(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
 

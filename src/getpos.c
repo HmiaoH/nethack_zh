@@ -765,7 +765,8 @@ auto_describe(coordxy cx, coordxy cy)
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
 #ifdef ZHLANG
         custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U),
-                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    "%s%s%s%s%s", zh_symdesc(firstmatch),
+                    *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
                       ? "（无效目标）" : "",
@@ -831,7 +832,7 @@ getpos_menu(coord *ccp, int gloc)
                               &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
-            Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", firstmatch,
+            Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", ZH_SYMDESC(firstmatch),
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, clr, fullbuf, MENU_ITEMFLAGS_NONE);

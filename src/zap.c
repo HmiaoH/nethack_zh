@@ -435,7 +435,7 @@ pline("A huge hole opens up...");
                 if (!canspotmon(mtmp))
                     Strcpy(buf, An(distant_name(obj, xname)));
                 pline(TR("%s falls to the %s.", "%s掉在了%s上。"), buf,
-                      surface(mtmp->mx, mtmp->my));
+                      zh_surface(mtmp->mx, mtmp->my));
             } else if (canspotmon(mtmp)) {
                 pline(TR("%s falls off.", "%s掉了下来。"), buf);
             }
@@ -3434,7 +3434,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
         ptmp = 0;
         if (u.dz < 0) {
             #ifdef ZHLANG
-You("你向%s探测。", ceiling(x, y));
+You("你向%s探测。", zh_ceiling(x, y));
 #else
 You("probe towards the %s.", ceiling(x, y));
 #endif
@@ -3449,11 +3449,11 @@ You("probe towards the %s.", ceiling(x, y));
             zap_map(x, y, obj);
             /*map_zapped = TRUE; // not needed due to early return*/
             if (ltyp == ICE || IS_FURNITURE(ltyp)) {
-                surf = "it";
+                surf = zh_surface_name("it");
                 if (svl.lastseentyp[x][y] != rememberedltyp)
                     ptmp += 1;
             } else {
-                surf = the(surface(x, y));
+                surf = the(zh_surface(x, y));
             }
             #ifdef ZHLANG
 You("你向%s底下探测。", surf);
@@ -3515,7 +3515,7 @@ You("probe beneath %s.", surf);
             int dmg;
             /* similar to zap_dig() */
             pline(TR("A rock is dislodged from the %s and falls on your %s.", "一块石头从%s上脱落，砸在了你的%s上。"),
-                  ceiling(x, y), body_part(HEAD));
+                  zh_ceiling(x, y), zh_body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
             losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
             if ((otmp = mksobj_at(ROCK, x, y, FALSE, FALSE)) != 0) {
@@ -3574,7 +3574,7 @@ pline("A trapdoor appears beneath you.");
             || (Is_qstart(&u.uz) && u.dz < 0)) {
             pline1(nothing_happens);
         } else if (u.dz < 0) { /* we should do more... */
-            pline(TR("Blood drips on your %s.", "血滴落在你的%s上。"), body_part(FACE));
+            pline(TR("Blood drips on your %s.", "血滴落在你的%s上。"), zh_body_part(FACE));
         } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
             /*
             Print this message only if there wasn't an engraving
@@ -5137,8 +5137,8 @@ dobuzz(
                             pline(TR("%s body reintegrates before your %s!", "%s的身体在你的%s前重新聚合！"),
                                   s_suffix(Monnam(mon)),
                                   (eyecount(gy.youmonst.data) == 1)
-                                      ? body_part(EYE)
-                                      : makeplural(body_part(EYE)));
+                                      ? zh_body_part(EYE)
+                                      : makeplural(zh_body_part(EYE)));
                             pline(TR("%s resurrects!", "%s复活了！"), Monnam(mon));
                         }
                         mon->mhp = mon->mhpmax;
@@ -5206,7 +5206,7 @@ dobuzz(
                 goto buzzmonst;
             } else if (!forcemiss && zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline_dir(xytodir(-dx, -dy), "%s hits you!",
+                pline_dir(xytodir(-dx, -dy), TR("%s hits you!", "%s击中了你！"),
                           The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
@@ -5228,7 +5228,7 @@ dobuzz(
             } else if (!Blind) {
                 pline(TR("%s whizzes by you!", "%s从你身边呼啸而过！"), The(flash_str(fltyp, FALSE)));
             } else if (damgtype == ZT_LIGHTNING) {
-                Your(TR("%s tingles.", "你的%s一阵发麻。"), body_part(ARM));
+                Your(TR("%s tingles.", "你的%s一阵发麻。"), zh_body_part(ARM));
             }
             if (damgtype == ZT_LIGHTNING)
                 (void) flashburn((long) d(nd, 50), TRUE);

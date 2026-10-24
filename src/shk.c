@@ -863,7 +863,7 @@ u_entered_shop(char *enterstring)
             SetVoice(shkp, 0, 80, 0);
 #ifdef ZHLANG
             verbalize("又回来了，%s？我的%s盯着你呢。",
-                      svp.plname, mbodypart(shkp, EYE));
+                      svp.plname, zh_mbodypart(shkp, EYE));
 #else
             verbalize("Back again, %s?  I've got my %s on you.",
                       svp.plname, mbodypart(shkp, EYE));
@@ -2768,7 +2768,7 @@ inherits(
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
                 Sprintf(takes, TR(", shakes %s %s,", "，摇了摇%s的%s，"), noit_mhis(shkp),
-                        mbodypart(shkp, HEAD));
+                        zh_mbodypart(shkp, HEAD));
             pline(TR("%s %slooks at your corpse%s and %s.", "%s%s看着你的尸体%s，然后%s。"), Shknam(shkp),
                   helpless(shkp) ? TR("wakes up, ", "醒来，") : "",
                   takes, !inhishop(shkp) ? TR("disappears", "消失了") : TR("sighs", "叹了口气"));
@@ -3312,7 +3312,7 @@ special_stock(
                 } else {
                     pline(TR("%s shakes %s %s in refusal.", "%s摇了摇%s的%s，表示拒绝。"),
                           Shknam(shkp), noit_mhis(shkp),
-                          mbodypart(shkp, HEAD));
+                          zh_mbodypart(shkp, HEAD));
                 }
             }
         }
@@ -5125,7 +5125,7 @@ shk_move(struct monst *shkp)
                 } else {
                     pline(TR("%s holds out %s upturned %s.", "%s伸出%s朝上的%s。"),
                           Shknam(shkp), noit_mhis(shkp),
-                          mbodypart(shkp, HAND));
+                          zh_mbodypart(shkp, HAND));
                 }
                 gf.followmsg = svm.moves;
                 if (!rn2(9)) {
@@ -5296,7 +5296,7 @@ shopdig(int fall)
                 return;
             } else
                 pline(TR("%s %s, and %s your backpack!", "%s%s，然后%s你的背包！"), Shknam(shkp),
-                      makeplural(locomotion(shkp->data, TR("leap", "跳跃"))), grabs);
+                      makeplural(zh_locomotion(shkp->data, TR("leap", "跳跃"), "跳跃")), grabs);
         } else
             pline(TR("%s %s your backpack!", "%s%s你的背包！"), Shknam(shkp), grabs);
 
@@ -5543,7 +5543,7 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
             } else {
                 pline(TR("%s lunges %s %s toward your %s!", "%s把%s的%s伸向你的%s！"),
                       Shknam(shkp), noit_mhis(shkp),
-                      mbodypart(shkp, HAND), body_part(NECK));
+                      zh_mbodypart(shkp, HAND), zh_body_part(NECK));
             }
         } else
             growl(shkp);
@@ -5768,7 +5768,7 @@ shk_chat(struct monst *shkp)
                           Hello(shkp), svp.plname);
             } else {
                 pline(TR("%s taps you on the %s.", "%s拍了拍你的%s。"),
-                      Shknam(shkp), body_part(ARM));
+                      Shknam(shkp), zh_body_part(ARM));
             }
         }
     } else if (eshk->billct) {

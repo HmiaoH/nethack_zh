@@ -9,7 +9,7 @@
 
 #ifdef ZHLANG
 /* Chinese display name for the dungeon shown by %Z; implemented in
-   dungeon.c (F1/F2).  Declared locally until the shared header has it. */
+   dungeon.c.  Declared locally until the shared header has it. */
 extern const char *dname_zh(const char *en);
 #endif
 

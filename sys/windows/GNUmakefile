@@ -975,7 +975,7 @@ CLEAN_FILE += $(SFCTARGETS) $(SFCTOOLOBJS) $(U)sf.tags $(U)sfdata.c $(INCL)/sfpr
 #==========================================
 ODLB = $(O)dlb
 DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
-DAT_CLEAN = $(addprefix $(DAT)/, data oracles_zh options porthelp rumors_zh \
+DAT_CLEAN = $(addprefix $(DAT)/, data_zh oracles_zh options porthelp rumors_zh \
 	      engrave_zh epitaph_zh bogusmon_zh)
 DAT_NOCLEAN = $(addprefix $(DAT)/, help help_zh hh hh_zh cmdhelp cmdhelp_zh \
 	      keyhelp keyhelp_zh history history_zh opthelp opthelp_zh \
@@ -999,7 +999,7 @@ $(ODLB)/%.o: $(U)%.c $(NHLUAH) | $(ODLB)
 $(ODLB):
 	@mkdir -p $@
 
-$(DAT)/data: $(U)makedefs.exe $(DAT)/data.base
+$(DAT)/data_zh: $(U)makedefs.exe $(DAT)/data_zh.base
 	$< -d
 
 $(DAT)/oracles_zh: $(U)makedefs.exe $(DAT)/oracles_zh.txt
@@ -1022,7 +1022,7 @@ $(DAT)/bogusmon_zh: $(U)makedefs.exe $(DAT)/bogusmon_zh.txt $(DAT)/engrave_zh.tx
 	$< -s
 
 $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
-	echo data > $(DLBLST)
+	echo data_zh > $(DLBLST)
 	echo oracles_zh >> $(DLBLST)
 	echo options >> $(DLBLST)
 	if [ -f $(DAT)/ttyoptions ] ; then echo ttyoptions >> $(DLBLST) ; fi

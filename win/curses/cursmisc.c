@@ -272,12 +272,78 @@ curses_copy_of(const char *s)
 }
 
 
+#ifdef ZHLANG
+/* Return the byte boundary of a prefix occupying at most 'columns' cells. */
+int
+curses_utf8_nbytes(const char *str, int columns)
+{
+    int bytes = 0, cells = 0, n, w;
+    char ch[5];
+
+    while (str[bytes]) {
+        n = u8_seqlen(str + bytes);
+        (void) memcpy(ch, str + bytes, n);
+        ch[n] = '\0';
+        w = u8_width(ch);
+        if (cells + w > columns)
+            break;
+        cells += w;
+        bytes += n;
+    }
+    return bytes;
+}
+
+void
+curses_utf8_truncate(char *str, int columns)
+{
+    str[curses_utf8_nbytes(str, max(0, columns))] = '\0';
+}
+
+/* All three wrapping operations share exactly the same byte boundaries. */
+static int
+curses_wrap_line(const char *str, int width, const char **next)
+{
+    const char *end, *space = 0;
+    int n = curses_utf8_nbytes(str, max(1, width));
+
+    end = str + n;
+    for (const char *p = str; p < end; p += u8_seqlen(p)) {
+        if (*p == '\n') {
+            *next = p + 1;
+            return (int) (p - str);
+        }
+        if (*p == ' ')
+            space = p;
+    }
+    if (*end && *end != '\n' && space && space > str)
+        end = space;
+    /* A one-cell pane must still make progress on a two-cell character. */
+    if (end == str && *str)
+        end += u8_seqlen(str);
+    *next = end + ((*end == ' ' || *end == '\n') ? 1 : 0);
+    return (int) (end - str);
+}
+#endif /* ZHLANG */
+
 /* Determine the number of lines needed for a string for a dialog window
    of the given width */
 
 int
 curses_num_lines(const char *str, int width)
 {
+#ifdef ZHLANG
+    int lines = 1;
+    const char *next;
+    while (*str) {
+        (void) curses_wrap_line(str, width, &next);
+        if (!*next)
+            break;
+        ++lines;
+        str = next;
+    }
+    return lines;
+#else
+
     int last_space, count;
     int curline = 1;
     char substr[BUFSZ];
@@ -306,6 +372,7 @@ curses_num_lines(const char *str, int width)
     }
 
     return curline;
+#endif /* ZHLANG */
 }
 
 
@@ -315,6 +382,22 @@ given width */
 char *
 curses_break_str(const char *str, int width, int line_num)
 {
+#ifdef ZHLANG
+    const char *next;
+    int n = 0;
+    char *result;
+    for (int line = 1; line <= line_num; ++line) {
+        n = curses_wrap_line(str, width, &next);
+        if (line == line_num)
+            break;
+        str = next;
+    }
+    result = (char *) alloc((unsigned) n + 1);
+    (void) memcpy(result, str, n);
+    result[n] = '\0';
+    return result;
+#else
+
     int last_space, count;
     char *retstr;
     int curline = 0;
@@ -384,6 +467,7 @@ curses_break_str(const char *str, int width, int line_num)
     retstr = curses_copy_of(curstr);
 
     return retstr;
+#endif /* ZHLANG */
 }
 
 
@@ -392,6 +476,15 @@ curses_break_str(const char *str, int width, int line_num)
 char *
 curses_str_remainder(const char *str, int width, int line_num)
 {
+#ifdef ZHLANG
+    const char *next;
+    for (int line = 0; line < line_num && *str; ++line) {
+        (void) curses_wrap_line(str, width, &next);
+        str = next;
+    }
+    return curses_copy_of(str);
+#else
+
     int last_space, count;
     char *retstr;
     int curline = 0;
@@ -451,6 +544,7 @@ curses_str_remainder(const char *str, int width, int line_num)
     retstr = curses_copy_of(substr);
 
     return retstr;
+#endif /* ZHLANG */
 }
 
 
@@ -700,7 +794,8 @@ curses_view_file(const char *filename, boolean must_exist)
 
     if (fp == NULL) {
         if (must_exist)
-            pline("Cannot open \"%s\" for reading!", filename);
+            pline(TR("Cannot open \"%s\" for reading!",
+                     "无法打开“%s”进行读取！"), filename);
         return;
     }
 

@@ -687,7 +687,7 @@ itemactions(struct obj *otmp)
              || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS) {
 #ifdef ZHLANG
         Sprintf(buf, "在%s上%s用%s",
-                surface(u.ux, u.uy),
+                zh_surface(u.ux, u.uy),
                 (is_blade(otmp) || otmp->oclass == WAND_CLASS
                  || ((otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
                      && objects[otmp->otyp].oc_tough)) ? "刻写" : "书写",
@@ -811,7 +811,7 @@ itemactions(struct obj *otmp)
             else
 #ifdef ZHLANG
                 Sprintf(buf, "[两只%s均已戴着戒指]",
-                        makeplural(body_part(FINGER)));
+                        makeplural(zh_body_part(FINGER)));
 #else
                 Sprintf(buf, "[both ring %s in use]",
                         makeplural(body_part(FINGER)));
@@ -1000,7 +1000,7 @@ itemactions(struct obj *otmp)
            whatever item you already have wielded so use "wield this item" */
 #ifdef ZHLANG
         Sprintf(buf, "在%s挥舞此%s",
-                makeplural(body_part(HAND)),
+                makeplural(zh_body_part(HAND)),
                 (otmp->quan > 1L) ? "叠物品" : "物品");
 #else
         Sprintf(buf, "Wield this %s in your %s",

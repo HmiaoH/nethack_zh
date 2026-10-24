@@ -447,7 +447,7 @@ moverock_core(coordxy sx, coordxy sy)
                 if (Blind)
                     feel_location(sx, sy);
                 pline(TR("%s won't roll diagonally on this %s.", "%s无法在这个%s上斜向滚动。"),
-                      The(xname(otmp)), surface(sx, sy));
+                      The(xname(otmp)), zh_surface(sx, sy));
                 return cannot_push(otmp, sx, sy);
             }
 
@@ -576,7 +576,7 @@ moverock_core(coordxy sx, coordxy sy)
                               (ttmp->ttyp == TRAPDOOR) ? "" : TR(" into", "进去"),
                               otense(otmp, TR("plug", "堵住")),
                               (ttmp->ttyp == TRAPDOOR) ? TR("trap door", "活板门") : TR("hole", "洞"),
-                              surface(rx, ry));
+                              zh_surface(rx, ry));
                     deltrap(ttmp);
                     useupf(otmp, 1L);
                     bury_objs(rx, ry);
@@ -1084,7 +1084,7 @@ test_move(
                         Strcpy(buf, TR("solid stone", "坚硬的石头"));
                     else if (sym >= 0)
 #ifdef ZHLANG
-                        /* R6: defsyms[].explanation is English; only the
+                        /* defsyms[].explanation is English; only the
                            solid obstacles which can be bumped into are
                            needed here */
                         Strcpy(buf, (sym >= S_vwall && sym <= S_trwall)
@@ -1257,7 +1257,7 @@ test_move(
         if (mode != TEST_TRAV && svc.context.run >= 2
             && !(Blind || Hallucination) && !could_move_onto_boulder(x, y)) {
             if (mode == DO_MOVE && flags.mention_walls)
-                pline_dir(xytodir(dx,dy), "A boulder blocks your path.");
+                pline_dir(xytodir(dx,dy), TR("A boulder blocks your path.", "一块巨石挡住了你的去路。"));
             return FALSE;
         }
         if (mode == DO_MOVE) {
@@ -1695,7 +1695,7 @@ trapmove(
                     culprit = "buried ball";
                 } else {
                     predicament = "stuck in the";
-                    culprit = surface(u.ux, u.uy);
+                    culprit = zh_surface(u.ux, u.uy);
                 }
                 if (u.usteed) {
                     if (anchored)
@@ -1856,6 +1856,16 @@ disturb_buried_zombies(coordxy x, coordxy y)
 const char *
 u_locomotion(const char *def)
 {
+#ifdef ZHLANG
+    /* Chinese text has no capitalized/lower-case distinction and the
+       special movement words have to be Chinese too; callers pass a
+       Chinese default (via TR()) and zh_locomotion() handles the rest. */
+    if (Levitation)
+        return "飘";
+    if (Flying)
+        return "飞";
+    return zh_locomotion(gy.youmonst.data, def, def);
+#else
     boolean capitalize = (*def == highc(*def));
 
     /* regular locomotion() takes a monster type rather than a specific
@@ -1866,6 +1876,7 @@ u_locomotion(const char *def)
     return Levitation ? (capitalize ? "Float" : "float")
            : Flying ? (capitalize ? "Fly" : "fly")
              : locomotion(gy.youmonst.data, def);
+#endif
 }
 
 /* Return a simplified floor solid/liquid state based on hero's state */
@@ -3139,7 +3150,7 @@ invocation_message(void)
         else if (Levitation || Flying)
             Strcpy(buf, TR("beneath you", "在你下方"));
         else
-            Sprintf(buf, TR("under your %s", "在你的%s下方"), makeplural(body_part(FOOT)));
+            Sprintf(buf, TR("under your %s", "在你的%s下方"), makeplural(zh_body_part(FOOT)));
 
         You_feel(TR("a strange vibration %s.", "你感到%s传来一阵奇怪的震动。"), buf);
         u.uevent.uvibrated = 1;
@@ -3484,7 +3495,7 @@ spoteffects(boolean pick)
         switch (mtmp->data->mlet) {
         case S_PIERCER:
             pline(TR("%s suddenly drops from the %s!", "%s突然从%s上掉了下来！"), Amonnam(mtmp),
-                  ceiling(u.ux, u.uy));
+                  zh_ceiling(u.ux, u.uy));
             if (mtmp->mtame) { /* jumps to greet you, not attack */
                 ;
             } else if (hard_helmet(uarmh)) {
@@ -3507,7 +3518,7 @@ spoteffects(boolean pick)
         default: /* monster surprises you. */
             if (mtmp->mtame)
                 pline(TR("%s jumps near you from the %s.", "%s从%s上跳到了你身边。"), Amonnam(mtmp),
-                      ceiling(u.ux, u.uy));
+                      zh_ceiling(u.ux, u.uy));
             else if (mtmp->mpeaceful) {
                 You(TR("surprise %s!", "你让%s吃了一惊！"),
                     Blind && !sensemon(mtmp) ? something : a_monnam(mtmp));
@@ -3749,7 +3760,7 @@ check_special_room(boolean newlev)
             break;
         case MORGUE:
             if (midnight()) {
-                const char *run = u_locomotion("Run");
+                const char *run = u_locomotion(TR("Run", "跑"));
 
                 pline(TR("%s away!  %s away!", "快%s！快%s！"), run, run);
             } else
@@ -3921,13 +3932,13 @@ pickup_checks(void)
         } else if (Blind) {
             You(TR("cannot reach anything here.", "你在这里什么也够不着。"));
         } else {
-            const char *surf = surface(u.ux, u.uy);
+            const char *surf = zh_surface(u.ux, u.uy);
 
             if (traphere) {
                 if (traphere->ttyp == HOLE)
-                    surf = "edge of the hole";
+                    surf = zh_surface_name("edge of the hole");
                 else if (traphere->ttyp == TRAPDOOR)
-                    surf = "trap door";
+                    surf = zh_surface_name("trap door");
             }
             You(TR("cannot reach the %s.", "你够不到%s。"), surf);
         }
@@ -4002,7 +4013,7 @@ lookaround(void)
                 if ((svc.context.run != 1 && !is_safemon(mtmp))
                     || (infront && !svc.context.travel)) {
                     if (flags.mention_walls)
-                        pline_xy(x, y, "%s blocks your path.",
+                        pline_xy(x, y, TR("%s blocks your path.", "%s挡住了你的去路。"),
                                  upstart(a_monnam(mtmp)));
                     goto stop;
                 }

@@ -371,7 +371,7 @@ do_oname(struct obj *obj)
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
 #ifdef ZHLANG
-        /* R6/F5: show the Chinese artifact name, not the English oname */
+        /* show the Chinese artifact name, not the English oname */
         pline("%s抵抗了这个尝试。",
               has_oname(obj) ? artiname_zh(obj->oartifact) : "神器");
 #else
@@ -385,7 +385,7 @@ do_oname(struct obj *obj)
 
     /* relax restrictions over proper capitalization for artifacts */
 #ifdef ZHLANG
-    /* C3/F5: a Chinese artifact name used when naming an item is converted
+    /* a Chinese artifact name used when naming an item is converted
        to the canonical English name first; everything below, and every
        internal lookup, keeps working with English */
     {
@@ -417,7 +417,7 @@ do_oname(struct obj *obj)
             wipeout_text(bufp, rnd_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
 #ifdef ZHLANG
-        pline("雕刻时，你的%s滑了一下。", body_part(HAND));
+        pline("雕刻时，你的%s滑了一下。", zh_body_part(HAND));
 #else
         pline("While engraving, your %s slips.", body_part(HAND));
 #endif
@@ -732,7 +732,7 @@ docall(struct obj *obj)
         Sprintf(qbuf, TR("Call a stream of %s fluid:", "把这股%s流体称作："),
                 OBJ_DESCR(objects[obj->otyp]));
     else
-        (void) safe_qbuf(qbuf, TR("Call ", "把"), TR(":", "："), obj,
+        (void) safe_qbuf(qbuf, TR("Call ", "把"), TR(":", "称作："), obj,
                          docall_xname, simpleonames,
                          TR("thing", "东西"));
     /* pointer to old name */
@@ -804,7 +804,7 @@ namefloorobj(void)
        resulting in the "can't be assigned a type name" message */
     Strcpy(buf, (obj->otyp != STRANGE_OBJECT)
                  ? simpleonames(obj)
-                 : obj_descr[STRANGE_OBJECT].oc_name);
+                 : OBJ_NAME(objects[STRANGE_OBJECT]));
     use_plural = (obj->quan > 1L);
     if (Hallucination) {
         const char *unames[6];
@@ -1584,12 +1584,57 @@ static NEARDATA const char *const hcolors[] = {
     "bistre", "ecru", "fulvous", "tekhelet", "selective yellow",
 };
 
+#ifdef ZHLANG
+/* Chinese display names, indexed the same way as hcolors[]; the English
+   array above stays available for anything that wants the original. */
+static NEARDATA const char *const hcolors_zh[] = {
+    "紫外色", "红外色", "蓝橙色", "红绿色", "暗白色",
+    "亮黑色", "天蓝粉色", "粉青色", "靛黄绿色",
+    "咸味", "甜味", "酸味", "苦味", "鲜味", /* basic tastes */
+    "条纹", "螺旋", "漩涡", "格纹", "棋盘格", "菱形花纹", "佩斯利花纹",
+    "斑点", "格恩西斑点", "圆点花纹", "方形", "圆形",
+    "三角形", "赤霞珠色", "桑格利亚色", "紫红色", "紫藤色", "柠檬青柠色",
+    "草莓香蕉色", "薄荷色", "浪漫色", "白炽色",
+    "八色", /* Discworld: the Colour of Magic */
+    "令人兴奋的暗淡色", "淡紫色", "电光色",
+    "霓虹色", "荧光色", "磷光色", "半透明", "不透明",
+    "迷幻色", "虹彩色", "彩虹色", "多色",
+    "无色", "无色的绿色",
+    "舞动的", "歌唱的", "充满爱的", "喧闹的", "嘈杂的", "咔嗒作响的", "寂静的",
+    "阿波青色", "红外粉色", "乳白色", "深紫色", "不成调的",
+    "铬绿色", "钴黄色", "朱砂色", "普紫红色", "藤黄色", "茜草色",
+    "焦棕色", "米色", "黄褐色", "特凯莱特蓝", "选择性黄色",
+};
+#endif /* ZHLANG */
+
+/* display name of a hallucinatory color; English build: unchanged */
+const char *
+zh_hcolor(const char *en)
+{
+#ifdef ZHLANG
+    int i;
+
+    if (!en)
+        return "";
+    for (i = 0; i < (int) SIZE(hcolors) && i < (int) SIZE(hcolors_zh); ++i)
+        if (!strcmp(en, hcolors[i]))
+            return hcolors_zh[i];
+#endif
+    return en;
+}
+
 const char *
 hcolor(const char *colorpref)
 {
+#ifdef ZHLANG
+    if (Hallucination || !colorpref)
+        return zh_hcolor(hcolors[rn2_on_display_rng(SIZE(hcolors))]);
+    return zh_obj_color(colorpref);
+#else
     return (Hallucination || !colorpref)
         ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
         : colorpref;
+#endif
 }
 
 /* return a random real color unless hallucinating */
@@ -1598,9 +1643,15 @@ rndcolor(void)
 {
     int k = rn2(CLR_MAX);
 
+#ifdef ZHLANG
+    return Hallucination
+               ? hcolor((char *) 0)
+               : zh_obj_color((k == NO_COLOR) ? "colorless" : c_obj_colors[k]);
+#else
     return Hallucination ? hcolor((char *) 0)
                          : (k == NO_COLOR) ? "colorless"
                                            : c_obj_colors[k];
+#endif
 }
 
 static NEARDATA const char *const hliquids[] = {
@@ -1614,6 +1665,36 @@ static NEARDATA const char *const hliquids[] = {
     "cosmic latte", "bone oil", "custard", "lard", "vinegar", "creosote",
     /* "new coke (tm)", --better not */
 };
+
+#ifdef ZHLANG
+/* Chinese display names, indexed the same way as hliquids[] */
+static NEARDATA const char *const hliquids_zh[] = {
+    "酸奶", "欧不裂", "凝固的血", "稀释的水", "净化水",
+    "速溶咖啡", "茶", "草药浸液", "液态彩虹",
+    "奶油泡沫", "热红酒", "肉汤", "花蜜", "格罗格酒", "飞扑胶",
+    "番茄酱", "慢光", "油", "油醋汁", "液晶", "蜂蜜",
+    "焦糖酱", "墨水", "房水", "代乳",
+    "果汁", "发光的熔岩", "胃酸", "矿泉水",
+    "止咳糖浆", "水银", "甜硝石", "灰蛊", "粉色黏液",
+    "宇宙拿铁", "骨油", "蛋奶冻", "猪油", "醋", "木馏油",
+};
+#endif /* ZHLANG */
+
+/* display name of a hallucinatory liquid; English build: unchanged */
+const char *
+zh_hliquid(const char *en)
+{
+#ifdef ZHLANG
+    int i;
+
+    if (!en)
+        return "";
+    for (i = 0; i < (int) SIZE(hliquids) && i < (int) SIZE(hliquids_zh); ++i)
+        if (!strcmp(en, hliquids[i]))
+            return hliquids_zh[i];
+#endif
+    return en;
+}
 
 /* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
@@ -1631,7 +1712,11 @@ hliquid(
             ++count;
         indx = rn2_on_display_rng(count);
         if (IndexOk(indx, hliquids))
+#ifdef ZHLANG
+            return zh_hliquid(hliquids[indx]);
+#else
             return hliquids[indx];
+#endif
     }
     return liquidpref;
 }

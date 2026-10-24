@@ -287,6 +287,23 @@ sleep_dialogue(void)
 
 DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
 
+#ifdef ZHLANG
+static NEARDATA const char *const choke_texts[] = {
+    "你觉得呼吸困难。",
+    "你大口喘着气。",
+    "你无法呼吸了。",
+    "你的脸色正在变成%s。",
+    "你窒息了。"
+};
+
+static NEARDATA const char *const choke_texts2[] = {
+    "你的%s越来越紧。",
+    "血液难以流到你的大脑。",
+    "你的%s承受的压力越来越大。",
+    "你的意识正在模糊。",
+    "你窒息了。"
+};
+#else
 static NEARDATA const char *const choke_texts[] = {
     "You find it hard to breathe.",
     "You're gasping for air.",
@@ -302,6 +319,7 @@ static NEARDATA const char *const choke_texts2[] = {
     "Your consciousness is fading.",
     "You suffocate."
 };
+#endif /* ZHLANG */
 
 staticfn void
 choke_dialogue(void)
@@ -312,7 +330,7 @@ choke_dialogue(void)
         if (Breathless || !rn2(50)) {
 #ifdef ZHLANG
             urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
-                         body_part(NECK));
+                         zh_body_part(NECK));
 #else
             urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
                          body_part(NECK));
@@ -339,9 +357,15 @@ choke_dialogue(void)
 }
 
 static NEARDATA const char *const sickness_texts[] = {
+#ifdef ZHLANG
+    "你的病情加重了。",
+    "你的病情很严重。",
+    "你已经濒临死亡。",
+#else
     "Your illness feels worse.",
     "Your illness is severe.",
     "You are at Death's door.",
+#endif
 };
 
 staticfn void
@@ -400,7 +424,7 @@ levitation_dialogue(void)
 
 #ifdef ZHLANG
             urgent_pline(s, danger ? TR("over", "上方") : "in",
-                         danger ? surface(u.ux, u.uy) : TR("air", "空气"));
+                         danger ? zh_surface(u.ux, u.uy) : TR("air", "空气"));
 #else
             urgent_pline(s, danger ? "over" : "in",
                          danger ? surface(u.ux, u.uy) : "air");
@@ -1258,7 +1282,7 @@ hatch_egg(anything *arg, long timeout)
             if (!cansee_hatchspot)
 #ifdef ZHLANG
                 You_feel(TR("%s %s from your pack!", "感到有%s从你的背包里%s！"), something,
-                         locomotion(mon->data, TR("drop", "掉落")));
+                         zh_locomotion(mon->data, TR("drop", "掉落"), "掉落"));
 #else
                 You_feel("%s %s from your pack!", something,
                          locomotion(mon->data, "drop"));
@@ -1266,7 +1290,7 @@ hatch_egg(anything *arg, long timeout)
             else
 #ifdef ZHLANG
                 You_see(TR("%s %s out of your pack!", "%s%s从你的背包里出来！"), monnambuf,
-                        locomotion(mon->data, TR("drop", "掉落")));
+                        zh_locomotion(mon->data, TR("drop", "掉落"), "掉落"));
 #else
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
@@ -1323,7 +1347,7 @@ hatch_egg(anything *arg, long timeout)
                 }
 #ifdef ZHLANG
                 You_see(TR("%s %s out of %s!", "%s%s从%s出来！"), monnambuf,
-                        locomotion(mon->data, TR("drop", "掉落")), carriedby);
+                        zh_locomotion(mon->data, TR("drop", "掉落"), "掉落"), carriedby);
 #else
                 You_see("%s %s out of %s!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
@@ -1427,7 +1451,7 @@ slip_or_trip(void)
             buf[0] = highc(buf[0]);
 #ifdef ZHLANG
             pline(TR("Egads!  %s bite%s your %s!", "天哪！%s咬%s你的%s！"), what,
-                  (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
+                  (!otmp || otmp->quan == 1L) ? "s" : "", zh_body_part(FOOT));
 #else
             pline("Egads!  %s bite%s your %s!", what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
@@ -1507,7 +1531,7 @@ slip_or_trip(void)
             case 1:
 #ifdef ZHLANG
                 You(TR("trip over your own %s.", "被自己的%s绊倒了。"),
-                    Hallucination ? TR("elbow", "手肘") : makeplural(body_part(FOOT)));
+                    Hallucination ? TR("elbow", "手肘") : makeplural(zh_body_part(FOOT)));
 #else
                 You("trip over your own %s.",
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
@@ -1546,7 +1570,7 @@ slip_or_trip(void)
             case 1:
 #ifdef ZHLANG
                 Your(TR("%s slip out of the stirrups.", "%s从马镫里滑了出来。"),
-                     makeplural(body_part(FOOT)));
+                     makeplural(zh_body_part(FOOT)));
 #else
                 Your("%s slip out of the stirrups.",
                      makeplural(body_part(FOOT)));

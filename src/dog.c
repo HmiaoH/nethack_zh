@@ -1378,7 +1378,7 @@ wary_dog(struct monst *mtmp, boolean was_dead)
                     pline_mon(mtmp,
                              "%s%s直视你的%s。", Monnam(mtmp),
                              mtmp->mpeaceful ? "似乎无法" : "拒绝",
-                             body_part(EYE));
+                             zh_body_part(EYE));
 #else
                     pline_mon(mtmp,
                              "%s %s to look you in the %s.", Monnam(mtmp),

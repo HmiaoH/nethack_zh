@@ -1410,9 +1410,50 @@ locomotion(const struct permonst *ptr, const char *def)
                         : def);
 }
 
+/*
+ * Display-only variant of locomotion().
+ *
+ * locomotion() keeps returning English verbs because some of its callers
+ * use the result as an identifier or splice it into English text.  Chinese
+ * messages call zh_locomotion() instead: in the ZHLANG build it returns a
+ * Chinese movement verb (special movement gives 漂浮/飞行/滑行/... and
+ * ordinary walkers get the caller's zh_def); in the English build it is
+ * exactly locomotion(ptr, en_def), so English behaviour doesn't change.
+ */
+const char *
+zh_locomotion(const struct permonst *ptr, const char *en_def,
+              const char *zh_def)
+{
+#ifdef ZHLANG
+    nhUse(en_def);
+    return (is_floater(ptr) ? "漂浮"
+            : (is_flyer(ptr) && ptr->msize <= MZ_SMALL) ? "飞行"
+              : (is_flyer(ptr) && ptr->msize > MZ_SMALL) ? "飞翔"
+                : slithy(ptr) ? "滑行"
+                  : amorphous(ptr) ? "蠕动"
+                    : !ptr->mmove ? "颤动"
+                      : nolimbs(ptr) ? "爬行"
+                        : zh_def);
+#else
+    nhUse(zh_def);
+    return locomotion(ptr, en_def);
+#endif
+}
+
 const char *
 stagger(const struct permonst *ptr, const char *def)
 {
+#ifdef ZHLANG
+    /* display-only in Chinese messages; special movement needs Chinese */
+    return (is_floater(ptr) ? "飘摇"
+            : (is_flyer(ptr) && ptr->msize <= MZ_SMALL) ? "振翅"
+              : (is_flyer(ptr) && ptr->msize > MZ_SMALL) ? "踉跄"
+                : slithy(ptr) ? "滑扭"
+                  : amorphous(ptr) ? "颤抖"
+                    : !ptr->mmove ? "脉动"
+                      : nolimbs(ptr) ? "踉跄"
+                        : def);
+#else
     int locoindx = (*def != highc(*def)) ? 2 : 3;
 
     return (is_floater(ptr) ? levitate[locoindx]
@@ -1423,6 +1464,7 @@ stagger(const struct permonst *ptr, const char *def)
                     : !ptr->mmove ? immobile[locoindx]
                       : nolimbs(ptr) ? crawl[locoindx]
                         : def);
+#endif
 }
 
 /* return phrase describing the effect of fire attack on a type of monster */
