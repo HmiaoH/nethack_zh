@@ -49,15 +49,27 @@ python3 test/zh/zh_accept.py --report /tmp/zh-report.md
 | | `C3-*` | 中文许愿：基本名、带前缀、无空格、诅咒、"X尸体"/"X的尸体" |
 | | `C4-role-option` | `NETHACKOPTIONS=role:Valkyrie` 不报错 |
 | | `C5-unique-zh-names` | 不同的英文物品名不共用同一个中文名 |
+| | `B5-no-embedded-english` | 没有小写英文单词紧贴汉字（如 `你的strengthis`、`human女武神`）。首字母大写的专名不计 |
 | **D** TTY | `D1-utf8-stream` | 终端原始字节是完全合法的 UTF-8（长中文消息换行时不截断字符） |
+| | `D2-status-line` | 按 80×24、汉字占 2 列渲染后，状态栏每个字段都带数值（`敏:12`、`生命:16(16)`、`防御:6`…） |
+| | `D4-getlin-echo` | 在许愿提示里输入中文，回显的字节流是合法 UTF-8 |
 | **E** 字符串 | `E0-TR-macro` | 存在 `TR(en, zh)` 宏 |
-| | `E1-untranslated-total` | 最终：≤ 基线的 10%（2798 → **≤279**）。`--interim` 下：≤ 基线 |
+| | `E1-untranslated-total` | 最终：≤ 基线的 10%（3305 → **≤330**，按 v2 规则，见下）。`--interim` 下：≤ 基线 |
 | | `E2-untranslated-per-file` | 最终：每个文件 ≤ 15 处 |
 | **F** 数据 | `F1-dungeon-zh-not-copy` | 不存在和 `dungeon.lua` 一模一样的 `dungeon_zh.lua` |
 | | `F2-overview-dungeon-names` | `#overview` 里不出现 `Dungeons of Doom` |
 | | `F3-tutorial` / `F6-lua-messages` | 共享 Lua 脚本里所有玩家可见的英文字面量，都能在 `dat/msgs_zh.lua` 里查到 |
 | | `F4-random-text` | 6 个随机文本文件都有 `_zh` 版本 |
 | | `F5-artifacts` | 神器名已翻译 |
+
+### 2.0 扫描规则版本
+
+- **v1**（初版）：`#ifdef ZHLANG` 分支里的内容一律视为已翻译。基线 2798 处。
+- **v2**（首轮验收后修订）：
+  - `ZHLANG` 分支照常扫描，里面仍是英文的字符串计为未翻译；
+  - 新增 `paranoid_query()` 和 `nomovemsg` / `multi_reason` 赋值。
+  
+  用 v2 重算 `b3072466c`，基线为 **3305 处**。修订原因：首轮验收时，`sounds.c` 等文件里大量"中英分支内容完全相同"的假翻译，以及祈祷确认等提示，都没有被 v1 统计到。
 
 ### 2.1 基线（`b3072466c`，2026-10-24 实测）
 

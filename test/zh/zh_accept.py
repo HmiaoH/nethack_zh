@@ -41,6 +41,12 @@ ANSI_RE = re.compile(rb"\x1b\[[0-9;?]*[ -/]*[@-~]|\x1b[()][0-9A-Za-z]|\x1b[=>78]
 CJK = "\u4e00-\u9fff"
 MIXED_RE = re.compile(
     rf"[{CJK}](?:'s|s)\b|\b(?:the|a|an) [{CJK}]|[{CJK}]es\b")
+# a lowercase English word stuck to Chinese text ("你的strengthis",
+# "human女武神"); capitalized words are names (Odin, NetHack) and pass
+GLUED_RE = re.compile(rf"[{CJK}][a-z]{{2,}}\b|\b[a-z]{{2,}}[{CJK}]")
+# every status field must render with its value (task D2)
+STATUS_ZH = (r"力:\S+", r"敏:\d+", r"体:\d+", r"智:\d+", r"慧:\d+", r"魅:\d+",
+             r"生命:\d+\(\d+\)", r"魔力:\d+\(\d+\)", r"防御:-?\d+")
 IMPOSSIBLE_RE = re.compile(r"程序出错了|Program in disorder|impossible:")
 OPTERR_RE = re.compile(r"Unknown role|错误 在 NETHACKOPTIONS|errors? in NETHACKOPTIONS")
 WARN_RE = re.compile(r"^(?:[\w./-]*/)?([\w-]+\.[ch]):(\d+):\d+: warning: (.*)$",
@@ -52,7 +58,11 @@ class Report:
     def __init__(self):
         self.rows = []  # (gate, check, ok, detail)
 
-    def add(self, gate, check, ok, detail=""):
+    def add(self, gate, check, ok, detail="", info=False):
+        # most details describe the failure; show them only when failing
+        # unless the caller marks the detail as informational
+        if ok and not info:
+            detail = ""
         self.rows.append((gate, check, bool(ok), detail))
 
     def gate_ok(self, gate):
@@ -157,6 +167,89 @@ def warnings(log):
 
 # ---------------------------------------------------------------- play
 
+class VT:
+    """Just enough of a terminal to see what an 80x24 screen shows.
+
+    CJK and other East Asian wide characters take two cells, as on a
+    real terminal, so column bookkeeping errors in the tty port show up
+    as overwritten text.
+    """
+
+    W, H = 80, 24
+    CSI_RE = re.compile(r"\x1b\[([0-9;?]*)[ -/]*([@-~])")
+    ESC_RE = re.compile(r"\x1b[()][0-9A-Za-z]|\x1b[=>78DME]")
+
+    def __init__(self, raw):
+        import unicodedata
+        self.uw = unicodedata.east_asian_width
+        self.g = [[" "] * self.W for _ in range(self.H)]
+        self.x = self.y = 0
+        self.feed(raw.decode("utf-8", "replace"))
+
+    def feed(self, text):
+        i = 0
+        while i < len(text):
+            c = text[i]
+            if c == "\x1b":
+                m = self.CSI_RE.match(text, i)
+                if m:
+                    self.csi(m.group(1), m.group(2))
+                    i = m.end()
+                    continue
+                m = self.ESC_RE.match(text, i)
+                i = m.end() if m else i + 1
+                continue
+            if c == "\r":
+                self.x = 0
+            elif c == "\n":
+                self.y = min(self.y + 1, self.H - 1)
+            elif c == "\b":
+                self.x = max(0, self.x - 1)
+            elif c >= " ":
+                w = 2 if self.uw(c) in "WF" else 1
+                if self.x + w > self.W:
+                    self.x, self.y = 0, min(self.y + 1, self.H - 1)
+                self.g[self.y][self.x] = c
+                if w == 2 and self.x + 1 < self.W:
+                    self.g[self.y][self.x + 1] = ""
+                self.x += w
+            i += 1
+
+    def csi(self, args, cmd):
+        a = [int(v) if v.isdigit() else 0
+             for v in args.lstrip("?").split(";")] if args else []
+        n = a[0] if a and a[0] else 1
+        if cmd in "Hf":
+            self.y = min(self.H - 1, n - 1)
+            self.x = min(self.W - 1, (a[1] if len(a) > 1 and a[1] else 1) - 1)
+        elif cmd == "A":
+            self.y = max(0, self.y - n)
+        elif cmd == "B":
+            self.y = min(self.H - 1, self.y + n)
+        elif cmd == "C":
+            self.x = min(self.W - 1, self.x + n)
+        elif cmd == "D":
+            self.x = max(0, self.x - n)
+        elif cmd == "K":
+            mode = a[0] if a else 0
+            cols = (range(self.x, self.W) if mode == 0 else
+                    range(0, self.x + 1) if mode == 1 else range(self.W))
+            for j in cols:
+                self.g[self.y][j] = " "
+        elif cmd == "J":
+            mode = a[0] if a else 0
+            if mode == 2:
+                self.g = [[" "] * self.W for _ in range(self.H)]
+            elif mode == 0:
+                for j in range(self.x, self.W):
+                    self.g[self.y][j] = " "
+                for r in range(self.y + 1, self.H):
+                    self.g[r] = [" "] * self.W
+
+    def render(self):
+        return ["".join(r).rstrip() for r in self.g]
+
+
 class Game:
     """Minimal expect-style driver for the tty interface."""
 
@@ -257,8 +350,12 @@ def play(playground, zh, rep, outdir):
             "!tutorial,!legacy,!autopickup,symset:plain,"
             "msg_window:single")
     g = Game(playground, opts)
+    status_rows = []
+    wish_raw = b""
     try:
         g.answer_prompts(60)
+        g.send("\x12")  # ^R redraw, so the status line is freshly painted
+        status_rows = VT(g.raw).render()[-2:]
         if zh:
             g.command("wizloadlua", "zh_accept")
             g.send("\x1b")
@@ -269,6 +366,16 @@ def play(playground, zh, rep, outdir):
             g.send("\x1b")
             g.mark = len(g.raw)
             g.send("i")
+            g.send("\x1b")
+            # Chinese typed into a getlin() prompt (task D4)
+            start = len(g.raw)
+            g.send("\x17", settle=False)
+            g.read()
+            g.send("银匕首\r")
+            g.send("\x1b")
+            wish_raw = g.raw[start:]
+            # enlightenment pages (task B5)
+            g.send("\x18")
             g.send("\x1b")
     finally:
         g.close()
@@ -284,7 +391,10 @@ def play(playground, zh, rep, outdir):
         return
 
     found = {}
-    for m in re.finditer(r"ZHT\|([\w-]+)\|(OK|FAIL)\|([^\n\r]*)", text):
+    # the tty may render the result window without line breaks, so a
+    # detail ends at the next "ZHT|" rather than at end of line
+    for m in re.finditer(r"ZHT\|([\w-]+)\|(OK|FAIL)\|(.*?)(?=ZHT\||[\r\n]|$)",
+                         text):
         found[m.group(1)] = (m.group(2) == "OK", m.group(3).strip())
     if "SUMMARY" not in text or not found:
         rep.add("A", "lua-run", False,
@@ -313,7 +423,26 @@ def play(playground, zh, rep, outdir):
     mixed = sorted({m.group(0) for m in MIXED_RE.finditer(text)})
     rep.add("B", "B2-no-mixed-grammar", not mixed,
             "、".join(mixed[:12]))
-    ov = text[text.rfind("overview"):] if "overview" in text else ""
+    # the driver's own "#wizloadlua" / "#overview" echo sits next to the
+    # Chinese prompt and is not game text
+    glued = sorted({m.group(0) for m in GLUED_RE.finditer(text)
+                    if not re.search(r"wizloadlua|overview", m.group(0))})
+    rep.add("B", "B5-no-embedded-english", not glued,
+            f"{len(glued)} 处，如 " + "、".join(glued[:15]))
+    try:
+        wish_raw.decode("utf-8")
+        rep.add("D", "D4-getlin-echo", bool(wish_raw), "未捕获到许愿输入")
+    except UnicodeDecodeError as e:
+        rep.add("D", "D4-getlin-echo", False,
+                f"输入中文时回显的 UTF-8 被拆开: {wish_raw[e.start - 20:e.start + 20]!r}")
+    rows = "\n".join(status_rows)
+    ok = all(re.search(p, rows) for p in STATUS_ZH)
+    rep.add("D", "D2-status-line", ok,
+            "状态栏渲染为: " + " / ".join(r.strip() for r in status_rows))
+    ov = ""
+    if "overview" in text:
+        ov = text[text.rfind("overview"):]
+        ov = ov[:ov.find("(end)")] if "(end)" in ov else ov
     rep.add("F", "F2-overview-dungeon-names",
             ov and "Dungeons of Doom" not in ov,
             "#overview 中仍出现 Dungeons of Doom" if ov else "未捕获到 #overview")
@@ -419,7 +548,7 @@ def untranslated(rep, final):
               ", ".join(f"{f}={n}" for f, n in worst))
     limit_total = btotal // 10 if final else btotal
     rep.add("E", "E1-untranslated-total", total <= limit_total,
-            detail + f"（上限 {limit_total}）")
+            detail + f"（上限 {limit_total}）", info=True)
     big = [f"{f}={n}" for f, n in now["files"].items() if n > 15]
     if final:
         rep.add("E", "E2-untranslated-per-file", not big,

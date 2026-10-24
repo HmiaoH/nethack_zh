@@ -351,6 +351,94 @@ E 的前提是 E0（`TR` 宏）先落地。F 和 E 改动的文件不重叠，�
 
 ---
 
+## 第二轮整改（2026-10-24 首轮验收后新增）
+
+首轮验收结论是**不通过**：A、C、F 通过，B、D、E 不通过。
+
+验收工具在首轮验收中修订了三处：
+- 扫描规则升级到 v2（见 ACCEPTANCE.md §2.0）；
+- 新增 `B5`、`D2`、`D4` 三项检查；
+- 修复了 Lua 结果的解析。
+
+下面每个问题都已经在验收工具或 80×24 渲染截图里实测复现。
+
+### R1 状态栏数值被覆盖　`D2-status-line`（严重）
+
+**现象：** 状态栏渲染为 `力:18/02 敏 体:18 智: 慧:8 魅: 中立` 和 `生命(16) 魔力(2) 防御`，多项数值不见了。
+
+**根因：** [wintty.c:5049](../../win/tty/wintty.c) 的 `tty_putstatusfield` 每输出一个**字节**就让 `curx++`，一个汉字被记成 3 列，实际只占 2 列。下一个字段定位时，tty 用退格（`\b`）往回移，把刚写好的数值盖掉了。原始字节流里可以看到 `敏:12\x08\x08 体`。
+
+**要求：** `curx` 和 `cw->curx` 按显示宽度累加，`cw->data` 的写入位置也要同步。改完后检查 `tty_curs` 不再输出多余的退格。
+
+### R2 getlin 中文回显被拆开　`D4-getlin-echo`（严重）
+
+**现象：** 在许愿、命名、刻字等提示里输入中文时，tty 按**字节**逐个回显，每个字节之间还插入光标显示/隐藏的转义序列（`\xe9 ESC[?12l ESC[?25h ESC[?25l \x93 …`），真实终端上会显示成乱码。
+
+**要求：** 回显时按完整的 UTF-8 序列一次输出；退格要删掉整个字符，并按 2 列回退光标（`win/tty/getline.c`）。
+
+### R3 假翻译：`ZHLANG` 分支照抄英文　`E1` / `E2`
+
+扫描器 v2 下还剩 **507 处**，上限是 330。其中 8 个文件超过 15 处：
+
+| 文件 | 剩余 |
+|---|---|
+| `mhitu.c`（怪物攻击，最高频） | 95 |
+| `timeout.c` | 67 |
+| `artifact.c` | 52 |
+| `steed.c` | 50 |
+| `muse.c` | 49 |
+| `vault.c` | 37 |
+| `cmd.c` | 35 |
+| `sounds.c` | 35 |
+
+这些大多是早期提交里"`#ifdef ZHLANG` 分支和 `#else` 分支内容一模一样"的写法，例如 `sounds.c:305` 的 `the footsteps of a guard on patrol.`。
+
+**要求：** 补成真正的中文，能改成 `TR` 的一律改成 `TR`。可以用 `python3 test/zh/scan_untranslated.py --list hits.txt` 拿到逐条清单。
+
+### R4 `You_feel` / `You_cant` 前缀重复（48 处）
+
+**现象：** `You_feel()` 的前缀是"你感到"，`You_cant()` 的是"你不能"。而 48 处译文本身又以"感到/感觉/觉得"或"不能/无法"开头，结果显示为"你感到感到内疚。"、"你不能无法拾起…"。后者是双重否定，意思直接反了。
+
+例子：`read.c:1891`、`eat.c:1443`、`pickup.c:1887`、`wield.c:922`、`engrave.c:551`。
+
+**要求：** 去掉这些译文开头重复的动词；或者让 `zh_you_prefix()` 在译文已带同义动词时不再加前缀。二选一，但要全部覆盖。
+
+### R5 片段拼接出的中英混杂　`B5-no-embedded-english`
+
+**实测：**
+- `^X` 属性页：`You are 见习，1 级的human女武神`、`你的strengthis 18/02`、`You have 4/16 点生命值`、`You are in the Dungeons of Doom`、`You can't 安全地祈祷`；
+- 吃东西：`这里is蛇鸡兽 尸体；要eatit吗？`、`尝起来okay.`、`尸体是gamey.`；
+- 地面刻字：`Something被刻在这里的floor上。`。
+
+**原因：** 这些句子是用 `enl_msg()` / `you_are()` 等函数加上 `"is"`、`"eat"`、`"it"` 这类短词片段拼起来的。片段太短，扫描器统计不到，但游戏里就是这样显示的。
+
+**要求：** `src/insight.c` 的 `enl_msg` 系列（前缀 `You are` / `You have` / `You can` / `Your … is`）、`src/eat.c` 的 `floorfood` 提示和口感形容词、`src/engrave.c` 的读刻字提示、`src/pager.c` 的 `farlook` 提示，都要整句中文化。英文属性名（strength 等）也要翻译。
+
+### R6 运行时仍是英文的提示（人工抽查发现）
+
+| 现象 | 位置 |
+|---|---|
+| 职业菜单第一项 `a - an Archeologist` | `src/role.c:31`：`#ifdef` 放错了位置，包住的是第一级头衔 Digger 而不是职业名。现在第一级头衔是"考古学家"，职业名仍是英文。两处都要修 |
+| `That is a silly thing to 喝.` | `src/decl.c:43` 的 getobj 提示表 |
+| `Are you sure you want to pray? [yn]` | `src/pray.c:2246`（`paranoid_query`） |
+| `You finish your prayer.` | `src/pray.c:2298`（`nomovemsg`） |
+| `选择a monster, object or location。`、farlook 的 `Tip:` 说明窗口 | `src/getpos.c` / `src/pager.c` |
+| `It's a wall.` | `src/hack.c` 撞墙提示 |
+| `Since you were in wizard mode, the score list will not be checked.` | `src/topten.c` |
+| `Put "OPTIONS=!tutorial" in .nethackrc to skip this query.` | 教程询问菜单 |
+| "Save bones?" 译成了"保存尸体吗？" | 意思不对，bones 指"遗骨文件"，建议译为"保存遗骨关卡吗？" |
+| 物品栏 `（已穿戴）` 前多一个半角空格；提示语用半角 `?` 和句号 `.`（如 `你希望得到什么?`、`e - 2 银匕首.`） | 标点规范，见 E 的翻译约定 |
+| 许愿得到神器后显示为 `长剑名为Excalibur` | 神器的中文名没有用在物品名显示上（F5 显示侧） |
+
+### R7 玩家可见的 `NOTRANS` 豁免
+
+130 处 `NOTRANS` 大多合理（配置文件格式、文件名、xlogfile 字段、调试输出）。以下几类是玩家能看到的，要改为翻译：
+- `livelog_printf(LL_CONDUCT / LL_GENOCIDE / LL_DIVINEGIFT …)`：会出现在 `#chronicle` 里；
+- `options.c` 选项菜单里显示的取值（`none`、`unknown`、`normal`、`%d top`…）；
+- `botl.c` 状态高亮菜单里的属性名（`normal`、`dim`、`underline`、`inverse`）。
+
+只写给文件、由程序解析的那些，保留豁免。
+
 ## 附：README 同步
 
 全部完成后，按实际情况改写 `README.md` 的"汉化范围"一节，删掉"全部 130+ C 源文件"这类和实际不符的说法；构建说明里切换英文版的方法要与 A5 一致。

@@ -25,9 +25,11 @@ CALLS = (
     "verbalize|Norep|urgent_pline|custompline|Strcpy|Strcat|Sprintf|Snprintf|"
     "yn_function|ynq|getlin|add_menu|add_menu_str|end_menu|putstr|"
     "livelog_printf|com_pager|Tobjnam|The|enlght_out|you_are|you_have|"
-    "you_have_X|you_can|you_have_been|enl_msg"
+    "you_have_X|you_can|you_have_been|enl_msg|paranoid_query"
 )
 CALL_RE = re.compile(r'\b(' + CALLS + r')\s*\([^;]*?"([^"\\]*(?:\\.[^"\\]*)*)"')
+# message pointers assigned for later display ("You finish your prayer.")
+ASSIGN_RE = re.compile(r'\b(nomovemsg|multi_reason)\s*=\s*"([^"\\]*(?:\\.[^"\\]*)*)"')
 # a literal that reads like English prose: at least one 3+ letter word
 ENGLISH_RE = re.compile(r'[A-Za-z]{3,}')
 CJK_RE = re.compile(r'[一-鿿]')
@@ -71,13 +73,16 @@ def scan_file(path):
                 elif kw == "endif" and stack:
                     stack.pop()
                 continue
-            if "Z" in stack or "E" in stack:
+            # the English branch of a ZHLANG conditional is expected to be
+            # English; the Chinese branch is scanned like ordinary code, so
+            # a "translation" that is still English counts as untranslated
+            if "E" in stack:
                 continue
             if s.startswith(("*", "//")) or SKIP_MARK in line:
                 continue
             if TR_RE.search(line):  # TR("english", "中文") counts as done
                 continue
-            for cm in CALL_RE.finditer(line):
+            for cm in list(CALL_RE.finditer(line)) + list(ASSIGN_RE.finditer(line)):
                 lit = cm.group(2)
                 if ENGLISH_RE.search(lit) and not CJK_RE.search(lit):
                     hits.append((lineno, cm.group(1), lit))
